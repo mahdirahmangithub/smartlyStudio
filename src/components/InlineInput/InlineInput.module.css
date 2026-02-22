@@ -1,0 +1,193 @@
+/* ── wrapper ──────────────────────────────────────────────────────────── */
+
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 96px;
+  padding: var(--spacing-2xs) var(--spacing-2xs) var(--spacing-2xs) var(--spacing-2xs);
+  cursor: text;
+}
+
+/* ── sizes ────────────────────────────────────────────────────────────── */
+
+.sm .nativeInput {
+  font-family: var(--type-label-sm-family);
+  font-weight: var(--type-label-sm-weight);
+  font-size: var(--type-label-sm-size);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+}
+
+.lg .nativeInput {
+  font-family: var(--type-label-md-family);
+  font-weight: var(--type-label-md-weight);
+  font-size: var(--type-label-md-size);
+  line-height: var(--type-label-md-line-height);
+  letter-spacing: var(--type-label-md-letter-spacing);
+}
+
+/* ── scroll wrapper (non-autoWidth) ───────────────────────────────────── */
+
+.scrollWrapper {
+  position: relative;
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── native input ─────────────────────────────────────────────────────── */
+
+.nativeInput {
+  width: 100%;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  color: var(--text-neutral-primary);
+  white-space: nowrap;
+}
+
+.nativeInput::placeholder {
+  color: var(--text-neutral-placeholder);
+}
+
+/* ── scroll faders ────────────────────────────────────────────────────── */
+
+.fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--spacing-2xl);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.fadeVisible {
+  opacity: 1;
+}
+
+.fadeStart {
+  left: 0;
+  background: linear-gradient(to right, var(--element-overlay-fader-end), var(--element-overlay-fader-start));
+}
+
+.fadeEnd {
+  right: 0;
+  background: linear-gradient(to left, var(--element-overlay-fader-end), var(--element-overlay-fader-start));
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Focus indicator (purple outline ring)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.withFocusIndicator:focus-within::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border: 1px solid var(--element-outline-brand-active);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Hover indicator (edit pencil icon with gradient fader)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.editOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to right,
+    var(--element-overlay-fader-start) 0%,
+    var(--element-overlay-fader-end) 84%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* In autoWidth mode the edit icon sits inline after the value */
+.autoWidth .editOverlay {
+  position: static;
+  background: none;
+  flex-shrink: 0;
+}
+
+.editIcon {
+  color: var(--text-neutral-secondary-default);
+}
+
+/* show edit overlay on hover, hide when focused */
+.wrapper:hover:not(.disabled):not(:focus-within) .editOverlay {
+  opacity: 1;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Disabled
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.disabled {
+  cursor: not-allowed;
+}
+
+.disabled .nativeInput {
+  color: var(--text-neutral-disable);
+  cursor: not-allowed;
+}
+
+.disabled .nativeInput::placeholder {
+  color: var(--text-neutral-disable);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Auto-width mode
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.autoWidth {
+  display: inline-flex;
+  min-width: 0;
+  width: auto;
+}
+
+.autoWidth .nativeInput {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  padding: inherit;
+}
+
+/* Hidden span that mirrors the input value to drive the wrapper width & height */
+.measurer {
+  visibility: hidden;
+  white-space: pre;
+  pointer-events: none;
+}
+
+.sm .measurer {
+  font-family: var(--type-label-sm-family);
+  font-weight: var(--type-label-sm-weight);
+  font-size: var(--type-label-sm-size);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+}
+
+.lg .measurer {
+  font-family: var(--type-label-md-family);
+  font-weight: var(--type-label-md-weight);
+  font-size: var(--type-label-md-size);
+  line-height: var(--type-label-md-line-height);
+  letter-spacing: var(--type-label-md-letter-spacing);
+}
