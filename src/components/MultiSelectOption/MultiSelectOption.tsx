@@ -5,6 +5,8 @@ import {
   OptionItemTrailing,
   type OptionItemTrailingProps,
 } from "../OptionItemTrailing";
+import { Tooltip } from "../Tooltip";
+import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./MultiSelectOption.module.css";
 
 export interface MultiSelectOptionProps
@@ -40,6 +42,8 @@ export function MultiSelectOption({
   const handleClick = () => {
     if (!disabled) onChange?.(!checked);
   };
+
+  const [labelRef, isLabelTruncated] = useIsTruncated<HTMLSpanElement>(labelText);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (disabled) return;
@@ -78,7 +82,9 @@ export function MultiSelectOption({
         )}
 
         <div className={styles.text}>
-          <span className={styles.label}>{labelText}</span>
+          <Tooltip label={labelText} disabled={!isLabelTruncated} placement="top" type="neutral" showTail={false}>
+            <span ref={labelRef} className={styles.label}>{labelText}</span>
+          </Tooltip>
           {description && (
             <span className={styles.description}>{descriptionText}</span>
           )}

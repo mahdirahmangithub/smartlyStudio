@@ -34,13 +34,14 @@ import OptionItemTrailingPlayground from "./pages/OptionItemTrailingPlayground";
 import MultiSelectOptionPlayground from "./pages/MultiSelectOptionPlayground";
 import SingleSelectOptionPlayground from "./pages/SingleSelectOptionPlayground";
 import GenericSelectOptionPlayground from "./pages/GenericSelectOptionPlayground";
+import NavigationSelectOptionPlayground from "./pages/NavigationSelectOptionPlayground";
 import ThumbnailPlayground from "./pages/ThumbnailPlayground";
 import SpinnerPlayground from "./pages/SpinnerPlayground";
 import CurrencyThumbnailPlayground from "./pages/CurrencyThumbnailPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "thumbnail" | "spinner" | "currency-thumbnail";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "thumbnail" | "spinner" | "currency-thumbnail";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -197,6 +198,7 @@ export default function App() {
     { key: "multi-select-option", label: "MultiSelectOpt" },
     { key: "single-select-option", label: "SingleSelectOpt" },
     { key: "generic-select-option", label: "GenericOpt" },
+    { key: "navigation-select-option", label: "NavOpt" },
     { key: "thumbnail", label: "Thumbnail" },
     { key: "spinner", label: "Spinner" },
     { key: "currency-thumbnail", label: "CurrencyThumb" },
@@ -255,6 +257,7 @@ export default function App() {
             {page === "multi-select-option" && <MultiSelectOptionPlayground />}
             {page === "single-select-option" && <SingleSelectOptionPlayground />}
             {page === "generic-select-option" && <GenericSelectOptionPlayground />}
+            {page === "navigation-select-option" && <NavigationSelectOptionPlayground />}
             {page === "thumbnail" && <ThumbnailPlayground />}
             {page === "spinner" && <SpinnerPlayground />}
             {page === "currency-thumbnail" && <CurrencyThumbnailPlayground />}
