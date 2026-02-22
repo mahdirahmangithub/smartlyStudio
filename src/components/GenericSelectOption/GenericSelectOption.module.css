@@ -1,0 +1,201 @@
+/* ── outer wrapper ─────────────────────────────────────────────────────── */
+
+.option {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: var(--spacing-2xs) 0;
+  width: 100%;
+}
+
+/* ── clickable content row ────────────────────────────────────────────── */
+
+.content {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  min-height: 40px;
+  overflow: clip;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  cursor: pointer;
+  border: none;
+  text-align: start;
+  background: var(--element-fill-neutral-tertiary-default);
+  transition:
+    background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   NEUTRAL interactive states
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.content:hover:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-hover);
+}
+
+.content:active:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-press);
+}
+
+.content:focus-visible {
+  background: var(--element-fill-neutral-tertiary-hover);
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   ALERT interactive states
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.alert {
+  background: var(--element-fill-alert-tertiary-default);
+}
+
+.alert:hover:not(.disabled) {
+  background: var(--element-fill-alert-tertiary-hover);
+}
+
+.alert:active:not(.disabled) {
+  background: var(--element-fill-alert-tertiary-press);
+}
+
+.alert:focus-visible {
+  background: var(--element-fill-alert-tertiary-hover);
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   DISABLED
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.disabled {
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+
+.alert.disabled {
+  background: var(--element-fill-alert-tertiary-disable);
+}
+
+/* ── alert leading color cascade ──────────────────────────────────────── */
+
+.alert .alertLeading {
+  color: var(--text-alert-default);
+}
+
+.alert:hover:not(.disabled) .alertLeading {
+  color: var(--text-alert-hover);
+}
+
+.alert:active:not(.disabled) .alertLeading {
+  color: var(--text-alert-press);
+}
+
+.alert:focus-visible .alertLeading {
+  color: var(--text-alert-hover);
+}
+
+/* ── text area ────────────────────────────────────────────────────────── */
+
+.text {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  align-items: flex-start;
+  min-width: 0;
+}
+
+/* ── label — neutral ──────────────────────────────────────────────────── */
+
+.label {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+  color: var(--text-neutral-secondary-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.content:hover:not(.disabled):not(.alert) .label {
+  color: var(--text-neutral-secondary-hover);
+}
+
+.content:active:not(.disabled):not(.alert) .label {
+  color: var(--text-neutral-secondary-press);
+}
+
+.content:focus-visible:not(.alert) .label {
+  color: var(--text-neutral-secondary-hover);
+}
+
+.disabled:not(.alert) .label {
+  color: var(--text-neutral-disable);
+}
+
+/* ── label — alert ────────────────────────────────────────────────────── */
+
+.alert .label {
+  color: var(--text-alert-default);
+}
+
+.alert:hover:not(.disabled) .label {
+  color: var(--text-alert-hover);
+}
+
+.alert:active:not(.disabled) .label {
+  color: var(--text-alert-press);
+}
+
+.alert:focus-visible .label {
+  color: var(--text-alert-hover);
+}
+
+.alert.disabled .label {
+  color: var(--text-alert-disable);
+}
+
+/* ── description ──────────────────────────────────────────────────────── */
+
+.description {
+  font-family: var(--type-body-sm-family);
+  font-weight: var(--type-body-sm-weight);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line-height);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-neutral-tertiary-default);
+  width: 100%;
+  white-space: pre-wrap;
+}
+
+.disabled .description {
+  color: var(--text-neutral-disable);
+}
+
+
+/* ── sub-menu chevron ─────────────────────────────────────────────────── */
+
+.subMenuIcon {
+  flex-shrink: 0;
+  color: var(--text-neutral-tertiary-default);
+}
+
+.disabled .subMenuIcon {
+  color: var(--text-neutral-disable);
+}
+
+.alert.disabled .alertLeading {
+  color: var(--text-alert-disable);
+}

@@ -66,6 +66,6 @@
 /* ── disabled state ───────────────────────────────────────────────────── */
 
 .disabled {
-  opacity: 0.4;
+  opacity: var(--opacity-40);
   pointer-events: none;
 }

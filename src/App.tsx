@@ -30,13 +30,17 @@ import TogglePlayground from "./pages/TogglePlayground";
 import TagPlayground from "./pages/TagPlayground";
 import RowContainerPlayground from "./pages/RowContainerPlayground";
 import OptionItemLeadingPlayground from "./pages/OptionItemLeadingPlayground";
+import OptionItemTrailingPlayground from "./pages/OptionItemTrailingPlayground";
+import MultiSelectOptionPlayground from "./pages/MultiSelectOptionPlayground";
+import SingleSelectOptionPlayground from "./pages/SingleSelectOptionPlayground";
+import GenericSelectOptionPlayground from "./pages/GenericSelectOptionPlayground";
 import ThumbnailPlayground from "./pages/ThumbnailPlayground";
 import SpinnerPlayground from "./pages/SpinnerPlayground";
 import CurrencyThumbnailPlayground from "./pages/CurrencyThumbnailPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "thumbnail" | "spinner" | "currency-thumbnail";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "thumbnail" | "spinner" | "currency-thumbnail";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -189,6 +193,10 @@ export default function App() {
     { key: "tag", label: "Tag" },
     { key: "row-container", label: "RowContainer" },
     { key: "option-leading", label: "OptionLeading" },
+    { key: "option-trailing", label: "OptionTrailing" },
+    { key: "multi-select-option", label: "MultiSelectOpt" },
+    { key: "single-select-option", label: "SingleSelectOpt" },
+    { key: "generic-select-option", label: "GenericOpt" },
     { key: "thumbnail", label: "Thumbnail" },
     { key: "spinner", label: "Spinner" },
     { key: "currency-thumbnail", label: "CurrencyThumb" },
@@ -243,6 +251,10 @@ export default function App() {
             {page === "tag" && <TagPlayground />}
             {page === "row-container" && <RowContainerPlayground />}
             {page === "option-leading" && <OptionItemLeadingPlayground />}
+            {page === "option-trailing" && <OptionItemTrailingPlayground />}
+            {page === "multi-select-option" && <MultiSelectOptionPlayground />}
+            {page === "single-select-option" && <SingleSelectOptionPlayground />}
+            {page === "generic-select-option" && <GenericSelectOptionPlayground />}
             {page === "thumbnail" && <ThumbnailPlayground />}
             {page === "spinner" && <SpinnerPlayground />}
             {page === "currency-thumbnail" && <CurrencyThumbnailPlayground />}
