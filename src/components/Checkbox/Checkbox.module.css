@@ -1,0 +1,267 @@
+/* ── wrapper ─────────────────────────────────────────────────────────── */
+
+.checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+
+/* ── hidden native input ────────────────────────────────────────────── */
+
+.input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  cursor: inherit;
+}
+
+/* ── visual box ─────────────────────────────────────────────────────── */
+
+.box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition:
+    background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* ── sizes ───────────────────────────────────────────────────────────── */
+
+.sm .box {
+  width: var(--spacing-md);
+  height: var(--spacing-md);
+}
+
+.lg .box {
+  width: var(--spacing-lg);
+  height: var(--spacing-lg);
+}
+
+/* ── icon ────────────────────────────────────────────────────────────── */
+
+.icon {
+  flex-shrink: 0;
+  overflow: visible;
+  width: 62.5%;
+  height: 62.5%;
+}
+
+/* ── path animations ────────────────────────────────────────────────── */
+
+.checkPath,
+.dashPath {
+  transform-box: view-box;
+  transform-origin: center;
+}
+
+.checkPath {
+  stroke-dasharray: 11;
+  stroke-dashoffset: 11;
+}
+
+.dashPath {
+  stroke-dasharray: 7;
+  stroke-dashoffset: 7;
+}
+
+/* draw-in (unchecked → active) */
+
+@keyframes drawCheck {
+  from { stroke-dashoffset: 11; }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes drawDash {
+  from { stroke-dashoffset: 7; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.checkPathDrawIn {
+  stroke-dashoffset: 0;
+  animation: drawCheck var(--animation-state-micro-duration) var(--animation-state-micro-easing) both;
+}
+
+.dashPathDrawIn {
+  stroke-dashoffset: 0;
+  animation: drawDash var(--animation-state-micro-duration) var(--animation-state-micro-easing) both;
+}
+
+/* checked → indeterminate: check 0° → -180°, dash 180° → 0° */
+
+@keyframes checkRotateOut {
+  from { transform: rotate(0deg);    stroke-dashoffset: 0;  opacity: var(--opacity-100); }
+  to   { transform: rotate(-180deg); stroke-dashoffset: 11; opacity: var(--opacity-0); }
+}
+
+@keyframes dashRotateIn {
+  from { transform: rotate(180deg); stroke-dashoffset: 7; opacity: var(--opacity-0); }
+  to   { transform: rotate(0deg);   stroke-dashoffset: 0; opacity: var(--opacity-100); }
+}
+
+.checkPathRotateOut {
+  stroke-dashoffset: 11;
+  animation: checkRotateOut var(--animation-state-micro-duration) var(--animation-state-micro-easing) both;
+}
+
+.dashPathRotateIn {
+  stroke-dashoffset: 0;
+  animation: dashRotateIn var(--animation-state-micro-duration) var(--animation-state-micro-easing) both;
+}
+
+/* indeterminate → checked (reverse): dash 0° → 180°, check -180° → 0° */
+
+@keyframes checkRotateIn {
+  from { transform: rotate(-180deg); stroke-dashoffset: 11; opacity: var(--opacity-0); }
+  to   { transform: rotate(0deg);    stroke-dashoffset: 0;  opacity: var(--opacity-100); }
+}
+
+@keyframes dashRotateOut {
+  from { transform: rotate(0deg);   stroke-dashoffset: 0; opacity: var(--opacity-100); }
+  to   { transform: rotate(180deg); stroke-dashoffset: 7; opacity: var(--opacity-0); }
+}
+
+.checkPathRotateIn {
+  stroke-dashoffset: 0;
+  animation: checkRotateIn var(--animation-state-micro-duration) var(--animation-state-micro-easing) both;
+}
+
+.dashPathRotateOut {
+  stroke-dashoffset: 7;
+  animation: dashRotateOut var(--animation-state-micro-duration) var(--animation-state-micro-easing) both;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UNCHECKED — no error
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.box {
+  background: var(--element-fill-neutral-tertiary-default);
+  border: var(--spacing-px) solid var(--element-outline-neutral-default);
+}
+
+.checkbox:hover:not(.disabled) .box {
+  background: var(--element-fill-neutral-tertiary-hover);
+  border-color: var(--element-outline-neutral-hover);
+}
+
+.checkbox:active:not(.disabled) .box {
+  background: var(--element-fill-neutral-tertiary-press);
+  border-color: var(--element-outline-neutral-press);
+}
+
+.input:focus-visible ~ .box {
+  background: var(--element-fill-neutral-tertiary-hover);
+  border-color: var(--element-outline-neutral-hover);
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+}
+
+.disabled .box {
+  background: var(--element-fill-neutral-tertiary-disable);
+  border-color: var(--element-outline-neutral-disable);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UNCHECKED — error
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.error .box {
+  background: var(--element-fill-alert-tertiary-default);
+  border-color: var(--element-outline-alert-active);
+}
+
+.error:hover:not(.disabled) .box {
+  background: var(--element-fill-alert-tertiary-hover);
+  border-color: var(--element-outline-alert-active);
+}
+
+.error:active:not(.disabled) .box {
+  background: var(--element-fill-alert-tertiary-press);
+  border-color: var(--element-outline-alert-active);
+}
+
+.error .input:focus-visible ~ .box {
+  background: var(--element-fill-alert-tertiary-hover);
+  border-color: var(--element-outline-alert-active);
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+}
+
+.error.disabled .box {
+  background: var(--element-fill-neutral-tertiary-disable);
+  border-color: var(--element-outline-neutral-disable);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CHECKED / INDETERMINATE — no error
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.active .box {
+  background: var(--element-fill-brand-primary-default);
+  border: none;
+  color: var(--element-knob-default);
+}
+
+.active:hover:not(.disabled) .box {
+  background: var(--element-fill-brand-primary-hover);
+}
+
+.active:active:not(.disabled) .box {
+  background: var(--element-fill-brand-primary-press);
+}
+
+.active .input:focus-visible ~ .box {
+  background: var(--element-fill-brand-primary-hover);
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+}
+
+.active.disabled .box {
+  background: var(--element-fill-brand-primary-disable-active);
+  color: var(--element-knob-disable);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CHECKED / INDETERMINATE — error
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.active.error .box {
+  background: var(--element-fill-alert-primary-default);
+  border: none;
+  color: var(--element-knob-default);
+}
+
+.active.error:hover:not(.disabled) .box {
+  background: var(--element-fill-alert-primary-hover);
+}
+
+.active.error:active:not(.disabled) .box {
+  background: var(--element-fill-alert-primary-press);
+}
+
+.active.error .input:focus-visible ~ .box {
+  background: var(--element-fill-alert-primary-hover);
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+}
+
+.active.error.disabled .box {
+  background: var(--element-fill-alert-primary-disable-active);
+  color: var(--element-knob-disable);
+}

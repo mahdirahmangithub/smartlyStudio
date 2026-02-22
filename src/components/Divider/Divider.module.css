@@ -1,0 +1,59 @@
+/* ── base ──────────────────────────────────────────────────────────────── */
+
+.divider {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  height: 0;
+}
+
+/* ── orientation ──────────────────────────────────────────────────────── */
+
+.vertical {
+  height: auto;
+  align-self: stretch;
+}
+
+/* ── type → color variable ────────────────────────────────────────────── */
+
+.neutral { --_divider-color: var(--element-divider-neutral-default); }
+.brand   { --_divider-color: var(--element-divider-brand);           }
+
+/* ── normal: solid border ─────────────────────────────────────────────── */
+
+.normal.horizontal { border-top: var(--spacing-px) solid var(--_divider-color); }
+.normal.vertical   { border-left: var(--spacing-px) solid var(--_divider-color); }
+
+/* ── dashed: 4px dash, 4px gap (matches Figma stroke-dasharray 4 4) ─── */
+
+.dashed.horizontal {
+  height: var(--spacing-px);
+  background: repeating-linear-gradient(to right, var(--_divider-color) 0 4px, transparent 4px 8px);
+}
+
+.dashed.vertical {
+  width: var(--spacing-px);
+  background: repeating-linear-gradient(to bottom, var(--_divider-color) 0 4px, transparent 4px 8px);
+}
+
+/* ── dotted: 1px dot, 4px gap (matches Figma dash 0.01 gap 4 round) ─── */
+
+.dotted.horizontal {
+  height: var(--spacing-px);
+  background: repeating-linear-gradient(to right, var(--_divider-color) 0 1px, transparent 1px 5px);
+}
+
+.dotted.vertical {
+  width: var(--spacing-px);
+  background: repeating-linear-gradient(to bottom, var(--_divider-color) 0 1px, transparent 1px 5px);
+}
+
+/* ── inset (equal margin along the line direction) ────────────────────── */
+
+.horizontal.inset { margin-left: var(--spacing-sm); margin-right: var(--spacing-sm);   }
+.vertical.inset   { margin-top: var(--spacing-sm);  margin-bottom: var(--spacing-sm);  }
+
+/* ── padding (margin perpendicular to the line) ───────────────────────── */
+
+.horizontal.withPadding { margin-top: var(--spacing-2xs);  margin-bottom: var(--spacing-2xs); }
+.vertical.withPadding   { margin-left: var(--spacing-2xs); margin-right: var(--spacing-2xs);  }

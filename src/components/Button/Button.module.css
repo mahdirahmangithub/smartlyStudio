@@ -1,0 +1,234 @@
+/* ====== BASE ====== */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  overflow: clip;
+  box-sizing: border-box;
+  border: var(--spacing-px) solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background var(--animation-state-change-duration) var(--animation-state-change-easing),
+    color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--element-outline-neutral-default);
+  outline-offset: 2px;
+}
+
+.button:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ====== SIZES ====== */
+.sm {
+  min-height: var(--spacing-xl);
+  padding: 0 var(--spacing-xs);
+  gap: var(--spacing-none);
+  border-radius: var(--radius-md);
+}
+
+.md {
+  min-height: var(--spacing-2xl);
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-lg);
+}
+
+.lg {
+  min-height: var(--spacing-4xl);
+  padding: 0 var(--spacing-sm-plus);
+  gap: var(--spacing-2xs);
+  border-radius: var(--radius-lg);
+}
+
+/* ====== LABEL ====== */
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sm .label {
+  padding: 0 var(--spacing-sm-minus);
+  font-family: var(--type-label-strong-xs-family);
+  font-weight: var(--type-label-strong-xs-weight);
+  font-size: var(--type-label-strong-xs-size);
+  line-height: var(--type-label-strong-xs-line-height);
+  letter-spacing: var(--type-label-strong-xs-letter-spacing);
+}
+
+.md .label {
+  padding: 0 var(--spacing-xs);
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+}
+
+.lg .label {
+  padding: 0 var(--spacing-sm-minus);
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+}
+
+/* ====== ICON CONTAINER ====== */
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sm .iconWrap { width: 16px; height: 16px; }
+.md .iconWrap { width: 16px; height: 16px; }
+.lg .iconWrap { width: 20px; height: 20px; }
+
+/* ============================================================
+   HIGH EMPHASIS
+   ============================================================ */
+.high.brand                                      { background: var(--element-fill-brand-primary-default); color: var(--text-neutral-inverse-primary); }
+.high.brand:hover:not(:disabled)                 { background: var(--element-fill-brand-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.brand:active:not(:disabled)                { background: var(--element-fill-brand-primary-press); color: var(--text-neutral-inverse-primary); }
+.high.brand:focus-visible:not(:disabled)        { background: var(--element-fill-brand-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.brand:disabled                            { background: var(--element-fill-brand-primary-disable); color: var(--text-neutral-inverse-disable); cursor: not-allowed; }
+
+.high.neutral                                    { background: var(--element-fill-neutral-primary-default); color: var(--text-neutral-inverse-primary); }
+.high.neutral:hover:not(:disabled)               { background: var(--element-fill-neutral-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.neutral:active:not(:disabled)             { background: var(--element-fill-neutral-primary-press); color: var(--text-neutral-inverse-primary); }
+.high.neutral:focus-visible:not(:disabled)      { background: var(--element-fill-neutral-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.neutral:disabled                           { background: var(--element-fill-neutral-primary-disable); color: var(--text-neutral-inverse-disable); cursor: not-allowed; }
+
+.high.info                                       { background: var(--element-fill-info-primary-default); color: var(--text-neutral-inverse-primary); }
+.high.info:hover:not(:disabled)                  { background: var(--element-fill-info-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.info:active:not(:disabled)                { background: var(--element-fill-info-primary-press); color: var(--text-neutral-inverse-primary); }
+.high.info:focus-visible:not(:disabled)         { background: var(--element-fill-info-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.info:disabled                              { background: var(--element-fill-info-primary-disable); color: var(--text-neutral-inverse-disable); cursor: not-allowed; }
+
+.high.success                                    { background: var(--element-fill-success-primary-default); color: var(--text-neutral-inverse-primary); }
+.high.success:hover:not(:disabled)              { background: var(--element-fill-success-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.success:active:not(:disabled)             { background: var(--element-fill-success-primary-press); color: var(--text-neutral-inverse-primary); }
+.high.success:focus-visible:not(:disabled)      { background: var(--element-fill-success-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.success:disabled                           { background: var(--element-fill-success-primary-disable); color: var(--text-neutral-inverse-disable); cursor: not-allowed; }
+
+.high.warning                                    { background: var(--element-fill-warning-primary-default); color: var(--text-neutral-inverse-primary); }
+.high.warning:hover:not(:disabled)               { background: var(--element-fill-warning-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.warning:active:not(:disabled)             { background: var(--element-fill-warning-primary-press); color: var(--text-neutral-inverse-primary); }
+.high.warning:focus-visible:not(:disabled)      { background: var(--element-fill-warning-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.warning:disabled                           { background: var(--element-fill-warning-primary-disable); color: var(--text-neutral-inverse-disable); cursor: not-allowed; }
+
+.high.alert                                      { background: var(--element-fill-alert-primary-default); color: var(--text-neutral-inverse-primary); }
+.high.alert:hover:not(:disabled)                { background: var(--element-fill-alert-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.alert:active:not(:disabled)               { background: var(--element-fill-alert-primary-press); color: var(--text-neutral-inverse-primary); }
+.high.alert:focus-visible:not(:disabled)        { background: var(--element-fill-alert-primary-hover); color: var(--text-neutral-inverse-primary); }
+.high.alert:disabled                             { background: var(--element-fill-alert-primary-disable); color: var(--text-neutral-inverse-disable); cursor: not-allowed; }
+
+.high.inverse                                    { background: var(--element-fill-neutral-primary-inverse-default); color: var(--text-neutral-primary); }
+.high.inverse:hover:not(:disabled)              { background: var(--element-fill-neutral-primary-inverse-hover); color: var(--text-neutral-primary); }
+.high.inverse:active:not(:disabled)             { background: var(--element-fill-neutral-primary-inverse-press); color: var(--text-neutral-primary); }
+.high.inverse:focus-visible:not(:disabled)      { background: var(--element-fill-neutral-primary-inverse-hover); color: var(--text-neutral-primary); }
+.high.inverse:disabled                           { background: var(--element-fill-neutral-primary-inverse-disable); color: var(--text-neutral-inverse-disable); cursor: not-allowed; }
+
+/* ============================================================
+   MEDIUM EMPHASIS
+   ============================================================ */
+
+.medium.brand                                      { background: var(--element-fill-brand-tertiary-default); border-color: var(--element-outline-brand-default); color: var(--text-brand-default); }
+.medium.brand:hover:not(:disabled)                 { background: var(--element-fill-brand-tertiary-hover); border-color: var(--element-outline-brand-hover); color: var(--text-brand-hover); }
+.medium.brand:active:not(:disabled)                { background: var(--element-fill-brand-tertiary-press); border-color: var(--element-outline-brand-press); color: var(--text-brand-press); }
+.medium.brand:focus-visible:not(:disabled)        { background: var(--element-fill-brand-tertiary-hover); border-color: var(--element-outline-brand-hover); color: var(--text-brand-hover); }
+.medium.brand:disabled                            { background: var(--element-fill-brand-tertiary-disable); border-color: var(--element-outline-brand-disable); color: var(--text-brand-disable); cursor: not-allowed; }
+
+.medium.neutral                                    { background: var(--element-fill-neutral-tertiary-default); border-color: var(--element-outline-neutral-default); color: var(--text-neutral-primary); }
+.medium.neutral:hover:not(:disabled)               { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-primary); }
+.medium.neutral:active:not(:disabled)              { background: var(--element-fill-neutral-tertiary-press); border-color: var(--element-outline-neutral-press); color: var(--text-neutral-primary); }
+.medium.neutral:focus-visible:not(:disabled)       { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-primary); }
+.medium.neutral:disabled                           { background: var(--element-fill-neutral-tertiary-disable); border-color: var(--element-outline-neutral-disable); color: var(--text-neutral-disable); cursor: not-allowed; }
+
+.medium.info                                      { background: var(--element-fill-info-tertiary-default); border-color: var(--element-outline-info-default); color: var(--text-info-default); }
+.medium.info:hover:not(:disabled)                 { background: var(--element-fill-info-tertiary-hover); border-color: var(--element-outline-info-hover); color: var(--text-info-hover); }
+.medium.info:active:not(:disabled)               { background: var(--element-fill-info-tertiary-press); border-color: var(--element-outline-info-press); color: var(--text-info-press); }
+.medium.info:focus-visible:not(:disabled)        { background: var(--element-fill-info-tertiary-hover); border-color: var(--element-outline-info-hover); color: var(--text-info-hover); }
+.medium.info:disabled                             { background: var(--element-fill-info-tertiary-disable); border-color: var(--element-outline-info-disable); color: var(--text-info-disable); cursor: not-allowed; }
+
+.medium.success                                   { background: var(--element-fill-success-tertiary-default); border-color: var(--element-outline-success-default); color: var(--text-success-default); }
+.medium.success:hover:not(:disabled)              { background: var(--element-fill-success-tertiary-hover); border-color: var(--element-outline-success-hover); color: var(--text-success-hover); }
+.medium.success:active:not(:disabled)             { background: var(--element-fill-success-tertiary-press); border-color: var(--element-outline-success-press); color: var(--text-success-press); }
+.medium.success:focus-visible:not(:disabled)      { background: var(--element-fill-success-tertiary-hover); border-color: var(--element-outline-success-hover); color: var(--text-success-hover); }
+.medium.success:disabled                          { background: var(--element-fill-success-tertiary-disable); border-color: var(--element-outline-success-disable); color: var(--text-success-disable); cursor: not-allowed; }
+
+.medium.warning                                   { background: var(--element-fill-warning-tertiary-default); border-color: var(--element-outline-warning-default); color: var(--text-warning-default); }
+.medium.warning:hover:not(:disabled)             { background: var(--element-fill-warning-tertiary-hover); border-color: var(--element-outline-warning-hover); color: var(--text-warning-hover); }
+.medium.warning:active:not(:disabled)             { background: var(--element-fill-warning-tertiary-press); border-color: var(--element-outline-warning-press); color: var(--text-warning-press); }
+.medium.warning:focus-visible:not(:disabled)      { background: var(--element-fill-warning-tertiary-hover); border-color: var(--element-outline-warning-hover); color: var(--text-warning-hover); }
+.medium.warning:disabled                          { background: var(--element-fill-warning-tertiary-disable); border-color: var(--element-outline-warning-disable); color: var(--text-warning-disable); cursor: not-allowed; }
+
+.medium.alert                                     { background: var(--element-fill-alert-tertiary-default); border-color: var(--element-outline-alert-default); color: var(--text-alert-default); }
+.medium.alert:hover:not(:disabled)               { background: var(--element-fill-alert-tertiary-hover); border-color: var(--element-outline-alert-hover); color: var(--text-alert-hover); }
+.medium.alert:active:not(:disabled)               { background: var(--element-fill-alert-tertiary-press); border-color: var(--element-outline-alert-press); color: var(--text-alert-press); }
+.medium.alert:focus-visible:not(:disabled)        { background: var(--element-fill-alert-tertiary-hover); border-color: var(--element-outline-alert-hover); color: var(--text-alert-hover); }
+.medium.alert:disabled                            { background: var(--element-fill-alert-tertiary-disable); border-color: var(--element-outline-alert-disable); color: var(--text-alert-disable); cursor: not-allowed; }
+
+.medium.inverse                                   { background: var(--element-fill-neutral-tertiary-inverse-default); border-color: var(--element-outline-neutral-inverse-default); color: var(--text-neutral-inverse-primary); }
+.medium.inverse:hover:not(:disabled)              { background: var(--element-fill-neutral-tertiary-inverse-hover); border-color: var(--element-outline-neutral-inverse-hover); color: var(--text-neutral-inverse-primary); }
+.medium.inverse:active:not(:disabled)             { background: var(--element-fill-neutral-tertiary-inverse-press); border-color: var(--element-outline-neutral-inverse-press); color: var(--text-neutral-inverse-primary); }
+.medium.inverse:focus-visible:not(:disabled)      { background: var(--element-fill-neutral-tertiary-inverse-hover); border-color: var(--element-outline-neutral-inverse-hover); color: var(--text-neutral-inverse-primary); }
+.medium.inverse:disabled                          { background: var(--element-fill-neutral-tertiary-inverse-disable); border-color: var(--element-outline-neutral-inverse-disable); color: var(--text-neutral-inverse-disable); cursor: not-allowed; }
+
+/* ============================================================
+   LOW EMPHASIS
+   ============================================================ */
+.low.brand                                      { background: var(--element-fill-brand-tertiary-default); color: var(--text-brand-default); }
+.low.brand:hover:not(:disabled)                 { background: var(--element-fill-brand-tertiary-hover); color: var(--text-brand-hover); }
+.low.brand:active:not(:disabled)                { background: var(--element-fill-brand-tertiary-press); color: var(--text-brand-press); }
+.low.brand:focus-visible:not(:disabled)         { background: var(--element-fill-brand-tertiary-hover); color: var(--text-brand-hover); }
+.low.brand:disabled                             { background: var(--element-fill-brand-tertiary-disable); color: var(--text-brand-disable); cursor: not-allowed; }
+
+.low.neutral                                    { background: var(--element-fill-neutral-tertiary-default); color: var(--text-neutral-primary); }
+.low.neutral:hover:not(:disabled)               { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-primary); }
+.low.neutral:active:not(:disabled)              { background: var(--element-fill-neutral-tertiary-press); color: var(--text-neutral-primary); }
+.low.neutral:focus-visible:not(:disabled)       { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-primary); }
+.low.neutral:disabled                           { background: var(--element-fill-neutral-tertiary-disable); color: var(--text-neutral-disable); cursor: not-allowed; }
+
+.low.info                                       { background: var(--element-fill-info-tertiary-default); color: var(--text-info-default); }
+.low.info:hover:not(:disabled)                  { background: var(--element-fill-info-tertiary-hover); color: var(--text-info-hover); }
+.low.info:active:not(:disabled)                 { background: var(--element-fill-info-tertiary-press); color: var(--text-info-press); }
+.low.info:focus-visible:not(:disabled)         { background: var(--element-fill-info-tertiary-hover); color: var(--text-info-hover); }
+.low.info:disabled                              { background: var(--element-fill-info-tertiary-disable); color: var(--text-info-disable); cursor: not-allowed; }
+
+.low.success                                    { background: var(--element-fill-success-tertiary-default); color: var(--text-success-default); }
+.low.success:hover:not(:disabled)               { background: var(--element-fill-success-tertiary-hover); color: var(--text-success-hover); }
+.low.success:active:not(:disabled)              { background: var(--element-fill-success-tertiary-press); color: var(--text-success-press); }
+.low.success:focus-visible:not(:disabled)       { background: var(--element-fill-success-tertiary-hover); color: var(--text-success-hover); }
+.low.success:disabled                           { background: var(--element-fill-success-tertiary-disable); color: var(--text-success-disable); cursor: not-allowed; }
+
+.low.warning                                    { background: var(--element-fill-warning-tertiary-default); color: var(--text-warning-default); }
+.low.warning:hover:not(:disabled)               { background: var(--element-fill-warning-tertiary-hover); color: var(--text-warning-hover); }
+.low.warning:active:not(:disabled)              { background: var(--element-fill-warning-tertiary-press); color: var(--text-warning-press); }
+.low.warning:focus-visible:not(:disabled)       { background: var(--element-fill-warning-tertiary-hover); color: var(--text-warning-hover); }
+.low.warning:disabled                           { background: var(--element-fill-warning-tertiary-disable); color: var(--text-warning-disable); cursor: not-allowed; }
+
+.low.alert                                      { background: var(--element-fill-alert-tertiary-default); color: var(--text-alert-default); }
+.low.alert:hover:not(:disabled)                { background: var(--element-fill-alert-tertiary-hover); color: var(--text-alert-hover); }
+.low.alert:active:not(:disabled)                { background: var(--element-fill-alert-tertiary-press); color: var(--text-alert-press); }
+.low.alert:focus-visible:not(:disabled)         { background: var(--element-fill-alert-tertiary-hover); color: var(--text-alert-hover); }
+.low.alert:disabled                             { background: var(--element-fill-alert-tertiary-disable); color: var(--text-alert-disable); cursor: not-allowed; }
+
+.low.inverse                                    { background: var(--element-fill-neutral-tertiary-inverse-default); color: var(--text-neutral-inverse-primary); }
+.low.inverse:hover:not(:disabled)               { background: var(--element-fill-neutral-tertiary-inverse-hover); color: var(--text-neutral-inverse-primary); }
+.low.inverse:active:not(:disabled)               { background: var(--element-fill-neutral-tertiary-inverse-press); color: var(--text-neutral-inverse-primary); }
+.low.inverse:focus-visible:not(:disabled)       { background: var(--element-fill-neutral-tertiary-inverse-hover); color: var(--text-neutral-inverse-primary); }
+.low.inverse:disabled                           { background: var(--element-fill-neutral-tertiary-inverse-disable); color: var(--text-neutral-inverse-disable); cursor: not-allowed; }

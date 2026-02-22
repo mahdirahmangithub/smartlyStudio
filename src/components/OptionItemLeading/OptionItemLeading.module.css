@@ -1,0 +1,71 @@
+/* ── base ──────────────────────────────────────────────────────────────── */
+
+.leading {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ── types with 24px fixed width + 2px padding (icon renders 20×20) ──── */
+
+.icon,
+.social {
+  width: 24px;
+  padding: var(--spacing-2xs);
+  box-sizing: border-box;
+}
+
+/* ── counter (flag) — 24px wide, no internal padding ──────────────────── */
+
+.counter {
+  width: 24px;
+}
+
+/* ── currency — wraps standalone CurrencyThumbnail ────────────────────── */
+
+.currency {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* ── thumbnail — 24×24 clipped image ──────────────────────────────────── */
+
+.thumbnail {
+  align-items: flex-start;
+}
+
+.thumbnailBox {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: var(--element-surface-default);
+}
+
+.thumbnailBox > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── avatar — 24px wrapper ────────────────────────────────────────────── */
+
+.avatar {
+  align-items: flex-start;
+}
+
+/* ── action / button — wrap interactive element ───────────────────────── */
+
+.action,
+.button {
+  align-items: flex-start;
+}
+
+/* ── disabled state ───────────────────────────────────────────────────── */
+
+.disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}

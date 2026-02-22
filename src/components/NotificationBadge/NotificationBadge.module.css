@@ -1,0 +1,119 @@
+/* ── base ──────────────────────────────────────────────────────────────── */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: clip;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* ── outline (sits outside the component via CSS outline) ─────────────── */
+
+.hasOutline {
+  outline-style: solid;
+  outline-color: var(--_nb-outline-color, var(--element-surface-default));
+}
+
+/* ── content: none (dot indicator) ────────────────────────────────────── */
+
+.dot.xs { width: 6px; height: 6px; }
+.dot.sm { width: 8px; height: 8px; }
+.dot.md { width: 10px; height: 10px; }
+.dot.lg { width: 12px; height: 12px; }
+
+.dot.xs.hasOutline { outline-width: var(--spacing-px); }
+.dot.sm.hasOutline { outline-width: 1.33px; }
+.dot.md.hasOutline { outline-width: 1.66px; }
+.dot.lg.hasOutline { outline-width: 2px; }
+
+/* ── content: icon / text ─────────────────────────────────────────────── */
+
+.withContent.sm {
+  min-height: var(--spacing-md);
+  min-width: var(--spacing-md);
+  padding: var(--spacing-none) var(--spacing-2xs);
+}
+
+.withContent.md {
+  min-height: var(--spacing-lg);
+  min-width: var(--spacing-lg);
+  padding: var(--spacing-2xs) var(--spacing-xs);
+}
+
+.withContent.lg {
+  min-height: var(--spacing-xl);
+  min-width: var(--spacing-xl);
+  padding: var(--spacing-2xs) var(--spacing-xs);
+}
+
+.withContent.sm.hasOutline { outline-width: 1.33px; }
+.withContent.md.hasOutline { outline-width: 1.66px; }
+.withContent.lg.hasOutline { outline-width: 2px; }
+
+/* ── icon slot ─────────────────────────────────────────────────────────── */
+
+.iconSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sm .iconSlot { width: 12px; height: 12px; }
+.md .iconSlot { width: 12px; height: 12px; }
+.lg .iconSlot { width: 16px; height: 16px; }
+
+/* ── label (text) ─────────────────────────────────────────────────────── */
+
+.label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--spacing-2xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.sm .label,
+.md .label {
+  font-family: var(--type-number-strong-xs-family);
+  font-weight: var(--type-number-strong-xs-weight);
+  font-size: var(--type-number-strong-xs-size);
+  line-height: var(--type-number-strong-xs-line-height);
+  letter-spacing: var(--type-number-strong-xs-letter-spacing);
+}
+
+.lg .label {
+  font-family: var(--type-number-strong-sm-family);
+  font-weight: var(--type-number-strong-sm-weight);
+  font-size: var(--type-number-strong-sm-size);
+  line-height: var(--type-number-strong-sm-line-height);
+  letter-spacing: var(--type-number-strong-sm-letter-spacing);
+}
+
+/* ====================================================================== */
+/* EMPHASIS: medium — secondary fill                                      */
+/* ====================================================================== */
+
+.medium.neutral  { background: var(--element-fill-neutral-secondary-default); color: var(--text-neutral-secondary-default); }
+.medium.brand    { background: var(--element-fill-brand-secondary-default);   color: var(--text-brand-default); }
+.medium.info     { background: var(--element-fill-info-secondary-default);    color: var(--text-info-default); }
+.medium.success  { background: var(--element-fill-success-secondary-default); color: var(--text-success-default); }
+.medium.warning  { background: var(--element-fill-warning-secondary-default); color: var(--text-warning-default); }
+.medium.alert    { background: var(--element-fill-alert-secondary-default);   color: var(--text-alert-default); }
+
+/* ====================================================================== */
+/* EMPHASIS: high — primary fill + inverse text                           */
+/* ====================================================================== */
+
+.high.neutral  { background: var(--element-fill-neutral-primary-default);  color: var(--text-neutral-inverse-primary); }
+.high.brand    { background: var(--element-fill-brand-primary-default);    color: var(--text-neutral-inverse-primary); }
+.high.info     { background: var(--element-fill-info-primary-default);     color: var(--text-neutral-inverse-primary); }
+.high.success  { background: var(--element-fill-success-primary-default);  color: var(--text-neutral-inverse-primary); }
+.high.warning  { background: var(--element-fill-warning-primary-default);  color: var(--text-neutral-inverse-primary); }
+.high.alert    { background: var(--element-fill-alert-primary-default);    color: var(--text-neutral-inverse-primary); }

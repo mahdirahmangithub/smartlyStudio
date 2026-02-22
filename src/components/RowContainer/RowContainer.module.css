@@ -1,0 +1,57 @@
+/* ── root ──────────────────────────────────────────────────────────────── */
+
+.rowContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── scroll wrapper (non-wrap) ─────────────────────────────────────────── */
+
+.scrollWrapper {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+/* ── items base (wrap mode) ────────────────────────────────────────────── */
+
+.itemsBase {
+  width: 100%;
+  min-width: 0;
+}
+
+/* ── items container ───────────────────────────────────────────────────── */
+
+.items {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.itemsWrap {
+  flex-wrap: wrap;
+  align-content: center;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── alignment ─────────────────────────────────────────────────────────── */
+
+.alignRight {
+  justify-content: flex-end;
+}
+
+.alignGrow > * {
+  flex: 1;
+}
+
+/* ── density (gap) ─────────────────────────────────────────────────────── */
+
+.densityNone { gap: var(--spacing-none); }
+.densityXs   { gap: var(--spacing-2xs); }
+.densitySm   { gap: var(--spacing-xs); }
+.densityMd   { gap: var(--spacing-sm); }
+.densityLg   { gap: var(--spacing-md); }

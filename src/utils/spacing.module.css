@@ -1,0 +1,4 @@
+.paddingTop    { padding-top:    var(--_pt); }
+.paddingBottom { padding-bottom: var(--_pb); }
+.insetLeft     { padding-left:   var(--_il); }
+.insetRight    { padding-right:  var(--_ir); }

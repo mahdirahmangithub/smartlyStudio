@@ -1,0 +1,405 @@
+/* ── base ──────────────────────────────────────────────────────────────── */
+
+.selectChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: clip;
+  border: var(--spacing-px) solid transparent;
+  border-radius: var(--radius-full);
+  cursor: default;
+  user-select: none;
+  white-space: nowrap;
+  transition:
+    background var(--animation-state-change-duration) var(--animation-state-change-easing),
+    color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.selectChip:focus-visible {
+  outline: 2px solid var(--element-outline-neutral-default);
+  outline-offset: 2px;
+}
+
+.selectChip:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ── sizes ─────────────────────────────────────────────────────────────── */
+
+.sm {
+  min-height: var(--spacing-xl);
+  padding: 0 var(--spacing-xs);
+  gap: var(--spacing-none);
+}
+
+.md {
+  min-height: var(--spacing-2xl);
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-xs);
+}
+
+.lg {
+  min-height: var(--spacing-4xl);
+  padding: 0 var(--spacing-sm-plus);
+  gap: var(--spacing-2xs);
+}
+
+/* ── leading icon ──────────────────────────────────────────────────────── */
+
+.leadingIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sm .leadingIcon,
+.md .leadingIcon { width: 16px; height: 16px; }
+.lg .leadingIcon { width: 20px; height: 20px; }
+
+/* ── label + chevron group ────────────────────────────────────────────── */
+
+.labelChevron {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* ── label ─────────────────────────────────────────────────────────────── */
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.sm .label {
+  padding-left: var(--spacing-sm-minus);
+  font-family: var(--type-label-strong-xs-family);
+  font-weight: var(--type-label-strong-xs-weight);
+  font-size: var(--type-label-strong-xs-size);
+  line-height: var(--type-label-strong-xs-line-height);
+  letter-spacing: var(--type-label-strong-xs-letter-spacing);
+}
+
+.md .label,
+.lg .label {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+}
+
+.md .label {
+  padding-left: var(--spacing-xs);
+}
+
+.lg .label {
+  padding-left: var(--spacing-sm-minus);
+}
+
+/* ── expander (chevron icon) ──────────────────────────────────────────── */
+
+.expander {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: transform var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+}
+
+.sm .expander,
+.md .expander { width: 16px; height: 16px; }
+.lg .expander { width: 20px; height: 20px; }
+
+.expander.open {
+  transform: rotate(180deg);
+}
+
+/* ── clear slot (InputClear container) ─────────────────────────────────── */
+
+.clearSlot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sm .clearSlot,
+.md .clearSlot { width: 16px; height: 16px; }
+.lg .clearSlot { width: 20px; height: 20px; }
+
+.clearSlot > * {
+  position: absolute;
+}
+
+/* ── disabled ──────────────────────────────────────────────────────────── */
+
+.selectChip.disabled {
+  pointer-events: none;
+}
+
+/* ====================================================================== */
+/* EMPHASIS: medium — tertiary fill + visible border                      */
+/* ====================================================================== */
+
+/* ── neutral / medium ──────────────────────────────────────────────────── */
+
+.medium.neutral {
+  background: var(--element-fill-neutral-tertiary-default);
+  border-color: var(--element-outline-neutral-default);
+  color: var(--text-neutral-secondary-default);
+}
+.medium.neutral:hover {
+  background: var(--element-fill-neutral-tertiary-hover);
+  border-color: var(--element-outline-neutral-hover);
+  color: var(--text-neutral-secondary-hover);
+}
+.medium.neutral:active:not(:has(button:active)) {
+  background: var(--element-fill-neutral-tertiary-press);
+  border-color: var(--element-outline-neutral-press);
+  color: var(--text-neutral-secondary-press);
+}
+.medium.neutral.disabled {
+  background: var(--element-fill-neutral-tertiary-disable);
+  border-color: var(--element-outline-neutral-disable);
+  color: var(--text-neutral-disable);
+}
+
+/* ── brand / medium ────────────────────────────────────────────────────── */
+
+.medium.brand {
+  background: var(--element-fill-brand-tertiary-default);
+  border-color: var(--element-outline-brand-default);
+  color: var(--text-brand-default);
+}
+.medium.brand:hover {
+  background: var(--element-fill-brand-tertiary-hover);
+  border-color: var(--element-outline-brand-hover);
+  color: var(--text-brand-hover);
+}
+.medium.brand:active:not(:has(button:active)) {
+  background: var(--element-fill-brand-tertiary-press);
+  border-color: var(--element-outline-brand-press);
+  color: var(--text-brand-press);
+}
+.medium.brand.disabled {
+  background: var(--element-fill-brand-tertiary-disable);
+  border-color: var(--element-outline-brand-disable);
+  color: var(--text-brand-disable);
+}
+
+/* ── info / medium ─────────────────────────────────────────────────────── */
+
+.medium.info {
+  background: var(--element-fill-info-tertiary-default);
+  border-color: var(--element-outline-info-default);
+  color: var(--text-info-default);
+}
+.medium.info:hover {
+  background: var(--element-fill-info-tertiary-hover);
+  border-color: var(--element-outline-info-hover);
+  color: var(--text-info-hover);
+}
+.medium.info:active:not(:has(button:active)) {
+  background: var(--element-fill-info-tertiary-press);
+  border-color: var(--element-outline-info-press);
+  color: var(--text-info-press);
+}
+.medium.info.disabled {
+  background: var(--element-fill-info-tertiary-disable);
+  border-color: var(--element-outline-info-disable);
+  color: var(--text-info-disable);
+}
+
+/* ── success / medium ──────────────────────────────────────────────────── */
+
+.medium.success {
+  background: var(--element-fill-success-tertiary-default);
+  border-color: var(--element-outline-success-default);
+  color: var(--text-success-default);
+}
+.medium.success:hover {
+  background: var(--element-fill-success-tertiary-hover);
+  border-color: var(--element-outline-success-hover);
+  color: var(--text-success-hover);
+}
+.medium.success:active:not(:has(button:active)) {
+  background: var(--element-fill-success-tertiary-press);
+  border-color: var(--element-outline-success-press);
+  color: var(--text-success-press);
+}
+.medium.success.disabled {
+  background: var(--element-fill-success-tertiary-disable);
+  border-color: var(--element-outline-success-disable);
+  color: var(--text-success-disable);
+}
+
+/* ── warning / medium ──────────────────────────────────────────────────── */
+
+.medium.warning {
+  background: var(--element-fill-warning-tertiary-default);
+  border-color: var(--element-outline-warning-default);
+  color: var(--text-warning-default);
+}
+.medium.warning:hover {
+  background: var(--element-fill-warning-tertiary-hover);
+  border-color: var(--element-outline-warning-hover);
+  color: var(--text-warning-hover);
+}
+.medium.warning:active:not(:has(button:active)) {
+  background: var(--element-fill-warning-tertiary-press);
+  border-color: var(--element-outline-warning-press);
+  color: var(--text-warning-press);
+}
+.medium.warning.disabled {
+  background: var(--element-fill-warning-tertiary-disable);
+  border-color: var(--element-outline-warning-disable);
+  color: var(--text-warning-disable);
+}
+
+/* ── alert / medium ────────────────────────────────────────────────────── */
+
+.medium.alert {
+  background: var(--element-fill-alert-tertiary-default);
+  border-color: var(--element-outline-alert-default);
+  color: var(--text-alert-default);
+}
+.medium.alert:hover {
+  background: var(--element-fill-alert-tertiary-hover);
+  border-color: var(--element-outline-alert-hover);
+  color: var(--text-alert-hover);
+}
+.medium.alert:active:not(:has(button:active)) {
+  background: var(--element-fill-alert-tertiary-press);
+  border-color: var(--element-outline-alert-press);
+  color: var(--text-alert-press);
+}
+.medium.alert.disabled {
+  background: var(--element-fill-alert-tertiary-disable);
+  border-color: var(--element-outline-alert-disable);
+  color: var(--text-alert-disable);
+}
+
+/* ====================================================================== */
+/* EMPHASIS: low — secondary fill, no border                              */
+/* ====================================================================== */
+
+/* ── neutral / low ─────────────────────────────────────────────────────── */
+
+.low.neutral {
+  background: var(--element-fill-neutral-secondary-default);
+  color: var(--text-neutral-secondary-default);
+}
+.low.neutral:hover {
+  background: var(--element-fill-neutral-secondary-hover);
+  color: var(--text-neutral-secondary-hover);
+}
+.low.neutral:active:not(:has(button:active)) {
+  background: var(--element-fill-neutral-secondary-press);
+  color: var(--text-neutral-secondary-press);
+}
+.low.neutral.disabled {
+  background: var(--element-fill-neutral-secondary-disable);
+  color: var(--text-neutral-disable);
+}
+
+/* ── brand / low ───────────────────────────────────────────────────────── */
+
+.low.brand {
+  background: var(--element-fill-brand-secondary-default);
+  color: var(--text-brand-default);
+}
+.low.brand:hover {
+  background: var(--element-fill-brand-secondary-hover);
+  color: var(--text-brand-hover);
+}
+.low.brand:active:not(:has(button:active)) {
+  background: var(--element-fill-brand-secondary-press);
+  color: var(--text-brand-press);
+}
+.low.brand.disabled {
+  background: var(--element-fill-brand-secondary-disable);
+  color: var(--text-brand-disable);
+}
+
+/* ── info / low ────────────────────────────────────────────────────────── */
+
+.low.info {
+  background: var(--element-fill-info-secondary-default);
+  color: var(--text-info-default);
+}
+.low.info:hover {
+  background: var(--element-fill-info-secondary-hover);
+  color: var(--text-info-hover);
+}
+.low.info:active:not(:has(button:active)) {
+  background: var(--element-fill-info-secondary-press);
+  color: var(--text-info-press);
+}
+.low.info.disabled {
+  background: var(--element-fill-info-secondary-disable);
+  color: var(--text-info-disable);
+}
+
+/* ── success / low ─────────────────────────────────────────────────────── */
+
+.low.success {
+  background: var(--element-fill-success-secondary-default);
+  color: var(--text-success-default);
+}
+.low.success:hover {
+  background: var(--element-fill-success-secondary-hover);
+  color: var(--text-success-hover);
+}
+.low.success:active:not(:has(button:active)) {
+  background: var(--element-fill-success-secondary-press);
+  color: var(--text-success-press);
+}
+.low.success.disabled {
+  background: var(--element-fill-success-secondary-disable);
+  color: var(--text-success-disable);
+}
+
+/* ── warning / low ─────────────────────────────────────────────────────── */
+
+.low.warning {
+  background: var(--element-fill-warning-secondary-default);
+  color: var(--text-warning-default);
+}
+.low.warning:hover {
+  background: var(--element-fill-warning-secondary-hover);
+  color: var(--text-warning-hover);
+}
+.low.warning:active:not(:has(button:active)) {
+  background: var(--element-fill-warning-secondary-press);
+  color: var(--text-warning-press);
+}
+.low.warning.disabled {
+  background: var(--element-fill-warning-secondary-disable);
+  color: var(--text-warning-disable);
+}
+
+/* ── alert / low ───────────────────────────────────────────────────────── */
+
+.low.alert {
+  background: var(--element-fill-alert-secondary-default);
+  color: var(--text-alert-default);
+}
+.low.alert:hover {
+  background: var(--element-fill-alert-secondary-hover);
+  color: var(--text-alert-hover);
+}
+.low.alert:active:not(:has(button:active)) {
+  background: var(--element-fill-alert-secondary-press);
+  color: var(--text-alert-press);
+}
+.low.alert.disabled {
+  background: var(--element-fill-alert-secondary-disable);
+  color: var(--text-alert-disable);
+}

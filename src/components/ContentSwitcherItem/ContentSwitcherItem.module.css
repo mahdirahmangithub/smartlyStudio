@@ -1,0 +1,234 @@
+/* ── base ──────────────────────────────────────────────────────────────── */
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: clip;
+  box-sizing: border-box;
+  cursor: pointer;
+  flex-shrink: 0;
+  white-space: nowrap;
+  user-select: none;
+  transition:
+    background var(--animation-state-change-duration) var(--animation-state-change-easing),
+    color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* ── high emphasis ────────────────────────────────────────────────────── */
+
+.high {
+  background: var(--element-fill-neutral-tertiary-default);
+  color: var(--text-neutral-secondary-default);
+  border: none;
+}
+
+.high:hover {
+  background: var(--element-fill-neutral-tertiary-hover);
+  color: var(--text-neutral-secondary-hover);
+}
+
+.high:active {
+  background: var(--element-fill-neutral-tertiary-press);
+  color: var(--text-neutral-secondary-press);
+}
+
+.high:focus-visible {
+  background: var(--element-fill-neutral-tertiary-hover);
+  color: var(--text-neutral-secondary-hover);
+  outline: 2px solid var(--element-outline-neutral-default);
+  outline-offset: 2px;
+}
+
+.high.checked {
+  background: var(--element-knob-active);
+  color: var(--text-neutral-primary);
+  box-shadow: var(--shadow-default);
+}
+
+.high.checked:hover,
+.high.checked:active {
+  background: var(--element-knob-active);
+  color: var(--text-neutral-primary);
+}
+
+.high.checked:focus-visible {
+  background: var(--element-knob-active);
+  color: var(--text-neutral-primary);
+  box-shadow: var(--shadow-default);
+  outline: 2px solid var(--element-outline-neutral-default);
+  outline-offset: 2px;
+}
+
+.high:disabled,
+.high:disabled:hover,
+.high:disabled:active {
+  background: var(--element-fill-neutral-tertiary-disable);
+  color: var(--text-neutral-disable);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ── low emphasis ─────────────────────────────────────────────────────── */
+
+.low {
+  background: var(--element-fill-neutral-tertiary-default);
+  color: var(--text-neutral-secondary-default);
+  border: var(--spacing-px) solid transparent;
+}
+
+.low:hover {
+  background: var(--element-fill-neutral-tertiary-hover);
+  color: var(--text-neutral-secondary-hover);
+  border-color: var(--element-outline-neutral-hover);
+}
+
+.low:active {
+  background: var(--element-fill-neutral-tertiary-press);
+  color: var(--text-neutral-secondary-press);
+  border-color: var(--element-outline-neutral-press);
+}
+
+.low:focus-visible {
+  background: var(--element-fill-neutral-tertiary-hover);
+  color: var(--text-neutral-secondary-hover);
+  outline: 2px solid var(--element-outline-neutral-default);
+  outline-offset: 2px;
+}
+
+.low.checked {
+  background: var(--element-fill-brand-tertiary-active-default);
+  color: var(--text-neutral-primary);
+  border-color: var(--element-outline-brand-active);
+}
+
+.low.checked:hover {
+  background: var(--element-fill-brand-tertiary-active-hover);
+  color: var(--text-neutral-primary);
+  border-color: var(--element-outline-brand-active);
+}
+
+.low.checked:active {
+  background: var(--element-fill-brand-tertiary-active-press);
+  color: var(--text-neutral-primary);
+  border-color: var(--element-outline-brand-active);
+}
+
+.low.checked:focus-visible {
+  background: var(--element-fill-brand-tertiary-active-default);
+  color: var(--text-neutral-primary);
+  border-color: transparent;
+  outline: 2px solid var(--element-outline-neutral-default);
+  outline-offset: 2px;
+}
+
+.low:disabled,
+.low:disabled:hover,
+.low:disabled:active {
+  background: var(--element-fill-neutral-tertiary-disable);
+  color: var(--text-neutral-disable);
+  border-color: transparent;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* ── sizes × emphasis ─────────────────────────────────────────────────── */
+
+/* sm / high — 20px */
+.sm.high {
+  min-height: var(--spacing-lg);
+  padding: 0 var(--spacing-2xs);
+  gap: var(--spacing-none);
+  border-radius: var(--radius-sm);
+}
+
+/* sm / low — 24px */
+.sm.low {
+  min-height: var(--spacing-xl);
+  padding: 0 var(--spacing-xs);
+  gap: var(--spacing-none);
+  border-radius: var(--radius-md);
+}
+
+/* md / high — 28px */
+.md.high {
+  min-height: var(--spacing-xl-plus);
+  padding: 0 var(--spacing-sm-minus);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-md);
+}
+
+/* md / low — 32px */
+.md.low {
+  min-height: var(--spacing-2xl);
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-lg);
+}
+
+/* lg / high — 36px */
+.lg.high {
+  min-height: var(--spacing-3xl);
+  padding: 0 var(--spacing-sm);
+  gap: var(--spacing-2xs);
+  border-radius: var(--radius-md);
+}
+
+/* lg / low — 40px */
+.lg.low {
+  min-height: var(--spacing-4xl);
+  padding: 0 var(--spacing-sm-plus);
+  gap: var(--spacing-2xs);
+  border-radius: var(--radius-lg);
+}
+
+/* ── icon slot ─────────────────────────────────────────────────────────── */
+
+.iconSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── label ─────────────────────────────────────────────────────────────── */
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* sm uses label/strong/xs, with px spacing/sm-minus for padding */
+.sm .label {
+  font-family: var(--type-label-strong-xs-family);
+  font-weight: var(--type-label-strong-xs-weight);
+  font-size: var(--type-label-strong-xs-size);
+  line-height: var(--type-label-strong-xs-line-height);
+  letter-spacing: var(--type-label-strong-xs-letter-spacing);
+  padding-inline: var(--spacing-sm-minus);
+}
+
+/* md uses label/strong/sm, with px spacing/xs for padding */
+.md .label {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+  padding-inline: var(--spacing-xs);
+}
+
+/* lg uses label/strong/sm, with px spacing/sm-minus for padding */
+.lg .label {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+  padding-inline: var(--spacing-sm-minus);
+}

@@ -1,0 +1,164 @@
+/* ── wrapper ─────────────────────────────────────────────────────────── */
+
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  vertical-align: middle;
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+
+/* ── hidden native input ────────────────────────────────────────────── */
+
+.input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  cursor: inherit;
+}
+
+/* ── track (pill) ───────────────────────────────────────────────────── */
+
+.track {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-2xs);
+  border-radius: var(--radius-full);
+  overflow: clip;
+  transition:
+    background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* ── sizes ───────────────────────────────────────────────────────────── */
+
+.sm .track {
+  height: var(--spacing-md);
+  width: var(--spacing-xl-plus);
+}
+
+.lg .track {
+  height: var(--spacing-lg);
+  width: var(--spacing-3xl);
+}
+
+/* ── knob ────────────────────────────────────────────────────────────── */
+
+.knob {
+  flex-shrink: 0;
+  aspect-ratio: 1;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--element-knob-default);
+  box-shadow:
+    0 0 var(--blur-2xs) 0 var(--shadow-ambient),
+    0 var(--space-2xs) var(--blur-xs) 0 var(--shadow-halo),
+    0 var(--space-2xs) var(--blur-xs) 0 var(--shadow-cast),
+    0 var(--space-2xs) var(--blur-md) 0 var(--shadow-cast-high);
+  transition: transform var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* knob slides right when checked */
+
+.sm.checked .knob {
+  transform: translateX(calc(var(--spacing-xl-plus) - var(--spacing-md)));
+}
+
+.lg.checked .knob {
+  transform: translateX(calc(var(--spacing-3xl) - var(--spacing-lg)));
+}
+
+/* disabled knob: no shadow, muted color */
+
+.disabled .knob {
+  background: var(--element-knob-disable);
+  box-shadow: none;
+}
+
+/* indeterminate: center the dash in the track */
+
+.active:not(.checked) .track {
+  justify-content: center;
+}
+
+/* ── indeterminate dash ─────────────────────────────────────────────── */
+
+.dash {
+  border-radius: var(--radius-full);
+  background: var(--element-knob-default);
+}
+
+.sm .dash {
+  width: 8px;
+  height: 2px;
+}
+
+.lg .dash {
+  width: 10px;
+  height: 2px;
+}
+
+.disabled .dash {
+  background: var(--element-knob-disable);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UNCHECKED
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.track {
+  background: var(--element-fill-neutral-secondary-default);
+}
+
+.toggle:hover:not(.disabled) .track {
+  background: var(--element-fill-neutral-secondary-hover);
+}
+
+.toggle:active:not(.disabled) .track {
+  background: var(--element-fill-neutral-secondary-press);
+}
+
+.input:focus-visible ~ .track {
+  background: var(--element-fill-neutral-secondary-hover);
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+}
+
+.disabled .track {
+  background: var(--element-fill-neutral-secondary-disable);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CHECKED / INDETERMINATE
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.active .track {
+  background: var(--element-fill-brand-primary-default);
+}
+
+.active:hover:not(.disabled) .track {
+  background: var(--element-fill-brand-primary-hover);
+}
+
+.active:active:not(.disabled) .track {
+  background: var(--element-fill-brand-primary-press);
+}
+
+.active .input:focus-visible ~ .track {
+  background: var(--element-fill-brand-primary-hover);
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+}
+
+.active.disabled .track {
+  background: var(--element-fill-brand-primary-disable-active);
+}
