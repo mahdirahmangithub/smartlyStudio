@@ -42,7 +42,7 @@ export function NavigationSelectOption({
   return (
     <div className={cx(styles.option, className)} {...rest}>
       <div
-        role="menuitem"
+        role="option"
         aria-disabled={disabled || undefined}
         tabIndex={disabled ? -1 : 0}
         className={cx(styles.content, disabled && styles.disabled)}

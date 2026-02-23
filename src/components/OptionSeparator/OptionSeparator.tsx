@@ -24,7 +24,7 @@ export function OptionSeparator({
 }: OptionSeparatorProps) {
   if (type === "divider") {
     return (
-      <div className={cx(styles.dividerWrapper, className)} {...rest}>
+      <div role="separator" className={cx(styles.dividerWrapper, className)} {...rest}>
         <Divider padding />
       </div>
     );
@@ -32,7 +32,8 @@ export function OptionSeparator({
 
   return (
     <div
-      role="presentation"
+      role="group"
+      aria-label={labelText}
       className={cx(styles.groupLabel, className)}
       {...rest}
     >

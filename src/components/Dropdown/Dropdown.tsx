@@ -130,6 +130,16 @@ const EXIT_MS = 200;
 const DEFAULT_WIDTH = 320;
 const DEFAULT_MAX_HEIGHT = 400;
 
+const FOCUSABLE_SEL = [
+  'input:not([disabled]):not([type="checkbox"]):not([type="radio"])',
+  "button:not([disabled])",
+  '[tabindex="0"]:not([aria-disabled="true"])',
+].join(", ");
+
+function focusVisible(el: HTMLElement | null | undefined) {
+  el?.focus({ focusVisible: true } as FocusOptions);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    Component
    ═══════════════════════════════════════════════════════════════════════ */
@@ -176,6 +186,7 @@ export function Dropdown({
         () => setIsMounted(false),
         EXIT_MS + 50
       );
+      anchorRef.current?.focus();
     }
     return () => clearTimeout(exitTimerRef.current);
   }, [open]);
@@ -292,6 +303,132 @@ export function Dropdown({
     return () => document.removeEventListener("keydown", handler);
   }, [isMounted, closeOnEscape, onClose]);
 
+  /* ── keyboard navigation ────────────────────────
+     Manages arrow-key roving focus between options,
+     focus-traps Tab within the panel, and auto-focuses
+     the search input (or first option) on open.
+     ─────────────────────────────────────────────── */
+
+  const getOptions = useCallback((): HTMLElement[] => {
+    const panel = panelRef.current;
+    if (!panel) return [];
+    return Array.from(
+      panel.querySelectorAll<HTMLElement>(
+        '[role="option"]:not([aria-disabled="true"])'
+      )
+    );
+  }, []);
+
+  const getHeaderInput = useCallback((): HTMLElement | null => {
+    return (
+      headerRef.current?.querySelector<HTMLElement>(
+        'input:not([type="checkbox"]):not([type="radio"])'
+      ) ?? null
+    );
+  }, []);
+
+  const getFocusables = useCallback((): HTMLElement[] => {
+    const panel = panelRef.current;
+    if (!panel) return [];
+    return Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SEL));
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted || anim !== "enter") return;
+    const timer = setTimeout(() => {
+      const input = getHeaderInput();
+      if (input) {
+        focusVisible(input);
+        return;
+      }
+      const opts = getOptions();
+      if (opts.length > 0) focusVisible(opts[0]);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [isMounted, anim, getHeaderInput, getOptions]);
+
+  const handlePanelKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const panel = panelRef.current;
+      if (!panel) return;
+      const { key, shiftKey } = e;
+
+      /* ── Arrow Up / Down ── */
+      if (key === "ArrowDown" || key === "ArrowUp") {
+        e.preventDefault();
+        const opts = getOptions();
+        if (opts.length === 0) return;
+
+        const active = document.activeElement as HTMLElement;
+        const hInput = getHeaderInput();
+        const inHeader = hInput && headerRef.current?.contains(active);
+
+        let idx = opts.indexOf(active);
+        if (idx < 0) {
+          const closest = active.closest('[role="option"]') as HTMLElement;
+          if (closest) idx = opts.indexOf(closest);
+        }
+
+        if (key === "ArrowDown") {
+          if (inHeader || idx < 0) focusVisible(opts[0]);
+          else if (idx < opts.length - 1) focusVisible(opts[idx + 1]);
+        } else {
+          if (idx === 0 && hInput) focusVisible(hInput);
+          else if (idx > 0) focusVisible(opts[idx - 1]);
+        }
+
+        requestAnimationFrame(() => {
+          const f = document.activeElement as HTMLElement;
+          if (f && panel.contains(f))
+            f.scrollIntoView?.({ block: "nearest" });
+        });
+      }
+
+      /* ── Home / End (skip when inside a text input) ── */
+      const isTextInput =
+        (document.activeElement as HTMLElement)?.tagName === "INPUT" &&
+        (document.activeElement as HTMLInputElement)?.type !== "checkbox" &&
+        (document.activeElement as HTMLInputElement)?.type !== "radio";
+
+      if (key === "Home" && !isTextInput) {
+        e.preventDefault();
+        const opts = getOptions();
+        focusVisible(opts[0]);
+        opts[0]?.scrollIntoView?.({ block: "nearest" });
+      }
+      if (key === "End" && !isTextInput) {
+        e.preventDefault();
+        const opts = getOptions();
+        const last = opts[opts.length - 1];
+        focusVisible(last);
+        last?.scrollIntoView?.({ block: "nearest" });
+      }
+
+      /* ── Focus trap (Tab / Shift-Tab) ── */
+      if (key === "Tab") {
+        const focusables = getFocusables();
+        if (focusables.length === 0) return;
+
+        const active = document.activeElement as HTMLElement;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (shiftKey) {
+          if (active === first || !panel.contains(active)) {
+            e.preventDefault();
+            focusVisible(last);
+          }
+        } else {
+          if (active === last || !panel.contains(active)) {
+            e.preventDefault();
+            focusVisible(first);
+          }
+        }
+      }
+    },
+    [getOptions, getHeaderInput, getFocusables]
+  );
+
   /* ── computed width ───────────────────────────── */
 
   const resolvedWidth = matchAnchorWidth
@@ -321,10 +458,12 @@ export function Dropdown({
   return createPortal(
     <div
       ref={panelRef}
+      role="listbox"
       className={cx(styles.panel, animClass, className)}
       style={panelStyle}
       data-theme={theme || undefined}
       onAnimationEnd={onAnimEnd}
+      onKeyDown={handlePanelKeyDown}
     >
       {header && (
         <div ref={headerRef} className={styles.header}>{header}</div>

@@ -60,7 +60,7 @@ export function GenericSelectOption({
   return (
     <div className={cx(styles.option, className)} {...rest}>
       <div
-        role="menuitem"
+        role="option"
         aria-disabled={disabled || undefined}
         tabIndex={disabled ? -1 : 0}
         className={cx(
