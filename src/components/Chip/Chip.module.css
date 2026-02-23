@@ -19,9 +19,9 @@
 }
 
 .chip:focus-visible {
-  box-shadow:
+  box-shadow: var(--focus-ring,
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
-    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
   outline: none;
 }
 
@@ -31,6 +31,7 @@
   min-height: var(--spacing-xl);
   padding: 0 var(--spacing-xs);
   gap: var(--spacing-none);
+  --focus-ring: inset 0 0 0 2px var(--element-outline-neutral-default);
 }
 
 .md {

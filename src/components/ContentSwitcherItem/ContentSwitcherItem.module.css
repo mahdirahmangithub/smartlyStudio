@@ -39,9 +39,9 @@
 .high:focus-visible {
   background: var(--element-fill-neutral-tertiary-hover);
   color: var(--text-neutral-secondary-hover);
-  box-shadow:
+  box-shadow: var(--focus-ring,
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
-    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
   outline: none;
 }
 
@@ -60,10 +60,9 @@
 .high.checked:focus-visible {
   background: var(--element-knob-active);
   color: var(--text-neutral-primary);
-  box-shadow:
-    var(--shadow-default),
+  box-shadow: var(--shadow-default), var(--focus-ring,
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
-    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
   outline: none;
 }
 
@@ -99,9 +98,9 @@
 .low:focus-visible {
   background: var(--element-fill-neutral-tertiary-hover);
   color: var(--text-neutral-secondary-hover);
-  box-shadow:
+  box-shadow: var(--focus-ring,
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
-    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
   outline: none;
 }
 
@@ -127,9 +126,9 @@
   background: var(--element-fill-brand-tertiary-active-default);
   color: var(--text-neutral-primary);
   border-color: transparent;
-  box-shadow:
+  box-shadow: var(--focus-ring,
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
-    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
   outline: none;
 }
 

@@ -16,6 +16,7 @@
   align-items: center;
   min-height: var(--spacing-4xl);
   overflow: clip;
+  --focus-ring: inset 0 0 0 2px var(--element-outline-neutral-default);
   padding: var(--spacing-sm);
   border-radius: var(--radius-lg);
   width: 100%;

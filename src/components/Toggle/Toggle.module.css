@@ -127,9 +127,9 @@
 
 .input:focus-visible ~ .track {
   background: var(--element-fill-neutral-secondary-hover);
-  box-shadow:
+  box-shadow: var(--focus-ring,
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
-    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
 }
 
 .disabled .track {
@@ -154,9 +154,9 @@
 
 .active .input:focus-visible ~ .track {
   background: var(--element-fill-brand-primary-hover);
-  box-shadow:
+  box-shadow: var(--focus-ring,
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
-    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
 }
 
 .active.disabled .track {
