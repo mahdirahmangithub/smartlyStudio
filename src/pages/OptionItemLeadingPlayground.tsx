@@ -81,6 +81,7 @@ export default function OptionItemLeadingPlayground() {
                   emphasis="low"
                   icon={<Icon name="favorite_fill" size={16} />}
                   aria-label="Favorite"
+                  disabled={disabled}
                 />
               </OptionItemLeading>
               <p style={{ fontSize: 10, color: "var(--text-neutral-tertiary-default)", marginTop: 4 }}>1-action</p>
@@ -89,7 +90,7 @@ export default function OptionItemLeadingPlayground() {
             {/* button */}
             <div style={{ textAlign: "center" }}>
               <OptionItemLeading type="button" disabled={disabled}>
-                <Button size="sm" variant="neutral" emphasis="medium">
+                <Button size="sm" variant="neutral" emphasis="medium" disabled={disabled}>
                   Label
                 </Button>
               </OptionItemLeading>
@@ -100,8 +101,8 @@ export default function OptionItemLeadingPlayground() {
             <div style={{ textAlign: "center" }}>
               <OptionItemLeading type="2-action" disabled={disabled}>
                 <RowContainer density="none">
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
                 </RowContainer>
               </OptionItemLeading>
               <p style={{ fontSize: 10, color: "var(--text-neutral-tertiary-default)", marginTop: 4 }}>2-action</p>
@@ -111,9 +112,9 @@ export default function OptionItemLeadingPlayground() {
             <div style={{ textAlign: "center" }}>
               <OptionItemLeading type="3-action" disabled={disabled}>
                 <RowContainer density="none">
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
                 </RowContainer>
               </OptionItemLeading>
               <p style={{ fontSize: 10, color: "var(--text-neutral-tertiary-default)", marginTop: 4 }}>3-action</p>

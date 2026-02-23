@@ -86,7 +86,7 @@ export function SingleSelectOption({
         {trailing && <OptionItemTrailing {...trailing} disabled={disabled} />}
 
         {checked && (
-          <Icon name="check" size={24} className={styles.checkIcon} />
+          <Icon name="check" size={20} className={styles.checkIcon} />
         )}
       </div>
     </div>

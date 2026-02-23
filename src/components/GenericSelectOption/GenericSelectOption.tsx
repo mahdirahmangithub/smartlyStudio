@@ -93,7 +93,7 @@ export function GenericSelectOption({
         {trailing && <OptionItemTrailing {...trailing} disabled={disabled} />}
 
         {subMenu && (
-          <Icon name="chevron_right" size={24} className={styles.subMenuIcon} />
+          <Icon name="chevron_right" size={16} className={styles.subMenuIcon} />
         )}
       </div>
     </div>

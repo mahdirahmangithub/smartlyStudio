@@ -160,6 +160,7 @@ export default function DropdownPlayground() {
               <MultiSelectOption
                 key={f}
                 labelText={f}
+                description={false}
                 checked={selectedFruits.has(f)}
                 onChange={() => toggleFruit(f)}
               />
@@ -209,6 +210,7 @@ export default function DropdownPlayground() {
               <MultiSelectOption
                 key={c}
                 labelText={c}
+                description={false}
                 checked={scrollSelected.has(c)}
                 onChange={() => toggleCountry(c)}
               />
@@ -236,6 +238,7 @@ export default function DropdownPlayground() {
               <SingleSelectOption
                 key={f}
                 labelText={f}
+                description={false}
                 checked={singleValue === f}
                 onChange={() => {
                   setSingleValue(f);
@@ -304,6 +307,7 @@ export default function DropdownPlayground() {
               <TagMultiSelectOption
                 key={t}
                 labelText={t}
+                description={false}
                 checked={selectedTags.has(t)}
                 onChange={() => toggleTag(t)}
               />
@@ -325,12 +329,12 @@ export default function DropdownPlayground() {
             anchorRef={genericRef}
           >
             <OptionSeparator type="group-label" labelText="Actions" />
-            <GenericSelectOption labelText="Copy" onClick={() => setGenericOpen(false)} />
-            <GenericSelectOption labelText="Paste" onClick={() => setGenericOpen(false)} />
-            <GenericSelectOption labelText="Duplicate" onClick={() => setGenericOpen(false)} />
+            <GenericSelectOption labelText="Copy" description={false} onClick={() => setGenericOpen(false)} />
+            <GenericSelectOption labelText="Paste" description={false} onClick={() => setGenericOpen(false)} />
+            <GenericSelectOption labelText="Duplicate" description={false} onClick={() => setGenericOpen(false)} />
             <OptionSeparator type="divider" />
             <OptionSeparator type="group-label" labelText="Danger zone" />
-            <GenericSelectOption labelText="Delete" onClick={() => setGenericOpen(false)} />
+            <GenericSelectOption labelText="Delete" description={false} onClick={() => setGenericOpen(false)} />
           </Dropdown>
         </section>
 
@@ -346,9 +350,9 @@ export default function DropdownPlayground() {
             anchorRef={minRef}
             width={200}
           >
-            <SingleSelectOption labelText="Small" onChange={() => setMinOpen(false)} />
-            <SingleSelectOption labelText="Medium" onChange={() => setMinOpen(false)} />
-            <SingleSelectOption labelText="Large" onChange={() => setMinOpen(false)} />
+            <SingleSelectOption labelText="Small" description={false} onChange={() => setMinOpen(false)} />
+            <SingleSelectOption labelText="Medium" description={false} onChange={() => setMinOpen(false)} />
+            <SingleSelectOption labelText="Large" description={false} onChange={() => setMinOpen(false)} />
           </Dropdown>
         </section>
 
@@ -367,10 +371,10 @@ export default function DropdownPlayground() {
             placement="top-start"
             width={240}
           >
-            <SingleSelectOption labelText="Option A" onChange={() => setTopOpen(false)} />
-            <SingleSelectOption labelText="Option B" onChange={() => setTopOpen(false)} />
-            <SingleSelectOption labelText="Option C" onChange={() => setTopOpen(false)} />
-            <SingleSelectOption labelText="Option D" onChange={() => setTopOpen(false)} />
+            <SingleSelectOption labelText="Option A" description={false} onChange={() => setTopOpen(false)} />
+            <SingleSelectOption labelText="Option B" description={false} onChange={() => setTopOpen(false)} />
+            <SingleSelectOption labelText="Option C" description={false} onChange={() => setTopOpen(false)} />
+            <SingleSelectOption labelText="Option D" description={false} onChange={() => setTopOpen(false)} />
           </Dropdown>
         </section>
       </div>

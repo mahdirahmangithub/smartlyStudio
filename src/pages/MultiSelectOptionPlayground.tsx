@@ -21,7 +21,7 @@ export default function MultiSelectOptionPlayground() {
               key={fruit}
               checked={!!selections[fruit]}
               labelText={fruit}
-              descriptionText={`A delicious ${fruit.toLowerCase()}`}
+              description={false}
               leading={<Icon name="favorite" size={20} />}
               trailing={{ type: "helper-text", helperText: "Fruit" }}
               onChange={() => toggle(fruit)}
@@ -36,13 +36,13 @@ export default function MultiSelectOptionPlayground() {
         <div style={{ maxWidth: 340 }}>
           <MultiSelectOption
             labelText="Normal"
-            descriptionText="Default unchecked state"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
           />
           <MultiSelectOption
             labelText="Disabled"
-            descriptionText="Cannot be interacted with"
+            description={false}
             disabled
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
@@ -56,7 +56,7 @@ export default function MultiSelectOptionPlayground() {
           <MultiSelectOption
             checked
             labelText="Normal checked"
-            descriptionText="Default checked state"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -64,7 +64,7 @@ export default function MultiSelectOptionPlayground() {
             checked
             disabled
             labelText="Disabled checked"
-            descriptionText="Cannot be unchecked"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -82,11 +82,11 @@ export default function MultiSelectOptionPlayground() {
           <MultiSelectOption
             checked
             labelText="Checked, no leading"
-            descriptionText="Has description but no icon"
+            description={false}
           />
           <MultiSelectOption
             labelText="With leading, no trailing"
-            descriptionText="Only leading icon shown"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
           />
         </div>

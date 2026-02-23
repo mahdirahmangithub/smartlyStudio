@@ -86,6 +86,7 @@ export default function SelectOptionHeaderPlayground() {
             <MultiSelectOption
               key={f}
               labelText={f}
+              description={false}
               checked={selected.has(f)}
               onChange={() => toggleFruit(f)}
             />
@@ -125,10 +126,10 @@ export default function SelectOptionHeaderPlayground() {
             onToChange={(e) => setToVal(e.target.value)}
           />
           <OptionSeparator type="divider" />
-          <SingleSelectOption labelText="Last 7 days" />
-          <SingleSelectOption labelText="Last 30 days" />
-          <SingleSelectOption labelText="Last 90 days" />
-          <SingleSelectOption labelText="Custom range" />
+          <SingleSelectOption labelText="Last 7 days" description={false} />
+          <SingleSelectOption labelText="Last 30 days" description={false} />
+          <SingleSelectOption labelText="Last 90 days" description={false} />
+          <SingleSelectOption labelText="Custom range" description={false} />
         </div>
       </section>
     </div>

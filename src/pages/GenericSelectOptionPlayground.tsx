@@ -12,14 +12,14 @@ export default function GenericSelectOptionPlayground() {
         <div style={{ maxWidth: 340 }}>
           <GenericSelectOption
             labelText="Open file"
-            descriptionText="Browse and open a file"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
             subMenu
           />
           <GenericSelectOption
             labelText="No sub-menu"
-            descriptionText="Regular action item"
+            description={false}
             leading={<Icon name="edit" size={20} />}
             trailing={{ type: "helper-text", helperText: "⌘E", helperIcon: false }}
           />
@@ -29,7 +29,7 @@ export default function GenericSelectOptionPlayground() {
           />
           <GenericSelectOption
             labelText="Disabled item"
-            descriptionText="Cannot be interacted with"
+            description={false}
             disabled
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
@@ -45,14 +45,14 @@ export default function GenericSelectOptionPlayground() {
           <GenericSelectOption
             alert
             labelText="Delete"
-            descriptionText="Permanently remove this item"
+            description={false}
             leading={<Icon name="delete" size={20} />}
             trailing={{ type: "helper-text", helperText: "⌫", helperIcon: false }}
           />
           <GenericSelectOption
             alert
             labelText="Remove all"
-            descriptionText="Clear entire list"
+            description={false}
             leading={<Icon name="delete" size={20} />}
             subMenu
           />
@@ -60,7 +60,7 @@ export default function GenericSelectOptionPlayground() {
             alert
             disabled
             labelText="Disabled alert"
-            descriptionText="Cannot be executed"
+            description={false}
             leading={<Icon name="delete" size={20} />}
             subMenu
           />
@@ -73,7 +73,7 @@ export default function GenericSelectOptionPlayground() {
         <div style={{ maxWidth: 340 }}>
           <GenericSelectOption
             labelText="No leading, no trailing"
-            descriptionText="Just text content"
+            description={false}
           />
           <GenericSelectOption
             labelText="Sub-menu only"
@@ -82,7 +82,7 @@ export default function GenericSelectOptionPlayground() {
           />
           <GenericSelectOption
             labelText="With leading only"
-            descriptionText="No trailing or sub-menu"
+            description={false}
             leading={<Icon name="settings" size={20} />}
           />
         </div>

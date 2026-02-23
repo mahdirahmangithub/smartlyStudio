@@ -9,7 +9,7 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { useScrollFade } from "../ScrollFade";
+import { ScrollFade } from "../ScrollFade";
 import styles from "./Dropdown.module.css";
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -153,7 +153,6 @@ export function Dropdown({
   const panelRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
-  const optionsRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(undefined);
 
   /* ── mount / unmount animation ────────────────── */
@@ -293,10 +292,6 @@ export function Dropdown({
     return () => document.removeEventListener("keydown", handler);
   }, [isMounted, closeOnEscape, onClose]);
 
-  /* ── scroll faders ────────────────────────────── */
-
-  const { showStart, showEnd, onScroll } = useScrollFade(optionsRef, "vertical");
-
   /* ── computed width ───────────────────────────── */
 
   const resolvedWidth = matchAnchorWidth
@@ -335,24 +330,14 @@ export function Dropdown({
         <div ref={headerRef} className={styles.header}>{header}</div>
       )}
 
-      <div className={styles.scrollContainer}>
-        <div
-          className={cx(styles.fade, styles.fadeTop, showStart && styles.fadeVisible)}
-          aria-hidden="true"
-        />
-        <div
-          ref={optionsRef}
-          className={styles.options}
-          style={scrollMaxH != null ? { maxHeight: scrollMaxH } : undefined}
-          onScroll={onScroll}
-        >
-          {children}
-        </div>
-        <div
-          className={cx(styles.fade, styles.fadeBottom, showEnd && styles.fadeVisible)}
-          aria-hidden="true"
-        />
-      </div>
+      <ScrollFade
+        direction="vertical"
+        surface="over"
+        scrollAreaClassName={styles.options}
+        scrollAreaStyle={scrollMaxH != null ? { maxHeight: scrollMaxH } : undefined}
+      >
+        {children}
+      </ScrollFade>
 
       {footer && (
         <div ref={footerRef} className={styles.footer}>{footer}</div>

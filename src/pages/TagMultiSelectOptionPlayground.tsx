@@ -34,7 +34,7 @@ export default function TagMultiSelectOptionPlayground() {
               checked={!!selections[label]}
               labelText={label}
               tagVariant={variant}
-              descriptionText={`${variant} tag variant`}
+              description={false}
               leading={<Icon name={icon} size={20} />}
               trailing={{ type: "helper-text", helperText: variant }}
               onChange={() => toggle(label)}
@@ -51,21 +51,21 @@ export default function TagMultiSelectOptionPlayground() {
             labelText="Brand high"
             tagVariant="brand"
             tagEmphasis="high"
-            descriptionText="High emphasis brand tag"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
           />
           <TagMultiSelectOption
             labelText="Success high"
             tagVariant="success"
             tagEmphasis="high"
-            descriptionText="High emphasis success tag"
+            description={false}
             leading={<Icon name="check_circle" size={20} />}
           />
           <TagMultiSelectOption
             labelText="Alert high"
             tagVariant="alert"
             tagEmphasis="high"
-            descriptionText="High emphasis alert tag"
+            description={false}
             leading={<Icon name="error" size={20} />}
           />
         </div>
@@ -78,7 +78,7 @@ export default function TagMultiSelectOptionPlayground() {
           <TagMultiSelectOption
             labelText="Normal"
             tagVariant="info"
-            descriptionText="Default unchecked"
+            description={false}
             leading={<Icon name="info" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -86,7 +86,7 @@ export default function TagMultiSelectOptionPlayground() {
             checked
             labelText="Checked"
             tagVariant="success"
-            descriptionText="Checked state"
+            description={false}
             leading={<Icon name="check_circle" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -94,7 +94,7 @@ export default function TagMultiSelectOptionPlayground() {
             disabled
             labelText="Disabled"
             tagVariant="warning"
-            descriptionText="Cannot be interacted with"
+            description={false}
             leading={<Icon name="warning" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -103,7 +103,7 @@ export default function TagMultiSelectOptionPlayground() {
             disabled
             labelText="Checked disabled"
             tagVariant="alert"
-            descriptionText="Cannot be unchecked"
+            description={false}
             leading={<Icon name="error" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -123,12 +123,12 @@ export default function TagMultiSelectOptionPlayground() {
             checked
             labelText="Checked, no leading"
             tagVariant="cat-5"
-            descriptionText="Has description but no icon"
+            description={false}
           />
           <TagMultiSelectOption
             labelText="With leading, no trailing"
             tagVariant="cat-6"
-            descriptionText="Only leading icon shown"
+            description={false}
             leading={<Icon name="settings" size={20} />}
           />
         </div>

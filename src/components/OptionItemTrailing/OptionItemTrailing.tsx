@@ -59,7 +59,7 @@ export function OptionItemTrailing({
       >
         <span className={styles.label}>{helperText}</span>
         {helperIcon && (
-          <Icon name="arrow_right" size={24} className={styles.helperIcon} />
+          <Icon name="arrow_right" size={16} className={styles.helperIcon} />
         )}
       </div>
     );

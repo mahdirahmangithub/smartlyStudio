@@ -30,16 +30,10 @@
    Options area (scrollable)
    ═══════════════════════════════════════════════════════════════════════ */
 
-.scrollContainer {
-  position: relative;
-  overflow: hidden;
-}
-
 .options {
   display: flex;
   flex-direction: column;
   padding: var(--spacing-sm);
-  overflow-y: auto;
   box-sizing: border-box;
 
   scrollbar-width: thin;
@@ -61,69 +55,46 @@
   background-clip: padding-box;
 }
 
-/* ── scroll faders ────────────────────────────────────────────────────── */
-
-.fade {
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 16px;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
-  z-index: 1;
-}
-
-.fadeVisible {
-  opacity: 1;
-}
-
-.fadeTop {
-  top: 0;
-  background: linear-gradient(to bottom, var(--element-surface-over), transparent);
-}
-
-.fadeBottom {
-  bottom: 0;
-  background: linear-gradient(to top, var(--element-surface-over), transparent);
-}
-
 /* ═══════════════════════════════════════════════════════════════════════
    Enter / exit animation
    ═══════════════════════════════════════════════════════════════════════ */
 
 @keyframes dropdownEnterBottom {
-  from { opacity: 0; transform: translateY(calc(-1 * var(--spacing-xs))); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: var(--opacity-0); transform: scale(.94) translateY(var(--spacing-negative-xs)); }
+  to   { opacity: var(--opacity-100); transform: scale(1) translateY(0); }
 }
 
 @keyframes dropdownExitBottom {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(calc(-1 * var(--spacing-xs))); }
+  from { opacity: var(--opacity-100); transform: scale(1) translateY(0); }
+  to   { opacity: var(--opacity-0); transform: scale(.94) translateY(var(--spacing-negative-xs)); }
 }
 
 @keyframes dropdownEnterTop {
-  from { opacity: 0; transform: translateY(var(--spacing-xs)); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { opacity: var(--opacity-0); transform: scale(.94) translateY(var(--spacing-xs)); }
+  to   { opacity: var(--opacity-100); transform: scale(1) translateY(0); }
 }
 
 @keyframes dropdownExitTop {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(var(--spacing-xs)); }
+  from { opacity: var(--opacity-100); transform: scale(1) translateY(0); }
+  to   { opacity: var(--opacity-0); transform: scale(.94) translateY(var(--spacing-xs)); }
 }
 
 .enterBottom {
-  animation: dropdownEnterBottom var(--animation-state-change-duration) var(--animation-state-change-easing) forwards;
+  transform-origin: top center;
+  animation: dropdownEnterBottom var(--animation-dropdown-enter-duration) var(--animation-dropdown-enter-easing) forwards;
 }
 
 .exitBottom {
-  animation: dropdownExitBottom var(--animation-state-change-duration) var(--animation-state-change-easing) forwards;
+  transform-origin: top center;
+  animation: dropdownExitBottom var(--animation-dropdown-exit-duration) var(--animation-dropdown-exit-easing) forwards;
 }
 
 .enterTop {
-  animation: dropdownEnterTop var(--animation-state-change-duration) var(--animation-state-change-easing) forwards;
+  transform-origin: bottom center;
+  animation: dropdownEnterTop var(--animation-dropdown-enter-duration) var(--animation-dropdown-enter-easing) forwards;
 }
 
 .exitTop {
-  animation: dropdownExitTop var(--animation-state-change-duration) var(--animation-state-change-easing) forwards;
+  transform-origin: bottom center;
+  animation: dropdownExitTop var(--animation-dropdown-exit-duration) var(--animation-dropdown-exit-easing) forwards;
 }

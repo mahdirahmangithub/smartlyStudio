@@ -29,7 +29,7 @@ export default function TagSingleSelectOptionPlayground() {
               checked={selected === label}
               labelText={label}
               tagVariant={variant}
-              descriptionText={`${variant} tag variant`}
+              description={false}
               leading={<Icon name={icon} size={20} />}
               trailing={{ type: "helper-text", helperText: variant }}
               onChange={() => setSelected(selected === label ? null : label)}
@@ -47,14 +47,14 @@ export default function TagSingleSelectOptionPlayground() {
             labelText="Brand high"
             tagVariant="brand"
             tagEmphasis="high"
-            descriptionText="High emphasis brand tag"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
           />
           <TagSingleSelectOption
             labelText="Success high"
             tagVariant="success"
             tagEmphasis="high"
-            descriptionText="High emphasis success tag"
+            description={false}
             leading={<Icon name="check_circle" size={20} />}
           />
         </div>
@@ -67,7 +67,7 @@ export default function TagSingleSelectOptionPlayground() {
           <TagSingleSelectOption
             labelText="Normal"
             tagVariant="info"
-            descriptionText="Default unchecked"
+            description={false}
             leading={<Icon name="info" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -75,7 +75,7 @@ export default function TagSingleSelectOptionPlayground() {
             checked
             labelText="Checked"
             tagVariant="success"
-            descriptionText="Selected with check icon"
+            description={false}
             leading={<Icon name="check_circle" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -83,7 +83,7 @@ export default function TagSingleSelectOptionPlayground() {
             disabled
             labelText="Disabled"
             tagVariant="warning"
-            descriptionText="Cannot be interacted with"
+            description={false}
             leading={<Icon name="warning" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -92,7 +92,7 @@ export default function TagSingleSelectOptionPlayground() {
             disabled
             labelText="Checked disabled"
             tagVariant="alert"
-            descriptionText="Cannot be deselected"
+            description={false}
             leading={<Icon name="error" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -112,12 +112,12 @@ export default function TagSingleSelectOptionPlayground() {
             checked
             labelText="Checked, no leading"
             tagVariant="cat-3"
-            descriptionText="Has description but no icon"
+            description={false}
           />
           <TagSingleSelectOption
             labelText="With leading, no trailing"
             tagVariant="cat-4"
-            descriptionText="Only leading icon shown"
+            description={false}
             leading={<Icon name="settings" size={20} />}
           />
         </div>

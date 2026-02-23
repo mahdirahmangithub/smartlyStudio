@@ -46,6 +46,7 @@ export default function OptionItemTrailingPlayground() {
                   emphasis="low"
                   icon={<Icon name="favorite_fill" size={16} />}
                   aria-label="Favorite"
+                  disabled={disabled}
                 />
               </OptionItemTrailing>
               <p style={{ fontSize: 10, color: "var(--text-neutral-tertiary-default)", marginTop: 4 }}>1-action</p>
@@ -55,8 +56,8 @@ export default function OptionItemTrailingPlayground() {
             <div style={{ textAlign: "center" }}>
               <OptionItemTrailing type="2-action" disabled={disabled}>
                 <RowContainer density="none">
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
                 </RowContainer>
               </OptionItemTrailing>
               <p style={{ fontSize: 10, color: "var(--text-neutral-tertiary-default)", marginTop: 4 }}>2-action</p>
@@ -66,9 +67,9 @@ export default function OptionItemTrailingPlayground() {
             <div style={{ textAlign: "center" }}>
               <OptionItemTrailing type="3-action" disabled={disabled}>
                 <RowContainer density="none">
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
-                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
+                  <IconButton size="sm" variant="neutral" emphasis="low" icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" disabled={disabled} />
                 </RowContainer>
               </OptionItemTrailing>
               <p style={{ fontSize: 10, color: "var(--text-neutral-tertiary-default)", marginTop: 4 }}>3-action</p>
@@ -77,7 +78,7 @@ export default function OptionItemTrailingPlayground() {
             {/* button */}
             <div style={{ textAlign: "center" }}>
               <OptionItemTrailing type="button" disabled={disabled}>
-                <Button size="sm" variant="neutral" emphasis="medium">
+                <Button size="sm" variant="neutral" emphasis="medium" disabled={disabled}>
                   Label
                 </Button>
               </OptionItemTrailing>

@@ -20,7 +20,7 @@ export default function SingleSelectOptionPlayground() {
               key={fruit}
               checked={selected === fruit}
               labelText={fruit}
-              descriptionText={`A delicious ${fruit.toLowerCase()}`}
+              description={false}
               leading={<Icon name="favorite" size={20} />}
               trailing={{ type: "helper-text", helperText: "Fruit" }}
               onChange={() => setSelected(selected === fruit ? null : fruit)}
@@ -35,13 +35,13 @@ export default function SingleSelectOptionPlayground() {
         <div style={{ maxWidth: 340 }}>
           <SingleSelectOption
             labelText="Normal"
-            descriptionText="Default unchecked state"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
           />
           <SingleSelectOption
             labelText="Disabled"
-            descriptionText="Cannot be interacted with"
+            description={false}
             disabled
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
@@ -55,7 +55,7 @@ export default function SingleSelectOptionPlayground() {
           <SingleSelectOption
             checked
             labelText="Normal checked"
-            descriptionText="Selected item with check icon"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -63,7 +63,7 @@ export default function SingleSelectOptionPlayground() {
             checked
             disabled
             labelText="Disabled checked"
-            descriptionText="Cannot be deselected"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
             trailing={{ type: "helper-text" }}
           />
@@ -81,11 +81,11 @@ export default function SingleSelectOptionPlayground() {
           <SingleSelectOption
             checked
             labelText="Checked, no leading"
-            descriptionText="Has description but no icon"
+            description={false}
           />
           <SingleSelectOption
             labelText="With leading, no trailing"
-            descriptionText="Only leading icon shown"
+            description={false}
             leading={<Icon name="favorite" size={20} />}
           />
         </div>

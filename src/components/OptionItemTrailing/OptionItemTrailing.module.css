@@ -54,6 +54,14 @@
 /* ── disabled state ───────────────────────────────────────────────────── */
 
 .disabled {
-  opacity: 0.4;
   pointer-events: none;
+}
+
+.helperText.disabled .label,
+.helperText.disabled .helperIcon {
+  color: var(--text-neutral-disable);
+}
+
+.shortcut.disabled {
+  opacity: var(--opacity-40);
 }

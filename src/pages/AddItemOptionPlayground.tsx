@@ -46,11 +46,13 @@ export default function AddItemOptionPlayground() {
         <div style={{ maxWidth: 304 }}>
           <MultiSelectOption
             labelText="Apple"
+            description={false}
             checked
             leading={<Icon name="favorite" size={24} />}
           />
           <MultiSelectOption
             labelText="Banana"
+            description={false}
             leading={<Icon name="info" size={24} />}
           />
           <AddItemOption
@@ -70,11 +72,13 @@ export default function AddItemOptionPlayground() {
         <div style={{ maxWidth: 304 }}>
           <SingleSelectOption
             labelText="Red"
+            description={false}
             checked
             leading={<Icon name="favorite" size={24} />}
           />
           <SingleSelectOption
             labelText="Blue"
+            description={false}
             leading={<Icon name="info" size={24} />}
           />
           <AddItemOption

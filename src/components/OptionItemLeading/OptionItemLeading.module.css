@@ -66,6 +66,17 @@
 /* ── disabled state ───────────────────────────────────────────────────── */
 
 .disabled {
-  opacity: var(--opacity-40);
   pointer-events: none;
+}
+
+.icon.disabled {
+  color: var(--text-neutral-disable);
+}
+
+.social.disabled,
+.counter.disabled,
+.currency.disabled,
+.thumbnail.disabled,
+.avatar.disabled {
+  opacity: var(--opacity-40);
 }
