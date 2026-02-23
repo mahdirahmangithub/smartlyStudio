@@ -69,7 +69,7 @@
 }
 
 .fadeVisible {
-  opacity: 1;
+  opacity: var(--opacity-100);
 }
 
 .fadeStart {
@@ -90,8 +90,8 @@
 .withFocusIndicator:focus-within::before {
   content: "";
   position: absolute;
-  inset: -2px;
-  border: 1px solid var(--element-outline-brand-active);
+  inset: var(--spacing-negative-2xs);
+  border: var(--spacing-px) solid var(--element-outline-brand-active);
   border-radius: var(--radius-sm);
   pointer-events: none;
 }

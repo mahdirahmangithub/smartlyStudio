@@ -40,13 +40,15 @@ import TagSingleSelectOptionPlayground from "./pages/TagSingleSelectOptionPlaygr
 import AddItemOptionPlayground from "./pages/AddItemOptionPlayground";
 import OptionSeparatorPlayground from "./pages/OptionSeparatorPlayground";
 import InlineInputPlayground from "./pages/InlineInputPlayground";
+import SearchInputAttachmentPlayground from "./pages/SearchInputAttachmentPlayground";
+import SearchInputPlayground from "./pages/SearchInputPlayground";
 import ThumbnailPlayground from "./pages/ThumbnailPlayground";
 import SpinnerPlayground from "./pages/SpinnerPlayground";
 import CurrencyThumbnailPlayground from "./pages/CurrencyThumbnailPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "thumbnail" | "spinner" | "currency-thumbnail";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "thumbnail" | "spinner" | "currency-thumbnail";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -209,6 +211,8 @@ export default function App() {
     { key: "add-item-option", label: "AddItemOpt" },
     { key: "option-separator", label: "OptionSeparator" },
     { key: "inline-input", label: "InlineInput" },
+    { key: "search-input-attachment", label: "SearchAttach" },
+    { key: "search-input", label: "SearchInput" },
     { key: "thumbnail", label: "Thumbnail" },
     { key: "spinner", label: "Spinner" },
     { key: "currency-thumbnail", label: "CurrencyThumb" },
@@ -273,6 +277,8 @@ export default function App() {
             {page === "add-item-option" && <AddItemOptionPlayground />}
             {page === "option-separator" && <OptionSeparatorPlayground />}
             {page === "inline-input" && <InlineInputPlayground />}
+            {page === "search-input-attachment" && <SearchInputAttachmentPlayground />}
+            {page === "search-input" && <SearchInputPlayground />}
             {page === "thumbnail" && <ThumbnailPlayground />}
             {page === "spinner" && <SpinnerPlayground />}
             {page === "currency-thumbnail" && <CurrencyThumbnailPlayground />}
