@@ -131,7 +131,7 @@
 
 .inverse {
   background: var(--element-fill-neutral-tertiary-inverse-default);
-  color: var(--text-neutral-inverse-secondary-default);
+  color: var(--text-neutral-inverse-primary);
 }
 .inverse:hover { background: var(--element-fill-neutral-tertiary-inverse-hover); }
 .inverse:active { background: var(--element-fill-neutral-tertiary-inverse-press); }

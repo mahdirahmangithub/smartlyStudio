@@ -415,7 +415,7 @@
     },
     "4xl-extra": {
       "$type": "number",
-      "$value": 48,
+      "$value": 40,
       "$extensions": {
         "com.figma.variableId": "VariableID:712:6051",
         "com.figma.scopes": [
@@ -428,8 +428,8 @@
           "FONT_VARIATIONS"
         ],
         "com.figma.aliasData": {
-          "targetVariableId": "VariableID:a9eca3385348733f98c9b08051ffd3bc169c5a15/-1:-1",
-          "targetVariableName": "space/4xl-extra",
+          "targetVariableId": "VariableID:4e76fb70721aa585f3979ff35b3e5d3861c2db6f/-1:-1",
+          "targetVariableName": "space/4xl",
           "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
           "targetVariableSetName": "primitives"
         },
