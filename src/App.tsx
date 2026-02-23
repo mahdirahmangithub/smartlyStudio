@@ -42,13 +42,15 @@ import OptionSeparatorPlayground from "./pages/OptionSeparatorPlayground";
 import InlineInputPlayground from "./pages/InlineInputPlayground";
 import SearchInputAttachmentPlayground from "./pages/SearchInputAttachmentPlayground";
 import SearchInputPlayground from "./pages/SearchInputPlayground";
+import SelectOptionHeaderPlayground from "./pages/SelectOptionHeaderPlayground";
+import DropdownPlayground from "./pages/DropdownPlayground";
 import ThumbnailPlayground from "./pages/ThumbnailPlayground";
 import SpinnerPlayground from "./pages/SpinnerPlayground";
 import CurrencyThumbnailPlayground from "./pages/CurrencyThumbnailPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "thumbnail" | "spinner" | "currency-thumbnail";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -168,6 +170,7 @@ function IconsPage() {
 
 export default function App() {
   const [theme, setTheme] = useState<Theme>("light");
+  const [density, setDensity] = useState<"normal" | "dense">("normal");
   const [page, setPage] = useState<Page>("button");
 
   const pages: { key: Page; label: string }[] = [
@@ -213,13 +216,15 @@ export default function App() {
     { key: "inline-input", label: "InlineInput" },
     { key: "search-input-attachment", label: "SearchAttach" },
     { key: "search-input", label: "SearchInput" },
+    { key: "select-option-header", label: "SelectOptHeader" },
+    { key: "dropdown", label: "Dropdown" },
     { key: "thumbnail", label: "Thumbnail" },
     { key: "spinner", label: "Spinner" },
     { key: "currency-thumbnail", label: "CurrencyThumb" },
   ];
 
   return (
-    <div className="app" data-theme={theme}>
+    <div className="app" data-theme={theme} data-density={density}>
       <div className="app-shell">
         <main className="app-main">
           <div className="app-topbar">
@@ -231,6 +236,17 @@ export default function App() {
                   onClick={() => setTheme(t)}
                 >
                   {t.charAt(0).toUpperCase() + t.slice(1)}
+                </button>
+              ))}
+            </div>
+            <div className="mode-switcher">
+              {(["normal", "dense"] as const).map((d) => (
+                <button
+                  key={d}
+                  className={`mode-btn ${density === d ? "active" : ""}`}
+                  onClick={() => setDensity(d)}
+                >
+                  {d.charAt(0).toUpperCase() + d.slice(1)}
                 </button>
               ))}
             </div>
@@ -279,6 +295,8 @@ export default function App() {
             {page === "inline-input" && <InlineInputPlayground />}
             {page === "search-input-attachment" && <SearchInputAttachmentPlayground />}
             {page === "search-input" && <SearchInputPlayground />}
+            {page === "select-option-header" && <SelectOptionHeaderPlayground />}
+            {page === "dropdown" && <DropdownPlayground />}
             {page === "thumbnail" && <ThumbnailPlayground />}
             {page === "spinner" && <SpinnerPlayground />}
             {page === "currency-thumbnail" && <CurrencyThumbnailPlayground />}

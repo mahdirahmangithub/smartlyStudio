@@ -1,0 +1,129 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Dropdown panel
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--element-surface-over);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* ── header (sticky top) ──────────────────────────────────────────────── */
+
+.header {
+  flex-shrink: 0;
+  padding: var(--spacing-sm) var(--spacing-sm) 0;
+}
+
+/* ── footer (sticky bottom) ───────────────────────────────────────────── */
+
+.footer {
+  flex-shrink: 0;
+  padding: 0 var(--spacing-sm) var(--spacing-sm);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Options area (scrollable)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.scrollContainer {
+  position: relative;
+  overflow: hidden;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-sm);
+  overflow-y: auto;
+  box-sizing: border-box;
+
+  scrollbar-width: thin;
+  scrollbar-color: var(--element-fill-neutral-secondary-default) transparent;
+}
+
+.options::-webkit-scrollbar {
+  width: 8px;
+}
+
+.options::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.options::-webkit-scrollbar-thumb {
+  background: var(--element-fill-neutral-secondary-default);
+  border-radius: var(--radius-full);
+  border: var(--spacing-2xs) solid transparent;
+  background-clip: padding-box;
+}
+
+/* ── scroll faders ────────────────────────────────────────────────────── */
+
+.fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+  z-index: 1;
+}
+
+.fadeVisible {
+  opacity: 1;
+}
+
+.fadeTop {
+  top: 0;
+  background: linear-gradient(to bottom, var(--element-surface-over), transparent);
+}
+
+.fadeBottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--element-surface-over), transparent);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Enter / exit animation
+   ═══════════════════════════════════════════════════════════════════════ */
+
+@keyframes dropdownEnterBottom {
+  from { opacity: 0; transform: translateY(calc(-1 * var(--spacing-xs))); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dropdownExitBottom {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(calc(-1 * var(--spacing-xs))); }
+}
+
+@keyframes dropdownEnterTop {
+  from { opacity: 0; transform: translateY(var(--spacing-xs)); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dropdownExitTop {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(var(--spacing-xs)); }
+}
+
+.enterBottom {
+  animation: dropdownEnterBottom var(--animation-state-change-duration) var(--animation-state-change-easing) forwards;
+}
+
+.exitBottom {
+  animation: dropdownExitBottom var(--animation-state-change-duration) var(--animation-state-change-easing) forwards;
+}
+
+.enterTop {
+  animation: dropdownEnterTop var(--animation-state-change-duration) var(--animation-state-change-easing) forwards;
+}
+
+.exitTop {
+  animation: dropdownExitTop var(--animation-state-change-duration) var(--animation-state-change-easing) forwards;
+}
