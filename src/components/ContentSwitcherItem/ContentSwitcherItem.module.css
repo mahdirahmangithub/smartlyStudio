@@ -39,8 +39,10 @@
 .high:focus-visible {
   background: var(--element-fill-neutral-tertiary-hover);
   color: var(--text-neutral-secondary-hover);
-  outline: 2px solid var(--element-outline-neutral-default);
-  outline-offset: 2px;
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
 }
 
 .high.checked {
@@ -58,9 +60,11 @@
 .high.checked:focus-visible {
   background: var(--element-knob-active);
   color: var(--text-neutral-primary);
-  box-shadow: var(--shadow-default);
-  outline: 2px solid var(--element-outline-neutral-default);
-  outline-offset: 2px;
+  box-shadow:
+    var(--shadow-default),
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
 }
 
 .high:disabled,
@@ -95,8 +99,10 @@
 .low:focus-visible {
   background: var(--element-fill-neutral-tertiary-hover);
   color: var(--text-neutral-secondary-hover);
-  outline: 2px solid var(--element-outline-neutral-default);
-  outline-offset: 2px;
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
 }
 
 .low.checked {
@@ -121,8 +127,10 @@
   background: var(--element-fill-brand-tertiary-active-default);
   color: var(--text-neutral-primary);
   border-color: transparent;
-  outline: 2px solid var(--element-outline-neutral-default);
-  outline-offset: 2px;
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
 }
 
 .low:disabled,
