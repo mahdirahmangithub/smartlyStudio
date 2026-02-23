@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Tooltip, TooltipProvider, type TooltipType, type TooltipAnchor, type Placement } from "../components/Tooltip";
-import { Icon } from "../components/Icon";
+import { Icon, type IconName } from "../components/Icon";
 
 const TYPES: TooltipType[] = ["inverse", "neutral", "brand", "info", "success", "warning", "alert"];
 const PLACEMENTS: Placement[] = [
@@ -11,7 +11,7 @@ const PLACEMENTS: Placement[] = [
 ];
 const ANCHORS: TooltipAnchor[] = ["trigger", "cursor"];
 
-const TYPE_ICONS: Record<TooltipType, string> = {
+const TYPE_ICONS: Record<TooltipType, IconName> = {
   inverse: "info",
   neutral: "info",
   brand: "star",

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { TagMultiSelectOption } from "../components/TagMultiSelectOption";
-import { Icon } from "../components/Icon";
+import { Icon, type IconName } from "../components/Icon";
 import type { TagType } from "../components/Tag";
 
-const ITEMS: { label: string; variant: TagType; icon: string }[] = [
+const ITEMS: { label: string; variant: TagType; icon: IconName }[] = [
   { label: "Marketing", variant: "brand", icon: "favorite" },
   { label: "Analytics", variant: "info", icon: "info" },
   { label: "Revenue", variant: "success", icon: "trending_up" },

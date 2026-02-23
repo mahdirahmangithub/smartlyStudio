@@ -10,7 +10,6 @@ import {
 import { Icon } from "../Icon";
 import { InputClear, type InputClearSize } from "../InputClear";
 import { SearchInputAttachment, type SearchInputAttachmentSize } from "../SearchInputAttachment";
-import { Divider } from "../Divider";
 import styles from "./SearchInput.module.css";
 
 export type SearchInputSize = "md" | "lg" | "xl";
@@ -45,12 +44,6 @@ export interface SearchInputProps
 function cx(...classes: (string | false | undefined | null)[]) {
   return classes.filter(Boolean).join(" ");
 }
-
-const INLINE_SIZE: Record<SearchInputSize, "sm" | "lg"> = {
-  md: "sm",
-  lg: "lg",
-  xl: "lg",
-};
 
 const CLEAR_SIZE: Record<SearchInputSize, InputClearSize> = {
   md: "sm",

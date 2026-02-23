@@ -86,8 +86,8 @@ export default function SelectOptionHeaderPlayground() {
             <MultiSelectOption
               key={f}
               labelText={f}
-              selected={selected.has(f)}
-              onClick={() => toggleFruit(f)}
+              checked={selected.has(f)}
+              onChange={() => toggleFruit(f)}
             />
           ))}
           {filteredFruits.length === 0 && (

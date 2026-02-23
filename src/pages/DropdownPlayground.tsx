@@ -8,6 +8,7 @@ import { NavigationSelectOption } from "../components/NavigationSelectOption";
 import { TagMultiSelectOption } from "../components/TagMultiSelectOption";
 import { AddItemOption } from "../components/AddItemOption";
 import { OptionSeparator } from "../components/OptionSeparator";
+import { Icon, type IconName } from "../components/Icon";
 
 const FRUITS = [
   "Apple", "Banana", "Cherry", "Date", "Elderberry",
@@ -260,7 +261,7 @@ export default function DropdownPlayground() {
               <NavigationSelectOption
                 key={p.label}
                 labelText={p.label}
-                leadingIcon={p.icon}
+                leading={<Icon name={p.icon as IconName} size={20} />}
                 onClick={() => setNavOpen(false)}
               />
             ))}

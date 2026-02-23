@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Icon } from "../Icon";
+import { Icon, type IconName } from "../Icon";
 import { Tooltip, type Placement, type TooltipType } from "../Tooltip";
 import styles from "./Hint.module.css";
 
@@ -9,7 +9,7 @@ export interface HintProps {
   size?: HintSize;
   disabled?: boolean;
   /** Icon name from the icon library (default: "info") */
-  iconName?: string;
+  iconName?: IconName;
   /** Override with a custom icon ReactNode */
   icon?: ReactNode;
 
