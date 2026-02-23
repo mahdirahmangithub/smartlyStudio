@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { Icon, searchIcons, getCategories } from "./components/Icon";
 import type { IconCategory, IconEntry } from "./components/Icon";
 import ButtonPlayground from "./pages/ButtonPlayground";
@@ -49,10 +49,11 @@ import SpinnerPlayground from "./pages/SpinnerPlayground";
 import CurrencyThumbnailPlayground from "./pages/CurrencyThumbnailPlayground";
 import FileTypeThumbnailPlayground from "./pages/FileTypeThumbnailPlayground";
 import FileAttachmentPlayground from "./pages/FileAttachmentPlayground";
+import SelectButtonPlayground from "./pages/SelectButtonPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -170,10 +171,26 @@ function IconsPage() {
   );
 }
 
+function getPageFromPath(): Page {
+  const path = window.location.pathname.replace(/^\//, "") || "button";
+  return path as Page;
+}
+
 export default function App() {
   const [theme, setTheme] = useState<Theme>("light");
   const [density, setDensity] = useState<"normal" | "dense">("normal");
-  const [page, setPage] = useState<Page>("button");
+  const [page, setPageState] = useState<Page>(getPageFromPath);
+
+  const setPage = useCallback((p: Page) => {
+    setPageState(p);
+    window.history.pushState(null, "", `/${p}`);
+  }, []);
+
+  useEffect(() => {
+    const onPop = () => setPageState(getPageFromPath());
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   const pages: { key: Page; label: string }[] = [
     { key: "button", label: "Button" },
@@ -225,6 +242,7 @@ export default function App() {
     { key: "currency-thumbnail", label: "CurrencyThumb" },
     { key: "file-type-thumbnail", label: "FileTypeThumb" },
     { key: "file-attachment", label: "FileAttachment" },
+    { key: "select-button", label: "SelectButton" },
   ];
 
   return (
@@ -306,6 +324,7 @@ export default function App() {
             {page === "currency-thumbnail" && <CurrencyThumbnailPlayground />}
             {page === "file-type-thumbnail" && <FileTypeThumbnailPlayground />}
             {page === "file-attachment" && <FileAttachmentPlayground />}
+            {page === "select-button" && <SelectButtonPlayground />}
           </div>
         </main>
 

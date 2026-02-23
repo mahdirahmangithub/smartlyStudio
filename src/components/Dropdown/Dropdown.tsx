@@ -338,11 +338,11 @@ export function Dropdown({
     const timer = setTimeout(() => {
       const input = getHeaderInput();
       if (input) {
-        focusVisible(input);
+        input.focus();
         return;
       }
       const opts = getOptions();
-      if (opts.length > 0) focusVisible(opts[0]);
+      if (opts.length > 0) opts[0].focus();
     }, 0);
     return () => clearTimeout(timer);
   }, [isMounted, anim, getHeaderInput, getOptions]);
