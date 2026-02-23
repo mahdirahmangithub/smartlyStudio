@@ -1,5 +1,7 @@
 import { GenericSelectOption } from "../components/GenericSelectOption";
 import { Icon } from "../components/Icon";
+import { KeyboardShortcut } from "../components/KeyboardShortcut";
+import { RowContainer } from "../components/RowContainer";
 
 export default function GenericSelectOptionPlayground() {
   return (
@@ -21,7 +23,15 @@ export default function GenericSelectOptionPlayground() {
             labelText="No sub-menu"
             description={false}
             leading={<Icon name="edit" size={20} />}
-            trailing={{ type: "helper-text", helperText: "⌘E", helperIcon: false }}
+            trailing={{
+              type: "shortcut",
+              children: (
+                <RowContainer density="xs">
+                  <KeyboardShortcut keyText="⌘" size="lg" />
+                  <KeyboardShortcut keyText="E" size="lg" />
+                </RowContainer>
+              ),
+            }}
           />
           <GenericSelectOption
             labelText="Label only"
@@ -47,7 +57,14 @@ export default function GenericSelectOptionPlayground() {
             labelText="Delete"
             description={false}
             leading={<Icon name="delete" size={20} />}
-            trailing={{ type: "helper-text", helperText: "⌫", helperIcon: false }}
+            trailing={{
+              type: "shortcut",
+              children: (
+                <RowContainer density="xs">
+                  <KeyboardShortcut keyText="⌫" size="lg" />
+                </RowContainer>
+              ),
+            }}
           />
           <GenericSelectOption
             alert

@@ -89,7 +89,7 @@ export default function OptionItemTrailingPlayground() {
             <div style={{ textAlign: "center" }}>
               <OptionItemTrailing type="shortcut" disabled={disabled}>
                 <RowContainer density="xs">
-                  <KeyboardShortcut keyText="⌘" size="sm" />
+                  <KeyboardShortcut keyText="⌘" size="lg" />
                 </RowContainer>
               </OptionItemTrailing>
               <p style={{ fontSize: 10, color: "var(--text-neutral-tertiary-default)", marginTop: 4 }}>shortcut</p>
