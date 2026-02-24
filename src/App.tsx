@@ -51,10 +51,12 @@ import FileTypeThumbnailPlayground from "./pages/FileTypeThumbnailPlayground";
 import FileAttachmentPlayground from "./pages/FileAttachmentPlayground";
 import SelectButtonPlayground from "./pages/SelectButtonPlayground";
 import SelectPlayground from "./pages/SelectPlayground";
+import SelectInputPlayground from "./pages/SelectInputPlayground";
+import MultiSelectInputPlayground from "./pages/MultiSelectInputPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -245,6 +247,8 @@ export default function App() {
     { key: "file-attachment", label: "FileAttachment" },
     { key: "select-button", label: "SelectButton" },
     { key: "select", label: "Select" },
+    { key: "select-input", label: "SelectInput" },
+    { key: "multi-select-input", label: "MultiSelectInput" },
   ];
 
   return (
@@ -328,6 +332,8 @@ export default function App() {
             {page === "file-attachment" && <FileAttachmentPlayground />}
             {page === "select-button" && <SelectButtonPlayground />}
             {page === "select" && <SelectPlayground />}
+            {page === "select-input" && <SelectInputPlayground />}
+            {page === "multi-select-input" && <MultiSelectInputPlayground />}
           </div>
         </main>
 

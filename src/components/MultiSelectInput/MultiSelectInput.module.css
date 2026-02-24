@@ -1,0 +1,180 @@
+/* ── base wrapper ──────────────────────────────────────────────────────── */
+
+.wrapper {
+  --input-bg: var(--element-surface-default);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--input-bg);
+  border: var(--spacing-px) solid var(--element-outline-neutral-default);
+  border-radius: var(--radius-lg);
+  box-sizing: border-box;
+  cursor: text;
+  width: 100%;
+  transition:
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing),
+    background var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* ── sizes ─────────────────────────────────────────────────────────────── */
+
+.md { min-height: var(--spacing-2xl); padding: var(--spacing-sm-minus) var(--spacing-sm); }
+.lg { min-height: var(--spacing-4xl); padding: var(--spacing-sm) var(--spacing-sm-plus); }
+.xl { min-height: 52px; padding: var(--spacing-md-minus) var(--spacing-md); }
+
+/* ── hover ─────────────────────────────────────────────────────────────── */
+
+.wrapper:hover:not(.disabled):not(.readOnly):not(:focus-within) {
+  border-color: var(--element-outline-neutral-hover);
+}
+
+/* ── focus ─────────────────────────────────────────────────────────────── */
+
+.wrapper:focus-within:not(.disabled):not(.readOnly) {
+  border-color: var(--element-outline-brand-active);
+  box-shadow: inset 0 0 0 var(--spacing-px) var(--element-outline-brand-active);
+}
+
+/* ── error ─────────────────────────────────────────────────────────────── */
+
+.wrapper.error {
+  border-color: var(--element-outline-alert-active);
+}
+
+.wrapper.error:hover:not(.disabled):not(.readOnly):not(:focus-within) {
+  border-color: var(--element-outline-alert-active);
+}
+
+.wrapper.error:focus-within:not(.disabled):not(.readOnly) {
+  border-color: var(--element-outline-alert-active);
+  box-shadow: inset 0 0 0 var(--spacing-px) var(--element-outline-alert-active);
+}
+
+.error .nativeInput {
+  caret-color: var(--util-caret-alert);
+}
+
+/* ── disabled / read-only ──────────────────────────────────────────────── */
+
+.disabled,
+.readOnly {
+  border-color: var(--element-outline-neutral-disable);
+  cursor: default;
+}
+
+.disabled:not(.filled) {
+  --input-bg: var(--element-fill-neutral-primary-disable-active);
+  background: var(--input-bg);
+}
+
+.filled {}
+
+.disabled {
+  pointer-events: none;
+}
+
+/* ── tags area (flex-wrap container for tags + inline input) ───────────── */
+
+.tagsArea {
+  display: flex;
+  flex: 1 0 0;
+  flex-wrap: wrap;
+  align-items: center;
+  align-content: center;
+  gap: var(--spacing-xs);
+  min-width: 0;
+}
+
+/* ── scroll-fade wrapper around the inline input ─────────────────────── */
+
+.inputScrollWrapper {
+  position: relative;
+  flex: 1 1 60px;
+  min-width: 60px;
+  overflow: hidden;
+}
+
+/* ── native input (inline after tags) ──────────────────────────────────── */
+
+.nativeInput {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--type-label-sm-family);
+  font-size: var(--type-label-sm-size);
+  font-weight: var(--type-label-sm-weight);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+  color: var(--text-neutral-primary);
+  caret-color: var(--util-caret-default);
+  white-space: nowrap;
+}
+
+.nativeInput::placeholder {
+  color: var(--text-neutral-placeholder);
+}
+
+.xl .nativeInput {
+  font-family: var(--type-label-md-family);
+  font-size: var(--type-label-md-size);
+  font-weight: var(--type-label-md-weight);
+  line-height: var(--type-label-md-line-height);
+  letter-spacing: var(--type-label-md-letter-spacing);
+}
+
+.disabled .nativeInput {
+  color: var(--text-neutral-disable);
+}
+
+.disabled .nativeInput::placeholder {
+  color: var(--text-neutral-disable);
+}
+
+/* ── input value scroll fades ─────────────────────────────────────────── */
+
+.inputFade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--spacing-md);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.inputFadeVisible {
+  opacity: 1;
+}
+
+.inputFadeStart {
+  left: 0;
+  background: linear-gradient(to right, var(--input-bg), transparent);
+}
+
+.inputFadeEnd {
+  right: 0;
+  background: linear-gradient(to left, var(--input-bg), transparent);
+}
+
+/* ── clear slot ───────────────────────────────────────────────────────── */
+
+.clearSlot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.md .clearSlot,
+.lg .clearSlot { width: 16px; height: 16px; }
+.xl .clearSlot { width: 20px; height: 20px; }
+
+.clearSlot > * {
+  position: absolute;
+}

@@ -39,6 +39,10 @@ export interface DropdownProps {
   closeOnEscape?: boolean;
   offset?: number;
   matchAnchorWidth?: boolean;
+  autoFocus?: boolean;
+  /** When ArrowUp from the first option, focus this element instead of doing nothing. */
+  returnFocusRef?: RefObject<HTMLElement | null>;
+  id?: string;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -159,6 +163,9 @@ export function Dropdown({
   closeOnEscape = true,
   offset = 4,
   matchAnchorWidth = false,
+  autoFocus = true,
+  returnFocusRef,
+  id,
 }: DropdownProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -334,7 +341,7 @@ export function Dropdown({
   }, []);
 
   useEffect(() => {
-    if (!isMounted || anim !== "enter") return;
+    if (!isMounted || anim !== "enter" || !autoFocus) return;
     const timer = setTimeout(() => {
       const input = getHeaderInput();
       if (input) {
@@ -345,7 +352,7 @@ export function Dropdown({
       if (opts.length > 0) opts[0].focus();
     }, 0);
     return () => clearTimeout(timer);
-  }, [isMounted, anim, getHeaderInput, getOptions]);
+  }, [isMounted, anim, autoFocus, getHeaderInput, getOptions]);
 
   const handlePanelKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -373,8 +380,10 @@ export function Dropdown({
           if (inHeader || idx < 0) focusVisible(opts[0]);
           else if (idx < opts.length - 1) focusVisible(opts[idx + 1]);
         } else {
-          if (idx === 0 && hInput) focusVisible(hInput);
-          else if (idx > 0) focusVisible(opts[idx - 1]);
+          if (idx === 0) {
+            if (hInput) focusVisible(hInput);
+            else if (returnFocusRef?.current) returnFocusRef.current.focus();
+          } else if (idx > 0) focusVisible(opts[idx - 1]);
         }
 
         requestAnimationFrame(() => {
@@ -426,7 +435,7 @@ export function Dropdown({
         }
       }
     },
-    [getOptions, getHeaderInput, getFocusables]
+    [getOptions, getHeaderInput, getFocusables, returnFocusRef]
   );
 
   /* ── computed width ───────────────────────────── */
@@ -458,6 +467,7 @@ export function Dropdown({
   return createPortal(
     <div
       ref={panelRef}
+      id={id}
       role="listbox"
       className={cx(styles.panel, animClass, className)}
       style={panelStyle}
