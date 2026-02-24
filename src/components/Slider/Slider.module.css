@@ -1,0 +1,275 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   Slider
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── root ──────────────────────────────────────────────────────────────── */
+
+.root {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-xs);
+}
+
+.horizontal {
+  flex-direction: column;
+  width: 100%;
+}
+
+.vertical {
+  flex-direction: row;
+  height: 100%;
+}
+
+/* ── bar row (leading icon · track · trailing icon) ───────────────────── */
+
+.barRow {
+  display: flex;
+  align-items: center;
+}
+
+.horizontal .barRow { flex-direction: row; width: 100%; }
+.vertical .barRow   { flex-direction: column; height: 100%; justify-content: center; }
+
+.lg.horizontal .barRow { gap: var(--spacing-sm-extra); }
+.sm.horizontal .barRow { gap: var(--spacing-sm); }
+.lg.vertical .barRow   { gap: var(--spacing-sm-extra); }
+.sm.vertical .barRow   { gap: var(--spacing-sm); }
+
+/* ── icon slots ───────────────────────────────────────────────────────── */
+
+.iconSlot {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  color: var(--text-neutral-secondary-default);
+}
+
+.horizontal .iconSlot { padding: var(--spacing-2xs) 0; }
+.vertical .iconSlot   { padding: 0 var(--spacing-2xs); }
+
+.disabled .iconSlot {
+  color: var(--text-neutral-disable);
+}
+
+/* ── track container (adds padding for hit area) ──────────────────────── */
+
+.trackContainer {
+  display: flex;
+  flex: 1 0 0;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+}
+
+.horizontal .trackContainer {
+  flex-direction: column;
+  padding: var(--spacing-sm) 0;
+}
+
+.vertical .trackContainer {
+  flex-direction: row;
+  align-items: start;
+  padding: 0 var(--spacing-sm);
+  height: 0;
+}
+
+/* ── track (the rounded background bar) ───────────────────────────────── */
+
+.track {
+  position: relative;
+  border-radius: var(--radius-full);
+  background: var(--element-fill-neutral-secondary-default);
+  cursor: pointer;
+  overflow: visible;
+}
+
+.horizontal .track { width: 100%; }
+.vertical .track   { height: 100%; flex-shrink: 0; }
+
+.lg.horizontal .track { height: 8px; }
+.sm.horizontal .track { height: 6px; }
+.lg.vertical .track   { width: 8px; }
+.sm.vertical .track   { width: 6px; }
+
+.disabled .track {
+  cursor: default;
+}
+
+/* ── indicator (filled/active portion) ────────────────────────────────── */
+
+.indicator {
+  position: absolute;
+  border-radius: var(--radius-full);
+  background: var(--element-fill-brand-primary-default);
+  pointer-events: none;
+}
+
+.horizontal .indicator { top: 0; height: 100%; }
+.vertical .indicator   { left: 0; width: 100%; }
+
+.disabled .indicator {
+  background: var(--element-fill-brand-primary-disable-active);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Knob
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.knob {
+  position: absolute;
+  border-radius: var(--radius-full);
+  background: var(--element-knob-default);
+  border: var(--spacing-hair-line) solid var(--element-outline-neutral-default);
+  box-shadow:
+    0 0 var(--blur-2xs) 0 var(--shadow-ambient),
+    0 var(--space-2xs) var(--blur-xs) 0 var(--shadow-halo),
+    0 var(--space-2xs) var(--blur-xs) 0 var(--shadow-cast),
+    0 var(--space-2xs) var(--blur-md) 0 var(--shadow-cast-high);
+  box-sizing: border-box;
+  cursor: grab;
+  user-select: none;
+  z-index: 1;
+  touch-action: none;
+  outline: none;
+  transition:
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing),
+    background var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* horizontal positioning */
+.horizontal .knob { top: 50%; }
+.lg.horizontal .knob { width: 22px; height: 22px; margin-top: -11px; margin-left: -11px; }
+.sm.horizontal .knob { width: 16px; height: 16px; margin-top: -8px; margin-left: -8px; }
+
+/* vertical positioning */
+.vertical .knob { left: 50%; }
+.lg.vertical .knob { width: 22px; height: 22px; margin-left: -11px; margin-bottom: -11px; }
+.sm.vertical .knob { width: 16px; height: 16px; margin-left: -8px; margin-bottom: -8px; }
+
+/* transparent click area */
+.knob::before {
+  content: "";
+  position: absolute;
+}
+
+.lg .knob::before {
+  width: 24px;
+  height: 24px;
+  inset: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.sm .knob::before {
+  width: 18px;
+  height: 18px;
+  inset: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* active knob (being dragged) */
+.knobActive {
+  z-index: 2;
+  cursor: grabbing;
+  border-color: var(--element-outline-neutral-press);
+}
+
+/* ── hover ─────────────────────────────────────────────────────────────── */
+
+.knob:hover:not(.knobDisabled):not(.knobActive) {
+  border-color: var(--element-outline-neutral-hover);
+}
+
+/* ── keyboard focus (managed via React state, not :focus-visible) ───── */
+
+.knobKbFocused:not(.knobDisabled) {
+  border-color: var(--element-outline-neutral-hover);
+  box-shadow:
+    0 0 var(--blur-2xs) 0 var(--shadow-ambient),
+    0 var(--space-2xs) var(--blur-xs) 0 var(--shadow-halo),
+    0 var(--space-2xs) var(--blur-xs) 0 var(--shadow-cast),
+    0 var(--space-2xs) var(--blur-md) 0 var(--shadow-cast-high),
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
+}
+
+/* ── disabled ──────────────────────────────────────────────────────────── */
+
+.knobDisabled {
+  background: var(--element-knob-disable);
+  border-color: var(--element-outline-neutral-disable);
+  box-shadow: none;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Markers (discrete labels) – rendered inside trackContainer
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.markers {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+  white-space: nowrap;
+  color: var(--text-neutral-secondary-default);
+}
+
+.horizontal .markers {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: var(--spacing-xs);
+}
+
+.vertical .markers {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  height: 100%;
+  margin-left: var(--spacing-xs);
+}
+
+.lg.horizontal .markers { height: var(--type-label-sm-line-height); }
+.sm.horizontal .markers { height: var(--type-label-xs-line-height); }
+
+/* reserve space below the slider for absolutely-positioned markers */
+.lg.horizontal:has(.markers) {
+  padding-bottom: calc(var(--spacing-xs) + var(--type-label-sm-line-height));
+}
+.sm.horizontal:has(.markers) {
+  padding-bottom: calc(var(--spacing-xs) + var(--type-label-xs-line-height));
+}
+
+.marker {
+  position: absolute;
+}
+
+.horizontal .marker {
+  transform: translateX(-50%);
+}
+
+.vertical .marker {
+  transform: translateY(50%);
+}
+
+.lg .markers, .lg .marker {
+  font-family: var(--type-label-sm-family);
+  font-size: var(--type-label-sm-size);
+  font-weight: var(--type-label-sm-weight);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+}
+
+.sm .markers, .sm .marker {
+  font-family: var(--type-label-xs-family);
+  font-size: var(--type-label-xs-size);
+  font-weight: var(--type-label-xs-weight);
+  line-height: var(--type-label-xs-line-height);
+  letter-spacing: var(--type-label-xs-letter-spacing);
+}
+
+.disabled .markers {
+  color: var(--text-neutral-disable);
+}
