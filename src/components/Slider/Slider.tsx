@@ -369,13 +369,29 @@ export function Slider(props: SliderProps) {
     [disabled, step, min, max, currentValue, updateKnob, fireChangeEnd, triggerTooltipReposition],
   );
 
-  /* ── clean up drag on unmount ───────────────── */
+  /* ── global pointer-up safety net ──────────────
+     Pointer capture can be lost silently (DOM changes, focus shifts,
+     pointer leaving the window). A window-level listener guarantees
+     the drag is always released. */
 
   useEffect(() => {
-    return () => {
+    if (dragging === null) return;
+
+    const onGlobalPointerUp = () => {
+      if (draggingRef.current === null) return;
       draggingRef.current = null;
+      setDragging(null);
+      fireChangeEnd(currentValue);
     };
-  }, []);
+
+    window.addEventListener("pointerup", onGlobalPointerUp);
+    window.addEventListener("pointercancel", onGlobalPointerUp);
+
+    return () => {
+      window.removeEventListener("pointerup", onGlobalPointerUp);
+      window.removeEventListener("pointercancel", onGlobalPointerUp);
+    };
+  }, [dragging, fireChangeEnd, currentValue]);
 
   /* ── computed percentages ───────────────────── */
 

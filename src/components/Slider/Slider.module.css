@@ -102,10 +102,19 @@
   border-radius: var(--radius-full);
   background: var(--element-fill-brand-primary-default);
   pointer-events: none;
+  transition:
+    left var(--animation-state-change-duration) var(--animation-state-change-easing),
+    bottom var(--animation-state-change-duration) var(--animation-state-change-easing),
+    width var(--animation-state-change-duration) var(--animation-state-change-easing),
+    height var(--animation-state-change-duration) var(--animation-state-change-easing);
 }
 
 .horizontal .indicator { top: 0; height: 100%; }
 .vertical .indicator   { left: 0; width: 100%; }
+
+.track:has(.knobActive) > .indicator {
+  transition-property: background;
+}
 
 .disabled .indicator {
   background: var(--element-fill-brand-primary-disable-active);
@@ -132,6 +141,8 @@
   touch-action: none;
   outline: none;
   transition:
+    left var(--animation-state-change-duration) var(--animation-state-change-easing),
+    bottom var(--animation-state-change-duration) var(--animation-state-change-easing),
     border-color var(--animation-state-change-duration) var(--animation-state-change-easing),
     box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing),
     background var(--animation-state-change-duration) var(--animation-state-change-easing);
@@ -172,6 +183,7 @@
   z-index: 2;
   cursor: grabbing;
   border-color: var(--element-outline-neutral-press);
+  transition-property: border-color, box-shadow, background;
 }
 
 /* ── hover ─────────────────────────────────────────────────────────────── */
