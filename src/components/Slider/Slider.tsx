@@ -332,14 +332,16 @@ export function Slider(props: SliderProps) {
       const bigStep = step ? step * 10 : (max - min) / 10;
       let newVal = currentValue[knobIdx];
 
+      const increment = e.shiftKey ? bigStep : stepSize;
+
       switch (e.key) {
         case "ArrowRight":
         case "ArrowUp":
-          newVal += stepSize;
+          newVal += increment;
           break;
         case "ArrowLeft":
         case "ArrowDown":
-          newVal -= stepSize;
+          newVal -= increment;
           break;
         case "PageUp":
           newVal += bigStep;
@@ -476,6 +478,7 @@ export function Slider(props: SliderProps) {
           onKeyDown={(e) => handleKeyDown(knobIdx, e)}
           onFocus={() => handleFocus(knobIdx)}
           onBlur={handleBlur}
+          onTransitionEnd={triggerTooltipReposition}
         />
       </Tooltip>
     );
