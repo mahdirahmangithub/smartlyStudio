@@ -1,3 +1,4 @@
+import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Radio.module.css";
 
 export type RadioSize = "sm" | "lg";
@@ -13,6 +14,7 @@ export interface RadioProps {
   value?: string;
   id?: string;
   "aria-label"?: string;
+  "aria-describedby"?: string;
 }
 
 function cx(...classes: (string | false | undefined | null)[]) {
@@ -30,7 +32,12 @@ export function Radio({
   value,
   id,
   "aria-label": ariaLabel,
+  "aria-describedby": ariaDescribedbyProp,
 }: RadioProps) {
+  const fieldCtx = useFieldContext();
+  const resolvedId = id ?? fieldCtx.inputId;
+  const ariaDescribedby = ariaDescribedbyProp ?? fieldCtx.hintId;
+
   return (
     <span
       className={cx(
@@ -49,8 +56,9 @@ export function Radio({
         disabled={disabled}
         name={name}
         value={value}
-        id={id}
+        id={resolvedId}
         aria-label={ariaLabel}
+        aria-describedby={ariaDescribedby}
         onChange={(e) => onChange?.(e.target.checked)}
       />
       <span className={styles.circle} aria-hidden="true">

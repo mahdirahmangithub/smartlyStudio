@@ -55,10 +55,12 @@ import SelectInputPlayground from "./pages/SelectInputPlayground";
 import MultiSelectInputPlayground from "./pages/MultiSelectInputPlayground";
 import ComboboxPlayground from "./pages/ComboboxPlayground";
 import SliderPlayground from "./pages/SliderPlayground";
+import InlineMessagePlayground from "./pages/InlineMessagePlayground";
+import FieldsetPlayground from "./pages/FieldsetPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -253,6 +255,8 @@ export default function App() {
     { key: "multi-select-input", label: "MultiSelectInput" },
     { key: "combobox", label: "Combobox" },
     { key: "slider", label: "Slider" },
+    { key: "inline-message", label: "InlineMessage" },
+    { key: "fieldset", label: "Fieldset" },
   ];
 
   return (
@@ -340,6 +344,8 @@ export default function App() {
             {page === "multi-select-input" && <MultiSelectInputPlayground />}
             {page === "combobox" && <ComboboxPlayground />}
             {page === "slider" && <SliderPlayground />}
+            {page === "inline-message" && <InlineMessagePlayground />}
+            {page === "fieldset" && <FieldsetPlayground />}
           </div>
         </main>
 

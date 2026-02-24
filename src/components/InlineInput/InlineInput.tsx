@@ -9,6 +9,7 @@ import {
 } from "react";
 import { Icon } from "../Icon";
 import { useScrollFade } from "../ScrollFade";
+import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./InlineInput.module.css";
 
 export type InlineInputSize = "sm" | "lg";
@@ -40,10 +41,16 @@ export const InlineInput = forwardRef<HTMLInputElement, InlineInputProps>(
       defaultValue,
       onChange,
       className,
+      id: idProp,
+      "aria-describedby": ariaDescribedbyProp,
       ...rest
     },
     externalRef
   ) => {
+    const fieldCtx = useFieldContext();
+    const id = idProp ?? fieldCtx.inputId;
+    const ariaDescribedby = ariaDescribedbyProp ?? fieldCtx.hintId;
+
     const innerRef = useRef<HTMLInputElement>(null);
 
     const setRef = useCallback(
@@ -120,6 +127,8 @@ export const InlineInput = forwardRef<HTMLInputElement, InlineInputProps>(
           <div className={styles.inputContainer}>
             <input
               ref={setRef}
+              id={id}
+              aria-describedby={ariaDescribedby}
               className={styles.nativeInput}
               disabled={disabled}
               value={isControlled ? value : undefined}
@@ -135,6 +144,8 @@ export const InlineInput = forwardRef<HTMLInputElement, InlineInputProps>(
           <div className={styles.scrollWrapper}>
             <input
               ref={setRef}
+              id={id}
+              aria-describedby={ariaDescribedby}
               className={styles.nativeInput}
               disabled={disabled}
               value={isControlled ? value : undefined}

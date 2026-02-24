@@ -1,6 +1,7 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { Badge } from "../Badge";
 import { Expander } from "../Expander";
+import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./SelectButton.module.css";
 
 export type SelectButtonSize = "sm" | "md" | "lg";
@@ -46,15 +47,22 @@ export const SelectButton = forwardRef<HTMLButtonElement, SelectButtonProps>(
       className,
       disabled,
       htmlType = "button",
+      id: idProp,
+      "aria-describedby": ariaDescribedbyProp,
       ...rest
     },
     ref
   ) => {
+    const fieldCtx = useFieldContext();
+    const id = idProp ?? fieldCtx.inputId;
+    const ariaDescribedby = ariaDescribedbyProp ?? fieldCtx.hintId;
     const showBadge = selectedCount !== undefined && selectedCount > 0;
 
     return (
       <button
         ref={ref}
+        id={id}
+        aria-describedby={ariaDescribedby}
         type={htmlType}
         disabled={disabled}
         className={cx(

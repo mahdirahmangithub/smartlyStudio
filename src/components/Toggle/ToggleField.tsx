@@ -11,6 +11,7 @@ export interface ToggleFieldProps
   onChange?: (checked: boolean) => void;
   name?: string;
   id?: string;
+  "aria-describedby"?: string;
 }
 
 export function ToggleField({
@@ -21,6 +22,7 @@ export function ToggleField({
   onChange,
   name,
   id,
+  "aria-describedby": ariaDescribedby,
   ...labelProps
 }: ToggleFieldProps) {
   const autoId = useId();
@@ -41,6 +43,7 @@ export function ToggleField({
           onChange={onChange}
           name={name}
           id={inputId}
+          aria-describedby={ariaDescribedby}
         />
       }
     />

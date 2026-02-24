@@ -10,6 +10,7 @@ import {
   type ChangeEvent,
   type KeyboardEvent,
 } from "react";
+import { useFieldContext } from "../Fieldset/FieldContext";
 import { InputClear, type InputClearSize } from "../InputClear";
 import { Expander } from "../Expander";
 import { Dropdown } from "../Dropdown";
@@ -65,10 +66,16 @@ export const SelectInput = forwardRef<HTMLInputElement, SelectInputProps>(
       onClick,
       onKeyDown,
       className,
+      id: idProp,
+      "aria-describedby": ariaDescribedbyProp,
       ...rest
     },
     externalRef
   ) => {
+    const fieldCtx = useFieldContext();
+    const id = idProp ?? fieldCtx.inputId;
+    const ariaDescribedby = ariaDescribedbyProp ?? fieldCtx.hintId;
+
     const innerRef = useRef<HTMLInputElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dropdownId = useId();
@@ -188,6 +195,8 @@ export const SelectInput = forwardRef<HTMLInputElement, SelectInputProps>(
               <input
                 ref={setRef}
                 className={styles.nativeInput}
+                id={id}
+                aria-describedby={ariaDescribedby}
                 disabled={disabled}
                 readOnly={readOnly}
                 value={isControlled ? value : undefined}

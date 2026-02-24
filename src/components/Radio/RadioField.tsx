@@ -12,6 +12,7 @@ export interface RadioFieldProps
   name?: string;
   value?: string;
   id?: string;
+  "aria-describedby"?: string;
 }
 
 export function RadioField({
@@ -23,6 +24,7 @@ export function RadioField({
   name,
   value,
   id,
+  "aria-describedby": ariaDescribedby,
   ...labelProps
 }: RadioFieldProps) {
   const autoId = useId();
@@ -44,6 +46,7 @@ export function RadioField({
           name={name}
           value={value}
           id={inputId}
+          aria-describedby={ariaDescribedby}
         />
       }
     />

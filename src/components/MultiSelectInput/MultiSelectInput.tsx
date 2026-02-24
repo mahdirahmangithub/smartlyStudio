@@ -14,6 +14,7 @@ import { InputClear, type InputClearSize } from "../InputClear";
 import { Expander } from "../Expander";
 import { Dropdown } from "../Dropdown";
 import { useScrollFade } from "../ScrollFade";
+import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./MultiSelectInput.module.css";
 
 export type MultiSelectInputSize = "md" | "lg" | "xl";
@@ -66,10 +67,16 @@ export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputPro
       onClick,
       onKeyDown,
       className,
+      id: idProp,
+      "aria-describedby": ariaDescribedbyProp,
       ...rest
     },
     externalRef
   ) => {
+    const fieldCtx = useFieldContext();
+    const id = idProp ?? fieldCtx.inputId;
+    const ariaDescribedby = ariaDescribedbyProp ?? fieldCtx.hintId;
+
     const innerRef = useRef<HTMLInputElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const dropdownId = useId();
@@ -180,6 +187,8 @@ export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputPro
               <div className={styles.inputScrollWrapper}>
                 <input
                   ref={setRef}
+                  id={id}
+                  aria-describedby={ariaDescribedby}
                   className={styles.nativeInput}
                   disabled={disabled}
                   value={isControlled ? value : undefined}

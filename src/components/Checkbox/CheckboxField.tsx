@@ -12,6 +12,7 @@ export interface CheckboxFieldProps
   onChange?: (checked: boolean) => void;
   name?: string;
   id?: string;
+  "aria-describedby"?: string;
 }
 
 export function CheckboxField({
@@ -23,6 +24,7 @@ export function CheckboxField({
   onChange,
   name,
   id,
+  "aria-describedby": ariaDescribedby,
   ...labelProps
 }: CheckboxFieldProps) {
   const autoId = useId();
@@ -44,6 +46,7 @@ export function CheckboxField({
           onChange={onChange}
           name={name}
           id={inputId}
+          aria-describedby={ariaDescribedby}
         />
       }
     />

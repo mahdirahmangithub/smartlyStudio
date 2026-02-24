@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Toggle.module.css";
 
 export type ToggleSize = "sm" | "lg";
@@ -13,6 +14,7 @@ export interface ToggleProps {
   name?: string;
   id?: string;
   "aria-label"?: string;
+  "aria-describedby"?: string;
 }
 
 function cx(...classes: (string | false | undefined | null)[]) {
@@ -29,7 +31,12 @@ export function Toggle({
   name,
   id,
   "aria-label": ariaLabel,
+  "aria-describedby": ariaDescribedbyProp,
 }: ToggleProps) {
+  const fieldCtx = useFieldContext();
+  const resolvedId = id ?? fieldCtx.inputId;
+  const ariaDescribedby = ariaDescribedbyProp ?? fieldCtx.hintId;
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -54,12 +61,14 @@ export function Toggle({
       <input
         ref={inputRef}
         type="checkbox"
+        role="switch"
         className={styles.input}
         checked={checked}
         disabled={disabled}
         name={name}
-        id={id}
+        id={resolvedId}
         aria-label={ariaLabel}
+        aria-describedby={ariaDescribedby}
         onChange={(e) => onChange?.(e.target.checked)}
       />
       <span className={styles.track} aria-hidden="true">

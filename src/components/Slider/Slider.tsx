@@ -9,6 +9,7 @@ import {
   type CSSProperties,
 } from "react";
 import { Tooltip } from "../Tooltip";
+import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Slider.module.css";
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -36,6 +37,8 @@ interface SliderBaseProps {
   trailingIcon?: ReactNode;
   formatValue?: (value: number) => string;
   className?: string;
+  id?: string;
+  "aria-describedby"?: string;
 }
 
 export interface SingleSliderProps extends SliderBaseProps {
@@ -106,8 +109,13 @@ export function Slider(props: SliderProps) {
     formatValue,
     className,
     range = false,
+    id: idProp,
+    "aria-describedby": ariaDescribedbyProp,
   } = props;
 
+  const fieldCtx = useFieldContext();
+  const sliderId = idProp ?? fieldCtx.inputId;
+  const sliderDescribedby = ariaDescribedbyProp ?? fieldCtx.hintId;
   const isH = orientation === "horizontal";
 
   /* ── value management ────────────────────────── */
@@ -465,6 +473,8 @@ export function Slider(props: SliderProps) {
           )}
           style={style}
           role="slider"
+          id={sliderId ? (range ? `${sliderId}-${knobIdx}` : sliderId) : undefined}
+          aria-describedby={sliderDescribedby}
           tabIndex={disabled ? -1 : 0}
           aria-valuemin={min}
           aria-valuemax={max}

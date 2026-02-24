@@ -10,6 +10,7 @@ import {
 } from "react";
 import { InputClear, type InputClearSize } from "../InputClear";
 import { useScrollFade } from "../ScrollFade";
+import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Input.module.css";
 
 export type InputSize = "md" | "lg" | "xl";
@@ -51,10 +52,16 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       defaultValue,
       onChange,
       className,
+      id: idProp,
+      "aria-describedby": ariaDescribedbyProp,
       ...rest
     },
     externalRef
   ) => {
+    const fieldCtx = useFieldContext();
+    const id = idProp ?? fieldCtx.inputId;
+    const ariaDescribedby = ariaDescribedbyProp ?? fieldCtx.hintId;
+
     const innerRef = useRef<HTMLInputElement>(null);
 
     const setRef = useCallback(
@@ -140,6 +147,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <input
               ref={setRef}
               className={styles.nativeInput}
+              id={id}
+              aria-describedby={ariaDescribedby}
               disabled={disabled}
               readOnly={readOnly}
               value={isControlled ? value : undefined}
