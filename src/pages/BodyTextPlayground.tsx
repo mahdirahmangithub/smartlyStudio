@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ElementType } from "react";
 import { BodyText, type BodyTextSize, type BodyTextEmphasis } from "../components/BodyText";
 import type { SpacingSize } from "../utils/spacing";
 
@@ -34,7 +34,7 @@ export default function BodyTextPlayground() {
   const [strong, setStrong] = useState(false);
   const [padTop, setPadTop] = useState<SpacingSize | "">("");
   const [padBottom, setPadBottom] = useState<SpacingSize | "">("");
-  const [tag, setTag] = useState<string>("p");
+  const [tag, setTag] = useState<ElementType>("p");
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
@@ -60,7 +60,7 @@ export default function BodyTextPlayground() {
 
             <label style={labelCtrlStyle}>
               <span style={captionStyle}>Tag</span>
-              <select value={tag} onChange={(e) => setTag(e.target.value)} style={selectStyle}>
+              <select value={tag as string} onChange={(e) => setTag(e.target.value as ElementType)} style={selectStyle}>
                 {["p", "span", "div", "blockquote", "li"].map((t) => <option key={t} value={t}>{`<${t}>`}</option>)}
               </select>
             </label>
