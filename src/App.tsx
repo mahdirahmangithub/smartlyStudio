@@ -60,10 +60,13 @@ import SliderPlayground from "./pages/SliderPlayground";
 import InlineMessagePlayground from "./pages/InlineMessagePlayground";
 import FieldsetPlayground from "./pages/FieldsetPlayground";
 import TitleTextPlayground from "./pages/TitleTextPlayground";
+import BodyTextPlayground from "./pages/BodyTextPlayground";
+import LinkPlayground from "./pages/LinkPlayground";
+import TextShowcase from "./pages/TextShowcase";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -261,11 +264,28 @@ export default function App() {
     { key: "inline-message", label: "InlineMessage" },
     { key: "fieldset", label: "Fieldset" },
     { key: "title-text", label: "TitleText" },
+    { key: "body-text", label: "BodyText" },
+    { key: "link", label: "Link" },
+    { key: "text-showcase", label: "TextShowcase" },
   ];
 
   return (
     <div className="app" data-theme={theme} data-density={density}>
       <div className="app-shell">
+        <aside className="app-sidebar">
+          <nav className="sidebar-nav">
+            {pages.map((p) => (
+              <button
+                key={p.key}
+                className={`sidebar-btn ${page === p.key ? "active" : ""}`}
+                onClick={() => setPage(p.key)}
+              >
+                {p.label}
+              </button>
+            ))}
+          </nav>
+        </aside>
+
         <main className="app-main">
           <div className="app-topbar">
             <ContentSwitcher
@@ -349,22 +369,11 @@ export default function App() {
             {page === "inline-message" && <InlineMessagePlayground />}
             {page === "fieldset" && <FieldsetPlayground />}
             {page === "title-text" && <TitleTextPlayground />}
+            {page === "body-text" && <BodyTextPlayground />}
+            {page === "link" && <LinkPlayground />}
+            {page === "text-showcase" && <TextShowcase />}
           </div>
         </main>
-
-        <aside className="app-sidebar">
-          <nav className="sidebar-nav">
-            {pages.map((p) => (
-              <button
-                key={p.key}
-                className={`sidebar-btn ${page === p.key ? "active" : ""}`}
-                onClick={() => setPage(p.key)}
-              >
-                {p.label}
-              </button>
-            ))}
-          </nav>
-        </aside>
       </div>
     </div>
   );

@@ -1,0 +1,129 @@
+/* ── root ──────────────────────────────────────────────────────────── */
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  overflow: clip;
+  border-radius: var(--radius-xs);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+/* ── focus ring ───────────────────────────────────────────────────── */
+
+.link:focus-visible {
+  box-shadow: var(--focus-ring,
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
+  outline: none;
+}
+
+/* ── disabled ─────────────────────────────────────────────────────── */
+
+.link[aria-disabled="true"] {
+  pointer-events: none;
+  cursor: default;
+}
+
+/* ── size: gap + typography ───────────────────────────────────────── */
+
+.lg { gap: var(--spacing-xs); }
+.md { gap: var(--spacing-xs); }
+.sm { gap: var(--spacing-2xs); }
+
+.lg {
+  font-family: var(--type-label-md-family);
+  font-weight: var(--type-label-md-weight);
+  font-size: var(--type-label-md-size);
+  line-height: var(--type-label-md-line-height);
+  letter-spacing: var(--type-label-md-letter-spacing);
+}
+
+.md {
+  font-family: var(--type-label-sm-family);
+  font-weight: var(--type-label-sm-weight);
+  font-size: var(--type-label-sm-size);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+}
+
+.sm {
+  font-family: var(--type-label-xs-family);
+  font-weight: var(--type-label-xs-weight);
+  font-size: var(--type-label-xs-size);
+  line-height: var(--type-label-xs-line-height);
+  letter-spacing: var(--type-label-xs-letter-spacing);
+}
+
+/* ── strong weight ────────────────────────────────────────────────── */
+
+.lg.strong {
+  font-family: var(--type-label-strong-md-family);
+  font-weight: var(--type-label-strong-md-weight);
+  font-size: var(--type-label-strong-md-size);
+  line-height: var(--type-label-strong-md-line-height);
+  letter-spacing: var(--type-label-strong-md-letter-spacing);
+}
+
+.md.strong {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+}
+
+.sm.strong {
+  font-family: var(--type-label-strong-xs-family);
+  font-weight: var(--type-label-strong-xs-weight);
+  font-size: var(--type-label-strong-xs-size);
+  line-height: var(--type-label-strong-xs-line-height);
+  letter-spacing: var(--type-label-strong-xs-letter-spacing);
+}
+
+/* ── type: neutral (regular) ──────────────────────────────────────── */
+
+.neutral                                  { color: var(--text-neutral-tertiary-default); }
+.neutral:hover                            { color: var(--text-neutral-tertiary-hover); }
+.neutral:active                           { color: var(--text-neutral-tertiary-press); }
+.neutral[aria-disabled="true"]            { color: var(--text-neutral-disable); }
+
+/* ── type: neutral (strong) ───────────────────────────────────────── */
+
+.neutral.strong                           { color: var(--text-neutral-secondary-default); }
+.neutral.strong:hover                     { color: var(--text-neutral-secondary-hover); }
+.neutral.strong:active                    { color: var(--text-neutral-secondary-press); }
+.neutral.strong[aria-disabled="true"]     { color: var(--text-neutral-disable); }
+
+/* ── type: brand ──────────────────────────────────────────────────── */
+
+.brand                                    { color: var(--text-brand-default); }
+.brand:hover                              { color: var(--text-brand-hover); }
+.brand:active                             { color: var(--text-brand-press); }
+.brand[aria-disabled="true"]              { color: var(--text-brand-disable); }
+
+/* ── icon ─────────────────────────────────────────────────────────── */
+
+.icon {
+  flex-shrink: 0;
+  color: currentColor;
+}
+
+/* ── underline ────────────────────────────────────────────────────── */
+
+.underline { text-decoration: underline; text-underline-offset: 2px; }
+
+/* inline: inherit size from surrounding text */
+.inline {
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  font-family: inherit;
+}
+
+.inline.strong {
+  font-weight: var(--type-label-strong-md-weight);
+}

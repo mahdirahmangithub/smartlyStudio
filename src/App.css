@@ -36,7 +36,7 @@
 .app-sidebar {
   width: 180px;
   flex-shrink: 0;
-  border-left: 1px solid var(--element-outline-neutral-default);
+  border-right: 1px solid var(--element-outline-neutral-default);
   background: var(--element-surface-default);
   position: sticky;
   top: 0;

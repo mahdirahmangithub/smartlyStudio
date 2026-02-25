@@ -1,4 +1,5 @@
-import type { ElementType, ReactNode } from "react";
+import type { CSSProperties, ElementType, ReactNode } from "react";
+import { getSpacing, type SpacingProps } from "../../utils/spacing";
 import styles from "./TitleText.module.css";
 
 export type TitleTextSize = "2xs" | "xs" | "sm" | "md" | "lg" | "xl";
@@ -21,19 +22,20 @@ const sizeClass: Record<TitleTextSize, string> = {
   "2xs": styles.xxs,
 };
 
-export interface TitleTextProps {
+export interface TitleTextProps extends SpacingProps {
   /** Visual size */
   size?: TitleTextSize;
   /** Title content */
-  title: string;
+  title: ReactNode;
   /** Optional description below the title */
-  description?: string;
+  description?: ReactNode;
   /** Leading icon element (e.g. `<Icon name="favorite_fill" size={24} />`) */
   leadingIcon?: ReactNode;
   /** HTML element for the title — defaults to h1–h6 based on size */
   as?: ElementType;
   /** Additional class on the root element */
   className?: string;
+  style?: CSSProperties;
 }
 
 export function TitleText({
@@ -43,11 +45,31 @@ export function TitleText({
   leadingIcon,
   as,
   className,
+  style,
+  paddingTop,
+  paddingBottom,
+  insetLeft,
+  insetRight,
 }: TitleTextProps) {
   const Heading = as ?? defaultHeadingLevel[size];
+  const { className: spacingCls, style: spacingStyle } = getSpacing({
+    paddingTop,
+    paddingBottom,
+    insetLeft,
+    insetRight,
+  });
+
+  const cls = [styles.root, sizeClass[size], spacingCls, className]
+    .filter(Boolean)
+    .join(" ");
+
+  const mergedStyle =
+    style || Object.keys(spacingStyle).length
+      ? { ...style, ...spacingStyle }
+      : undefined;
 
   return (
-    <div className={`${styles.root} ${sizeClass[size]}${className ? ` ${className}` : ""}`}>
+    <div className={cls} style={mergedStyle}>
       {leadingIcon !== undefined && (
         <span className={styles.icon}>{leadingIcon}</span>
       )}
