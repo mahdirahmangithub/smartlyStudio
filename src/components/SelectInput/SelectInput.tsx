@@ -149,7 +149,7 @@ export const SelectInput = forwardRef<HTMLInputElement, SelectInputProps>(
 
     const handleWrapperClick = () => {
       innerRef.current?.focus();
-      onClick?.({ target: innerRef.current } as React.MouseEvent<HTMLInputElement>);
+      onClick?.({ target: innerRef.current } as unknown as React.MouseEvent<HTMLInputElement>);
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -167,7 +167,7 @@ export const SelectInput = forwardRef<HTMLInputElement, SelectInputProps>(
           }
         } else {
           e.preventDefault();
-          onClick?.({ target: innerRef.current } as React.MouseEvent<HTMLInputElement>);
+          onClick?.({ target: innerRef.current } as unknown as React.MouseEvent<HTMLInputElement>);
         }
       }
       onKeyDown?.(e);

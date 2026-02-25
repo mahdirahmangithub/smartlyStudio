@@ -19,7 +19,7 @@ export default function SelectPlayground() {
         </p>
 
         <Select value={dino} onValueChange={setDino} name="dino">
-          <Select.Trigger leadingIcon={<Icon name="pet" />}>
+          <Select.Trigger leadingIcon={<Icon name="pets" />}>
             <Select.Value placeholder="Pick a dinosaur" />
           </Select.Trigger>
 

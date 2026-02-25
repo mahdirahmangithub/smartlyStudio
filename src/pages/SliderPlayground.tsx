@@ -402,8 +402,8 @@ function SliderWithFormat() {
           value={val}
           onChange={setVal}
           formatValue={(v) => `${Math.round(v)}%`}
-          leadingIcon={<Icon name="brightness_low" size={24} />}
-          trailingIcon={<Icon name="brightness_high" size={24} />}
+          leadingIcon={<Icon name="brightness_4" size={24} />}
+          trailingIcon={<Icon name="brightness_7" size={24} />}
         />
       </div>
       <span style={valueStyle}>{Math.round(val)}%</span>

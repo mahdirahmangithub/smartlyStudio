@@ -136,7 +136,7 @@ export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputPro
 
     const handleWrapperClick = () => {
       innerRef.current?.focus();
-      onClick?.({ target: innerRef.current } as React.MouseEvent<HTMLInputElement>);
+      onClick?.({ target: innerRef.current } as unknown as React.MouseEvent<HTMLInputElement>);
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -154,7 +154,7 @@ export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputPro
           }
         } else {
           e.preventDefault();
-          onClick?.({ target: innerRef.current } as React.MouseEvent<HTMLInputElement>);
+          onClick?.({ target: innerRef.current } as unknown as React.MouseEvent<HTMLInputElement>);
         }
       }
 

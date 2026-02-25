@@ -91,7 +91,7 @@ export default function ComboboxPlayground() {
           <Combobox value={dino} onValueChange={setDino}>
             <Combobox.Input
               placeholder="Search dinosaurs..."
-              leadingIcon={<Icon name="pet" size={16} />}
+              leadingIcon={<Icon name="pets" size={16} />}
               clearable
             />
             <Combobox.Content>
