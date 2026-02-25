@@ -188,7 +188,12 @@ export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputPro
                 <input
                   ref={setRef}
                   id={id}
+                  role="combobox"
                   aria-describedby={ariaDescribedby}
+                  aria-expanded={expanded}
+                  aria-haspopup="listbox"
+                  aria-controls={expanded ? dropdownId : undefined}
+                  aria-autocomplete="list"
                   className={styles.nativeInput}
                   disabled={disabled}
                   value={isControlled ? value : undefined}

@@ -7,6 +7,7 @@ import {
 } from "react";
 import { InputClear, type InputClearSize } from "../InputClear";
 import { Tooltip } from "../Tooltip";
+import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./ToggleChip.module.css";
 
 export type ToggleChipSize = "sm" | "md" | "lg";
@@ -73,6 +74,8 @@ export const ToggleChip = forwardRef<HTMLDivElement, ToggleChipProps>(
     };
 
     const inputClearVariant = checked ? "brand" : "neutral";
+    const labelText = typeof children === "string" ? children : "";
+    const [labelRef, isLabelTruncated] = useIsTruncated<HTMLSpanElement>(labelText);
 
     const chip = (
       <div
@@ -102,7 +105,7 @@ export const ToggleChip = forwardRef<HTMLDivElement, ToggleChipProps>(
           <span className={styles.leadingIcon}>{leadingIcon}</span>
         )}
 
-        {children && <span className={styles.label}>{children}</span>}
+        {children && <span ref={labelRef} className={styles.label}>{children}</span>}
 
         {onRemove && (
           <span className={styles.clearSlot}>
@@ -119,9 +122,12 @@ export const ToggleChip = forwardRef<HTMLDivElement, ToggleChipProps>(
       </div>
     );
 
-    if (!children && ariaLabel) {
+    const showTooltip = (!children && !!ariaLabel) || isLabelTruncated;
+    const tooltipText = !children && ariaLabel ? ariaLabel : labelText;
+
+    if (showTooltip) {
       return (
-        <Tooltip type="inverse" showTail={false} placement="top" label={ariaLabel}>
+        <Tooltip type="inverse" showTail={false} placement="top" label={tooltipText}>
           {chip}
         </Tooltip>
       );

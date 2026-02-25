@@ -131,6 +131,7 @@ export function FieldGroup({
             emphasis={messageEmphasis}
             text={message}
             showLeadingIcon={showMessageIcon}
+            disabled={disabled}
           />
         )}
       </div>

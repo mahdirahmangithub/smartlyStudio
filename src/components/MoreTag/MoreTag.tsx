@@ -93,6 +93,7 @@ export function MoreTag({
         tabIndex={disabled ? -1 : 0}
         role="button"
         aria-expanded={open}
+        aria-haspopup="listbox"
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         style={{ cursor: disabled ? "default" : "pointer" }}

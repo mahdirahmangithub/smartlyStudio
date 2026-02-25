@@ -38,6 +38,8 @@ interface SliderBaseProps {
   formatValue?: (value: number) => string;
   className?: string;
   id?: string;
+  "aria-label"?: string;
+  "aria-labelledby"?: string;
   "aria-describedby"?: string;
 }
 
@@ -110,11 +112,15 @@ export function Slider(props: SliderProps) {
     className,
     range = false,
     id: idProp,
+    "aria-label": ariaLabelProp,
+    "aria-labelledby": ariaLabelledbyProp,
     "aria-describedby": ariaDescribedbyProp,
   } = props;
 
   const fieldCtx = useFieldContext();
   const sliderId = idProp ?? fieldCtx.inputId;
+  const sliderLabel = ariaLabelProp;
+  const sliderLabelledby = ariaLabelledbyProp ?? fieldCtx.labelId;
   const sliderDescribedby = ariaDescribedbyProp ?? fieldCtx.hintId;
   const isH = orientation === "horizontal";
 
@@ -473,7 +479,9 @@ export function Slider(props: SliderProps) {
           )}
           style={style}
           role="slider"
-          id={sliderId ? (range ? `${sliderId}-${knobIdx}` : sliderId) : undefined}
+          id={sliderId ? (range && knobIdx > 0 ? `${sliderId}-${knobIdx}` : sliderId) : undefined}
+          aria-label={sliderLabel ? (range ? `${sliderLabel} ${knobIdx === 0 ? "minimum" : "maximum"}` : sliderLabel) : undefined}
+          aria-labelledby={!sliderLabel ? sliderLabelledby : undefined}
           aria-describedby={sliderDescribedby}
           tabIndex={disabled ? -1 : 0}
           aria-valuemin={min}

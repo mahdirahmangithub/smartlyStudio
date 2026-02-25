@@ -223,7 +223,7 @@ export default function FieldsetPlayground() {
             message="Search across all documents"
             messageType="info"
           >
-            <Input placeholder="Search…" />
+            <Input placeholder="Search…" aria-label="Search" />
           </Fieldset>
         </div>
       </div>

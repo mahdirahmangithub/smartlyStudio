@@ -109,6 +109,7 @@ export function Fieldset({
   const baseId = idProp ?? autoId;
   const inputId = `${baseId}-input`;
   const hintId = `${baseId}-hint`;
+  const labelId = `${baseId}-label`;
 
   const hasLabel = !!label;
   const hasMessage = !!message || charMax !== undefined;
@@ -119,8 +120,8 @@ export function Fieldset({
       : children;
 
   const ctxValue = useMemo(
-    () => ({ inputId, hintId }),
-    [inputId, hintId],
+    () => ({ inputId, hintId, labelId }),
+    [inputId, hintId, labelId],
   );
 
   return (
@@ -129,6 +130,7 @@ export function Fieldset({
         {hasLabel && (
           <Label
             label={label!}
+            id={labelId}
             htmlFor={inputId}
             size={labelSize}
             strong={labelStrong}
@@ -157,6 +159,7 @@ export function Fieldset({
               showLeadingIcon={showMessageIcon}
               charCount={charCount}
               charMax={charMax}
+              disabled={disabled}
             />
           )}
         </div>

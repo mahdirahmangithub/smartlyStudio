@@ -31,6 +31,15 @@ export interface InlineMessageProps {
   endText?: string;
   /** HTML id — useful for aria-describedby associations. */
   id?: string;
+  /**
+   * When set, the message becomes a live region so screen readers announce
+   * dynamic changes (e.g. validation errors appearing after user action).
+   * - `"polite"` — announced when the user is idle (recommended default)
+   * - `"assertive"` — interrupts immediately (use sparingly, e.g. critical errors)
+   */
+  "aria-live"?: "polite" | "assertive";
+  /** Marks the message as belonging to a disabled/inactive field (exempt from contrast requirements). */
+  disabled?: boolean;
   className?: string;
 }
 
@@ -58,15 +67,18 @@ export function InlineMessage({
   startText = "Start",
   endText = "End",
   id,
+  "aria-live": ariaLive,
+  disabled = false,
   className,
 }: InlineMessageProps) {
   const isHigh = emphasis === "high";
   const isRange = type === "range";
   const showCounter = !isHigh && !isRange && charMax !== undefined;
+  const isDecorative = !isHigh && type === "none" && !showCounter;
 
   if (isRange) {
     return (
-      <div id={id} className={cx(styles.root, styles.range, className)}>
+      <div id={id} className={cx(styles.root, styles.range, className)} aria-live={ariaLive} role={ariaLive ? "status" : undefined} aria-disabled={disabled || undefined}>
         <span className={styles.rangeLabel}>{startText}</span>
         <span className={cx(styles.rangeLabel, styles.rangeLabelEnd)}>
           {endText}
@@ -90,7 +102,7 @@ export function InlineMessage({
   );
 
   return (
-    <div id={id} className={rootClass}>
+    <div id={id} className={rootClass} aria-live={ariaLive} role={ariaLive ? (type === "alert" ? "alert" : "status") : undefined} aria-disabled={disabled || undefined} aria-hidden={isDecorative || undefined}>
       <div className={styles.content}>
         {iconNode && <span className={styles.icon}>{iconNode}</span>}
         <span className={styles.text}>{text}</span>

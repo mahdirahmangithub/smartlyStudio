@@ -146,7 +146,7 @@
 /* ── optional text ───────────────────────────────────────────────────── */
 
 .optional {
-  color: var(--text-neutral-placeholder);
+  color: var(--text-neutral-tertiary-default);
   white-space: nowrap;
   margin-inline-start: var(--spacing-2xs);
   font-family: var(--type-label-xs-family);

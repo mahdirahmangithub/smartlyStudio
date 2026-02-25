@@ -32,6 +32,8 @@ export interface LabelProps {
   description?: string;
   /** Trailing action slot (e.g. an IconButton) */
   action?: ReactNode;
+  /** HTML id for the <label> element — used for aria-labelledby associations. */
+  id?: string;
   className?: string;
 }
 
@@ -65,6 +67,7 @@ export function Label({
   hintDescription,
   description,
   action,
+  id,
   className,
 }: LabelProps) {
   return (
@@ -84,7 +87,7 @@ export function Label({
             <span className={styles.leadingIcon}>{leadingIcon}</span>
           )}
 
-          <label htmlFor={htmlFor} className={styles.labelRow}>
+          <label id={id} htmlFor={htmlFor} className={styles.labelRow}>
             <span className={styles.labelInner}>
               <span className={styles.labelText}>{label}</span>
               {required && <span className={styles.required}>*</span>}

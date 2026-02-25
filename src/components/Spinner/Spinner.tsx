@@ -73,6 +73,7 @@ export const Spinner = forwardRef<HTMLDivElement, SpinnerProps>(
       <div
         ref={ref}
         role="progressbar"
+        aria-label="Loading"
         aria-valuenow={mode === "determinate" ? clampedValue : undefined}
         aria-valuemin={mode === "determinate" ? 0 : undefined}
         aria-valuemax={mode === "determinate" ? 100 : undefined}

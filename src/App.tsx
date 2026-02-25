@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect, useCallback } from "react";
 import { Icon, searchIcons, getCategories } from "./components/Icon";
 import type { IconCategory, IconEntry } from "./components/Icon";
+import { ContentSwitcher } from "./components/ContentSwitcher";
+import { ContentSwitcherItem } from "./components/ContentSwitcherItem";
 import ButtonPlayground from "./pages/ButtonPlayground";
 import ScrollFadePage from "./pages/ScrollFadePage";
 import ExpanderPlayground from "./pages/ExpanderPlayground";
@@ -57,10 +59,11 @@ import ComboboxPlayground from "./pages/ComboboxPlayground";
 import SliderPlayground from "./pages/SliderPlayground";
 import InlineMessagePlayground from "./pages/InlineMessagePlayground";
 import FieldsetPlayground from "./pages/FieldsetPlayground";
+import TitleTextPlayground from "./pages/TitleTextPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -257,6 +260,7 @@ export default function App() {
     { key: "slider", label: "Slider" },
     { key: "inline-message", label: "InlineMessage" },
     { key: "fieldset", label: "Fieldset" },
+    { key: "title-text", label: "TitleText" },
   ];
 
   return (
@@ -264,28 +268,26 @@ export default function App() {
       <div className="app-shell">
         <main className="app-main">
           <div className="app-topbar">
-            <div className="mode-switcher">
-              {(["light", "dark", "dusk"] as const).map((t) => (
-                <button
-                  key={t}
-                  className={`mode-btn ${theme === t ? "active" : ""}`}
-                  onClick={() => setTheme(t)}
-                >
-                  {t.charAt(0).toUpperCase() + t.slice(1)}
-                </button>
-              ))}
-            </div>
-            <div className="mode-switcher">
-              {(["normal", "dense"] as const).map((d) => (
-                <button
-                  key={d}
-                  className={`mode-btn ${density === d ? "active" : ""}`}
-                  onClick={() => setDensity(d)}
-                >
-                  {d.charAt(0).toUpperCase() + d.slice(1)}
-                </button>
-              ))}
-            </div>
+            <ContentSwitcher
+              size="md"
+              emphasis="high"
+              value={theme}
+              onChange={(v) => setTheme(v as Theme)}
+            >
+              <ContentSwitcherItem value="light">Light</ContentSwitcherItem>
+              <ContentSwitcherItem value="dark">Dark</ContentSwitcherItem>
+              <ContentSwitcherItem value="dusk">Dusk</ContentSwitcherItem>
+            </ContentSwitcher>
+
+            <ContentSwitcher
+              size="md"
+              emphasis="high"
+              value={density}
+              onChange={(v) => setDensity(v as "normal" | "dense")}
+            >
+              <ContentSwitcherItem value="normal">Normal</ContentSwitcherItem>
+              <ContentSwitcherItem value="dense">Dense</ContentSwitcherItem>
+            </ContentSwitcher>
           </div>
 
           <div className="app-content">
@@ -346,6 +348,7 @@ export default function App() {
             {page === "slider" && <SliderPlayground />}
             {page === "inline-message" && <InlineMessagePlayground />}
             {page === "fieldset" && <FieldsetPlayground />}
+            {page === "title-text" && <TitleTextPlayground />}
           </div>
         </main>
 

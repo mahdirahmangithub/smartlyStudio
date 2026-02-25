@@ -78,7 +78,7 @@
   font-weight: var(--type-caption-sm-weight);
   line-height: var(--type-caption-sm-line-height);
   letter-spacing: var(--type-caption-sm-letter-spacing);
-  color: var(--text-neutral-placeholder);
+  color: var(--text-neutral-tertiary-default);
   white-space: nowrap;
 }
 
@@ -99,7 +99,7 @@
   font-weight: var(--type-caption-sm-weight);
   line-height: var(--type-caption-sm-line-height);
   letter-spacing: var(--type-caption-sm-letter-spacing);
-  color: var(--text-neutral-placeholder);
+  color: var(--text-neutral-tertiary-default);
 }
 
 .rangeLabelEnd {

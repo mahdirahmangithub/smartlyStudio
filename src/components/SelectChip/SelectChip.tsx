@@ -1,7 +1,8 @@
-import { forwardRef, type HTMLAttributes, type ReactNode, type MouseEvent } from "react";
+import { forwardRef, type HTMLAttributes, type ReactNode, type MouseEvent, type KeyboardEvent } from "react";
 import { Icon } from "../Icon";
 import { InputClear, type InputClearSize } from "../InputClear";
 import { Tooltip } from "../Tooltip";
+import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./SelectChip.module.css";
 
 export type SelectChipSize = "sm" | "md" | "lg";
@@ -58,6 +59,17 @@ export const SelectChip = forwardRef<HTMLDivElement, SelectChipProps>(
       onRemove?.();
     };
 
+    const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+      if (onClick && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        onClick(e as unknown as MouseEvent<HTMLDivElement>);
+      }
+    };
+
+    const isInteractive = !!onClick && !disabled;
+    const labelText = typeof children === "string" ? children : "";
+    const [labelRef, isLabelTruncated] = useIsTruncated<HTMLSpanElement>(labelText);
+
     const chip = (
       <div
         ref={ref}
@@ -69,8 +81,11 @@ export const SelectChip = forwardRef<HTMLDivElement, SelectChipProps>(
           disabled && styles.disabled,
           className
         )}
+        role={onClick ? "button" : undefined}
         onClick={disabled ? undefined : onClick}
+        onKeyDown={isInteractive ? handleKeyDown : undefined}
         tabIndex={disabled ? undefined : 0}
+        aria-disabled={disabled || undefined}
         aria-label={ariaLabel}
         {...rest}
       >
@@ -79,7 +94,7 @@ export const SelectChip = forwardRef<HTMLDivElement, SelectChipProps>(
         )}
 
         <span className={styles.labelChevron}>
-          {children && <span className={styles.label}>{children}</span>}
+          {children && <span ref={labelRef} className={styles.label}>{children}</span>}
           <span className={cx(styles.expander, open && styles.open)}>
             <Icon name="arrow_chevron_down" size={ICON_SIZE[size]} />
           </span>
@@ -100,9 +115,12 @@ export const SelectChip = forwardRef<HTMLDivElement, SelectChipProps>(
       </div>
     );
 
-    if (!children && ariaLabel) {
+    const showTooltip = (!children && !!ariaLabel) || isLabelTruncated;
+    const tooltipText = !children && ariaLabel ? ariaLabel : labelText;
+
+    if (showTooltip) {
       return (
-        <Tooltip type="inverse" showTail={false} placement="top" label={ariaLabel}>
+        <Tooltip type="inverse" showTail={false} placement="top" label={tooltipText}>
           {chip}
         </Tooltip>
       );

@@ -10,6 +10,8 @@ import {
   type CSSProperties,
 } from "react";
 import { InputClear, type InputClearSize, type InputClearType } from "../InputClear";
+import { Tooltip } from "../Tooltip";
+import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./Tag.module.css";
 
 export type TagSize = "md" | "lg";
@@ -190,6 +192,8 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(
       return () => obs.disconnect();
     }, [outline, surface, isCategorical]);
 
+    const [labelRef, isLabelTruncated] = useIsTruncated<HTMLSpanElement>(label);
+
     const handleRemoveClick = (e: MouseEvent) => {
       e.stopPropagation();
       onRemove?.();
@@ -227,9 +231,11 @@ export const Tag = forwardRef<HTMLSpanElement, TagProps>(
 
           <span className={styles.labelGroup}>
             {label && (
-              <span className={styles.label}>
-                <span className={styles.labelText}>{label}</span>
-              </span>
+              <Tooltip label={label} disabled={!isLabelTruncated} placement="top" type="inverse" showTail={false}>
+                <span className={styles.label}>
+                  <span ref={labelRef} className={styles.labelText}>{label}</span>
+                </span>
+              </Tooltip>
             )}
 
             {trailingIcon && (

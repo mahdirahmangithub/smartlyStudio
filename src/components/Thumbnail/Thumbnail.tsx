@@ -6,6 +6,8 @@ import {
 import { Icon } from "../Icon";
 import { Imagery } from "../Imagery";
 import { Spinner, type SpinnerSize } from "../Spinner";
+import { Tooltip } from "../Tooltip";
+import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./Thumbnail.module.css";
 
 export type ThumbnailSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
@@ -96,6 +98,7 @@ export const Thumbnail = forwardRef<HTMLDivElement, ThumbnailProps>(
   ) => {
     const isMedia = type === "media";
     const showError = error && !isMedia;
+    const [textRef, isTextTruncated] = useIsTruncated<HTMLSpanElement>(text);
 
     return (
       <div
@@ -132,9 +135,11 @@ export const Thumbnail = forwardRef<HTMLDivElement, ThumbnailProps>(
 
         {/* text content */}
         {type === "text" && !showError && (
-          <div className={styles.content}>
-            <span className={cx(styles.text, TEXT_CLASS[size])}>{text}</span>
-          </div>
+          <Tooltip label={text} disabled={!isTextTruncated} placement="top" type="inverse" showTail={false}>
+            <div className={styles.content}>
+              <span ref={textRef} className={cx(styles.text, TEXT_CLASS[size])}>{text}</span>
+            </div>
+          </Tooltip>
         )}
 
         {/* error state (icon & text types only) */}
