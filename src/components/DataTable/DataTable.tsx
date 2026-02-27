@@ -16,6 +16,8 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import styles from "./DataTable.module.css";
+import { IconButton } from "../IconButton";
+import { Expander } from "../Expander";
 
 /* ═══════════════════════════════════════════════════════════════
    Utilities
@@ -346,8 +348,7 @@ export function DataTable<T extends Record<string, any>>({
   );
 
   const showExpandCol = hasExpandRender && !isTreeData;
-  const internalColCount =
-    (hasRowDnD ? 1 : 0) + (hasSelection ? 1 : 0) + (showExpandCol ? 1 : 0);
+  const internalColCount = hasRowDnD ? 1 : 0;
   const internalColWidth = 40;
 
   /* ── Column order (for column DnD) ── */
@@ -925,36 +926,7 @@ export function DataTable<T extends Record<string, any>>({
             />
           )}
 
-          {ri === 0 && hasSelection && (
-            <th
-              rowSpan={maxDepth}
-              className={styles.headerCell}
-              style={{ width: internalColWidth }}
-            >
-              {selType === "checkbox" && (
-                <input
-                  type="checkbox"
-                  checked={allSelected}
-                  ref={(el) => {
-                    if (el) el.indeterminate = someSelected && !allSelected;
-                  }}
-                  onChange={toggleAll}
-                  aria-label="Select all rows"
-                />
-              )}
-            </th>
-          )}
-
-          {ri === 0 && showExpandCol && (
-            <th
-              rowSpan={maxDepth}
-              className={styles.headerCell}
-              style={{ width: internalColWidth }}
-              aria-label="Expand"
-            />
-          )}
-
-          {row.map((cell) => {
+          {row.map((cell, cellIdx) => {
             const col = cell.column;
             const isSortable = cell.isLeaf && col.sortable;
             const isLastLeaf =
@@ -1010,7 +982,20 @@ export function DataTable<T extends Record<string, any>>({
                 {...(cell.isLeaf ? col.onHeaderCell?.() : {})}
                 {...(cell.isLeaf ? colDragProps(col.key) : {})}
               >
-                <span>{col.title}</span>
+                <span className={ri === 0 && cellIdx === 0 && (hasSelection || showExpandCol) ? styles.inlineCellControls : undefined}>
+                  {ri === 0 && cellIdx === 0 && hasSelection && selType === "checkbox" && (
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      ref={(el) => {
+                        if (el) el.indeterminate = someSelected && !allSelected;
+                      }}
+                      onChange={toggleAll}
+                      aria-label="Select all rows"
+                    />
+                  )}
+                  {col.title}
+                </span>
                 {isSortable && (
                   <span aria-hidden="true" className={styles.sortIndicator}>
                     {sortDir === "asc"
@@ -1104,52 +1089,6 @@ export function DataTable<T extends Record<string, any>>({
                   </td>
                 )}
 
-                {/* ── Selection ── */}
-                {hasSelection && (
-                  <td
-                    style={{ width: internalColWidth }}
-                    data-row={rowIdx}
-                    data-col={colIdx++}
-                    tabIndex={keyboardNavigation ? -1 : undefined}
-                  >
-                    <input
-                      type={selType}
-                      checked={isSelected}
-                      onChange={() => toggleRow(rk)}
-                      name={
-                        selType === "radio"
-                          ? "dt-row-select"
-                          : undefined
-                      }
-                      aria-label={`Select row ${rowIdx + 1}`}
-                      {...checkProps}
-                    />
-                  </td>
-                )}
-
-                {/* ── Expand column (non-tree) ── */}
-                {showExpandCol && (
-                  <td
-                    style={{ width: internalColWidth }}
-                    data-row={rowIdx}
-                    data-col={colIdx++}
-                    tabIndex={keyboardNavigation ? -1 : undefined}
-                  >
-                    {canExpand && (
-                      <button
-                        className={styles.expandButton}
-                        onClick={() => toggleExpand(rk, record)}
-                        aria-expanded={isExpanded}
-                        aria-label={
-                          isExpanded ? "Collapse row" : "Expand row"
-                        }
-                      >
-                        {isExpanded ? "▼" : "▶"}
-                      </button>
-                    )}
-                  </td>
-                )}
-
                 {/* ── Data cells ── */}
                 {leafCols.map((col, ci) => {
                   const val = getValueByPath(record, col.dataIndex);
@@ -1182,30 +1121,59 @@ export function DataTable<T extends Record<string, any>>({
                       )}
                       {...cellProps}
                     >
-                      {isFirst && isTreeData && (
-                        <span
-                          className={styles.treeIndent}
-                          style={{ width: depth * indentSize }}
-                        >
-                          {/* spacer for indentation */}
+                      {isFirst && (hasSelection || showExpandCol || isTreeData) ? (
+                        <span className={styles.inlineCellControls}>
+                          {hasSelection && (
+                            <input
+                              type={selType}
+                              checked={isSelected}
+                              onChange={() => toggleRow(rk)}
+                              name={selType === "radio" ? "dt-row-select" : undefined}
+                              aria-label={`Select row ${rowIdx + 1}`}
+                              {...checkProps}
+                            />
+                          )}
+                          {isTreeData && (
+                            <span
+                              className={styles.treeIndent}
+                              style={{ width: depth * indentSize }}
+                            />
+                          )}
+                          {showExpandCol && canExpand && (
+                            <IconButton
+                              size="md"
+                              variant="neutral"
+                              emphasis="low"
+                              icon={<Expander expanded={isExpanded} size="sm" />}
+                              onClick={() => toggleExpand(rk, record)}
+                              aria-expanded={isExpanded}
+                              aria-label={isExpanded ? "Collapse row" : "Expand row"}
+                              className={styles.expandButton}
+                            />
+                          )}
+                          {showExpandCol && !canExpand && (
+                            <span className={styles.treeLeafSpacer} />
+                          )}
+                          {treeCanExpand && (
+                            <IconButton
+                              size="md"
+                              variant="neutral"
+                              emphasis="low"
+                              icon={<Expander expanded={isExpanded} size="sm" />}
+                              onClick={() => toggleExpand(rk, record)}
+                              aria-expanded={isExpanded}
+                              aria-label={isExpanded ? "Collapse row" : "Expand row"}
+                              className={styles.expandButton}
+                            />
+                          )}
+                          {isTreeData && !treeCanExpand && (
+                            <span className={styles.treeLeafSpacer} />
+                          )}
+                          <span>{rendered != null ? rendered : ""}</span>
                         </span>
+                      ) : (
+                        rendered != null ? rendered : ""
                       )}
-                      {isFirst && treeCanExpand && (
-                        <button
-                          className={styles.expandButton}
-                          onClick={() => toggleExpand(rk, record)}
-                          aria-expanded={isExpanded}
-                          aria-label={
-                            isExpanded ? "Collapse row" : "Expand row"
-                          }
-                        >
-                          {isExpanded ? "▼" : "▶"}
-                        </button>
-                      )}
-                      {isFirst && isTreeData && !treeCanExpand && (
-                        <span className={styles.treeLeafSpacer} />
-                      )}
-                      {rendered != null ? rendered : ""}
                     </td>
                   );
                 })}
@@ -1256,8 +1224,6 @@ export function DataTable<T extends Record<string, any>>({
       >
         <colgroup>
           {hasRowDnD && <col style={{ width: internalColWidth }} />}
-          {hasSelection && <col style={{ width: internalColWidth }} />}
-          {showExpandCol && <col style={{ width: internalColWidth }} />}
           {leafCols.map((c) => (
             <col key={c.key} style={{ width: activeWidths.get(c.key) }} />
           ))}
