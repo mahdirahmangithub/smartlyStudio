@@ -1,5 +1,5 @@
 import { useState, useCallback, type CSSProperties } from "react";
-import { DataTable, type ColumnDef, type SortState } from "../components/DataTable";
+import { DataTable, dataTableStyles, type ColumnDef, type SortState } from "../components/DataTable";
 
 /* ═══════════════════════════════════════════════════════════════
    Shared layout styles (mirrors other playground pages)
@@ -108,6 +108,145 @@ function BasicDemo() {
     <DataTable<Employee>
       columns={columns}
       dataSource={EMPLOYEES}
+      rowKey="id"
+    />
+  );
+}
+
+/* ── RowSpan demo data (employees grouped by department) ── */
+
+const ROWSPAN_DATA: Employee[] = [
+  { id: 1, name: "Alice Johnson", age: 32, email: "alice@example.com", department: "Engineering", salary: 95000 },
+  { id: 3, name: "Charlie Brown", age: 28, email: "charlie@example.com", department: "Engineering", salary: 78000 },
+  { id: 5, name: "Eve Martinez", age: 29, email: "eve@example.com", department: "Engineering", salary: 91000 },
+  { id: 2, name: "Bob Smith", age: 45, email: "bob@example.com", department: "Marketing", salary: 82000 },
+  { id: 6, name: "Frank Lee", age: 52, email: "frank@example.com", department: "Marketing", salary: 110000 },
+  { id: 4, name: "Diana Prince", age: 36, email: "diana@example.com", department: "Design", salary: 88000 },
+  { id: 7, name: "Grace Hopper", age: 41, email: "grace@example.com", department: "Design", salary: 96000 },
+];
+
+const deptSpans = (() => {
+  const map = new Map<number, number>();
+  let i = 0;
+  while (i < ROWSPAN_DATA.length) {
+    const dept = ROWSPAN_DATA[i].department;
+    let count = 1;
+    while (i + count < ROWSPAN_DATA.length && ROWSPAN_DATA[i + count].department === dept) count++;
+    map.set(i, count);
+    for (let j = 1; j < count; j++) map.set(i + j, 0);
+    i += count;
+  }
+  return map;
+})();
+
+function RowSpanDemo() {
+  const columns: ColumnDef<Employee>[] = [
+    {
+      key: "department",
+      title: "Department",
+      dataIndex: "department",
+      width: 130,
+      onCell: (_record, index) => ({ rowSpan: deptSpans.get(index) }),
+    },
+    { key: "name", title: "Name", dataIndex: "name", width: 160 },
+    { key: "age", title: "Age", dataIndex: "age", width: 80, align: "right" },
+    { key: "email", title: "Email", dataIndex: "email", width: 220 },
+    {
+      key: "salary",
+      title: "Salary",
+      dataIndex: "salary",
+      width: 120,
+      align: "right",
+      render: (v: number) => `$${v.toLocaleString()}`,
+    },
+  ];
+
+  return (
+    <DataTable<Employee>
+      columns={columns}
+      dataSource={ROWSPAN_DATA}
+      rowKey="id"
+    />
+  );
+}
+
+/* ── ColSpan demo data (section header rows spanning all columns) ── */
+
+interface ColSpanRow {
+  id: number;
+  name: string;
+  age: number | null;
+  email: string;
+  department: string;
+  salary: number | null;
+  isSectionHeader?: boolean;
+}
+
+const COLSPAN_DATA: ColSpanRow[] = [
+  { id: 100, name: "Engineering", age: null, email: "", department: "Engineering", salary: null, isSectionHeader: true },
+  { id: 1, name: "Alice Johnson", age: 32, email: "alice@example.com", department: "Engineering", salary: 95000 },
+  { id: 3, name: "Charlie Brown", age: 28, email: "charlie@example.com", department: "Engineering", salary: 78000 },
+  { id: 5, name: "Eve Martinez", age: 29, email: "eve@example.com", department: "Engineering", salary: 91000 },
+  { id: 200, name: "Marketing", age: null, email: "", department: "Marketing", salary: null, isSectionHeader: true },
+  { id: 2, name: "Bob Smith", age: 45, email: "bob@example.com", department: "Marketing", salary: 82000 },
+  { id: 6, name: "Frank Lee", age: 52, email: "frank@example.com", department: "Marketing", salary: 110000 },
+  { id: 300, name: "Design", age: null, email: "", department: "Design", salary: null, isSectionHeader: true },
+  { id: 4, name: "Diana Prince", age: 36, email: "diana@example.com", department: "Design", salary: 88000 },
+  { id: 7, name: "Grace Hopper", age: 41, email: "grace@example.com", department: "Design", salary: 96000 },
+];
+
+const TOTAL_LEAF_COLS = 5;
+
+function ColSpanDemo() {
+  const columns: ColumnDef<ColSpanRow>[] = [
+    {
+      key: "name",
+      title: "Name",
+      dataIndex: "name",
+      width: 160,
+      onCell: (record) =>
+        record.isSectionHeader
+          ? { colSpan: TOTAL_LEAF_COLS, style: { fontWeight: 600, backgroundColor: "var(--element-divider-neutral-weak)" } }
+          : {},
+    },
+    {
+      key: "age",
+      title: "Age",
+      dataIndex: "age",
+      width: 80,
+      align: "right",
+      onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
+      render: (v: number | null) => v ?? "",
+    },
+    {
+      key: "email",
+      title: "Email",
+      dataIndex: "email",
+      width: 220,
+      onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
+    },
+    {
+      key: "department",
+      title: "Dept",
+      dataIndex: "department",
+      width: 130,
+      onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
+    },
+    {
+      key: "salary",
+      title: "Salary",
+      dataIndex: "salary",
+      width: 120,
+      align: "right",
+      onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
+      render: (v: number | null) => (v != null ? `$${v.toLocaleString()}` : ""),
+    },
+  ];
+
+  return (
+    <DataTable<ColSpanRow>
+      columns={columns}
+      dataSource={COLSPAN_DATA}
       rowKey="id"
     />
   );
@@ -509,17 +648,65 @@ function CombinedDemo() {
    Playground Page
    ═══════════════════════════════════════════════════════════════ */
 
+type CellOverflow = "default" | "wrap" | "truncate";
+
+const overflowClass: Record<CellOverflow, string | undefined> = {
+  default: undefined,
+  wrap: dataTableStyles.wrapCells,
+  truncate: dataTableStyles.truncateCells,
+};
+
 export default function DataTablePlayground() {
+  const [cellOverflow, setCellOverflow] = useState<CellOverflow>("default");
+
   return (
     <div>
       <h1>DataTable</h1>
-      <p style={{ opacity: 0.6, marginBottom: 32 }}>
+      <p style={{ opacity: 0.6, marginBottom: 16 }}>
         Functional demos — no decorative styling applied.
       </p>
 
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 32 }}>
+        <span style={{ fontSize: 13, fontWeight: 600 }}>Cell overflow:</span>
+        {(["default", "wrap", "truncate"] as const).map((mode) => (
+          <button
+            key={mode}
+            onClick={() => setCellOverflow(mode)}
+            style={{
+              padding: "4px 12px",
+              borderRadius: 6,
+              border: "1px solid #ccc",
+              background: cellOverflow === mode ? "#333" : "#fff",
+              color: cellOverflow === mode ? "#fff" : "#333",
+              cursor: "pointer",
+              fontSize: 13,
+            }}
+          >
+            {mode}
+          </button>
+        ))}
+      </div>
+
+      <div className={overflowClass[cellOverflow]}>
       <section style={sectionStyle}>
         <h2>Basic</h2>
         <div style={cardStyle}><BasicDemo /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>RowSpan</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Department column merges vertically for consecutive rows in the same department via <code>onCell</code> returning <code>rowSpan</code>.
+        </p>
+        <div style={cardStyle}><RowSpanDemo /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>ColSpan</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Section header rows span all columns using <code>colSpan</code>. Other columns return <code>colSpan: 0</code> to hide.
+        </p>
+        <div style={cardStyle}><ColSpanDemo /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -586,6 +773,7 @@ export default function DataTablePlayground() {
         <h2>Combined Features</h2>
         <div style={cardStyle}><CombinedDemo /></div>
       </section>
+      </div>
     </div>
   );
 }

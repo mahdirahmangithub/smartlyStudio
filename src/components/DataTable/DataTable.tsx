@@ -610,6 +610,7 @@ export function DataTable<T extends Record<string, any>>({
   const resizeW0 = useRef(0);
   const resizeMinW = useRef(50);
   const resizeMaxW = useRef(9999);
+  const didResize = useRef(false);
   const resizeNeighborW0 = useRef(0);
   const resizeNeighborMinW = useRef(50);
   const resizeNeighborMaxW = useRef(9999);
@@ -624,6 +625,7 @@ export function DataTable<T extends Record<string, any>>({
       const frozen = new Map<string, number>();
       for (const c of leafCols) frozen.set(c.key, numericWidth(c));
       frozenWidths.current = frozen;
+      didResize.current = true;
 
       setResizingCol(colKey);
       resizeX0.current = e.clientX;
@@ -719,6 +721,7 @@ export function DataTable<T extends Record<string, any>>({
       frozenWidths.current = null;
       resizeNeighborKey.current = null;
       setResizingCol(null);
+      requestAnimationFrame(() => { didResize.current = false; });
     };
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
@@ -1003,7 +1006,7 @@ export function DataTable<T extends Record<string, any>>({
                   textAlign: col.align,
                   ...stickyS,
                 }}
-                onClick={isSortable ? () => cycleSort(col.key) : undefined}
+                onClick={isSortable ? () => { if (!didResize.current) cycleSort(col.key); } : undefined}
                 {...(cell.isLeaf ? col.onHeaderCell?.() : {})}
                 {...(cell.isLeaf ? colDragProps(col.key) : {})}
               >
@@ -1154,8 +1157,12 @@ export function DataTable<T extends Record<string, any>>({
                     ? col.render(val, record, rowIdx)
                     : val;
                   const cellProps = col.onCell?.(record, rowIdx) ?? {};
-                  const isFirst = ci === 0;
                   const currentCol = colIdx++;
+
+                  if (cellProps.colSpan === 0 || cellProps.rowSpan === 0)
+                    return null;
+
+                  const isFirst = ci === 0;
 
                   return (
                     <td

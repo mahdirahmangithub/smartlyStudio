@@ -190,3 +190,17 @@
   outline: 2px solid currentColor;
   outline-offset: -2px;
 }
+
+/* ── Cell content overflow ── */
+
+.wrapCells td {
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.truncateCells td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
