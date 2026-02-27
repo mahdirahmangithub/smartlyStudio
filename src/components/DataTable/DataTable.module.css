@@ -1,0 +1,192 @@
+.root {
+  overflow: auto;
+  position: relative;
+}
+
+.table {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.table th,
+.table td {
+  background-color: var(--element-surface-over);
+  border-bottom: 1px solid var(--element-divider-neutral-weak);
+  border-right: 1px solid var(--element-divider-neutral-weak);
+  text-align: left;
+  padding: 8px;
+}
+
+.table th:last-child,
+.table td:last-child {
+  border-right: none;
+}
+
+/* ── Sticky header ── */
+
+.stickyHead {
+  position: sticky;
+  z-index: 3;
+}
+
+.scrolledTop .stickyHead {
+  box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Sticky column cells ── */
+
+.stickyCell,
+.stickyLeftEdge,
+.stickyRightEdge {
+  position: relative;
+}
+
+.stickyLeftEdge::after,
+.stickyRightEdge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms;
+}
+
+.stickyLeftEdge::after {
+  right: -8px;
+  box-shadow: inset 8px 0 6px -6px rgba(0, 0, 0, 0.12);
+}
+
+.stickyRightEdge::after {
+  left: -8px;
+  box-shadow: inset -8px 0 6px -6px rgba(0, 0, 0, 0.12);
+}
+
+.scrolledLeft .stickyLeftEdge::after {
+  opacity: 1;
+}
+
+.scrolledRight .stickyRightEdge::after {
+  opacity: 1;
+}
+
+/* ── Header cells ── */
+
+.headerCell {
+  position: relative;
+  white-space: nowrap;
+  user-select: none;
+  vertical-align: bottom;
+}
+
+.sortableHeader {
+  cursor: pointer;
+}
+
+.sortIndicator {
+  display: inline;
+  font-size: 0.7em;
+}
+
+/* ── Column resize ── */
+
+.resizeHandle {
+  position: absolute;
+  right: -3px;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+  z-index: 1;
+}
+
+.resizeHandle::after {
+  content: "";
+  position: absolute;
+  top: 25%;
+  bottom: 25%;
+  left: 3px;
+  width: 1px;
+  background-color: var(--element-divider-neutral-default);
+  opacity: 0;
+  transition: opacity 120ms;
+}
+
+.headerCell:hover > .resizeHandle::after,
+.resizing .resizeHandle::after {
+  opacity: 1;
+}
+
+.resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* ── Expand button ── */
+
+.expandButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+/* ── Tree indentation ── */
+
+.treeIndent {
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.treeLeafSpacer {
+  display: inline-block;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+/* ── Row DnD ── */
+
+.dragHandle {
+  cursor: grab;
+  user-select: none;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.dragging {
+  opacity: 0.4;
+}
+
+.dragOver {
+  outline: 2px dashed currentColor;
+  outline-offset: -2px;
+}
+
+/* ── Empty state ── */
+
+.emptyCell {
+  text-align: center;
+  padding: 24px;
+}
+
+/* ── Expanded detail row ── */
+
+.expandedCell {
+  padding: 0;
+}
+
+/* ── Keyboard focus ── */
+
+.focusedCell {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
