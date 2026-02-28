@@ -198,9 +198,11 @@ export default function App() {
   const [density, setDensity] = useState<"normal" | "dense">("normal");
   const [typeface, setTypeface] = useState<"mac" | "windows" | "marketing" | "inter">("mac");
   const [page, setPageState] = useState<Page>(getPageFromPath);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const setPage = useCallback((p: Page) => {
     setPageState(p);
+    setSidebarOpen(false);
     window.history.pushState(null, "", `/${p}`);
   }, []);
 
@@ -281,7 +283,8 @@ export default function App() {
   return (
     <div className="app" data-theme={theme} data-density={density} data-typeface={typeface}>
       <div className="app-shell">
-        <aside className="app-sidebar">
+        {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
+        <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
           <nav className="sidebar-nav">
             {pages.map((p) => (
               <button
@@ -297,6 +300,9 @@ export default function App() {
 
         <main className="app-main">
           <div className="app-topbar" data-density="normal" data-typeface="mac">
+            <button className="burger-btn" onClick={() => setSidebarOpen((o) => !o)} aria-label="Toggle menu">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+            </button>
             <ContentSwitcher
               size="lg"
               emphasis="high"
