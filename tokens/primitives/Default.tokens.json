@@ -6014,6 +6014,18 @@
     }
   },
   "font": {
+    "String": {
+      "$type": "string",
+      "$value": "String value",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:3568:1634",
+        "com.figma.scopes": [
+          "ALL_SCOPES"
+        ],
+        "com.figma.type": "string",
+        "com.figma.isOverride": true
+      }
+    },
     "family": {
       "mac": {
         "heading": {
@@ -6097,6 +6109,44 @@
           "$value": "Menlo",
           "$extensions": {
             "com.figma.variableId": "VariableID:3220:86630",
+            "com.figma.type": "string",
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "inter": {
+        "heading": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:3568:1635",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ],
+            "com.figma.type": "string",
+            "com.figma.isOverride": true
+          }
+        },
+        "text": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:3568:1636",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ],
+            "com.figma.type": "string",
+            "com.figma.isOverride": true
+          }
+        },
+        "code": {
+          "$type": "string",
+          "$value": "Geist Mono",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:3568:1637",
+            "com.figma.scopes": [
+              "ALL_SCOPES"
+            ],
             "com.figma.type": "string",
             "com.figma.isOverride": true
           }
@@ -7366,24 +7416,6 @@
           "com.figma.isOverride": true
         }
       },
-      "creative": {
-        "layer-editor": {
-          "$type": "number",
-          "$value": 44,
-          "$extensions": {
-            "com.figma.variableId": "VariableID:323:576",
-            "com.figma.isOverride": true
-          }
-        },
-        "layers": {
-          "$type": "number",
-          "$value": 56,
-          "$extensions": {
-            "com.figma.variableId": "VariableID:323:577",
-            "com.figma.isOverride": true
-          }
-        }
-      },
       "nav": {
         "tight": {
           "$type": "number",
@@ -7398,6 +7430,24 @@
           "$value": 112,
           "$extensions": {
             "com.figma.variableId": "VariableID:304:64499",
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "creative": {
+        "layer-editor": {
+          "$type": "number",
+          "$value": 44,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:323:576",
+            "com.figma.isOverride": true
+          }
+        },
+        "layers": {
+          "$type": "number",
+          "$value": 56,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:323:577",
             "com.figma.isOverride": true
           }
         }

@@ -351,6 +351,7 @@ const TYPEFACES = [
   { file: "mac.tokens.json", selector: ":root, [data-typeface='mac']", name: "mac" },
   { file: "windows.tokens.json", selector: "[data-typeface='windows']", name: "windows" },
   { file: "marketing.tokens.json", selector: "[data-typeface='marketing']", name: "marketing" },
+  { file: "inter.tokens.json", selector: "[data-typeface='inter']", name: "inter" },
 ];
 
 const PROP_TO_PREFIX = {

@@ -66,10 +66,11 @@ import TextShowcase from "./pages/TextShowcase";
 import TextareaPlayground from "./pages/TextareaPlayground";
 import DataTablePlayground from "./pages/DataTablePlayground";
 import AnimatedIconsPlayground from "./pages/AnimatedIconsPlayground";
+import TypographyPlayground from "./pages/TypographyPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons";
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -195,6 +196,7 @@ function getPageFromPath(): Page {
 export default function App() {
   const [theme, setTheme] = useState<Theme>("light");
   const [density, setDensity] = useState<"normal" | "dense">("normal");
+  const [typeface, setTypeface] = useState<"mac" | "windows" | "marketing" | "inter">("mac");
   const [page, setPageState] = useState<Page>(getPageFromPath);
 
   const setPage = useCallback((p: Page) => {
@@ -273,10 +275,11 @@ export default function App() {
     { key: "textarea", label: "Textarea" },
     { key: "data-table", label: "DataTable" },
     { key: "animated-icons", label: "AnimatedIcons" },
+    { key: "typography", label: "Typography" },
   ];
 
   return (
-    <div className="app" data-theme={theme} data-density={density}>
+    <div className="app" data-theme={theme} data-density={density} data-typeface={typeface}>
       <div className="app-shell">
         <aside className="app-sidebar">
           <nav className="sidebar-nav">
@@ -293,9 +296,9 @@ export default function App() {
         </aside>
 
         <main className="app-main">
-          <div className="app-topbar">
+          <div className="app-topbar" data-density="normal" data-typeface="mac">
             <ContentSwitcher
-              size="md"
+              size="lg"
               emphasis="high"
               value={theme}
               onChange={(v) => setTheme(v as Theme)}
@@ -306,13 +309,25 @@ export default function App() {
             </ContentSwitcher>
 
             <ContentSwitcher
-              size="md"
+              size="lg"
               emphasis="high"
               value={density}
               onChange={(v) => setDensity(v as "normal" | "dense")}
             >
               <ContentSwitcherItem value="normal">Normal</ContentSwitcherItem>
               <ContentSwitcherItem value="dense">Dense</ContentSwitcherItem>
+            </ContentSwitcher>
+
+            <ContentSwitcher
+              size="lg"
+              emphasis="high"
+              value={typeface}
+              onChange={(v) => setTypeface(v as "mac" | "windows" | "marketing" | "inter")}
+            >
+              <ContentSwitcherItem value="mac">Mac</ContentSwitcherItem>
+              <ContentSwitcherItem value="windows">Windows</ContentSwitcherItem>
+              <ContentSwitcherItem value="marketing">Marketing</ContentSwitcherItem>
+              <ContentSwitcherItem value="inter">Inter</ContentSwitcherItem>
             </ContentSwitcher>
           </div>
 
@@ -381,6 +396,7 @@ export default function App() {
             {page === "textarea" && <TextareaPlayground />}
             {page === "data-table" && <DataTablePlayground />}
             {page === "animated-icons" && <AnimatedIconsPlayground />}
+            {page === "typography" && <TypographyPlayground />}
           </div>
         </main>
       </div>

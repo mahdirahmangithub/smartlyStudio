@@ -1,0 +1,3231 @@
+{
+  "heading": {
+    "lg": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:275",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:bdb07b5c090c33a9ce99fdd2acd5b5378c9c136d/-1:-1",
+            "targetVariableName": "font/family/inter/heading",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 700,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:274",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:b2de7042fe838605847d5579a0d4aa2ba9108e65/-1:-1",
+            "targetVariableName": "font/weight/bold",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 80,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:44:87",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:f001faaf417043bf692e7723078d9b5fd408c7ac/-1:-1",
+            "targetVariableName": "font/size/10xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 80,
+        "$description": "font/line-height/unitless-none",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:44:89",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:c279ed9cc80266d7dd6c19f9aac906c20fb32a91/-1:-1",
+            "targetVariableName": "font/line-height/8xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -1.399999976158142,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:44:90",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:fe95518cec26ca649c67d0362da4c2df4470f916/-1:-1",
+            "targetVariableName": "font/letter-spacing/4xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "md": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:280",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:bdb07b5c090c33a9ce99fdd2acd5b5378c9c136d/-1:-1",
+            "targetVariableName": "font/family/inter/heading",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 700,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:279",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:b2de7042fe838605847d5579a0d4aa2ba9108e65/-1:-1",
+            "targetVariableName": "font/weight/bold",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 56,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:45:48",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:9ec01c08ae9e3a1535d9395c3e685f33cce2c7c5/-1:-1",
+            "targetVariableName": "font/size/7xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 64,
+        "$description": "font/line-height/unitless-tightest",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:45:46",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2d1517765ca2dbfb265dac776762a3ac97a9efe4/-1:-1",
+            "targetVariableName": "font/line-height/6xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.800000011920929,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:45:45",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a045ad11489b040a6ce1ce9e13f94d02fd927ece/-1:-1",
+            "targetVariableName": "font/letter-spacing/3xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "sm": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:285",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:bdb07b5c090c33a9ce99fdd2acd5b5378c9c136d/-1:-1",
+            "targetVariableName": "font/family/inter/heading",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 700,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:284",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:b2de7042fe838605847d5579a0d4aa2ba9108e65/-1:-1",
+            "targetVariableName": "font/weight/bold",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 48,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:18",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:779ca9cf71635bed0616f073c19efbdcd7a0ef19/-1:-1",
+            "targetVariableName": "font/size/6xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 56,
+        "$description": "font/line-height/unitless-tighter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:16",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:eb02d87f479162c601159a7cf486513e438f6ea5/-1:-1",
+            "targetVariableName": "font/line-height/5xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.800000011920929,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:15",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a045ad11489b040a6ce1ce9e13f94d02fd927ece/-1:-1",
+            "targetVariableName": "font/letter-spacing/3xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    }
+  },
+  "title": {
+    "lg": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:292",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:bdb07b5c090c33a9ce99fdd2acd5b5378c9c136d/-1:-1",
+            "targetVariableName": "font/family/inter/heading",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 600,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:291",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d074e2d7ba5c04eeaaaf857f99e3d151de4a074c/-1:-1",
+            "targetVariableName": "font/weight/semibold",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 32,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:81",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:07de14f110e251969183aa7cacf1faef866a4960/-1:-1",
+            "targetVariableName": "font/size/4xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 40,
+        "$description": "font/line-height/unitless-tight",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:79",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:685b91a67625b2906ab494da5485c360cc2d9082/-1:-1",
+            "targetVariableName": "font/line-height/4xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.4000000059604645,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:78",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:551c6321777c9d57f98bc13cede318866d5b429c/-1:-1",
+            "targetVariableName": "font/letter-spacing/2xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "md": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:297",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:bdb07b5c090c33a9ce99fdd2acd5b5378c9c136d/-1:-1",
+            "targetVariableName": "font/family/inter/heading",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 600,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:296",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d074e2d7ba5c04eeaaaf857f99e3d151de4a074c/-1:-1",
+            "targetVariableName": "font/weight/semibold",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 24,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:64",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:44543416e115edc6eafa706bce085f407ca81e04/-1:-1",
+            "targetVariableName": "font/size/2xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 32,
+        "$description": "font/line-height/unitless-snug",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:61",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e344f6d69627e43bffa433b5610e62a98d930ca3/-1:-1",
+            "targetVariableName": "font/line-height/2xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.20000000298023224,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:62",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:360108322014f14cd8808c33a610455c51712714/-1:-1",
+            "targetVariableName": "font/letter-spacing/xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "sm": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:302",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:bdb07b5c090c33a9ce99fdd2acd5b5378c9c136d/-1:-1",
+            "targetVariableName": "font/family/inter/heading",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 600,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:301",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d074e2d7ba5c04eeaaaf857f99e3d151de4a074c/-1:-1",
+            "targetVariableName": "font/weight/semibold",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 20,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:46",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:cf5b0c8b716d8b00c3b6a5d851ee2617acaca57c/-1:-1",
+            "targetVariableName": "font/size/xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 28,
+        "$description": "font/line-height/unitless-normal-minus",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:47",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:b276c6f604a3ea7f6739ad13e771c9ab24279cf8/-1:-1",
+            "targetVariableName": "font/line-height/xl-plus",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.20000000298023224,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:44",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:360108322014f14cd8808c33a610455c51712714/-1:-1",
+            "targetVariableName": "font/letter-spacing/xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "xs": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:307",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:bdb07b5c090c33a9ce99fdd2acd5b5378c9c136d/-1:-1",
+            "targetVariableName": "font/family/inter/heading",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 600,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:306",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d074e2d7ba5c04eeaaaf857f99e3d151de4a074c/-1:-1",
+            "targetVariableName": "font/weight/semibold",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 18,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:34",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:5ea1f3ba70e5b52cf9d166c2dc2d4278a77e2dd1/-1:-1",
+            "targetVariableName": "font/size/lg",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "font/line-height/unitless-snug",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:35",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+            "targetVariableName": "font/line-height/xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.10000000149011612,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:46:32",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+            "targetVariableName": "font/letter-spacing/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    }
+  },
+  "label": {
+    "lg": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:314",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:313",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 18,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:50",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:5ea1f3ba70e5b52cf9d166c2dc2d4278a77e2dd1/-1:-1",
+            "targetVariableName": "font/size/lg",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "font/line-height/unitless-snug",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:46",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+            "targetVariableName": "font/line-height/xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.20000000298023224,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:43",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:360108322014f14cd8808c33a610455c51712714/-1:-1",
+            "targetVariableName": "font/letter-spacing/xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "md": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:319",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:318",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 16,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:68",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e6ad46003753c5f0fe3195951333951c9a31451e/-1:-1",
+            "targetVariableName": "font/size/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 20,
+        "$description": "font/line-height/unitless-tight",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:66",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:999301225ff203dd903541d104fac7ffa24ad310/-1:-1",
+            "targetVariableName": "font/line-height/lg",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.10000000149011612,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:69",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+            "targetVariableName": "font/letter-spacing/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "sm": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:324",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:323",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 14,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:86",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a96b90c1c012b1fa0ab895c4cb8fc14ad1b8daaa/-1:-1",
+            "targetVariableName": "font/size/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "font/line-height/unitless-tightest",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:84",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+            "targetVariableName": "font/line-height/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.10000000149011612,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:83",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+            "targetVariableName": "font/letter-spacing/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "xs": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:97:201747",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:97:201748",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 12,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:97:201749",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2f202bb47505453bb92329bfedb4f8d35ea362c7/-1:-1",
+            "targetVariableName": "font/size/xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 14,
+        "$description": "font/line-height/unitless-tighter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:97:201750",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:ff77c5996b4881b532c08df91a421db1676f1c12/-1:-1",
+            "targetVariableName": "font/line-height/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": 0,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:97:201751",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:cfa4bbcc153e6ce2d9d8633f3886a80f7a90670a/-1:-1",
+            "targetVariableName": "font/letter-spacing/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "strong": {
+      "lg": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:507",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:508",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 18,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:509",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:5ea1f3ba70e5b52cf9d166c2dc2d4278a77e2dd1/-1:-1",
+              "targetVariableName": "font/size/lg",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 24,
+          "$description": "font/line-height/unitless-snug",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:510",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+              "targetVariableName": "font/line-height/xl",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": -0.20000000298023224,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:511",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:360108322014f14cd8808c33a610455c51712714/-1:-1",
+              "targetVariableName": "font/letter-spacing/xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "md": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:512",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:513",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 16,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:514",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:e6ad46003753c5f0fe3195951333951c9a31451e/-1:-1",
+              "targetVariableName": "font/size/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 20,
+          "$description": "font/line-height/unitless-tight",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:515",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:999301225ff203dd903541d104fac7ffa24ad310/-1:-1",
+              "targetVariableName": "font/line-height/lg",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": -0.10000000149011612,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:516",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+              "targetVariableName": "font/letter-spacing/sm",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "sm": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:517",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:518",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 14,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:519",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:a96b90c1c012b1fa0ab895c4cb8fc14ad1b8daaa/-1:-1",
+              "targetVariableName": "font/size/sm",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 16,
+          "$description": "font/line-height/unitless-tightest",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:520",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+              "targetVariableName": "font/line-height/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": -0.10000000149011612,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:521",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+              "targetVariableName": "font/letter-spacing/sm",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "xs": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:99:196864",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:99:196865",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 12,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:99:196866",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:2f202bb47505453bb92329bfedb4f8d35ea362c7/-1:-1",
+              "targetVariableName": "font/size/xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 14,
+          "$description": "font/line-height/unitless-tighter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:99:196867",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:ff77c5996b4881b532c08df91a421db1676f1c12/-1:-1",
+              "targetVariableName": "font/line-height/sm",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": 0,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:99:196868",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:cfa4bbcc153e6ce2d9d8633f3886a80f7a90670a/-1:-1",
+              "targetVariableName": "font/letter-spacing/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      }
+    }
+  },
+  "body": {
+    "lg": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:331",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:330",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 16,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:156",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e6ad46003753c5f0fe3195951333951c9a31451e/-1:-1",
+            "targetVariableName": "font/size/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "font/line-height/unitless-normal",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:158",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+            "targetVariableName": "font/line-height/xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.10000000149011612,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:159",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+            "targetVariableName": "font/letter-spacing/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "md": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:336",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:335",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 14,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:162",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a96b90c1c012b1fa0ab895c4cb8fc14ad1b8daaa/-1:-1",
+            "targetVariableName": "font/size/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 20,
+        "$description": "font/line-height/unitless-semi-normal",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:164",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:999301225ff203dd903541d104fac7ffa24ad310/-1:-1",
+            "targetVariableName": "font/line-height/lg",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.10000000149011612,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:165",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+            "targetVariableName": "font/letter-spacing/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "sm": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:341",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:340",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 12,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:168",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2f202bb47505453bb92329bfedb4f8d35ea362c7/-1:-1",
+            "targetVariableName": "font/size/xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "font/line-height/unitless-snug",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:170",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+            "targetVariableName": "font/line-height/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": 0,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:171",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:cfa4bbcc153e6ce2d9d8633f3886a80f7a90670a/-1:-1",
+            "targetVariableName": "font/letter-spacing/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "strong": {
+      "lg": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:524",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:525",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 16,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:526",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:e6ad46003753c5f0fe3195951333951c9a31451e/-1:-1",
+              "targetVariableName": "font/size/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 24,
+          "$description": "font/line-height/unitless-normal",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:527",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+              "targetVariableName": "font/line-height/xl",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": -0.10000000149011612,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:528",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+              "targetVariableName": "font/letter-spacing/sm",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "md": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:529",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:530",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 14,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:531",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:a96b90c1c012b1fa0ab895c4cb8fc14ad1b8daaa/-1:-1",
+              "targetVariableName": "font/size/sm",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 20,
+          "$description": "font/line-height/unitless-semi-normal",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:532",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:999301225ff203dd903541d104fac7ffa24ad310/-1:-1",
+              "targetVariableName": "font/line-height/lg",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": -0.10000000149011612,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:533",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+              "targetVariableName": "font/letter-spacing/sm",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "sm": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:534",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:535",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 12,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:536",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:2f202bb47505453bb92329bfedb4f8d35ea362c7/-1:-1",
+              "targetVariableName": "font/size/xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 16,
+          "$description": "font/line-height/unitless-snug",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:537",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+              "targetVariableName": "font/line-height/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": 0,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:538",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:cfa4bbcc153e6ce2d9d8633f3886a80f7a90670a/-1:-1",
+              "targetVariableName": "font/letter-spacing/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      }
+    }
+  },
+  "number": {
+    "lg": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:348",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:347",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 18,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:214",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:5ea1f3ba70e5b52cf9d166c2dc2d4278a77e2dd1/-1:-1",
+            "targetVariableName": "font/size/lg",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "font/line-height/unitless-snug",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:216",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+            "targetVariableName": "font/line-height/xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.800000011920929,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:217",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a045ad11489b040a6ce1ce9e13f94d02fd927ece/-1:-1",
+            "targetVariableName": "font/letter-spacing/3xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "md": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:353",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:352",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 16,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:218",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e6ad46003753c5f0fe3195951333951c9a31451e/-1:-1",
+            "targetVariableName": "font/size/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "font/line-height/unitless-normal",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:219",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+            "targetVariableName": "font/line-height/xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.800000011920929,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:220",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a045ad11489b040a6ce1ce9e13f94d02fd927ece/-1:-1",
+            "targetVariableName": "font/letter-spacing/3xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "sm": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:358",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:357",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 14,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:221",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a96b90c1c012b1fa0ab895c4cb8fc14ad1b8daaa/-1:-1",
+            "targetVariableName": "font/size/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 20,
+        "$description": "font/line-height/unitless-semi-normal",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:222",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:999301225ff203dd903541d104fac7ffa24ad310/-1:-1",
+            "targetVariableName": "font/line-height/lg",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.800000011920929,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:223",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a045ad11489b040a6ce1ce9e13f94d02fd927ece/-1:-1",
+            "targetVariableName": "font/letter-spacing/3xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "xs": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:363",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:362",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 12,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:224",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2f202bb47505453bb92329bfedb4f8d35ea362c7/-1:-1",
+            "targetVariableName": "font/size/xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "font/line-height/unitless-snug",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:225",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+            "targetVariableName": "font/line-height/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.4000000059604645,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:226",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:551c6321777c9d57f98bc13cede318866d5b429c/-1:-1",
+            "targetVariableName": "font/letter-spacing/2xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "strong": {
+      "lg": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:540",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:541",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 18,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:542",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:5ea1f3ba70e5b52cf9d166c2dc2d4278a77e2dd1/-1:-1",
+              "targetVariableName": "font/size/lg",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 24,
+          "$description": "font/line-height/unitless-snug",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:543",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+              "targetVariableName": "font/line-height/xl",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": -0.800000011920929,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:544",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:a045ad11489b040a6ce1ce9e13f94d02fd927ece/-1:-1",
+              "targetVariableName": "font/letter-spacing/3xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "md": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:545",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:546",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 16,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:547",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:e6ad46003753c5f0fe3195951333951c9a31451e/-1:-1",
+              "targetVariableName": "font/size/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 24,
+          "$description": "font/line-height/unitless-normal",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:548",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+              "targetVariableName": "font/line-height/xl",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": -0.800000011920929,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:549",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:a045ad11489b040a6ce1ce9e13f94d02fd927ece/-1:-1",
+              "targetVariableName": "font/letter-spacing/3xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "sm": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:550",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:551",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 14,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:552",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:a96b90c1c012b1fa0ab895c4cb8fc14ad1b8daaa/-1:-1",
+              "targetVariableName": "font/size/sm",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 20,
+          "$description": "font/line-height/unitless-semi-normal",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:553",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:999301225ff203dd903541d104fac7ffa24ad310/-1:-1",
+              "targetVariableName": "font/line-height/lg",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": -0.800000011920929,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:554",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:a045ad11489b040a6ce1ce9e13f94d02fd927ece/-1:-1",
+              "targetVariableName": "font/letter-spacing/3xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "xs": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:555",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:556",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 12,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:557",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:2f202bb47505453bb92329bfedb4f8d35ea362c7/-1:-1",
+              "targetVariableName": "font/size/xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 16,
+          "$description": "font/line-height/unitless-snug",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:558",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+              "targetVariableName": "font/line-height/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": -0.4000000059604645,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:559",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:551c6321777c9d57f98bc13cede318866d5b429c/-1:-1",
+              "targetVariableName": "font/letter-spacing/2xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      }
+    }
+  },
+  "caption": {
+    "md": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:370",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:369",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 12,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:231",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2f202bb47505453bb92329bfedb4f8d35ea362c7/-1:-1",
+            "targetVariableName": "font/size/xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "font/line-height/unitless-snug",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:233",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+            "targetVariableName": "font/line-height/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": 0.10000000149011612,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:234",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:00667067a4c25fa16e1673e1bb343c14c97486f9/-1:-1",
+            "targetVariableName": "font/letter-spacing/lg",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "sm": {
+      "family": {
+        "$type": "string",
+        "$value": "Inter",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:375",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+            "targetVariableName": "font/family/inter/text",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:374",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 10,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:232",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e5b61d1d61b452e7d0b469d15fa0b5f401bf1fda/-1:-1",
+            "targetVariableName": "font/size/2xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "font/line-height/unitless-relaxed",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:241",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+            "targetVariableName": "font/line-height/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": 0.20000000298023224,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:48:240",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:5ddf3ec3d41f57a7a6a5fc9cd8c22a1750b43b7c/-1:-1",
+            "targetVariableName": "font/letter-spacing/xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "strong": {
+      "md": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:561",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:562",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 12,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:563",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:2f202bb47505453bb92329bfedb4f8d35ea362c7/-1:-1",
+              "targetVariableName": "font/size/xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 16,
+          "$description": "font/line-height/unitless-snug",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:564",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+              "targetVariableName": "font/line-height/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": 0.10000000149011612,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:565",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:00667067a4c25fa16e1673e1bb343c14c97486f9/-1:-1",
+              "targetVariableName": "font/letter-spacing/lg",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      },
+      "sm": {
+        "family": {
+          "$type": "string",
+          "$value": "Inter",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:566",
+            "com.figma.scopes": [
+              "FONT_FAMILY"
+            ],
+            "com.figma.type": "string",
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:0f9aa7e134316c4506be030fd66523ed697e56b5/-1:-1",
+              "targetVariableName": "font/family/inter/text",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "weight": {
+          "$type": "number",
+          "$value": 500,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:567",
+            "com.figma.scopes": [
+              "FONT_STYLE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:bc94c2d2c94f3397f56731cecbbc6c2d30300bad/-1:-1",
+              "targetVariableName": "font/weight/medium",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "size": {
+          "$type": "number",
+          "$value": 10,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:568",
+            "com.figma.scopes": [
+              "FONT_SIZE"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:e5b61d1d61b452e7d0b469d15fa0b5f401bf1fda/-1:-1",
+              "targetVariableName": "font/size/2xs",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "line-height": {
+          "$type": "number",
+          "$value": 16,
+          "$description": "font/line-height/unitless-relaxed",
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:569",
+            "com.figma.scopes": [
+              "LINE_HEIGHT"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+              "targetVariableName": "font/line-height/md",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        },
+        "letter-spacing": {
+          "$type": "number",
+          "$value": 0.20000000298023224,
+          "$extensions": {
+            "com.figma.variableId": "VariableID:48:570",
+            "com.figma.scopes": [
+              "LETTER_SPACING"
+            ],
+            "com.figma.aliasData": {
+              "targetVariableId": "VariableID:5ddf3ec3d41f57a7a6a5fc9cd8c22a1750b43b7c/-1:-1",
+              "targetVariableName": "font/letter-spacing/xl",
+              "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+              "targetVariableSetName": "primitives"
+            },
+            "com.figma.isOverride": true
+          }
+        }
+      }
+    }
+  },
+  "code": {
+    "lg": {
+      "family": {
+        "$type": "string",
+        "$value": "Geist Mono",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86631",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d1b89d16ef0f462e36ba2161872fb5676695f881/-1:-1",
+            "targetVariableName": "font/family/inter/code",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86632",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 16,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86633",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:e6ad46003753c5f0fe3195951333951c9a31451e/-1:-1",
+            "targetVariableName": "font/size/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 24,
+        "$description": "font/line-height/unitless-normal",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86634",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:850a1a3a46d0d4c399dfb89c7f987e38365bb0cb/-1:-1",
+            "targetVariableName": "font/line-height/xl",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.10000000149011612,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86635",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+            "targetVariableName": "font/letter-spacing/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "md": {
+      "family": {
+        "$type": "string",
+        "$value": "Geist Mono",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86636",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d1b89d16ef0f462e36ba2161872fb5676695f881/-1:-1",
+            "targetVariableName": "font/family/inter/code",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86637",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 14,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86638",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a96b90c1c012b1fa0ab895c4cb8fc14ad1b8daaa/-1:-1",
+            "targetVariableName": "font/size/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 20,
+        "$description": "font/line-height/unitless-semi-normal",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86639",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:999301225ff203dd903541d104fac7ffa24ad310/-1:-1",
+            "targetVariableName": "font/line-height/lg",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": -0.10000000149011612,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86640",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:0b8a7bbd2b921eff464c65700b16ef570b5c6ab9/-1:-1",
+            "targetVariableName": "font/letter-spacing/sm",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    },
+    "sm": {
+      "family": {
+        "$type": "string",
+        "$value": "Geist Mono",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86641",
+          "com.figma.scopes": [
+            "FONT_FAMILY"
+          ],
+          "com.figma.type": "string",
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d1b89d16ef0f462e36ba2161872fb5676695f881/-1:-1",
+            "targetVariableName": "font/family/inter/code",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "weight": {
+        "$type": "number",
+        "$value": 400,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86642",
+          "com.figma.scopes": [
+            "FONT_STYLE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d3ab4aca6a444980d874d22a75019f25ab55ff64/-1:-1",
+            "targetVariableName": "font/weight/regular",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "size": {
+        "$type": "number",
+        "$value": 12,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86643",
+          "com.figma.scopes": [
+            "FONT_SIZE"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2f202bb47505453bb92329bfedb4f8d35ea362c7/-1:-1",
+            "targetVariableName": "font/size/xs",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "line-height": {
+        "$type": "number",
+        "$value": 16,
+        "$description": "font/line-height/unitless-snug",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86644",
+          "com.figma.scopes": [
+            "LINE_HEIGHT"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:c96c7e66ed504a979f0a30c55e4be55045e187e5/-1:-1",
+            "targetVariableName": "font/line-height/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      },
+      "letter-spacing": {
+        "$type": "number",
+        "$value": 0,
+        "$extensions": {
+          "com.figma.variableId": "VariableID:3220:86645",
+          "com.figma.scopes": [
+            "LETTER_SPACING"
+          ],
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:cfa4bbcc153e6ce2d9d8633f3886a80f7a90670a/-1:-1",
+            "targetVariableName": "font/letter-spacing/md",
+            "targetVariableSetId": "VariableCollectionId:fe1713751ae5ebeffb9b5b4b8196c4b5c99354da/-1:-1",
+            "targetVariableSetName": "primitives"
+          },
+          "com.figma.isOverride": true
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "com.figma.modeName": "inter"
+  }
+}

@@ -339,6 +339,9 @@
   --font-family-marketing-heading: "Roc Grotesk";
   --font-family-marketing-text: "Roc Grotesk";
   --font-family-marketing-code: "Menlo";
+  --font-family-inter-heading: "Inter";
+  --font-family-inter-text: "Inter";
+  --font-family-inter-code: "Geist Mono";
 
   /* font-size */
   --font-size-2xs: 0.625rem;
@@ -607,10 +610,10 @@
   --grid-offset-md: 16px;
   --grid-offset-lg: 24px;
   --grid-offset-xl: 32px;
-  --grid-offset-creative-layer-editor: 44px;
-  --grid-offset-creative-layers: 56px;
   --grid-offset-nav-tight: 96px;
   --grid-offset-nav-relaxed: 112px;
+  --grid-offset-creative-layer-editor: 44px;
+  --grid-offset-creative-layers: 56px;
 
   /* grid-margin */
   --grid-margin-none: 0px;
