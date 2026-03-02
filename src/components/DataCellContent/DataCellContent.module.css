@@ -1,0 +1,85 @@
+/* ── root ──────────────────────────────────────────────────────────────── */
+
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  min-width: 0;
+}
+
+/* ── cell alignment (justify-content of root) ─────────────────────────── */
+
+.cellLeft   { justify-content: flex-start; }
+.cellCenter { justify-content: center; }
+.cellRight  { justify-content: flex-end; }
+
+/* ── text block ───────────────────────────────────────────────────────── */
+
+.text {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: var(--spacing-none);
+  min-width: 1px;
+  min-height: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── text alignment ───────────────────────────────────────────────────── */
+
+.textLeft   { align-items: flex-start; text-align: left; }
+.textCenter { align-items: center; text-align: center; }
+.textRight  { align-items: flex-end; text-align: right; }
+
+/* ── title ────────────────────────────────────────────────────────────── */
+
+.title {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+/* ── description ──────────────────────────────────────────────────────── */
+
+.description {
+  font-family: var(--type-body-sm-family);
+  font-weight: var(--type-body-sm-weight);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line-height);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   STATE — text color
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* normal: title inherits primary, description is tertiary */
+.normal .title       { color: var(--text-neutral-primary); }
+.normal .description { color: var(--text-neutral-tertiary-default); }
+
+/* normal-low: both inherit tertiary */
+.normalLow .title       { color: var(--text-neutral-tertiary-default); }
+.normalLow .description { color: var(--text-neutral-tertiary-default); }
+
+/* disable: both inherit disable */
+.disable .title       { color: var(--text-neutral-disable); }
+.disable .description { color: var(--text-neutral-disable); }
+
+/* ── slots ────────────────────────────────────────────────────────────── */
+
+.slot {
+  flex-shrink: 0;
+}

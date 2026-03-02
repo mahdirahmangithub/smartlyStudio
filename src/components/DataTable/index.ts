@@ -1,5 +1,4 @@
 export { DataTable } from "./DataTable";
-export { default as dataTableStyles } from "./DataTable.module.css";
 export type {
   DataTableProps,
   ColumnDef,
@@ -9,4 +8,5 @@ export type {
   RowDragAndDropConfig,
   ColumnDragAndDropConfig,
   ColumnResizeConfig,
+  TableDensity,
 } from "./DataTable";

@@ -1,5 +1,10 @@
 import { useState, useCallback, type CSSProperties } from "react";
-import { DataTable, dataTableStyles, type ColumnDef, type SortState } from "../components/DataTable";
+import { DataTable, type ColumnDef, type SortState, type TableDensity } from "../components/DataTable";
+import { DataCellContent } from "../components/DataCellContent";
+import { RowContainer } from "../components/RowContainer";
+import { Badge } from "../components/Badge";
+import { Icon } from "../components/Icon";
+import { IconButton } from "../components/IconButton";
 
 /* ═══════════════════════════════════════════════════════════════
    Shared layout styles (mirrors other playground pages)
@@ -88,23 +93,48 @@ const TREE_DATA: TreeRow[] = [
    Sub-demos (stateful sections)
    ═══════════════════════════════════════════════════════════════ */
 
-function CellStatesDemo() {
+function CellStatesDemo({ density }: { density: TableDensity }) {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([2, 5]);
 
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180 },
-    { key: "age", title: "Age", dataIndex: "age", width: 80, align: "right" },
-    { key: "email", title: "Email", dataIndex: "email", width: 240 },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130 },
+    {
+      key: "name",
+      title: "Name",
+      dataIndex: "name",
+      width: 200,
+      render: (_, r) => <DataCellContent title={r.name} description={r.email} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 80, align: "right",
+      render: (v: number) => <DataCellContent title={String(v)} textAlignment="right" />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
     {
       key: "salary",
       title: "Salary",
       dataIndex: "salary",
       width: 120,
       align: "right",
-      render: (v: number) => `$${v.toLocaleString()}`,
+      render: (v: number) => (
+        <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />
+      ),
     },
   ];
+
+  const disabledColumns: ColumnDef<Employee>[] = columns.map((col) => ({
+    ...col,
+    render: col.render
+      ? (v: any, r: Employee, i: number) => {
+          const el = (col.render as any)(v, r, i);
+          if (el && typeof el === "object" && el.props) {
+            const isDisabled = r.department === "Marketing";
+            return { ...el, props: { ...el.props, state: isDisabled ? "disable" : "normal" } };
+          }
+          return el;
+        }
+      : col.render,
+  }));
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
@@ -117,6 +147,7 @@ function CellStatesDemo() {
           columns={columns}
           dataSource={EMPLOYEES}
           rowKey="id"
+          density={density}
           rowSelection={{
             selectedRowKeys: selectedKeys,
             onChange: (keys) => setSelectedKeys(keys),
@@ -134,6 +165,7 @@ function CellStatesDemo() {
           columns={columns}
           dataSource={EMPLOYEES}
           rowKey="id"
+          density={density}
           rowError={(record) => record.salary < 85000}
           keyboardNavigation
         />
@@ -145,9 +177,10 @@ function CellStatesDemo() {
           Marketing department rows are disabled — hover is suppressed and cursor changes.
         </p>
         <DataTable<Employee>
-          columns={columns}
+          columns={disabledColumns}
           dataSource={EMPLOYEES}
           rowKey="id"
+          density={density}
           rowDisabled={(record) => record.department === "Marketing"}
           rowSelection={{
             selectedRowKeys: [1],
@@ -168,6 +201,7 @@ function CellStatesDemo() {
           columns={columns}
           dataSource={EMPLOYEES}
           rowKey="id"
+          density={density}
           rowSelection={{
             selectedRowKeys: [1],
             onChange: () => {},
@@ -181,19 +215,64 @@ function CellStatesDemo() {
   );
 }
 
-function BasicDemo() {
+function BasicDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180 },
-    { key: "age", title: "Age", dataIndex: "age", width: 80, align: "right" },
-    { key: "email", title: "Email", dataIndex: "email", width: 220 },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130 },
+    {
+      key: "name",
+      title: "Name",
+      dataIndex: "name",
+      width: 220,
+      render: (_, r) => (
+        <DataCellContent
+          title={r.name}
+          description={r.email}
+          leading={
+            <RowContainer density="sm">
+              <Icon name="person" size={20} />
+            </RowContainer>
+          }
+        />
+      ),
+    },
+    {
+      key: "age",
+      title: "Age",
+      dataIndex: "age",
+      width: 80,
+      align: "right",
+      render: (v: number) => (
+        <DataCellContent title={String(v)} textAlignment="right" />
+      ),
+    },
+    {
+      key: "department",
+      title: "Dept",
+      dataIndex: "department",
+      width: 150,
+      render: (v: string) => (
+        <DataCellContent
+          title={v}
+          trailing={
+            <RowContainer density="sm">
+              <Badge size="sm">{v}</Badge>
+            </RowContainer>
+          }
+        />
+      ),
+    },
     {
       key: "salary",
       title: "Salary",
       dataIndex: "salary",
-      width: 120,
+      width: 140,
       align: "right",
-      render: (v: number) => `$${v.toLocaleString()}`,
+      render: (v: number) => (
+        <DataCellContent
+          title={`$${v.toLocaleString()}`}
+          description="Annual"
+          textAlignment="right"
+        />
+      ),
     },
   ];
 
@@ -202,6 +281,7 @@ function BasicDemo() {
       columns={columns}
       dataSource={EMPLOYEES}
       rowKey="id"
+      density={density}
     />
   );
 }
@@ -232,7 +312,7 @@ const deptSpans = (() => {
   return map;
 })();
 
-function RowSpanDemo() {
+function RowSpanDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
     {
       key: "department",
@@ -240,17 +320,26 @@ function RowSpanDemo() {
       dataIndex: "department",
       width: 130,
       onCell: (_record, index) => ({ rowSpan: deptSpans.get(index) }),
+      render: (v: string) => <DataCellContent title={v} />,
     },
-    { key: "name", title: "Name", dataIndex: "name", width: 160 },
-    { key: "age", title: "Age", dataIndex: "age", width: 80, align: "right" },
-    { key: "email", title: "Email", dataIndex: "email", width: 220 },
+    { key: "name", title: "Name", dataIndex: "name", width: 160,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 80, align: "right",
+      render: (v: number) => <DataCellContent title={String(v)} textAlignment="right" />,
+    },
+    { key: "email", title: "Email", dataIndex: "email", width: 220,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
     {
       key: "salary",
       title: "Salary",
       dataIndex: "salary",
       width: 120,
       align: "right",
-      render: (v: number) => `$${v.toLocaleString()}`,
+      render: (v: number) => (
+        <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />
+      ),
     },
   ];
 
@@ -259,6 +348,7 @@ function RowSpanDemo() {
       columns={columns}
       dataSource={ROWSPAN_DATA}
       rowKey="id"
+      density={density}
     />
   );
 }
@@ -290,7 +380,7 @@ const COLSPAN_DATA: ColSpanRow[] = [
 
 const TOTAL_LEAF_COLS = 5;
 
-function ColSpanDemo() {
+function ColSpanDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<ColSpanRow>[] = [
     {
       key: "name",
@@ -301,6 +391,8 @@ function ColSpanDemo() {
         record.isSectionHeader
           ? { colSpan: TOTAL_LEAF_COLS, style: { fontWeight: 600, backgroundColor: "var(--element-divider-neutral-weak)" } }
           : {},
+      render: (v: string, r) =>
+        r.isSectionHeader ? v : <DataCellContent title={v} />,
     },
     {
       key: "age",
@@ -309,7 +401,8 @@ function ColSpanDemo() {
       width: 80,
       align: "right",
       onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
-      render: (v: number | null) => v ?? "",
+      render: (v: number | null) =>
+        v != null ? <DataCellContent title={String(v)} textAlignment="right" /> : "",
     },
     {
       key: "email",
@@ -317,6 +410,8 @@ function ColSpanDemo() {
       dataIndex: "email",
       width: 220,
       onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
+      render: (v: string, r) =>
+        r.isSectionHeader ? "" : <DataCellContent title={v} />,
     },
     {
       key: "department",
@@ -324,6 +419,8 @@ function ColSpanDemo() {
       dataIndex: "department",
       width: 130,
       onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
+      render: (v: string, r) =>
+        r.isSectionHeader ? "" : <DataCellContent title={v} />,
     },
     {
       key: "salary",
@@ -332,7 +429,8 @@ function ColSpanDemo() {
       width: 120,
       align: "right",
       onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
-      render: (v: number | null) => (v != null ? `$${v.toLocaleString()}` : ""),
+      render: (v: number | null) =>
+        v != null ? <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" /> : "",
     },
   ];
 
@@ -341,33 +439,44 @@ function ColSpanDemo() {
       columns={columns}
       dataSource={COLSPAN_DATA}
       rowKey="id"
+      density={density}
     />
   );
 }
 
-function GroupedHeaderDemo() {
+function GroupedHeaderDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180 },
+    { key: "name", title: "Name", dataIndex: "name", width: 180,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
     {
       key: "personal",
       title: "Personal Info",
       children: [
-        { key: "age", title: "Age", dataIndex: "age", width: 80, align: "right" },
-        { key: "email", title: "Email", dataIndex: "email", width: 220 },
+        { key: "age", title: "Age", dataIndex: "age", width: 80, align: "right",
+          render: (v: number) => <DataCellContent title={String(v)} textAlignment="right" />,
+        },
+        { key: "email", title: "Email", dataIndex: "email", width: 220,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
       ],
     },
     {
       key: "work",
       title: "Work Info",
       children: [
-        { key: "department", title: "Dept", dataIndex: "department", width: 130 },
+        { key: "department", title: "Dept", dataIndex: "department", width: 130,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
         {
           key: "salary",
           title: "Salary",
           dataIndex: "salary",
           width: 120,
           align: "right",
-          render: (v: number) => `$${v.toLocaleString()}`,
+          render: (v: number) => (
+            <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />
+          ),
         },
       ],
     },
@@ -378,18 +487,25 @@ function GroupedHeaderDemo() {
       columns={columns}
       dataSource={EMPLOYEES}
       rowKey="id"
+      density={density}
     />
   );
 }
 
-function SelectionDemo() {
+function SelectionDemo({ density }: { density: TableDensity }) {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [radioKey, setRadioKey] = useState<React.Key[]>([]);
 
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180 },
-    { key: "age", title: "Age", dataIndex: "age", width: 80 },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130 },
+    { key: "name", title: "Name", dataIndex: "name", width: 180,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 80,
+      render: (v: number) => <DataCellContent title={String(v)} />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
   ];
 
   return (
@@ -403,6 +519,7 @@ function SelectionDemo() {
           columns={columns}
           dataSource={EMPLOYEES.slice(0, 5)}
           rowKey="id"
+          density={density}
           rowSelection={{
             type: "checkbox",
             selectedRowKeys: selectedKeys,
@@ -420,6 +537,7 @@ function SelectionDemo() {
           columns={columns}
           dataSource={EMPLOYEES.slice(0, 5)}
           rowKey="id"
+          density={density}
           rowSelection={{
             type: "radio",
             selectedRowKeys: radioKey,
@@ -431,16 +549,22 @@ function SelectionDemo() {
   );
 }
 
-function ExpandableDemo() {
+function ExpandableDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180 },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130 },
+    { key: "name", title: "Name", dataIndex: "name", width: 180,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
     {
       key: "salary",
       title: "Salary",
       dataIndex: "salary",
       width: 120,
-      render: (v: number) => `$${v.toLocaleString()}`,
+      render: (v: number) => (
+        <DataCellContent title={`$${v.toLocaleString()}`} />
+      ),
     },
   ];
 
@@ -449,6 +573,7 @@ function ExpandableDemo() {
       columns={columns}
       dataSource={EMPLOYEES.slice(0, 5)}
       rowKey="id"
+      density={density}
       expandable={{
         expandedRowRender: (record) => (
           <div style={{ padding: 12 }}>
@@ -463,10 +588,14 @@ function ExpandableDemo() {
   );
 }
 
-function TreeDemo() {
+function TreeDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<TreeRow>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 250 },
-    { key: "role", title: "Role", dataIndex: "role", width: 150 },
+    { key: "name", title: "Name", dataIndex: "name", width: 250,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "role", title: "Role", dataIndex: "role", width: 150,
+      render: (v: string) => <DataCellContent title={v} state="normal-low" />,
+    },
   ];
 
   return (
@@ -474,12 +603,13 @@ function TreeDemo() {
       columns={columns}
       dataSource={TREE_DATA}
       rowKey="id"
+      density={density}
       expandable={{ defaultExpandedRowKeys: [1] }}
     />
   );
 }
 
-function SortingDemo() {
+function SortingDemo({ density }: { density: TableDensity }) {
   const [sortState, setSortState] = useState<SortState | null>(null);
 
   const sorted = [...EMPLOYEES].sort((a, b) => {
@@ -492,9 +622,15 @@ function SortingDemo() {
   });
 
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180, sortable: true },
-    { key: "age", title: "Age", dataIndex: "age", width: 80, sortable: true, align: "right" },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130, sortable: true },
+    { key: "name", title: "Name", dataIndex: "name", width: 180, sortable: true,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 80, sortable: true, align: "right",
+      render: (v: number) => <DataCellContent title={String(v)} textAlignment="right" />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130, sortable: true,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
     {
       key: "salary",
       title: "Salary",
@@ -502,7 +638,9 @@ function SortingDemo() {
       width: 120,
       sortable: true,
       align: "right",
-      render: (v: number) => `$${v.toLocaleString()}`,
+      render: (v: number) => (
+        <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />
+      ),
     },
   ];
 
@@ -515,6 +653,7 @@ function SortingDemo() {
         columns={columns}
         dataSource={sorted}
         rowKey="id"
+        density={density}
         sortState={sortState}
         onSort={setSortState}
       />
@@ -522,13 +661,23 @@ function SortingDemo() {
   );
 }
 
-function ColumnResizeDefaultDemo() {
+function ColumnResizeDefaultDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180, minWidth: 80 },
-    { key: "age", title: "Age", dataIndex: "age", width: 80, minWidth: 50 },
-    { key: "email", title: "Email", dataIndex: "email", width: 220, minWidth: 120 },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130, minWidth: 80 },
-    { key: "salary", title: "Salary", dataIndex: "salary", width: 120, minWidth: 70, align: "right", render: (v: number) => `$${v.toLocaleString()}` },
+    { key: "name", title: "Name", dataIndex: "name", width: 180, minWidth: 80,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 80, minWidth: 50,
+      render: (v: number) => <DataCellContent title={String(v)} />,
+    },
+    { key: "email", title: "Email", dataIndex: "email", width: 220, minWidth: 120,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130, minWidth: 80,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "salary", title: "Salary", dataIndex: "salary", width: 120, minWidth: 70, align: "right",
+      render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />,
+    },
   ];
 
   return (
@@ -536,18 +685,29 @@ function ColumnResizeDefaultDemo() {
       columns={columns}
       dataSource={EMPLOYEES.slice(0, 5)}
       rowKey="id"
+      density={density}
       columnResize={{ mode: "fixed" }}
     />
   );
 }
 
-function ColumnResizeFluidDemo() {
+function ColumnResizeFluidDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", flex: 2, minWidth: 120 },
-    { key: "age", title: "Age", dataIndex: "age", flex: 0.5, minWidth: 50, align: "right" },
-    { key: "email", title: "Email", dataIndex: "email", flex: 2, minWidth: 150 },
-    { key: "department", title: "Dept", dataIndex: "department", flex: 1, minWidth: 80 },
-    { key: "salary", title: "Salary", dataIndex: "salary", flex: 1, minWidth: 70, align: "right", render: (v: number) => `$${v.toLocaleString()}` },
+    { key: "name", title: "Name", dataIndex: "name", flex: 2, minWidth: 120,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", flex: 0.5, minWidth: 50, align: "right",
+      render: (v: number) => <DataCellContent title={String(v)} textAlignment="right" />,
+    },
+    { key: "email", title: "Email", dataIndex: "email", flex: 2, minWidth: 150,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", flex: 1, minWidth: 80,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "salary", title: "Salary", dataIndex: "salary", flex: 1, minWidth: 70, align: "right",
+      render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />,
+    },
   ];
 
   return (
@@ -555,6 +715,7 @@ function ColumnResizeFluidDemo() {
       columns={columns}
       dataSource={EMPLOYEES.slice(0, 5)}
       rowKey="id"
+      density={density}
       columnResize={{ mode: "overflow" }}
     />
   );
@@ -572,14 +733,26 @@ const STICKY_DATA: Employee[] = [
   { id: 15, name: "Olivia Pope", age: 38, email: "olivia@example.com", department: "Engineering", salary: 115000 },
 ];
 
-function StickyDemo() {
+function StickyDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name (sticky left)", dataIndex: "name", width: 180, fixed: "left" },
-    { key: "age", title: "Age", dataIndex: "age", width: 120 },
-    { key: "email", title: "Email", dataIndex: "email", width: 280 },
-    { key: "department", title: "Dept", dataIndex: "department", width: 200 },
-    { key: "salary", title: "Salary", dataIndex: "salary", width: 200, render: (v: number) => `$${v.toLocaleString()}` },
-    { key: "id", title: "ID (sticky right)", dataIndex: "id", width: 120, fixed: "right" },
+    { key: "name", title: "Name (sticky left)", dataIndex: "name", width: 180, fixed: "left",
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 120,
+      render: (v: number) => <DataCellContent title={String(v)} />,
+    },
+    { key: "email", title: "Email", dataIndex: "email", width: 280,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 200,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "salary", title: "Salary", dataIndex: "salary", width: 200,
+      render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} />,
+    },
+    { key: "id", title: "ID (sticky right)", dataIndex: "id", width: 120, fixed: "right",
+      render: (v: number) => <DataCellContent title={String(v)} />,
+    },
   ];
 
   return (
@@ -591,6 +764,7 @@ function StickyDemo() {
         columns={columns}
         dataSource={STICKY_DATA}
         rowKey="id"
+        density={density}
         stickyHeader
         style={{ maxHeight: 250 }}
       />
@@ -598,7 +772,7 @@ function StickyDemo() {
   );
 }
 
-function RowDnDDemo() {
+function RowDnDDemo({ density }: { density: TableDensity }) {
   const [data, setData] = useState(EMPLOYEES.slice(0, 5));
 
   const reorder = useCallback(
@@ -614,9 +788,15 @@ function RowDnDDemo() {
   );
 
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180 },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130 },
-    { key: "age", title: "Age", dataIndex: "age", width: 80 },
+    { key: "name", title: "Name", dataIndex: "name", width: 180,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 80,
+      render: (v: number) => <DataCellContent title={String(v)} />,
+    },
   ];
 
   return (
@@ -628,18 +808,27 @@ function RowDnDDemo() {
         columns={columns}
         dataSource={data}
         rowKey="id"
+        density={density}
         rowDragAndDrop={{ onReorder: reorder }}
       />
     </>
   );
 }
 
-function ColumnDnDDemo() {
+function ColumnDnDDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180 },
-    { key: "age", title: "Age", dataIndex: "age", width: 80 },
-    { key: "email", title: "Email", dataIndex: "email", width: 220 },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130 },
+    { key: "name", title: "Name", dataIndex: "name", width: 180,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 80,
+      render: (v: number) => <DataCellContent title={String(v)} />,
+    },
+    { key: "email", title: "Email", dataIndex: "email", width: 220,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
   ];
 
   return (
@@ -651,17 +840,24 @@ function ColumnDnDDemo() {
         columns={columns}
         dataSource={EMPLOYEES.slice(0, 4)}
         rowKey="id"
+        density={density}
         columnDragAndDrop={{ onReorder: (from, to) => console.log("col move", from, to) }}
       />
     </>
   );
 }
 
-function KeyboardNavDemo() {
+function KeyboardNavDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180 },
-    { key: "age", title: "Age", dataIndex: "age", width: 80 },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130 },
+    { key: "name", title: "Name", dataIndex: "name", width: 180,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 80,
+      render: (v: number) => <DataCellContent title={String(v)} />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
   ];
 
   return (
@@ -673,13 +869,14 @@ function KeyboardNavDemo() {
         columns={columns}
         dataSource={EMPLOYEES.slice(0, 4)}
         rowKey="id"
+        density={density}
         keyboardNavigation
       />
     </>
   );
 }
 
-function CombinedDemo() {
+function CombinedDemo({ density }: { density: TableDensity }) {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [sortState, setSortState] = useState<SortState | null>(null);
 
@@ -693,10 +890,33 @@ function CombinedDemo() {
   });
 
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180, sortable: true, resizable: true },
-    { key: "age", title: "Age", dataIndex: "age", width: 80, sortable: true, align: "right" },
-    { key: "email", title: "Email", dataIndex: "email", width: 220, resizable: true },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130, sortable: true },
+    { key: "name", title: "Name", dataIndex: "name", width: 180, sortable: true, resizable: true,
+      render: (_, r) => (
+        <DataCellContent
+          title={r.name}
+          description={r.department}
+          leading={
+            <RowContainer density="sm">
+              <Icon name="person" size={20} />
+            </RowContainer>
+          }
+          trailing={
+            <RowContainer density="sm">
+              <IconButton icon={<Icon name="more_vert" size={16} />} size="sm" emphasis="low" variant="neutral" aria-label="More options" />
+            </RowContainer>
+          }
+        />
+      ),
+    },
+    { key: "age", title: "Age", dataIndex: "age", width: 80, sortable: true, align: "right",
+      render: (v: number) => <DataCellContent title={String(v)} textAlignment="right" />,
+    },
+    { key: "email", title: "Email", dataIndex: "email", width: 220, resizable: true,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130, sortable: true,
+      render: (v: string) => <DataCellContent title={v} />,
+    },
     {
       key: "salary",
       title: "Salary",
@@ -704,19 +924,22 @@ function CombinedDemo() {
       width: 120,
       sortable: true,
       align: "right",
-      render: (v: number) => `$${v.toLocaleString()}`,
+      render: (v: number) => (
+        <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />
+      ),
     },
   ];
 
   return (
     <>
       <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
-        Selection + sorting + resize + expandable + keyboard nav
+        Selection + sorting + resize + expandable + keyboard nav + DataCellContent
       </p>
       <DataTable<Employee>
         columns={columns}
         dataSource={sorted}
         rowKey="id"
+        density={density}
         rowSelection={{
           selectedRowKeys: selectedKeys,
           onChange: (keys) => setSelectedKeys(keys),
@@ -741,16 +964,18 @@ function CombinedDemo() {
    Playground Page
    ═══════════════════════════════════════════════════════════════ */
 
-type CellOverflow = "default" | "wrap" | "truncate";
-
-const overflowClass: Record<CellOverflow, string | undefined> = {
-  default: undefined,
-  wrap: dataTableStyles.wrapCells,
-  truncate: dataTableStyles.truncateCells,
+const DENSITIES: TableDensity[] = ["none", "sm", "md", "lg"];
+const selectStyle: CSSProperties = {
+  padding: "4px 8px",
+  borderRadius: 6,
+  border: "1px solid var(--element-outline-neutral-default)",
+  background: "var(--element-surface-over)",
+  color: "var(--text-neutral-primary)",
+  fontSize: 13,
 };
 
 export default function DataTablePlayground() {
-  const [cellOverflow, setCellOverflow] = useState<CellOverflow>("default");
+  const [density, setDensity] = useState<TableDensity>("md");
 
   return (
     <div>
@@ -759,36 +984,30 @@ export default function DataTablePlayground() {
         Functional demos — no decorative styling applied.
       </p>
 
-      <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 32 }}>
-        <span style={{ fontSize: 13, fontWeight: 600 }}>Cell overflow:</span>
-        {(["default", "wrap", "truncate"] as const).map((mode) => (
-          <button
-            key={mode}
-            onClick={() => setCellOverflow(mode)}
-            style={{
-              padding: "4px 12px",
-              borderRadius: 6,
-              border: "1px solid #ccc",
-              background: cellOverflow === mode ? "#333" : "#fff",
-              color: cellOverflow === mode ? "#fff" : "#333",
-              cursor: "pointer",
-              fontSize: 13,
-            }}
+      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 32 }}>
+        <label style={{ fontSize: 13, fontWeight: 600 }}>
+          Density:{" "}
+          <select
+            value={density}
+            onChange={(e) => setDensity(e.target.value as TableDensity)}
+            style={selectStyle}
           >
-            {mode}
-          </button>
-        ))}
+            {DENSITIES.map((d) => (
+              <option key={d} value={d}>{d}</option>
+            ))}
+          </select>
+        </label>
       </div>
 
-      <div className={overflowClass[cellOverflow]}>
+      <div>
       <section style={sectionStyle}>
         <h2>Cell States (Checked / Error / Disabled / Hover / Focus)</h2>
-        <div style={cardStyle}><CellStatesDemo /></div>
+        <div style={cardStyle}><CellStatesDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Basic</h2>
-        <div style={cardStyle}><BasicDemo /></div>
+        <div style={cardStyle}><BasicDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -796,7 +1015,7 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Department column merges vertically for consecutive rows in the same department via <code>onCell</code> returning <code>rowSpan</code>.
         </p>
-        <div style={cardStyle}><RowSpanDemo /></div>
+        <div style={cardStyle}><RowSpanDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -804,32 +1023,32 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Section header rows span all columns using <code>colSpan</code>. Other columns return <code>colSpan: 0</code> to hide.
         </p>
-        <div style={cardStyle}><ColSpanDemo /></div>
+        <div style={cardStyle}><ColSpanDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Grouped Headers (Multi-Level)</h2>
-        <div style={cardStyle}><GroupedHeaderDemo /></div>
+        <div style={cardStyle}><GroupedHeaderDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Row Selection</h2>
-        <div style={cardStyle}><SelectionDemo /></div>
+        <div style={cardStyle}><SelectionDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Expandable Rows</h2>
-        <div style={cardStyle}><ExpandableDemo /></div>
+        <div style={cardStyle}><ExpandableDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Tree / Hierarchical Data</h2>
-        <div style={cardStyle}><TreeDemo /></div>
+        <div style={cardStyle}><TreeDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Sorting</h2>
-        <div style={cardStyle}><SortingDemo /></div>
+        <div style={cardStyle}><SortingDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -838,38 +1057,38 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Table width stays constant. Dragging a column border grows/shrinks it and the neighbor column compensates — no overflow.
         </p>
-        <div style={cardStyle}><ColumnResizeDefaultDemo /></div>
+        <div style={cardStyle}><ColumnResizeDefaultDemo density={density} /></div>
 
         <h3 style={{ marginTop: 24 }}>Overflow (flex widths)</h3>
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Columns use <code>flex</code> to share available space. Resizing a column converts it to a fixed width; the table can overflow.
         </p>
-        <div style={cardStyle}><ColumnResizeFluidDemo /></div>
+        <div style={cardStyle}><ColumnResizeFluidDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Sticky Header & Columns</h2>
-        <div style={cardStyle}><StickyDemo /></div>
+        <div style={cardStyle}><StickyDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Row Drag & Drop Reordering</h2>
-        <div style={cardStyle}><RowDnDDemo /></div>
+        <div style={cardStyle}><RowDnDDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Column Drag & Drop Reordering</h2>
-        <div style={cardStyle}><ColumnDnDDemo /></div>
+        <div style={cardStyle}><ColumnDnDDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Keyboard Navigation</h2>
-        <div style={cardStyle}><KeyboardNavDemo /></div>
+        <div style={cardStyle}><KeyboardNavDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Combined Features</h2>
-        <div style={cardStyle}><CombinedDemo /></div>
+        <div style={cardStyle}><CombinedDemo density={density} /></div>
       </section>
       </div>
     </div>

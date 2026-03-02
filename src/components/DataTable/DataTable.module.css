@@ -15,8 +15,65 @@
   border-bottom: var(--space-px) solid var(--element-divider-neutral-weak);
   border-right: var(--space-px) solid var(--element-divider-neutral-weak);
   text-align: left;
-  padding: 8px;
   outline: none;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* ── Density (table-level) ─────────────────────────────────────── */
+
+/* none: no padding at all */
+
+/* sm: headers 8px tb, cells 4px tb, both 8px lr */
+.densitySm th {
+  padding: var(--spacing-sm) var(--spacing-sm);
+}
+.densitySm td {
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+/* md (default): headers 12px tb, cells 8px tb, both 8px lr */
+.densityMd th {
+  padding: var(--spacing-sm-extra) var(--spacing-sm);
+}
+.densityMd td {
+  padding: var(--spacing-sm) var(--spacing-sm);
+}
+
+/* lg: headers 16px tb, cells 12px tb, both 8px lr */
+.densityLg th {
+  padding: var(--spacing-md) var(--spacing-sm);
+}
+.densityLg td {
+  padding: var(--spacing-sm-extra) var(--spacing-sm);
+}
+
+/* ── Density (cell-level override) ─────────────────────────────── */
+
+.table th.cellDensityNone,
+.table td.cellDensityNone {
+  padding: 0;
+}
+
+.table th.cellDensitySm {
+  padding: var(--spacing-sm) var(--spacing-sm);
+}
+.table td.cellDensitySm {
+  padding: var(--spacing-xs) var(--spacing-sm);
+}
+
+.table th.cellDensityMd {
+  padding: var(--spacing-sm-extra) var(--spacing-sm);
+}
+.table td.cellDensityMd {
+  padding: var(--spacing-sm) var(--spacing-sm);
+}
+
+.table th.cellDensityLg {
+  padding: var(--spacing-md) var(--spacing-sm);
+}
+.table td.cellDensityLg {
+  padding: var(--spacing-sm-extra) var(--spacing-sm);
 }
 
 .table th:last-child,
@@ -201,7 +258,7 @@
 
 .resizeHandle {
   position: absolute;
-  right: -3px;
+  right: 0;
   top: 0;
   bottom: 0;
   width: 7px;
@@ -216,7 +273,7 @@
   position: absolute;
   top: 25%;
   bottom: 25%;
-  left: 3px;
+  right: 0;
   width: 1px;
   background-color: var(--element-divider-neutral-default);
   opacity: 0;
@@ -291,16 +348,3 @@
   outline: none;
 }
 
-/* ── Cell content overflow ── */
-
-.wrapCells td {
-  white-space: normal;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-.truncateCells td {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}

@@ -5,7 +5,10 @@ import {
   useEffect,
   useMemo,
   Fragment,
+  isValidElement,
+  cloneElement,
   type ReactNode,
+  type ReactElement,
   type Key,
   type CSSProperties,
   type HTMLAttributes,
@@ -18,6 +21,9 @@ import {
 import styles from "./DataTable.module.css";
 import { IconButton } from "../IconButton";
 import { Expander } from "../Expander";
+import { DataCellContent } from "../DataCellContent";
+import { Checkbox } from "../Checkbox";
+import { Radio } from "../Radio";
 
 /* ═══════════════════════════════════════════════════════════════
    Utilities
@@ -28,6 +34,8 @@ function cx(...c: (string | false | undefined | null)[]) {
 }
 
 const DEFAULT_COL_WIDTH = 100;
+
+export type TableDensity = "none" | "sm" | "md" | "lg";
 
 /* ═══════════════════════════════════════════════════════════════
    Public Types
@@ -52,6 +60,7 @@ export interface ColumnDef<T = any> {
     index: number
   ) => TdHTMLAttributes<HTMLTableCellElement>;
   onHeaderCell?: () => ThHTMLAttributes<HTMLTableHeaderCellElement>;
+  density?: TableDensity;
 }
 
 export interface RowSelection<T = any> {
@@ -123,11 +132,27 @@ export interface DataTableProps<T = any> {
   rowError?: (record: T, index: number) => boolean;
   /** Return true for rows that should appear disabled (no hover, no interaction). */
   rowDisabled?: (record: T, index: number) => boolean;
+  /** Controls cell padding. Columns can override via their own `density` prop. */
+  density?: TableDensity;
 }
 
 /* ═══════════════════════════════════════════════════════════════
    Internal Helpers
    ═══════════════════════════════════════════════════════════════ */
+
+const DENSITY_CLASS: Record<TableDensity, string | false> = {
+  none: false,
+  sm: styles.densitySm,
+  md: styles.densityMd,
+  lg: styles.densityLg,
+};
+
+const CELL_DENSITY_CLASS: Record<TableDensity, string> = {
+  none: styles.cellDensityNone,
+  sm: styles.cellDensitySm,
+  md: styles.cellDensityMd,
+  lg: styles.cellDensityLg,
+};
 
 function getRowKey<T>(
   record: T,
@@ -290,6 +315,7 @@ export function DataTable<T extends Record<string, any>>({
   onRow,
   rowError,
   rowDisabled,
+  density = "md",
 }: DataTableProps<T>) {
   const tableRef = useRef<HTMLTableElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -978,7 +1004,8 @@ export function DataTable<T extends Record<string, any>>({
                   isSortable && styles.sortableHeader,
                   overCol === col.key && styles.dragOver,
                   cell.isLeaf && cellStickyClass(col),
-                  hasSelection && allSelected && styles.cellChecked
+                  hasSelection && allSelected && styles.cellChecked,
+                  cell.isLeaf && col.density && CELL_DENSITY_CLASS[col.density]
                 )}
                 style={{
                   width: cell.isLeaf ? activeWidths.get(col.key) : undefined,
@@ -989,29 +1016,26 @@ export function DataTable<T extends Record<string, any>>({
                 {...(cell.isLeaf ? col.onHeaderCell?.() : {})}
                 {...(cell.isLeaf ? colDragProps(col.key) : {})}
               >
-                <span className={ri === 0 && cellIdx === 0 && (hasSelection || showExpandCol) ? styles.inlineCellControls : undefined}>
-                  {ri === 0 && cellIdx === 0 && hasSelection && selType === "checkbox" && (
-                    <input
-                      type="checkbox"
-                      checked={allSelected}
-                      ref={(el) => {
-                        if (el) el.indeterminate = someSelected && !allSelected;
-                      }}
-                      onChange={toggleAll}
-                      aria-label="Select all rows"
-                    />
-                  )}
-                  {col.title}
-                </span>
-                {isSortable && (
-                  <span aria-hidden="true" className={styles.sortIndicator}>
-                    {sortDir === "asc"
-                      ? " ▲"
-                      : sortDir === "desc"
-                        ? " ▼"
-                        : " ⇅"}
-                  </span>
-                )}
+                <DataCellContent
+                  title={col.title}
+                  switchSlot={
+                    ri === 0 && cellIdx === 0 && hasSelection && selType === "checkbox" ? (
+                      <Checkbox
+                        checked={allSelected}
+                        indeterminate={someSelected && !allSelected}
+                        onChange={toggleAll}
+                        aria-label="Select all rows"
+                      />
+                    ) : undefined
+                  }
+                  trailing={
+                    isSortable ? (
+                      <span aria-hidden="true" className={styles.sortIndicator}>
+                        {sortDir === "asc" ? " ▲" : sortDir === "desc" ? " ▼" : " ⇅"}
+                      </span>
+                    ) : undefined
+                  }
+                />
                 {isResizable && (
                   <span
                     className={styles.resizeHandle}
@@ -1129,29 +1153,41 @@ export function DataTable<T extends Record<string, any>>({
                           styles.focusedCell,
                         isSelected && styles.cellChecked,
                         isRowError && styles.cellError,
-                        isRowDisabled && styles.cellDisabled
+                        isRowDisabled && styles.cellDisabled,
+                        col.density && CELL_DENSITY_CLASS[col.density]
                       )}
                       {...cellProps}
                     >
-                      {isFirst && (hasSelection || showExpandCol || isTreeData) ? (
-                        <span className={styles.inlineCellControls}>
-                          {hasSelection && (
-                            <input
-                              type={selType}
+                      {(() => {
+                        const raw: ReactNode = rendered != null ? rendered : "";
+                        if (!isFirst || !(hasSelection || showExpandCol || isTreeData))
+                          return raw;
+
+                        const switchSlot = hasSelection ? (
+                          selType === "radio" ? (
+                            <Radio
                               checked={isSelected}
                               onChange={() => toggleRow(rk)}
-                              name={selType === "radio" ? "dt-row-select" : undefined}
+                              name="dt-row-select"
                               aria-label={`Select row ${rowIdx + 1}`}
-                              {...checkProps}
+                              disabled={checkProps.disabled}
                             />
-                          )}
-                          {isTreeData && (
-                            <span
-                              className={styles.treeIndent}
-                              style={{ width: depth * indentSize }}
+                          ) : (
+                            <Checkbox
+                              checked={isSelected}
+                              onChange={() => toggleRow(rk)}
+                              aria-label={`Select row ${rowIdx + 1}`}
+                              disabled={checkProps.disabled}
                             />
-                          )}
-                          {showExpandCol && canExpand && (
+                          )
+                        ) : undefined;
+
+                        let expandBtnSlot: ReactNode = undefined;
+                        if (isTreeData || showExpandCol) {
+                          const indent = isTreeData && depth > 0 ? (
+                            <span className={styles.treeIndent} style={{ width: depth * indentSize }} />
+                          ) : null;
+                          const btn = ((showExpandCol && canExpand) || treeCanExpand) ? (
                             <IconButton
                               size="md"
                               variant="neutral"
@@ -1162,30 +1198,30 @@ export function DataTable<T extends Record<string, any>>({
                               aria-label={isExpanded ? "Collapse row" : "Expand row"}
                               className={styles.expandButton}
                             />
-                          )}
-                          {showExpandCol && !canExpand && (
+                          ) : ((showExpandCol || (isTreeData && !treeCanExpand)) ? (
                             <span className={styles.treeLeafSpacer} />
-                          )}
-                          {treeCanExpand && (
-                            <IconButton
-                              size="md"
-                              variant="neutral"
-                              emphasis="low"
-                              icon={<Expander expanded={isExpanded} size="sm" />}
-                              onClick={() => toggleExpand(rk, record)}
-                              aria-expanded={isExpanded}
-                              aria-label={isExpanded ? "Collapse row" : "Expand row"}
-                              className={styles.expandButton}
-                            />
-                          )}
-                          {isTreeData && !treeCanExpand && (
-                            <span className={styles.treeLeafSpacer} />
-                          )}
-                          <span>{rendered != null ? rendered : ""}</span>
-                        </span>
-                      ) : (
-                        rendered != null ? rendered : ""
-                      )}
+                          ) : null);
+                          if (indent && btn) {
+                            expandBtnSlot = <span style={{ display: 'inline-flex', alignItems: 'center' }}>{indent}{btn}</span>;
+                          } else {
+                            expandBtnSlot = indent || btn || undefined;
+                          }
+                        }
+
+                        if (isValidElement(raw) && (raw as ReactElement).type === DataCellContent) {
+                          return cloneElement(raw as ReactElement<any>, {
+                            switchSlot: switchSlot ?? (raw as ReactElement<any>).props.switchSlot,
+                            expandButton: expandBtnSlot ?? (raw as ReactElement<any>).props.expandButton,
+                          });
+                        }
+                        return (
+                          <DataCellContent
+                            switchSlot={switchSlot}
+                            expandButton={expandBtnSlot}
+                            title={raw}
+                          />
+                        );
+                      })()}
                     </td>
                   );
                 })}
@@ -1224,7 +1260,7 @@ export function DataTable<T extends Record<string, any>>({
     >
       <table
         ref={tableRef}
-        className={styles.table}
+        className={cx(styles.table, DENSITY_CLASS[density])}
         style={{
           width:
             resizeMode === "overflow"
