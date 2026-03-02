@@ -17,7 +17,6 @@
   text-align: left;
   outline: none;
   padding: 0;
-  overflow: hidden;
 }
 
 /* ── Density (table-level) ─────────────────────────────────────── */
@@ -205,11 +204,12 @@
 .stickyLeftEdge::after {
   right: var(--space-negative-md);
   box-shadow:inset var(--space-sm) var(--space-none) var(--blur-md) var(--space-negative-sm) var(--shadow-cast-high);
- }
+  }
 
 .stickyRightEdge::after {
   left: var(--space-negative-md);
   box-shadow:inset var(--space-negative-sm) var(--space-none) var(--blur-md) var(--space-negative-sm) var(--shadow-cast-high);
+ 
  }
 
 

@@ -51,7 +51,7 @@
 
 .shimmer {
   mask-image: linear-gradient(
-    -64deg,
+    90deg,
     var(--color-black-opacity-48) 0%,
     var(--color-black-opacity-48) 36%,
     var(--color-black-opacity-32) 41%,
@@ -63,7 +63,7 @@
     var(--color-black-opacity-48) 100%
   );
   -webkit-mask-image: linear-gradient(
-    -64deg,
+    90deg,
     var(--color-black-opacity-48) 0%,
     var(--color-black-opacity-48) 36%,
     var(--color-black-opacity-32) 41%,
@@ -82,7 +82,7 @@
 
 .shimmerInverse {
   mask-image: linear-gradient(
-    -64deg,
+    90deg,
     var(--color-black-opacity-32) 0%,
     var(--color-black-opacity-32) 36%,
     var(--color-black-opacity-32) 41%,
@@ -94,7 +94,7 @@
     var(--color-black-opacity-32) 100%
   );
   -webkit-mask-image: linear-gradient(
-    -64deg,
+    90deg,
     var(--color-black-opacity-32) 0%,
     var(--color-black-opacity-32) 36%,
     var(--color-black-opacity-32) 41%,

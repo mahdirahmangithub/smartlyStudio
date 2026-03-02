@@ -392,7 +392,7 @@ function ColSpanDemo({ density }: { density: TableDensity }) {
           ? { colSpan: TOTAL_LEAF_COLS, style: { fontWeight: 600, backgroundColor: "var(--element-divider-neutral-weak)" } }
           : {},
       render: (v: string, r) =>
-        r.isSectionHeader ? v : <DataCellContent title={v} />,
+        r.isSectionHeader ? <DataCellContent title={v} /> : <DataCellContent title={v} />,
     },
     {
       key: "age",
@@ -402,7 +402,7 @@ function ColSpanDemo({ density }: { density: TableDensity }) {
       align: "right",
       onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
       render: (v: number | null) =>
-        v != null ? <DataCellContent title={String(v)} textAlignment="right" /> : "",
+        v != null ? <DataCellContent title={String(v)} textAlignment="right" /> : null,
     },
     {
       key: "email",
@@ -411,7 +411,7 @@ function ColSpanDemo({ density }: { density: TableDensity }) {
       width: 220,
       onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
       render: (v: string, r) =>
-        r.isSectionHeader ? "" : <DataCellContent title={v} />,
+        r.isSectionHeader ? null : <DataCellContent title={v} />,
     },
     {
       key: "department",
@@ -420,7 +420,7 @@ function ColSpanDemo({ density }: { density: TableDensity }) {
       width: 130,
       onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
       render: (v: string, r) =>
-        r.isSectionHeader ? "" : <DataCellContent title={v} />,
+        r.isSectionHeader ? null : <DataCellContent title={v} />,
     },
     {
       key: "salary",
@@ -430,7 +430,7 @@ function ColSpanDemo({ density }: { density: TableDensity }) {
       align: "right",
       onCell: (record) => (record.isSectionHeader ? { colSpan: 0 } : {}),
       render: (v: number | null) =>
-        v != null ? <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" /> : "",
+        v != null ? <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" /> : null,
     },
   ];
 
@@ -496,15 +496,17 @@ function SelectionDemo({ density }: { density: TableDensity }) {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [radioKey, setRadioKey] = useState<React.Key[]>([]);
 
+  const isDisabled = (r: Employee) => r.id === 3;
+
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 180,
-      render: (v: string) => <DataCellContent title={v} />,
+      render: (_: string, r: Employee) => <DataCellContent title={r.name} state={isDisabled(r) ? "disable" : "normal"} />,
     },
     { key: "age", title: "Age", dataIndex: "age", width: 80,
-      render: (v: number) => <DataCellContent title={String(v)} />,
+      render: (v: number, r: Employee) => <DataCellContent title={String(v)} state={isDisabled(r) ? "disable" : "normal"} />,
     },
     { key: "department", title: "Dept", dataIndex: "department", width: 130,
-      render: (v: string) => <DataCellContent title={v} />,
+      render: (v: string, r: Employee) => <DataCellContent title={v} state={isDisabled(r) ? "disable" : "normal"} />,
     },
   ];
 
@@ -513,35 +515,38 @@ function SelectionDemo({ density }: { density: TableDensity }) {
       <div style={{ flex: 1, minWidth: 300 }}>
         <h4 style={{ margin: "0 0 8px" }}>Checkbox (multi-select)</h4>
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
-          Selected: {selectedKeys.length ? selectedKeys.join(", ") : "none"}
+          Selected: {selectedKeys.length ? selectedKeys.join(", ") : "none"} — Row 3 is disabled
         </p>
         <DataTable<Employee>
           columns={columns}
           dataSource={EMPLOYEES.slice(0, 5)}
           rowKey="id"
           density={density}
+          rowDisabled={isDisabled}
           rowSelection={{
             type: "checkbox",
             selectedRowKeys: selectedKeys,
             onChange: (keys) => setSelectedKeys(keys),
-            getCheckboxProps: (r) => ({ disabled: r.id === 3 }),
+            getCheckboxProps: (r) => ({ disabled: isDisabled(r) }),
           }}
         />
       </div>
       <div style={{ flex: 1, minWidth: 300 }}>
         <h4 style={{ margin: "0 0 8px" }}>Radio (single-select)</h4>
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
-          Selected: {radioKey.length ? radioKey[0] : "none"}
+          Selected: {radioKey.length ? radioKey[0] : "none"} — Row 3 is disabled
         </p>
         <DataTable<Employee>
           columns={columns}
           dataSource={EMPLOYEES.slice(0, 5)}
           rowKey="id"
           density={density}
+          rowDisabled={isDisabled}
           rowSelection={{
             type: "radio",
             selectedRowKeys: radioKey,
             onChange: (keys) => setRadioKey(keys),
+            getCheckboxProps: (r) => ({ disabled: isDisabled(r) }),
           }}
         />
       </div>
