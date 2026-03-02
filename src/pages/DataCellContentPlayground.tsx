@@ -133,7 +133,7 @@ export default function DataCellContentPlayground() {
               description="Senior Software Engineer"
               trailing={
                 <RowContainer density="sm">
-                  <Badge label="Active" />
+                  <Badge>Active</Badge>
                 </RowContainer>
               }
             />
