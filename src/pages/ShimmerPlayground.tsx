@@ -18,7 +18,7 @@ export default function ShimmerPlayground() {
   const shimmer = useShimmer(loading, inverse);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 32, maxWidth: 600 }}>
       <h2 style={{ margin: 0 }}>AI Loading Shimmer</h2>
 
       {/* ── Toggle ─────────────────────────────────────────── */}

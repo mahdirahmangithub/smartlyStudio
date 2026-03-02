@@ -13,7 +13,7 @@
 @keyframes shimmerPulse {
   0%,
   100% {
-    opacity: var(--opacity-24);
+    opacity: var(--opacity-32);
   }
   50% {
     opacity: var(--opacity-64);
@@ -26,7 +26,7 @@
     opacity: var(--opacity-48);
   }
   50% {
-    opacity: var(--opacity-100);
+    opacity: var(--opacity-88);
   }
 }
 
@@ -76,8 +76,8 @@
   );
 
   animation:
-    shimmerPulse 1800ms linear infinite,
-    shimmerMask 1800ms linear infinite;
+    shimmerPulse 1800ms ease-in-out infinite,
+    shimmerMask 1800ms ease-in-out infinite;
 }
 
 .shimmerInverse {
@@ -107,6 +107,6 @@
   );
 
   animation:
-    shimmerPulseInverse 1800ms linear infinite,
-    shimmerMask 1800ms linear infinite;
+    shimmerPulseInverse 1800ms ease-in-out infinite,
+    shimmerMask 1800ms ease-in-out infinite;
 }
