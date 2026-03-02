@@ -119,6 +119,10 @@ export interface DataTableProps<T = any> {
     record: T,
     index: number
   ) => HTMLAttributes<HTMLTableRowElement>;
+  /** Return true for rows that should appear in an error state. */
+  rowError?: (record: T, index: number) => boolean;
+  /** Return true for rows that should appear disabled (no hover, no interaction). */
+  rowDisabled?: (record: T, index: number) => boolean;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -284,6 +288,8 @@ export function DataTable<T extends Record<string, any>>({
   emptyContent = "No data",
   loading = false,
   onRow,
+  rowError,
+  rowDisabled,
 }: DataTableProps<T>) {
   const tableRef = useRef<HTMLTableElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -971,7 +977,8 @@ export function DataTable<T extends Record<string, any>>({
                   styles.headerCell,
                   isSortable && styles.sortableHeader,
                   overCol === col.key && styles.dragOver,
-                  cell.isLeaf && cellStickyClass(col)
+                  cell.isLeaf && cellStickyClass(col),
+                  hasSelection && allSelected && styles.cellChecked
                 )}
                 style={{
                   width: cell.isLeaf ? activeWidths.get(col.key) : undefined,
@@ -1048,6 +1055,8 @@ export function DataTable<T extends Record<string, any>>({
           const treeCanExpand = isTreeData && hasChildren;
           const userRowProps = onRow?.(record, rowIdx) ?? {};
           const checkProps = rowSelection?.getCheckboxProps?.(record) ?? {};
+          const isRowError = rowError?.(record, rowIdx) ?? false;
+          const isRowDisabled = rowDisabled?.(record, rowIdx) ?? false;
 
           let colIdx = 0;
 
@@ -1117,7 +1126,10 @@ export function DataTable<T extends Record<string, any>>({
                         cellStickyClass(col),
                         focusPos?.[0] === rowIdx &&
                           focusPos?.[1] === currentCol &&
-                          styles.focusedCell
+                          styles.focusedCell,
+                        isSelected && styles.cellChecked,
+                        isRowError && styles.cellError,
+                        isRowDisabled && styles.cellDisabled
                       )}
                       {...cellProps}
                     >

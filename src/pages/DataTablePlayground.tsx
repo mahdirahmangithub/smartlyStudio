@@ -88,6 +88,99 @@ const TREE_DATA: TreeRow[] = [
    Sub-demos (stateful sections)
    ═══════════════════════════════════════════════════════════════ */
 
+function CellStatesDemo() {
+  const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([2, 5]);
+
+  const columns: ColumnDef<Employee>[] = [
+    { key: "name", title: "Name", dataIndex: "name", width: 180 },
+    { key: "age", title: "Age", dataIndex: "age", width: 80, align: "right" },
+    { key: "email", title: "Email", dataIndex: "email", width: 240 },
+    { key: "department", title: "Dept", dataIndex: "department", width: 130 },
+    {
+      key: "salary",
+      title: "Salary",
+      dataIndex: "salary",
+      width: 120,
+      align: "right",
+      render: (v: number) => `$${v.toLocaleString()}`,
+    },
+  ];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+      <div>
+        <h4 style={{ margin: "0 0 8px" }}>Normal + Checked rows</h4>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Rows 2 &amp; 5 are pre-selected (checked). Hover any cell to see state change. Click to select/deselect.
+        </p>
+        <DataTable<Employee>
+          columns={columns}
+          dataSource={EMPLOYEES}
+          rowKey="id"
+          rowSelection={{
+            selectedRowKeys: selectedKeys,
+            onChange: (keys) => setSelectedKeys(keys),
+          }}
+          keyboardNavigation
+        />
+      </div>
+
+      <div>
+        <h4 style={{ margin: "0 0 8px" }}>Error rows</h4>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Rows with salary &lt; $85k are flagged as error. Hover to see the error hover state.
+        </p>
+        <DataTable<Employee>
+          columns={columns}
+          dataSource={EMPLOYEES}
+          rowKey="id"
+          rowError={(record) => record.salary < 85000}
+          keyboardNavigation
+        />
+      </div>
+
+      <div>
+        <h4 style={{ margin: "0 0 8px" }}>Disabled rows</h4>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Marketing department rows are disabled — hover is suppressed and cursor changes.
+        </p>
+        <DataTable<Employee>
+          columns={columns}
+          dataSource={EMPLOYEES}
+          rowKey="id"
+          rowDisabled={(record) => record.department === "Marketing"}
+          rowSelection={{
+            selectedRowKeys: [1],
+            onChange: () => {},
+            getCheckboxProps: (record) => ({
+              disabled: record.department === "Marketing",
+            }),
+          }}
+        />
+      </div>
+
+      <div>
+        <h4 style={{ margin: "0 0 8px" }}>Checked + Error + Disabled combined</h4>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Row 1 selected, row 3 error, row 6 disabled. Focus any cell (tab or click) to see the focus ring.
+        </p>
+        <DataTable<Employee>
+          columns={columns}
+          dataSource={EMPLOYEES}
+          rowKey="id"
+          rowSelection={{
+            selectedRowKeys: [1],
+            onChange: () => {},
+          }}
+          rowError={(record) => record.id === 3}
+          rowDisabled={(record) => record.id === 6}
+          keyboardNavigation
+        />
+      </div>
+    </div>
+  );
+}
+
 function BasicDemo() {
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 180 },
@@ -688,6 +781,11 @@ export default function DataTablePlayground() {
       </div>
 
       <div className={overflowClass[cellOverflow]}>
+      <section style={sectionStyle}>
+        <h2>Cell States (Checked / Error / Disabled / Hover / Focus)</h2>
+        <div style={cardStyle}><CellStatesDemo /></div>
+      </section>
+
       <section style={sectionStyle}>
         <h2>Basic</h2>
         <div style={cardStyle}><BasicDemo /></div>

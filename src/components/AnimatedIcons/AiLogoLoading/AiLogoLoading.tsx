@@ -207,6 +207,8 @@ export function AiLogoLoading({
   const colorRef = useRef<[number, number, number]>([0, 0, 0]);
   const speedRef = useRef(speed);
   speedRef.current = speed;
+  const activeRef = useRef(active);
+  activeRef.current = active;
 
   /* ── Setup WebGL context & buffers ─────────────────────────────── */
 
@@ -290,15 +292,28 @@ export function AiLogoLoading({
     };
   }, []);
 
-  /* ── Resolve color ─────────────────────────────────────────────── */
+  /* ── Resolve color (reacts to prop + theme changes) ───────────── */
 
   useEffect(() => {
     const cv = canvasRef.current;
     if (!cv) return;
     if (color) cv.style.color = color;
     else cv.style.color = "";
-    const resolved = getComputedStyle(cv).color;
-    colorRef.current = parseRgb(resolved);
+
+    let lastCss = "";
+    const check = () => {
+      const css = getComputedStyle(cv).color;
+      if (css === lastCss) return;
+      lastCss = css;
+      colorRef.current = parseRgb(css);
+      const st = stRef.current;
+      if (st && !activeRef.current) {
+        requestAnimationFrame(() => drawStatic(st));
+      }
+    };
+    check();
+    const iv = setInterval(check, 150);
+    return () => clearInterval(iv);
   }, [color]);
 
   /* ── Resize handler ────────────────────────────────────────────── */
@@ -466,7 +481,8 @@ export function AiLogoLoading({
     let running = true;
     const loop = (now: number) => {
       if (!running) return;
-      drawFrame(st, now, speedRef.current);
+      const cur = stRef.current;
+      if (cur) drawFrame(cur, now, speedRef.current);
       rafRef.current = requestAnimationFrame(loop);
     };
     rafRef.current = requestAnimationFrame(loop);
