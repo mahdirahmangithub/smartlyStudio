@@ -32,6 +32,7 @@
   padding: var(--spacing-2xs);
   border-radius: var(--radius-full);
   overflow: clip;
+  pointer-events: none;
   transition:
     background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
     box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing);
