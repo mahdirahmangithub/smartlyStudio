@@ -792,14 +792,19 @@ export function DataTable<T extends Record<string, any>>({
             onDragLeave: () => setOverRow(null),
             onDrop: (e: ReactDragEvent<HTMLTableRowElement>) => {
               e.preventDefault();
-              if (dragRow !== null && dragRow !== idx)
-                rowDragAndDrop!.onReorder?.(dragRow, idx, dataSource);
+              if (dragRow !== null && dragRow !== idx) {
+                const targetIdx =
+                  dropPosition === "above" && dragRow < idx
+                    ? idx - 1
+                    : idx;
+                rowDragAndDrop!.onReorder?.(dragRow, targetIdx, dataSource);
+              }
               setDragRow(null);
               setOverRow(null);
             },
           }
         : {},
-    [hasRowDnD, dragRow, rowDragAndDrop, dataSource, flatRows.length]
+    [hasRowDnD, dragRow, dropPosition, rowDragAndDrop, dataSource, flatRows.length]
   );
 
   /* ══════════════════════════════════════════════════════════
