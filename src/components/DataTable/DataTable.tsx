@@ -811,9 +811,11 @@ export function DataTable<T extends Record<string, any>>({
             },
             onDragOver: (e: ReactDragEvent<HTMLTableCellElement>) => {
               e.preventDefault();
-              setOverCol(colKey);
+              if (overCol !== colKey) setOverCol(colKey);
             },
-            onDragLeave: () => setOverCol(null),
+            onDragLeave: (e: ReactDragEvent<HTMLTableCellElement>) => {
+              if (!e.currentTarget.contains(e.relatedTarget as Node)) setOverCol(null);
+            },
             onDrop: (e: ReactDragEvent<HTMLTableCellElement>) => {
               e.preventDefault();
               if (dragCol && dragCol !== colKey) {
@@ -837,7 +839,7 @@ export function DataTable<T extends Record<string, any>>({
             },
           }
         : {},
-    [dragCol, columnDragAndDrop, leafCols]
+    [dragCol, overCol, columnDragAndDrop, leafCols]
   );
 
   /* ══════════════════════════════════════════════════════════
@@ -1002,7 +1004,8 @@ export function DataTable<T extends Record<string, any>>({
                 className={cx(
                   styles.headerCell,
                   isSortable && styles.sortableHeader,
-                  overCol === col.key && styles.dragOver,
+                  overCol === col.key && styles.colDragOver,
+                  dragCol === col.key && styles.colDragging,
                   cell.isLeaf && cellStickyClass(col),
                   hasSelection && allSelected && styles.cellChecked,
                   cell.isLeaf && col.density && CELL_DENSITY_CLASS[col.density]
