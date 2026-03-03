@@ -258,31 +258,34 @@
 
 .resizeHandle {
   position: absolute;
-  right: 0;
+  right: calc(var(--spacing-sm-plus) / 2 * -1 - var(--space-hair-line));
   top: 0;
   bottom: 0;
-  width: 7px;
+  width: var(--spacing-sm-plus);
   cursor: col-resize;
   user-select: none;
   touch-action: none;
   z-index: 1;
-}
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  }
 
 .resizeHandle::after {
   content: "";
   position: absolute;
-  top: 25%;
-  bottom: 25%;
-  right: 0;
-  width: 1px;
-  background-color: var(--element-divider-neutral-default);
-  opacity: 0;
+  top: 10%;
+  bottom: 10%;
+  width: 3px;
+  background-color: var(--element-fill-brand-primary-default);
+  opacity: var(--opacity-0);
+  border-radius: var(--radius-full);
   transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
 }
 
 .headerCell:hover > .resizeHandle::after,
-.resizing .resizeHandle::after {
-  opacity: 1;
+.resizeHandle:active::after {
+  opacity: var(--opacity-100);
 }
 
 .resizing {
@@ -320,12 +323,14 @@
 }
 
 .dragging {
-  opacity: 0.4;
-}
+  opacity: var(--opacity-100);
+ }
 
 .dragOver {
-  outline: 2px dashed currentColor;
+  outline: 2px solid var(--element-fill-brand-primary-default);
   outline-offset: -2px;
+  border-radius: var(--radius-md);
+  
 }
 
 /* ── Empty state ── */
