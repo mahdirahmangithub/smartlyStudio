@@ -778,7 +778,7 @@ function StickyDemo({ density }: { density: TableDensity }) {
 }
 
 function RowDnDDemo({ density }: { density: TableDensity }) {
-  const [data, setData] = useState(EMPLOYEES.slice(0, 5));
+  const [data, setData] = useState(STICKY_DATA);
 
   const reorder = useCallback(
     (from: number, to: number) => {
@@ -802,19 +802,24 @@ function RowDnDDemo({ density }: { density: TableDensity }) {
     { key: "age", title: "Age", dataIndex: "age", width: 80,
       render: (v: number) => <DataCellContent title={String(v)} />,
     },
+    { key: "salary", title: "Salary", dataIndex: "salary", width: 120, align: "right",
+      render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />,
+    },
   ];
 
   return (
     <>
       <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
-        Drag the ⠿ handle to reorder rows
+        Drag the ⠿ handle to reorder rows — scroll vertically with sticky header
       </p>
       <DataTable<Employee>
         columns={columns}
         dataSource={data}
         rowKey="id"
         density={density}
+        stickyHeader
         rowDragAndDrop={{ onReorder: reorder }}
+        style={{ maxHeight: 300 }}
       />
     </>
   );

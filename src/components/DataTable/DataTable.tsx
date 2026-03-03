@@ -827,10 +827,12 @@ export function DataTable<T extends Record<string, any>>({
               clone.style.display = "table-cell";
               clone.style.width = `${th.offsetWidth}px`;
               clone.style.height = `${th.offsetHeight}px`;
-              document.body.appendChild(clone);
+              const cs = getComputedStyle(th);
+              clone.style.padding = cs.padding;
+              const themeRoot = th.closest("[data-theme]") ?? document.body;
+              themeRoot.appendChild(clone);
               e.dataTransfer.setDragImage(clone, th.offsetWidth / 2, th.offsetHeight / 2);
-              setTimeout(() => document.body.removeChild(clone));
-              th.classList.add(styles.colBeingDragged);
+              setTimeout(() => themeRoot.removeChild(clone));
             },
             onDragOver: (e: ReactDragEvent<HTMLTableCellElement>) => {
               e.preventDefault();
@@ -861,14 +863,10 @@ export function DataTable<T extends Record<string, any>>({
                   columnDragAndDrop.onReorder?.(fi, ti);
                 }
               }
-              e.currentTarget.closest("thead")
-                ?.querySelectorAll(`.${styles.colBeingDragged}`)
-                .forEach((el) => el.classList.remove(styles.colBeingDragged));
               setDragCol(null);
               setOverCol(null);
             },
-            onDragEnd: (e: ReactDragEvent<HTMLTableCellElement>) => {
-              e.currentTarget.classList.remove(styles.colBeingDragged);
+            onDragEnd: () => {
               setDragCol(null);
               setOverCol(null);
             },
@@ -1040,6 +1038,7 @@ export function DataTable<T extends Record<string, any>>({
                   styles.headerCell,
                   isSortable && styles.sortableHeader,
                   overCol === col.key && (colDropPosition === "before" ? styles.colDragOverBefore : styles.colDragOverAfter),
+                  dragCol === col.key && styles.colBeingDragged,
                   cell.isLeaf && cellStickyClass(col),
                   hasSelection && allSelected && styles.cellChecked,
                   cell.isLeaf && col.density && CELL_DENSITY_CLASS[col.density]
@@ -1127,7 +1126,8 @@ export function DataTable<T extends Record<string, any>>({
                 aria-selected={hasSelection ? isSelected : undefined}
                 aria-rowindex={rowIdx + 1}
                 className={cx(
-                  overRow === rowIdx && (dropPosition === "above" ? styles.dragOverAbove : styles.dragOverBelow)
+                  overRow === rowIdx && (dropPosition === "above" ? styles.dragOverAbove : styles.dragOverBelow),
+                  dragRow === rowIdx && styles.rowBeingDragged
                 )}
                 {...userRowProps}
                 {...rowDropProps(rowIdx)}
@@ -1153,15 +1153,22 @@ export function DataTable<T extends Record<string, any>>({
                         clone.style.left = "-9999px";
                         clone.style.display = "table";
                         clone.style.width = `${tr.offsetWidth}px`;
-                        document.body.appendChild(clone);
+                        const origCells = tr.querySelectorAll("td");
+                        const cloneCells = clone.querySelectorAll("td");
+                        origCells.forEach((cell, i) => {
+                          if (cloneCells[i]) {
+                            const cs = getComputedStyle(cell);
+                            cloneCells[i].style.padding = cs.padding;
+                            cloneCells[i].style.width = `${cell.offsetWidth}px`;
+                          }
+                        });
+                        const themeRoot = tr.closest("[data-theme]") ?? document.body;
+                        themeRoot.appendChild(clone);
                         e.dataTransfer.setDragImage(clone, 0, 0);
-                        setTimeout(() => document.body.removeChild(clone));
-                        tr.classList.add(styles.rowBeingDragged);
+                        setTimeout(() => themeRoot.removeChild(clone));
                       }
                     }}
-                    onDragEnd={(e) => {
-                      const tr = (e.target as HTMLElement).closest("tr");
-                      if (tr) tr.classList.remove(styles.rowBeingDragged);
+                    onDragEnd={() => {
                       setDragRow(null);
                       setOverRow(null);
                     }}
@@ -1202,7 +1209,8 @@ export function DataTable<T extends Record<string, any>>({
                         isSelected && styles.cellChecked,
                         isRowError && styles.cellError,
                         isRowDisabled && styles.cellDisabled,
-                        col.density && CELL_DENSITY_CLASS[col.density]
+                        col.density && CELL_DENSITY_CLASS[col.density],
+                        dragCol === col.key && styles.colBeingDragged
                       )}
                       {...cellProps}
                     >
@@ -1308,7 +1316,7 @@ export function DataTable<T extends Record<string, any>>({
     >
       <table
         ref={tableRef}
-        className={cx(styles.table, DENSITY_CLASS[density])}
+        className={cx(styles.table, DENSITY_CLASS[density], dragRow != null && styles.rowDragging, dragCol && styles.colDragging)}
         style={{
           width:
             resizeMode === "overflow"
