@@ -793,17 +793,17 @@ function RowDnDDemo({ density }: { density: TableDensity }) {
   );
 
   const columns: ColumnDef<Employee>[] = [
-    { key: "name", title: "Name", dataIndex: "name", width: 180,
-      render: (v: string) => <DataCellContent title={v} />,
+    { key: "name", title: "Name", dataIndex: "name", width: 220,
+      render: (_: string, r: Employee) => <DataCellContent title={r.name} description={r.email} />,
     },
-    { key: "department", title: "Dept", dataIndex: "department", width: 130,
-      render: (v: string) => <DataCellContent title={v} />,
+    { key: "department", title: "Dept", dataIndex: "department", width: 150,
+      render: (v: string, r: Employee) => <DataCellContent title={v} description={`ID: ${r.id}`} />,
     },
-    { key: "age", title: "Age", dataIndex: "age", width: 80,
-      render: (v: number) => <DataCellContent title={String(v)} />,
+    { key: "age", title: "Age", dataIndex: "age", width: 100,
+      render: (v: number) => <DataCellContent title={String(v)} description="years" />,
     },
-    { key: "salary", title: "Salary", dataIndex: "salary", width: 120, align: "right",
-      render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />,
+    { key: "salary", title: "Salary", dataIndex: "salary", width: 140, align: "right",
+      render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} description="Annual" textAlignment="right" />,
     },
   ];
 
