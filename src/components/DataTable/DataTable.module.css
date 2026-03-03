@@ -322,25 +322,88 @@
   vertical-align: middle;
 }
 
-.dragging {
+/* Applied synchronously in dragStart so the browser captures a styled ghost */
+.rowDragGhost > td {
+  background-color: var(--element-surface-over);
+  padding: var(--spacing-sm) var(--spacing-none);
+}
+.rowDragGhost > td:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+.rowDragGhost > td:last-child {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* Persists on the source row throughout the drag */
+.rowBeingDragged {
   opacity: var(--opacity-48);
 }
 
-.dragOver {
-  outline: 2px solid var(--element-fill-brand-primary-default);
-  outline-offset: -2px;
-  border-radius: var(--radius-md);
+.dragOverAbove,
+.dragOverBelow {
+  position: relative;
+}
+
+.dragOverAbove::after,
+.dragOverBelow::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background-color: var(--element-fill-brand-primary-default);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: var(--radius-full);
+}
+
+.dragOverAbove::after {
+  top: var(--space-negative-px);
+}
+
+.dragOverBelow::after {
+  bottom: var(--space-px);
 }
 
 /* ── Column DnD ── */
 
-.colDragging {
+/* Applied synchronously in dragStart so the browser captures a styled ghost */
+.colDragGhost {
+  background-color: var(--element-surface-over);
+  padding: var(--spacing-sm) var(--spacing-sm);
+  border-radius: var(--radius-md);
+}
+
+/* Persists on the source header throughout the drag */
+.colBeingDragged {
   opacity: var(--opacity-48);
 }
 
-.colDragOver {
-  box-shadow: inset 0 0 0 var(--spacing-2xs) var(--element-fill-brand-primary-default);
-   border-radius: var(--radius-md);
+.colDragOverBefore,
+.colDragOverAfter {
+  position: relative;
+}
+
+.colDragOverBefore::after,
+.colDragOverAfter::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background-color: var(--element-fill-brand-primary-default);
+  pointer-events: none;
+  z-index: 1;
+  border-radius: var(--radius-full);
+
+}
+
+.colDragOverBefore::after {
+  left: 0
+}
+
+.colDragOverAfter::after {
+  right: 0;
 }
 
 /* ── Empty state ── */

@@ -770,6 +770,7 @@ export function DataTable<T extends Record<string, any>>({
 
   const [dragRow, setDragRow] = useState<number | null>(null);
   const [overRow, setOverRow] = useState<number | null>(null);
+  const [dropPosition, setDropPosition] = useState<"above" | "below">("below");
 
   const rowDropProps = useCallback(
     (idx: number) =>
@@ -778,6 +779,14 @@ export function DataTable<T extends Record<string, any>>({
             onDragOver: (e: ReactDragEvent<HTMLTableRowElement>) => {
               e.preventDefault();
               e.dataTransfer.dropEffect = "move";
+              const isLastRow = idx === flatRows.length - 1;
+              if (isLastRow) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const midY = rect.top + rect.height / 2;
+                setDropPosition(e.clientY < midY ? "above" : "below");
+              } else {
+                setDropPosition("above");
+              }
               setOverRow(idx);
             },
             onDragLeave: () => setOverRow(null),
@@ -790,7 +799,7 @@ export function DataTable<T extends Record<string, any>>({
             },
           }
         : {},
-    [hasRowDnD, dragRow, rowDragAndDrop, dataSource]
+    [hasRowDnD, dragRow, rowDragAndDrop, dataSource, flatRows.length]
   );
 
   /* ══════════════════════════════════════════════════════════
@@ -799,6 +808,7 @@ export function DataTable<T extends Record<string, any>>({
 
   const [dragCol, setDragCol] = useState<string | null>(null);
   const [overCol, setOverCol] = useState<string | null>(null);
+  const [colDropPosition, setColDropPosition] = useState<"before" | "after">("before");
 
   const colDragProps = useCallback(
     (colKey: string) =>
@@ -808,9 +818,30 @@ export function DataTable<T extends Record<string, any>>({
             onDragStart: (e: ReactDragEvent<HTMLTableCellElement>) => {
               setDragCol(colKey);
               e.dataTransfer.effectAllowed = "move";
+              const th = e.currentTarget;
+              const clone = th.cloneNode(true) as HTMLElement;
+              clone.classList.add(styles.colDragGhost);
+              clone.style.position = "fixed";
+              clone.style.top = "-9999px";
+              clone.style.left = "-9999px";
+              clone.style.display = "table-cell";
+              clone.style.width = `${th.offsetWidth}px`;
+              clone.style.height = `${th.offsetHeight}px`;
+              document.body.appendChild(clone);
+              e.dataTransfer.setDragImage(clone, th.offsetWidth / 2, th.offsetHeight / 2);
+              setTimeout(() => document.body.removeChild(clone));
+              th.classList.add(styles.colBeingDragged);
             },
             onDragOver: (e: ReactDragEvent<HTMLTableCellElement>) => {
               e.preventDefault();
+              const isLastCol = colKey === leafCols[leafCols.length - 1]?.key;
+              if (isLastCol) {
+                const rect = e.currentTarget.getBoundingClientRect();
+                const midX = rect.left + rect.width / 2;
+                setColDropPosition(e.clientX < midX ? "before" : "after");
+              } else {
+                setColDropPosition("before");
+              }
               if (overCol !== colKey) setOverCol(colKey);
             },
             onDragLeave: (e: ReactDragEvent<HTMLTableCellElement>) => {
@@ -830,10 +861,14 @@ export function DataTable<T extends Record<string, any>>({
                   columnDragAndDrop.onReorder?.(fi, ti);
                 }
               }
+              e.currentTarget.closest("thead")
+                ?.querySelectorAll(`.${styles.colBeingDragged}`)
+                .forEach((el) => el.classList.remove(styles.colBeingDragged));
               setDragCol(null);
               setOverCol(null);
             },
-            onDragEnd: () => {
+            onDragEnd: (e: ReactDragEvent<HTMLTableCellElement>) => {
+              e.currentTarget.classList.remove(styles.colBeingDragged);
               setDragCol(null);
               setOverCol(null);
             },
@@ -1004,8 +1039,7 @@ export function DataTable<T extends Record<string, any>>({
                 className={cx(
                   styles.headerCell,
                   isSortable && styles.sortableHeader,
-                  overCol === col.key && styles.colDragOver,
-                  dragCol === col.key && styles.colDragging,
+                  overCol === col.key && (colDropPosition === "before" ? styles.colDragOverBefore : styles.colDragOverAfter),
                   cell.isLeaf && cellStickyClass(col),
                   hasSelection && allSelected && styles.cellChecked,
                   cell.isLeaf && col.density && CELL_DENSITY_CLASS[col.density]
@@ -1093,8 +1127,7 @@ export function DataTable<T extends Record<string, any>>({
                 aria-selected={hasSelection ? isSelected : undefined}
                 aria-rowindex={rowIdx + 1}
                 className={cx(
-                  overRow === rowIdx && styles.dragOver,
-                  dragRow === rowIdx && styles.dragging
+                  overRow === rowIdx && (dropPosition === "above" ? styles.dragOverAbove : styles.dragOverBelow)
                 )}
                 {...userRowProps}
                 {...rowDropProps(rowIdx)}
@@ -1111,12 +1144,24 @@ export function DataTable<T extends Record<string, any>>({
                     onDragStart={(e) => {
                       setDragRow(rowIdx);
                       e.dataTransfer.effectAllowed = "move";
-                      const tr = (
-                        e.target as HTMLElement
-                      ).closest("tr");
-                      if (tr) e.dataTransfer.setDragImage(tr, 0, 0);
+                      const tr = (e.target as HTMLElement).closest("tr");
+                      if (tr) {
+                        const clone = tr.cloneNode(true) as HTMLElement;
+                        clone.classList.add(styles.rowDragGhost);
+                        clone.style.position = "fixed";
+                        clone.style.top = "-9999px";
+                        clone.style.left = "-9999px";
+                        clone.style.display = "table";
+                        clone.style.width = `${tr.offsetWidth}px`;
+                        document.body.appendChild(clone);
+                        e.dataTransfer.setDragImage(clone, 0, 0);
+                        setTimeout(() => document.body.removeChild(clone));
+                        tr.classList.add(styles.rowBeingDragged);
+                      }
                     }}
-                    onDragEnd={() => {
+                    onDragEnd={(e) => {
+                      const tr = (e.target as HTMLElement).closest("tr");
+                      if (tr) tr.classList.remove(styles.rowBeingDragged);
                       setDragRow(null);
                       setOverRow(null);
                     }}
