@@ -115,7 +115,7 @@
 }
 
 .accordionBorder {
-  border: 1px solid var(--element-divider-neutral-default);
+  border: var(--spacing-px) solid var(--element-divider-neutral-default);
   border-radius: var(--radius-lg);
   overflow: hidden;
 }

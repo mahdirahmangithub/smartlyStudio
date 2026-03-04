@@ -363,6 +363,17 @@ export function DataTable<T extends Record<string, any>>({
     };
   }, []);
 
+  /* ── Table height (for resize handle indicator) ── */
+  useEffect(() => {
+    const el = tableRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      el.style.setProperty("--table-height", `${el.offsetHeight}px`);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
   /* ── Feature flags ── */
   const hasSelection = !!rowSelection;
   const selType = rowSelection?.type ?? "checkbox";

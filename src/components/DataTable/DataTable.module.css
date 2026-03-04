@@ -269,21 +269,22 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  }
+   }
 
 .resizeHandle::after {
   content: "";
   position: absolute;
-  top: 10%;
-  bottom: 10%;
+  top: calc(var(--table-height, 100%) * 0.03);
+  height: calc(var(--table-height, 100%) * 0.94);
   width: 3px;
   background-color: var(--element-fill-brand-primary-default);
   opacity: var(--opacity-0);
   border-radius: var(--radius-full);
   transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+  pointer-events: none;
 }
 
-.headerCell:hover > .resizeHandle::after,
+.resizeHandle:hover::after,
 .resizeHandle:active::after {
   opacity: var(--opacity-100);
 }
