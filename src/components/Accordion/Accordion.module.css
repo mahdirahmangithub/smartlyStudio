@@ -64,8 +64,6 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--space-px);
-  background: var(--element-divider-neutral-default);
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -103,8 +101,6 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: var(--space-px);
-  background: var(--element-divider-neutral-default);
   z-index: 1;
 }
 

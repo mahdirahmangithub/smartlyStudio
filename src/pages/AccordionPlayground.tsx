@@ -409,6 +409,41 @@ function GroupControlledDemo() {
   );
 }
 
+function GroupTitleTextXsDemo() {
+  return (
+    <div style={rowStyle}>
+      <div style={colStyle}>
+        <h4 style={{ margin: "0 0 8px" }}>border + single (size xs)</h4>
+        <Accordion border type="single" size="xs" defaultExpanded={[0]}>
+          <AccordionItem title="Account Settings" leadingIcon={<Icon name="settings" size={20} />}>
+            {sampleContent("Update your display name, email, and notification preferences.")}
+          </AccordionItem>
+          <AccordionItem title="Privacy & Security" leadingIcon={<Icon name="lock" size={20} />}>
+            {sampleContent("Configure two-factor authentication and manage active sessions.")}
+          </AccordionItem>
+          <AccordionItem title="Billing Information" leadingIcon={<Icon name="attach_money" size={20} />}>
+            {sampleContent("Add or remove payment methods and download past invoices.")}
+          </AccordionItem>
+        </Accordion>
+      </div>
+      <div style={colStyle}>
+        <h4 style={{ margin: "0 0 8px" }}>no border + multiple (size xs)</h4>
+        <Accordion border={false} size="xs" defaultExpanded={[0, 1]}>
+          <AccordionItem title="Account Settings" leadingIcon={<Icon name="settings" size={20} />}>
+            {sampleContent("Update your display name, email, and notification preferences.")}
+          </AccordionItem>
+          <AccordionItem title="Privacy & Security" leadingIcon={<Icon name="lock" size={20} />}>
+            {sampleContent("Configure two-factor authentication and manage active sessions.")}
+          </AccordionItem>
+          <AccordionItem title="Billing Information" leadingIcon={<Icon name="attach_money" size={20} />}>
+            {sampleContent("Add or remove payment methods and download past invoices.")}
+          </AccordionItem>
+        </Accordion>
+      </div>
+    </div>
+  );
+}
+
 export default function AccordionPlayground() {
   return (
     <div>
@@ -492,6 +527,14 @@ export default function AccordionPlayground() {
           No outer border, round item headers. Left: multiple, right: single.
         </p>
         <div style={cardStyle}><GroupBorderlessDemo /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>TitleText xs Size</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Accordion group with <code>size="xs"</code> — smaller title text with descriptions.
+        </p>
+        <div style={cardStyle}><GroupTitleTextXsDemo /></div>
       </section>
 
       <section style={sectionStyle}>

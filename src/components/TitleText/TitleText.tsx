@@ -70,7 +70,7 @@ export function TitleText({
 
   return (
     <div className={cls} style={mergedStyle}>
-      {leadingIcon !== undefined && (
+      {leadingIcon && (
         <span className={styles.icon}>{leadingIcon}</span>
       )}
 

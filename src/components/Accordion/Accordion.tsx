@@ -11,6 +11,7 @@ import {
 import { TitleText, type TitleTextSize } from "../TitleText";
 import { Expander } from "../Expander";
 import { ScrollFade } from "../ScrollFade";
+import { Divider } from "../Divider";
 import styles from "./Accordion.module.css";
 
 function cx(...classes: (string | false | undefined | null)[]) {
@@ -80,7 +81,7 @@ export function AccordionHeader({
         disabled={disabled}
       />
 
-      {!round && divider && <span className={styles.divider} aria-hidden="true" />}
+      {!round && divider && <Divider className={styles.divider} />}
     </button>
   );
 }
@@ -223,7 +224,7 @@ export function AccordionItem({
         </div>
       </div>
 
-      {divider && <span className={styles.itemDivider} aria-hidden="true" />}
+      {divider && <Divider className={styles.itemDivider} />}
     </div>
   );
 }
