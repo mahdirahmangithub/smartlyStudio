@@ -169,6 +169,7 @@ export function AccordionItem({
           {maxContentHeight != null ? (
             <ScrollFade
               direction="vertical"
+              fadeSize={16}
               style={{ maxHeight: maxContentHeight, height: "auto" }}
               scrollAreaStyle={{ maxHeight: maxContentHeight }}
             >
