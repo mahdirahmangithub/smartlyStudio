@@ -1,0 +1,125 @@
+/* ══════════════════════════════════════════════════════════
+   Accordion Header
+   ══════════════════════════════════════════════════════════ */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm-extra);
+  padding: var(--spacing-sm-extra) var(--spacing-sm) var(--spacing-sm-extra) var(--spacing-lg);
+  position: relative;
+  width: 100%;
+  border: none;
+  background: var(--element-fill-neutral-tertiary-default);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  outline: none;
+}
+
+/* ── Round variant ── */
+
+.round {
+  border-radius: var(--radius-lg);
+}
+
+/* ── Interactive states ── */
+
+.header:hover:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-hover);
+}
+
+.header:active:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-press);
+}
+
+.header:focus-visible:not(.disabled) {
+  box-shadow: inset 0 0 0 var(--spacing-2xs) var(--element-outline-brand-active);
+}
+
+/* ── Disabled ── */
+
+.disabled {
+  cursor: default;
+  pointer-events: none;
+  color: var(--text-neutral-disable);
+}
+
+.disabled * {
+  color: inherit !important;
+}
+
+/* ── TitleText area (flex-1) ── */
+
+.titleArea {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+/* ── Divider (bottom line for non-round header) ── */
+
+.divider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--space-px);
+  background: var(--element-divider-neutral-default);
+}
+
+/* ══════════════════════════════════════════════════════════
+   Accordion Item
+   ══════════════════════════════════════════════════════════ */
+
+.item {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  isolation: isolate;
+}
+
+.itemRound {
+  border-radius: var(--radius-lg);
+}
+
+/* ── Collapsible content ── */
+
+.content {
+  overflow: hidden;
+  height: 0;
+  opacity: var(--opacity-0);
+}
+
+.contentInner {
+  padding: var(--spacing-xl);
+}
+
+/* ── Item-level divider ── */
+
+.itemDivider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--space-px);
+  background: var(--element-divider-neutral-default);
+  z-index: 1;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Accordion (group container)
+   ══════════════════════════════════════════════════════════ */
+
+.accordion {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.accordionBorder {
+  border: 1px solid var(--element-divider-neutral-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
