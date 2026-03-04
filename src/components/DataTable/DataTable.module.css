@@ -323,9 +323,10 @@
 }
 
 /* Applied synchronously in dragStart so the browser captures a styled ghost */
+ 
 .rowDragGhost > td {
   background-color: var(--element-surface-over);
-}
+ }
 .rowDragGhost > td:first-child {
   border-radius: var(--radius-md) 0 0 var(--radius-md);
 }
@@ -335,7 +336,8 @@
 
 /* Persists on the source row throughout the drag */
 .rowBeingDragged > td {
-  opacity: var(--opacity-32);
+  opacity: var(--opacity-24);
+  border-bottom: var(--space-px) solid var(--element-divider-neutral-strong);
 }
 
 /* Suppress body row hover while a row drag is active */
@@ -379,7 +381,7 @@
 
 /* Persists on the source column throughout the drag */
 .colBeingDragged > * {
-  opacity: var(--opacity-32);
+  opacity: var(--opacity-24);
 }
 
 /* Suppress header hover while a column drag is active */
