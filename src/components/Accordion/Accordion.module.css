@@ -91,7 +91,7 @@
 }
 
 .contentInner {
-  padding: var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-lg);
 }
 
 /* ── Item-level divider ── */
