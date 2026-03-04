@@ -274,8 +274,8 @@
 .resizeHandle::after {
   content: "";
   position: absolute;
-  top: calc(var(--table-height, 100%) * 0.03);
-  height: calc(var(--table-height, 100%) * 0.94);
+  top: 4px;
+  height: calc(var(--table-height) - 8px);
   width: 3px;
   background-color: var(--element-fill-brand-primary-default);
   opacity: var(--opacity-0);

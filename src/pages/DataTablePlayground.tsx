@@ -669,7 +669,7 @@ function SortingDemo({ density }: { density: TableDensity }) {
 function ColumnResizeDefaultDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 180, minWidth: 80,
-      render: (v: string) => <DataCellContent title={v} />,
+      render: (v: string, r: Employee) => <DataCellContent title={v} description={r.email} />,
     },
     { key: "age", title: "Age", dataIndex: "age", width: 80, minWidth: 50,
       render: (v: number) => <DataCellContent title={String(v)} />,
@@ -678,7 +678,7 @@ function ColumnResizeDefaultDemo({ density }: { density: TableDensity }) {
       render: (v: string) => <DataCellContent title={v} />,
     },
     { key: "department", title: "Dept", dataIndex: "department", width: 130, minWidth: 80,
-      render: (v: string) => <DataCellContent title={v} />,
+      render: (v: string) => <DataCellContent title={v} description="Team member" />,
     },
     { key: "salary", title: "Salary", dataIndex: "salary", width: 120, minWidth: 70, align: "right",
       render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />,
@@ -688,10 +688,12 @@ function ColumnResizeDefaultDemo({ density }: { density: TableDensity }) {
   return (
     <DataTable<Employee>
       columns={columns}
-      dataSource={EMPLOYEES.slice(0, 5)}
+      dataSource={EMPLOYEES}
       rowKey="id"
       density={density}
       columnResize={{ mode: "fixed" }}
+      stickyHeader
+      style={{ maxHeight: 320 }}
     />
   );
 }
@@ -699,7 +701,7 @@ function ColumnResizeDefaultDemo({ density }: { density: TableDensity }) {
 function ColumnResizeFluidDemo({ density }: { density: TableDensity }) {
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", flex: 2, minWidth: 120,
-      render: (v: string) => <DataCellContent title={v} />,
+      render: (v: string, r: Employee) => <DataCellContent title={v} description={r.email} />,
     },
     { key: "age", title: "Age", dataIndex: "age", flex: 0.5, minWidth: 50, align: "right",
       render: (v: number) => <DataCellContent title={String(v)} textAlignment="right" />,
@@ -708,7 +710,7 @@ function ColumnResizeFluidDemo({ density }: { density: TableDensity }) {
       render: (v: string) => <DataCellContent title={v} />,
     },
     { key: "department", title: "Dept", dataIndex: "department", flex: 1, minWidth: 80,
-      render: (v: string) => <DataCellContent title={v} />,
+      render: (v: string) => <DataCellContent title={v} description="Team member" />,
     },
     { key: "salary", title: "Salary", dataIndex: "salary", flex: 1, minWidth: 70, align: "right",
       render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} textAlignment="right" />,
@@ -718,10 +720,12 @@ function ColumnResizeFluidDemo({ density }: { density: TableDensity }) {
   return (
     <DataTable<Employee>
       columns={columns}
-      dataSource={EMPLOYEES.slice(0, 5)}
+      dataSource={EMPLOYEES}
       rowKey="id"
       density={density}
       columnResize={{ mode: "overflow" }}
+      stickyHeader
+      style={{ maxHeight: 320 }}
     />
   );
 }

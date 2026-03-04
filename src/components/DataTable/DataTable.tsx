@@ -363,14 +363,15 @@ export function DataTable<T extends Record<string, any>>({
     };
   }, []);
 
-  /* ── Table height (for resize handle indicator) ── */
+  /* ── Visible container height (for resize handle indicator) ── */
   useEffect(() => {
-    const el = tableRef.current;
-    if (!el) return;
+    const wrapper = wrapperRef.current;
+    const table = tableRef.current;
+    if (!wrapper || !table) return;
     const ro = new ResizeObserver(() => {
-      el.style.setProperty("--table-height", `${el.offsetHeight}px`);
+      table.style.setProperty("--table-height", `${wrapper.clientHeight}px`);
     });
-    ro.observe(el);
+    ro.observe(wrapper);
     return () => ro.disconnect();
   }, []);
 
