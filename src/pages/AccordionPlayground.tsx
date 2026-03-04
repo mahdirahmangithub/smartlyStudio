@@ -22,8 +22,6 @@ const colStyle: CSSProperties = {
 };
 
 function HeaderStatesDemo() {
-  const [expanded, setExpanded] = useState(false);
-
   return (
     <div style={rowStyle}>
       <div style={colStyle}>
