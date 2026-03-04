@@ -88,6 +88,7 @@ const CATEGORY_LABELS: Record<IconCategory, string> = {
 function IconsPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<IconCategory | "all">("all");
+  const [iconSize, setIconSize] = useState<number>(24);
 
   const results = useMemo(() => {
     const cat = category === "all" ? undefined : category;
@@ -120,6 +121,18 @@ function IconsPage() {
             <Icon name="close" size={16} />
           </button>
         )}
+      </div>
+
+      <div className="size-filter">
+        {[14, 16, 20, 24, 32].map((s) => (
+          <button
+            key={s}
+            className={`cat-btn ${iconSize === s ? "active" : ""}`}
+            onClick={() => setIconSize(s)}
+          >
+            {s}px
+          </button>
+        ))}
       </div>
 
       <div className="category-filter">
@@ -155,7 +168,7 @@ function IconsPage() {
                   <div className="icon-preview">
                     <Icon
                       name={icon.name}
-                      size={24}
+                      size={iconSize}
                       className={MONOCHROME.has(icon.category) ? "icon-mono" : ""}
                     />
                   </div>
@@ -172,7 +185,7 @@ function IconsPage() {
               <div className="icon-preview">
                 <Icon
                   name={icon.name}
-                  size={24}
+                  size={iconSize}
                   className={MONOCHROME.has(icon.category) ? "icon-mono" : ""}
                 />
               </div>

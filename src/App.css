@@ -229,6 +229,15 @@
   color: var(--text-neutral-secondary-hover);
 }
 
+/* Size filter */
+
+.size-filter {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
 /* Category filter */
 
 .category-filter {
