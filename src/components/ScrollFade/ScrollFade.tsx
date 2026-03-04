@@ -46,47 +46,49 @@ const SURFACE_TOKENS: Record<string, string> = {
   under: "--element-surface-under",
 };
 
-function detectSurface(element: HTMLElement): string {
-  // Strategy 1: walk up and check inline style values for var() references.
-  // This is the only reliable way when multiple tokens resolve to the same
-  // computed color (e.g. light theme: default and over are both white).
-  let el: HTMLElement | null = element.parentElement;
-  while (el) {
-    const rawBg = el.style.background || el.style.backgroundColor;
-    if (rawBg) {
-      for (const [key, token] of Object.entries(SURFACE_TOKENS)) {
-        if (rawBg.includes(`var(${token})`)) return key;
+function extractBgToken(element: HTMLElement): string | null {
+  const raw = element.style.background || element.style.backgroundColor;
+  if (raw) {
+    const m = raw.match(/var\((--[^),]+)/);
+    if (m) return m[1];
+  }
+
+  let token: string | null = null;
+
+  const walk = (rules: CSSRuleList) => {
+    for (const rule of rules) {
+      if (rule instanceof CSSStyleRule) {
+        try { if (!element.matches(rule.selectorText)) continue; } catch { continue; }
+        for (const prop of ["background", "background-color"]) {
+          const val = rule.style.getPropertyValue(prop);
+          if (val) {
+            const m = val.match(/var\((--[^),]+)/);
+            if (m) token = m[1];
+          }
+        }
+      } else if ("cssRules" in rule) {
+        walk((rule as CSSGroupingRule).cssRules);
       }
     }
-    el = el.parentElement;
-  }
+  };
 
-  // Strategy 2: fall back to computed rgb comparison for class-based backgrounds.
-  // Resolve tokens inside the themed container so they inherit the right values.
-  const tokenColors: [string, string][] = [];
-  for (const [key, token] of Object.entries(SURFACE_TOKENS)) {
-    const temp = document.createElement("div");
-    temp.style.backgroundColor = `var(${token})`;
-    element.appendChild(temp);
-    const resolved = getComputedStyle(temp).backgroundColor;
-    element.removeChild(temp);
-    if (resolved && resolved !== "rgba(0, 0, 0, 0)" && resolved !== "transparent") {
-      tokenColors.push([key, resolved]);
-    }
+  for (const sheet of document.styleSheets) {
+    try { walk(sheet.cssRules); } catch { /* cross-origin */ }
   }
+  return token;
+}
 
-  el = element.parentElement;
+function detectFadeColor(element: HTMLElement): string {
+  let el: HTMLElement | null = element.parentElement;
   while (el) {
     const bg = getComputedStyle(el).backgroundColor;
     if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
-      for (let i = tokenColors.length - 1; i >= 0; i--) {
-        if (bg === tokenColors[i][1]) return tokenColors[i][0];
-      }
-      break;
+      const token = extractBgToken(el);
+      return token ? `var(${token})` : bg;
     }
     el = el.parentElement;
   }
-  return "default";
+  return "var(--element-surface-default)";
 }
 
 // ── hook ───────────────────────────────────────────────────────────────
@@ -171,29 +173,26 @@ export const ScrollFade = forwardRef<HTMLDivElement, ScrollFadeProps>(
       threshold
     );
 
-    const [resolvedSurface, setResolvedSurface] = useState<string>(
-      surface === "auto" ? "default" : surface
-    );
+    const [fadeColor, setFadeColor] = useState("transparent");
 
     useEffect(() => {
       if (surface !== "auto") {
-        setResolvedSurface(surface);
+        setFadeColor(`var(${SURFACE_TOKENS[surface]})`);
         return;
       }
+
       const el = wrapperRef.current;
       if (!el) return;
-      setResolvedSurface(detectSurface(el));
+      setFadeColor(detectFadeColor(el));
     }, [surface]);
-
-    const tokenVar = `var(${SURFACE_TOKENS[resolvedSurface]})`;
 
     const isH = direction === "horizontal";
     const startGrad = isH
-      ? `linear-gradient(to right, ${tokenVar}, transparent)`
-      : `linear-gradient(to bottom, ${tokenVar}, transparent)`;
+      ? `linear-gradient(to right, ${fadeColor}, transparent)`
+      : `linear-gradient(to bottom, ${fadeColor}, transparent)`;
     const endGrad = isH
-      ? `linear-gradient(to left, ${tokenVar}, transparent)`
-      : `linear-gradient(to top, ${tokenVar}, transparent)`;
+      ? `linear-gradient(to left, ${fadeColor}, transparent)`
+      : `linear-gradient(to top, ${fadeColor}, transparent)`;
 
     const fadeDimStyle: CSSProperties = isH
       ? { width: fadeSize }
