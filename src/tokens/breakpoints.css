@@ -1,0 +1,38 @@
+/*
+ * ── SDS Breakpoints ──
+ * Auto-generated from design tokens — do not edit manually.
+ * Run `npm run tokens` to regenerate.
+ *
+ * Name  | Min      | Max      | Range
+ * ──────┼──────────┼──────────┼─────────────────────────
+ * 2xs   | 320px    | 375px    | Small mobile
+ * xs    | 376px    | 520px    | Mobile
+ * sm    | 521px    | 1024px   | Large mobile – Tablet
+ * md    | 1025px   | 1280px   | Tablet – Small laptop
+ * lg    | 1281px   | 1440px   | Small laptop – Laptop
+ * xl    | 1441px   | 1920px   | Laptop – Desktop
+ * 2xl   | 1921px   | —        | Large desktop +
+ *
+ * Usage in CSS Modules (mobile-first):
+ *   @media (min-width: 521px)  { .el { ... } }   ← sm and up
+ *   @media (min-width: 1025px) { .el { ... } }   ← md and up
+ *   @media (max-width: 1024px) { .el { ... } }   ← below md
+ */
+
+/* ── Resolved Breakpoint Boundaries ── */
+:root {
+  --breakpoint-2xs-min: 320px;
+  --breakpoint-2xs-max: 375px;
+  --breakpoint-xs-min: 376px;
+  --breakpoint-xs-max: 520px;
+  --breakpoint-sm-min: 521px;
+  --breakpoint-sm-max: 1024px;
+  --breakpoint-md-min: 1025px;
+  --breakpoint-md-max: 1280px;
+  --breakpoint-lg-min: 1281px;
+  --breakpoint-lg-max: 1440px;
+  --breakpoint-xl-min: 1441px;
+  --breakpoint-xl-max: 1920px;
+  --breakpoint-2xl-min: 1921px;
+}
+

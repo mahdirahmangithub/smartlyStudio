@@ -100,16 +100,3 @@
   color: var(--text-neutral-disable);
 }
 
-/* ── leading icon color ──────────────────────────────────────────────── */
-
-.content:hover:not(.disabled) .leading {
-  color: var(--text-brand-default);
-}
-
-.content:active:not(.disabled) .leading {
-  color: var(--text-brand-default);
-}
-
-.content:focus-visible .leading {
-  color: var(--text-brand-default);
-}

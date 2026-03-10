@@ -8,6 +8,7 @@ import "./tokens/spacing.css";
 import "./tokens/animation.css";
 import "./tokens/typography.css";
 import "./tokens/shadow.css";
+import "./tokens/breakpoints.css";
 import "./tokens/tokens.css";
 import App from "./App.tsx";
 

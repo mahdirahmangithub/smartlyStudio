@@ -1,0 +1,56 @@
+/* ── Root ── */
+
+.root {
+  display: flex;
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ── Content ── */
+
+.content {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+}
+
+/* ── Panel (shared) ── */
+
+.panel {
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* ── Push Panel ── */
+
+.push {
+  transition: width var(--motion-duration-fast-md) var(--motion-easing-standard);
+}
+
+/* ── Overlay Panel ── */
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: var(--z-index-navigation);
+  transition: transform var(--motion-duration-fast-md) var(--motion-easing-standard);
+}
+
+.overlay.left {
+  left: 0;
+}
+
+.overlay.right {
+  right: 0;
+}
+
+.overlay.left.closed {
+  transform: translateX(-100%);
+}
+
+.overlay.right.closed {
+  transform: translateX(100%);
+}

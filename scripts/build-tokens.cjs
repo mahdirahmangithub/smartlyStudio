@@ -481,3 +481,142 @@ for (const sTheme of SHADOW_THEMES) {
 const shadowCss = shadowVars.join("\n");
 fs.writeFileSync(path.join(OUT_DIR, "shadow.css"), shadowCss);
 console.log(`Generated shadow.css with ${shadowCount} shadow tokens.`);
+
+// --- Build breakpoints.css and breakpoints.ts ---
+
+const deviceSizes = primitives.grid["device-size"];
+const sizeMap = {};
+for (const [name, token] of Object.entries(deviceSizes)) {
+  sizeMap[name] = token.$value;
+}
+
+function resolveBreakpointValue(symbolic) {
+  if (symbolic == null) return undefined;
+  const parts = symbolic.split("+");
+  let value = sizeMap[parts[0]];
+  if (value == null) return undefined;
+  if (parts.length > 1 && parts[1] === "shift") {
+    value += sizeMap.shift;
+  }
+  return value;
+}
+
+const mediaQueryTokens = primitives.grid["media-query"];
+const BP_ORDER = ["2xs", "xs", "sm", "md", "lg", "xl", "2xl"];
+const breakpoints = [];
+
+for (const name of BP_ORDER) {
+  const def = mediaQueryTokens[name];
+  if (!def) continue;
+  const min = resolveBreakpointValue(def.min?.$value);
+  const max = def.max ? resolveBreakpointValue(def.max.$value) : null;
+  const device = def.min?.$description || `${min}px`;
+  breakpoints.push({ name, min, max, device });
+}
+
+// Device label lookup for the reference table
+const deviceLabels = {
+  "2xs": "Small mobile",
+  xs: "Mobile",
+  sm: "Large mobile \u2013 Tablet",
+  md: "Tablet \u2013 Small laptop",
+  lg: "Small laptop \u2013 Laptop",
+  xl: "Laptop \u2013 Desktop",
+  "2xl": "Large desktop +",
+};
+
+// ── breakpoints.css ──
+
+const bpCss = [];
+
+bpCss.push("/*");
+bpCss.push(" * \u2500\u2500 SDS Breakpoints \u2500\u2500");
+bpCss.push(" * Auto-generated from design tokens \u2014 do not edit manually.");
+bpCss.push(" * Run `npm run tokens` to regenerate.");
+bpCss.push(" *");
+bpCss.push(" * Name  | Min      | Max      | Range");
+bpCss.push(" * \u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u253c\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500");
+
+for (const bp of breakpoints) {
+  const n = bp.name.padEnd(5);
+  const mn = `${bp.min}px`.padEnd(8);
+  const mx = bp.max != null ? `${bp.max}px`.padEnd(8) : "\u2014".padEnd(8);
+  bpCss.push(` * ${n} | ${mn} | ${mx} | ${deviceLabels[bp.name] || ""}`);
+}
+
+bpCss.push(" *");
+bpCss.push(" * Usage in CSS Modules (mobile-first):");
+bpCss.push(" *   @media (min-width: 521px)  { .el { ... } }   \u2190 sm and up");
+bpCss.push(" *   @media (min-width: 1025px) { .el { ... } }   \u2190 md and up");
+bpCss.push(" *   @media (max-width: 1024px) { .el { ... } }   \u2190 below md");
+bpCss.push(" */");
+bpCss.push("");
+bpCss.push("/* \u2500\u2500 Resolved Breakpoint Boundaries \u2500\u2500 */");
+bpCss.push(":root {");
+
+for (const bp of breakpoints) {
+  bpCss.push(`  --breakpoint-${bp.name}-min: ${bp.min}px;`);
+  if (bp.max != null) {
+    bpCss.push(`  --breakpoint-${bp.name}-max: ${bp.max}px;`);
+  }
+}
+
+bpCss.push("}");
+bpCss.push("");
+
+fs.writeFileSync(path.join(OUT_DIR, "breakpoints.css"), bpCss.join("\n") + "\n");
+
+const bpVarCount = bpCss.filter((l) => l.trimStart().startsWith("--")).length;
+console.log(`Generated breakpoints.css with ${bpVarCount} custom properties (${breakpoints.length} breakpoints).`);
+
+// ── breakpoints.ts ──
+
+const bpTs = [];
+
+bpTs.push("// Auto-generated from design tokens \u2014 do not edit manually.");
+bpTs.push("// Run `npm run tokens` to regenerate.");
+bpTs.push("");
+bpTs.push("export const BREAKPOINT_ORDER = [" + breakpoints.map((b) => `"${b.name}"`).join(", ") + "] as const;");
+bpTs.push("");
+bpTs.push("export type BreakpointName = (typeof BREAKPOINT_ORDER)[number];");
+bpTs.push("");
+bpTs.push("export interface Breakpoint {");
+bpTs.push("  readonly min: number;");
+bpTs.push("  readonly max: number | null;");
+bpTs.push("}");
+bpTs.push("");
+bpTs.push("export const BREAKPOINTS: Record<BreakpointName, Breakpoint> = {");
+for (const bp of breakpoints) {
+  bpTs.push(`  "${bp.name}": { min: ${bp.min}, max: ${bp.max} },`);
+}
+bpTs.push("};");
+bpTs.push("");
+
+bpTs.push("export interface MediaQueries {");
+bpTs.push("  readonly up: string;");
+bpTs.push("  readonly down: string | null;");
+bpTs.push("  readonly only: string;");
+bpTs.push("}");
+bpTs.push("");
+
+bpTs.push("/** Pre-built media query strings for window.matchMedia() and CSS reference */");
+bpTs.push("export const MEDIA_QUERIES: Record<BreakpointName, MediaQueries> = {");
+for (const bp of breakpoints) {
+  const up = `(min-width: ${bp.min}px)`;
+  const only =
+    bp.max != null
+      ? `(min-width: ${bp.min}px) and (max-width: ${bp.max}px)`
+      : `(min-width: ${bp.min}px)`;
+  const down = bp.max != null ? `(max-width: ${bp.max}px)` : null;
+
+  bpTs.push(`  "${bp.name}": {`);
+  bpTs.push(`    up: "${up}",`);
+  bpTs.push(`    down: ${down ? `"${down}"` : "null"},`);
+  bpTs.push(`    only: "${only}",`);
+  bpTs.push("  },");
+}
+bpTs.push("};");
+bpTs.push("");
+
+fs.writeFileSync(path.join(OUT_DIR, "breakpoints.ts"), bpTs.join("\n") + "\n");
+console.log(`Generated breakpoints.ts with types and ${breakpoints.length} media query definitions.`);

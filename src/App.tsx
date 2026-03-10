@@ -36,6 +36,7 @@ import OptionItemTrailingPlayground from "./pages/OptionItemTrailingPlayground";
 import MultiSelectOptionPlayground from "./pages/MultiSelectOptionPlayground";
 import SingleSelectOptionPlayground from "./pages/SingleSelectOptionPlayground";
 import GenericSelectOptionPlayground from "./pages/GenericSelectOptionPlayground";
+import GridPlayground from "./pages/GridPlayground";
 import NavigationSelectOptionPlayground from "./pages/NavigationSelectOptionPlayground";
 import TagMultiSelectOptionPlayground from "./pages/TagMultiSelectOptionPlayground";
 import TagSingleSelectOptionPlayground from "./pages/TagSingleSelectOptionPlayground";
@@ -70,11 +71,14 @@ import TypographyPlayground from "./pages/TypographyPlayground";
 import ShimmerPlayground from "./pages/ShimmerPlayground";
 import DataCellContentPlayground from "./pages/DataCellContentPlayground";
 import AccordionPlayground from "./pages/AccordionPlayground";
+import NavigationItemPlayground from "./pages/NavigationItemPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
 type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
-| "accordion";
+| "accordion"
+| "grid"
+| "navigation-item";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -255,6 +259,7 @@ export default function App() {
     { key: "file-attachment", label: "FileAttachment" },
     { key: "file-type-thumbnail", label: "FileTypeThumb" },
     { key: "generic-select-option", label: "GenericOpt" },
+    { key: "grid", label: "Grid" },
     { key: "hint", label: "Hint" },
     { key: "icon-badge", label: "IconBadge" },
     { key: "icons", label: "Icons" },
@@ -268,6 +273,7 @@ export default function App() {
     { key: "link", label: "Link" },
     { key: "multi-select-input", label: "MultiSelectInput" },
     { key: "multi-select-option", label: "MultiSelectOpt" },
+    { key: "navigation-item", label: "NavItem" },
     { key: "navigation-select-option", label: "NavOpt" },
     { key: "notification-badge", label: "NotificationBadge" },
     { key: "option-leading", label: "OptionLeading" },
@@ -392,6 +398,8 @@ export default function App() {
             {page === "multi-select-option" && <MultiSelectOptionPlayground />}
             {page === "single-select-option" && <SingleSelectOptionPlayground />}
             {page === "generic-select-option" && <GenericSelectOptionPlayground />}
+            {page === "grid" && <GridPlayground />}
+            {page === "navigation-item" && <NavigationItemPlayground />}
             {page === "navigation-select-option" && <NavigationSelectOptionPlayground />}
             {page === "tag-multi-select-option" && <TagMultiSelectOptionPlayground />}
             {page === "tag-single-select-option" && <TagSingleSelectOptionPlayground />}
