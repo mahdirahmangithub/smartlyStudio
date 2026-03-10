@@ -15,7 +15,8 @@ const cardStyle = {
 export default function ShimmerPlayground() {
   const [loading, setLoading] = useState(true);
   const [inverse, setInverse] = useState(false);
-  const shimmer = useShimmer(loading, inverse);
+  const [pulse, setPulse] = useState(true);
+  const shimmer = useShimmer(loading, inverse, pulse);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 32, maxWidth: 600 }}>
@@ -47,6 +48,15 @@ export default function ShimmerPlayground() {
           />
           <span style={{ fontSize: 14 }}>
             {inverse ? "Inverse" : "Normal"}
+          </span>
+
+          <Toggle
+            checked={pulse}
+            onChange={setPulse}
+            size="sm"
+          />
+          <span style={{ fontSize: 14 }}>
+            Pulse {pulse ? "on" : "off"}
           </span>
         </div>
 

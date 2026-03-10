@@ -12,6 +12,8 @@ import styles from "./Shimmer.module.css";
  * @param inverse – When `true`, inverts the mask gradient so the centre of the
  *                  sweep is the most visible part and the edges fade out.
  *                  Defaults to `false` (centre is the least visible / "glint" style).
+ * @param pulse –   When `false`, disables the opacity pulse animation and keeps
+ *                  only the mask sweep. Defaults to `true`.
  *
  * @returns A class name string (empty when disabled). Append it to the
  *          target element's `className`.
@@ -36,7 +38,24 @@ import styles from "./Shimmer.module.css";
  * For inline elements (`<span>`, `<a>`, etc.) apply `display: inline-block`
  * so the mask renders correctly.
  */
-export function useShimmer(enabled: boolean, inverse?: boolean): string {
+export function useShimmer(
+  enabled: boolean,
+  inverse?: boolean,
+  pulse?: boolean,
+): string {
   if (!enabled) return "";
-  return inverse ? styles.shimmerInverse : styles.shimmer;
+
+  const classes: string[] = [];
+
+  if (inverse) {
+    classes.push(styles.shimmerInverse);
+  } else {
+    classes.push(styles.shimmer);
+  }
+
+  if (pulse === false) {
+    classes.push(styles.noPulse);
+  }
+
+  return classes.join(" ");
 }

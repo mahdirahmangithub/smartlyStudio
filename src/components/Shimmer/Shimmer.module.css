@@ -110,3 +110,12 @@
     shimmerPulseInverse 1800ms ease-in-out infinite,
     shimmerMask 1800ms ease-in-out infinite;
 }
+
+/* ── Disable opacity pulse, keep mask sweep only ── */
+
+.noPulse {
+  animation-name: shimmerMask;
+  animation-duration: 1800ms;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
