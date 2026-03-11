@@ -175,6 +175,7 @@
   flex-shrink: 0;
   height: var(--spacing-lg);
   overflow: visible;
+  --focus-ring: inset 0 0 0 2px var(--element-outline-neutral-default);
 }
 
 .actionContainer.pinned {
