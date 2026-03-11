@@ -50,11 +50,11 @@
   background: var(--element-fill-brand-tertiary-active-hover);
 }
 
-.root:active:not(.disabled) {
+.root:active:not(:has(.actionContainer:active)) {
   background: var(--element-fill-brand-tertiary-press);
 }
 
-.root.checked:active:not(.disabled) {
+.root.checked:active:not(:has(.actionContainer:active)) {
   background: var(--element-fill-brand-tertiary-active-press);
 }
 
@@ -103,7 +103,11 @@
 }
 
 .expandableClip {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
+  min-width: 0;
+  padding-block: calc((var(--spacing-xl) - var(--spacing-lg)) / 2);
+  margin-block: calc((var(--spacing-xl) - var(--spacing-lg)) / -2);
   -webkit-mask-image: linear-gradient(to right, var(--color-black-black) calc(100% - var(--_fade-size)), var(--color-black-opacity-0) 100%);
   mask-image: linear-gradient(to right, var(--color-black-black) calc(100% - var(--_fade-size)), var(--color-black-opacity-0) 100%);
 }
@@ -111,10 +115,11 @@
 .expandableInner {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+    gap: var(--spacing-sm);
   padding-left: var(--spacing-sm-extra);
   min-width: 0;
   width: var(--_content-width, auto);
+  
 }
 
 /* ── Label ── */
@@ -159,6 +164,69 @@
   flex-shrink: 0;
   display: flex;
   color: var(--text-neutral-secondary-default);
+}
+
+/* ── Action container ── */
+
+.actionContainer {
+  position: relative;
+  display: none;
+  align-items: center;
+  flex-shrink: 0;
+  height: var(--spacing-lg);
+  overflow: visible;
+}
+
+.actionContainer.pinned {
+  display: flex;
+}
+
+.root:hover .actionContainer,
+.root:focus-within .actionContainer {
+  display: flex;
+}
+
+.root.iconOnly .actionContainer {
+  display: none;
+}
+
+.actionButton {
+  display: flex;
+  align-items: center;
+  opacity: var(--opacity-0);
+  pointer-events: none;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+ }
+
+.root:hover .actionButton,
+.root:focus-within .actionButton {
+  opacity: var(--opacity-100);
+  pointer-events: auto;
+}
+
+.pinnedIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-xl);
+  height: var(--spacing-xl);
+  color: var(--text-neutral-disable);
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.actionContainer.pinned .actionButton {
+  position: absolute;
+  inset: 0;
+  justify-content: center;
+}
+
+.actionContainer.pinned .pinnedIndicator {
+  opacity: var(--opacity-100);
+}
+
+.root:hover .actionContainer.pinned .pinnedIndicator,
+.root:focus-within .actionContainer.pinned .pinnedIndicator {
+  opacity: var(--opacity-0);
 }
 
 /* ── Badge (inline inside clip, absolute for icon-only corner) ── */

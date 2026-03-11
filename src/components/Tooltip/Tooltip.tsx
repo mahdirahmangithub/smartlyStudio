@@ -490,8 +490,13 @@ export function Tooltip({
         ? new DOMRect(mouseRef.current.x, mouseRef.current.y, 0, 0)
         : ref.getBoundingClientRect();
 
+    if (anchor !== "cursor" && refRect.width === 0 && refRect.height === 0) {
+      setOpen(false);
+      return;
+    }
+
     setPos(calcPos(refRect, fl.offsetWidth, fl.offsetHeight, placement, off));
-  }, [placement, offsetPx, showTail, anchor]);
+  }, [placement, offsetPx, showTail, anchor, setOpen]);
 
   const updatePosRef = useRef(updatePos);
   updatePosRef.current = updatePos;

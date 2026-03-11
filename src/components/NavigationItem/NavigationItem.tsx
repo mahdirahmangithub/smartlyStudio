@@ -5,11 +5,13 @@ import {
   useRef,
   type HTMLAttributes,
   type KeyboardEvent,
+  type MouseEvent,
   type ReactNode,
 } from "react";
 import { Badge } from "../Badge";
 import { Icon } from "../Icon";
 import { IconBadge } from "../IconBadge";
+import { IconButton } from "../IconButton";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./NavigationItem.module.css";
@@ -34,6 +36,14 @@ export interface NavigationItemProps
   locked?: boolean;
   /** Shows the external-link arrow icon */
   externalLink?: boolean;
+  /** Whether the item is pinned */
+  pinned?: boolean;
+  /** Icon name for the action button (e.g. "keep", "more_horiz") */
+  actionIcon?: string;
+  /** Accessible label for the action button */
+  actionLabel?: string;
+  /** Callback when the action button is clicked */
+  onAction?: () => void;
   onClick?: () => void;
 }
 
@@ -47,6 +57,10 @@ export const NavigationItem = forwardRef<HTMLDivElement, NavigationItemProps>(
       badgeCount,
       locked = false,
       externalLink = false,
+      pinned = false,
+      actionIcon,
+      actionLabel = "Action",
+      onAction,
       onClick,
       className,
       ...rest
@@ -96,12 +110,20 @@ export const NavigationItem = forwardRef<HTMLDivElement, NavigationItemProps>(
     }, [iconOnly]);
 
     const hasBadge = badgeCount != null;
+    const hasAction = actionIcon != null;
 
     const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+      if (e.target !== e.currentTarget) return;
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
         onClick?.();
       }
+    };
+
+    const handleAction = (e: MouseEvent<HTMLButtonElement>) => {
+      e.stopPropagation();
+      e.currentTarget.blur();
+      onAction?.();
     };
 
     const badge = hasBadge ? (
@@ -152,6 +174,28 @@ export const NavigationItem = forwardRef<HTMLDivElement, NavigationItemProps>(
                   </span>
                 )}
               </span>
+
+              {(hasAction || pinned) && (
+                <span className={cx(styles.actionContainer, pinned && styles.pinned)}>
+                  {pinned && (
+                    <span className={styles.pinnedIndicator}>
+                      <Icon name="keep_fill" size={16} />
+                    </span>
+                  )}
+                  {hasAction && (
+                    <span className={styles.actionButton}>
+                      <IconButton
+                        size="sm"
+                        variant="neutral"
+                        emphasis="low"
+                        icon={<Icon name={actionIcon} size={16} />}
+                        aria-label={actionLabel}
+                        onClick={handleAction}
+                      />
+                    </span>
+                  )}
+                </span>
+              )}
 
               {badge && (
                 <span className={styles.badgeInline}>{badge}</span>

@@ -24,6 +24,8 @@ function PropsPlayground() {
   const [externalLink, setExternalLink] = useState(false);
   const [badgeEnabled, setBadgeEnabled] = useState(false);
   const [badgeCount, setBadgeCount] = useState("3");
+  const [pinned, setPinned] = useState(false);
+  const [actionEnabled, setActionEnabled] = useState(false);
 
   return (
     <div style={{ display: "flex", gap: 32 }}>
@@ -65,6 +67,14 @@ function PropsPlayground() {
             />
           )}
         </label>
+        <label style={controlRow}>
+          <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
+          pinned
+        </label>
+        <label style={controlRow}>
+          <input type="checkbox" checked={actionEnabled} onChange={(e) => setActionEnabled(e.target.checked)} />
+          action button
+        </label>
       </div>
 
       <div style={{ flex: 1, display: "flex", alignItems: "start" }}>
@@ -77,6 +87,10 @@ function PropsPlayground() {
             locked={locked}
             externalLink={externalLink}
             badgeCount={badgeEnabled ? badgeCount : undefined}
+            pinned={pinned}
+            actionIcon={actionEnabled ? (pinned ? "keep_off" : "keep") : undefined}
+            actionLabel={pinned ? "Unpin" : "Pin"}
+            onAction={() => setPinned((p) => !p)}
           />
         </div>
       </div>
@@ -215,6 +229,46 @@ function IconOnlyBadgeDemo() {
   );
 }
 
+function PinnedActionsDemo() {
+  const [pinnedItems, setPinnedItems] = useState<Set<string>>(new Set(["campaigns", "assets"]));
+
+  const toggle = (id: string) => {
+    setPinnedItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const items = [
+    { id: "home", label: "Home", icon: "home" as const },
+    { id: "campaigns", label: "Campaigns", icon: "rocket" as const },
+    { id: "analytics", label: "Analytics & Reporting Dashboard", icon: "dashboard" as const },
+    { id: "assets", label: "Creative Assets Library", icon: "image" as const },
+    { id: "settings", label: "Settings", icon: "settings" as const },
+  ];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+      {items.map((item) => {
+        const isPinned = pinnedItems.has(item.id);
+        return (
+          <NavigationItem
+            key={item.id}
+            label={item.label}
+            leadingIcon={<Icon name={item.icon} size={20} />}
+            pinned={isPinned}
+            actionIcon={isPinned ? "keep_off" : "keep"}
+            actionLabel={isPinned ? "Unpin" : "Pin"}
+            onAction={() => toggle(item.id)}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 function ExternalLinkDemo() {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
@@ -284,6 +338,16 @@ export default function NavigationItemPlayground() {
         </p>
         <div style={cardStyle}>
           <IconOnlyBadgeDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Pinned & Actions</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Hover to reveal the action button. Pinned items show a keep icon that the button overlays on hover.
+        </p>
+        <div style={cardStyle}>
+          <PinnedActionsDemo />
         </div>
       </section>
 
