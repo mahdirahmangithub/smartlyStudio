@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { Badge } from "../Badge";
-import { Icon } from "../Icon";
+import { Icon, type IconName } from "../Icon";
 import { IconBadge } from "../IconBadge";
 import { IconButton } from "../IconButton";
 import { Tooltip } from "../Tooltip";
@@ -39,7 +39,7 @@ export interface NavigationItemProps
   /** Whether the item is pinned */
   pinned?: boolean;
   /** Icon name for the action button (e.g. "keep", "more_horiz") */
-  actionIcon?: string;
+  actionIcon?: IconName;
   /** Accessible label for the action button */
   actionLabel?: string;
   /** Callback when the action button is clicked */
