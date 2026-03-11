@@ -24,7 +24,7 @@
     background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
     box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing),
     --_fade-size var(--animation-state-expand-duration) ease-in,
-    min-width 0s;
+    min-width 0s linear var(--animation-state-expand-duration);
 }
 
 .root.iconOnly {
