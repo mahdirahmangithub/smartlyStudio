@@ -12,6 +12,8 @@ export interface IconButtonProps
   icon: ReactNode;
   "aria-label": string;
   htmlType?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
+  /** Hide the built-in tooltip */
+  hideTooltip?: boolean;
 }
 
 function cx(...classes: (string | false | undefined | null)[]) {
@@ -28,13 +30,14 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       className,
       disabled,
       htmlType = "button",
+      hideTooltip = false,
       "aria-label": ariaLabel,
       ...rest
     },
     ref
   ) => {
     return (
-      <Tooltip type="inverse" showTail={false} placement="top" label={ariaLabel}>
+      <Tooltip type="inverse" showTail={false} placement="top" label={ariaLabel} disabled={hideTooltip}>
         <button
           ref={ref}
           type={htmlType}

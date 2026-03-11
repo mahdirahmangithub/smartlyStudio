@@ -71,6 +71,7 @@ import TypographyPlayground from "./pages/TypographyPlayground";
 import ShimmerPlayground from "./pages/ShimmerPlayground";
 import DataCellContentPlayground from "./pages/DataCellContentPlayground";
 import AccordionPlayground from "./pages/AccordionPlayground";
+import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import NavigationItemPlayground from "./pages/NavigationItemPlayground";
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
 import "./App.css";
@@ -80,7 +81,8 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "accordion"
 | "grid"
 | "navigation-item"
-| "navigation-sub-item";
+| "navigation-sub-item"
+| "ai-text-generation";
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -238,6 +240,7 @@ export default function App() {
   const pages: { key: Page; label: string }[] = [
     { key: "accordion", label: "Accordion" },
     { key: "add-item-option", label: "AddItemOpt" },
+    { key: "ai-text-generation", label: "AI TextGen" },
     { key: "animated-icons", label: "AnimatedIcons" },
     { key: "avatar", label: "Avatar" },
     { key: "badge", label: "Badge" },
@@ -438,6 +441,7 @@ export default function App() {
             {page === "shimmer" && <ShimmerPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
+            {page === "ai-text-generation" && <AITextGenerationPlayground />}
           </div>
         </main>
       </div>
