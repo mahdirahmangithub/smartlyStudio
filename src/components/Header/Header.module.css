@@ -1,0 +1,138 @@
+/* ── Root ── */
+/* Default density is sm (16px padding) */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  padding-top: var(--spacing-md);
+  padding-inline: var(--spacing-md);
+}
+
+.densityLg {
+  padding-top: var(--spacing-xl);
+  padding-inline: var(--spacing-xl);
+}
+
+/* Bottom padding reserves space for the absolutely-positioned divider */
+
+.hasDivider { padding-bottom: var(--spacing-md); }
+.hasDivider.densityLg { padding-bottom: var(--spacing-xl); }
+
+/* ── Content ── */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.size2xl .content { gap: var(--spacing-sm); }
+.sizeXl .content  { gap: var(--spacing-sm); }
+.sizeLg .content  { gap: var(--spacing-xs); }
+.sizeMd .content  { gap: var(--spacing-2xs); }
+.sizeSm .content  { gap: var(--spacing-xs); }
+
+/* ── Title & actions row ── */
+
+.titleActions {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.size2xl .titleActions { gap: var(--spacing-md); }
+.sizeXl .titleActions,
+.sizeLg .titleActions,
+.sizeMd .titleActions,
+.sizeSm .titleActions { gap: var(--spacing-sm); }
+
+/* ── Thumbnail wrapper ── */
+
+.thumbnail {
+  flex-shrink: 0;
+}
+
+/* ── Slot ── */
+
+.slot {
+  flex-shrink: 0;
+}
+
+/* ── Right group (actions + close, always together on the right) ── */
+
+.rightGroup {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.size2xl .rightGroup { gap: var(--spacing-md); }
+.sizeXl .rightGroup,
+.sizeLg .rightGroup,
+.sizeMd .rightGroup,
+.sizeSm .rightGroup { gap: var(--spacing-sm); }
+
+/* ── Title area ── */
+
+.title {
+  flex: 1 1 0%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: var(--spacing-2xl);
+}
+
+.sizeSm .title { min-height: var(--spacing-xl); }
+
+.sizeLg .title { padding-block: var(--spacing-xs); }
+.sizeMd .title { padding-block: var(--spacing-sm-minus); }
+.sizeSm .title { padding-block: var(--spacing-xs); }
+
+/* ── Description row ── */
+
+.descriptionRow {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.size2xl .descriptionRow { gap: var(--spacing-md); }
+.sizeXl .descriptionRow,
+.sizeLg .descriptionRow,
+.sizeMd .descriptionRow,
+.sizeSm .descriptionRow { gap: var(--spacing-sm); }
+
+/* ── Description indent spacer ── */
+/* Matches the leading element width so the description aligns under the title */
+
+.descriptionSpacer {
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+.size2xl .descriptionSpacer { width: var(--spacing-4xl); }
+.sizeXl .descriptionSpacer,
+.sizeLg .descriptionSpacer,
+.sizeMd .descriptionSpacer,
+.sizeSm .descriptionSpacer { width: var(--spacing-2xl); }
+
+/* ── Description text ── */
+
+.descriptionText {
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+/* ── Divider ── */
+
+.divider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}

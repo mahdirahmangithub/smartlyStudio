@@ -72,7 +72,11 @@ import ShimmerPlayground from "./pages/ShimmerPlayground";
 import DataCellContentPlayground from "./pages/DataCellContentPlayground";
 import AccordionPlayground from "./pages/AccordionPlayground";
 import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
+import HeaderPlayground from "./pages/HeaderPlayground";
+import NavigationCategoryItemPlayground from "./pages/NavigationCategoryItemPlayground";
 import NavigationItemPlayground from "./pages/NavigationItemPlayground";
+import NavigationItemTestPlayground from "./pages/NavigationItemTestPlayground";
+import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlayground";
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
 import "./App.css";
 
@@ -80,9 +84,14 @@ type Theme = "light" | "dark" | "dusk";
 type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
 | "accordion"
 | "grid"
+| "header"
+| "navigation-category-item"
 | "navigation-item"
 | "navigation-sub-item"
-| "ai-text-generation";
+| "navigation-profile-item"
+| "ai-text-generation"
+| "nav-item-test"
+
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
 const CATEGORY_LABELS: Record<IconCategory, string> = {
@@ -238,6 +247,7 @@ export default function App() {
   }, []);
 
   const pages: { key: Page; label: string }[] = [
+    { key: "nav-item-test", label: "NavItem Test" },
     { key: "accordion", label: "Accordion" },
     { key: "add-item-option", label: "AddItemOpt" },
     { key: "ai-text-generation", label: "AI TextGen" },
@@ -265,6 +275,7 @@ export default function App() {
     { key: "file-type-thumbnail", label: "FileTypeThumb" },
     { key: "generic-select-option", label: "GenericOpt" },
     { key: "grid", label: "Grid" },
+    { key: "header", label: "Header" },
     { key: "hint", label: "Hint" },
     { key: "icon-badge", label: "IconBadge" },
     { key: "icons", label: "Icons" },
@@ -278,7 +289,9 @@ export default function App() {
     { key: "link", label: "Link" },
     { key: "multi-select-input", label: "MultiSelectInput" },
     { key: "multi-select-option", label: "MultiSelectOpt" },
+    { key: "navigation-category-item", label: "NavCategoryItem" },
     { key: "navigation-item", label: "NavItem" },
+    { key: "navigation-profile-item", label: "NavProfileItem" },
     { key: "navigation-sub-item", label: "NavSubItem" },
     { key: "navigation-select-option", label: "NavOpt" },
     { key: "notification-badge", label: "NotificationBadge" },
@@ -405,7 +418,10 @@ export default function App() {
             {page === "single-select-option" && <SingleSelectOptionPlayground />}
             {page === "generic-select-option" && <GenericSelectOptionPlayground />}
             {page === "grid" && <GridPlayground />}
+            {page === "header" && <HeaderPlayground />}
+            {page === "navigation-category-item" && <NavigationCategoryItemPlayground />}
             {page === "navigation-item" && <NavigationItemPlayground />}
+            {page === "navigation-profile-item" && <NavigationProfileItemPlayground />}
             {page === "navigation-sub-item" && <NavigationSubItemPlayground />}
             {page === "navigation-select-option" && <NavigationSelectOptionPlayground />}
             {page === "tag-multi-select-option" && <TagMultiSelectOptionPlayground />}
@@ -442,6 +458,7 @@ export default function App() {
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
             {page === "ai-text-generation" && <AITextGenerationPlayground />}
+            {page === "nav-item-test" && <NavigationItemTestPlayground />}
           </div>
         </main>
       </div>

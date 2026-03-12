@@ -7,7 +7,6 @@
 /* ── Root ── */
 
 .root {
-  --_expanded-min: 208px;
   display: flex;
   align-items: center;
   padding: var(--spacing-sm-plus);
@@ -17,19 +16,16 @@
   cursor: pointer;
   border: none;
   text-align: start;
-  width: fit-content;
-  min-width: var(--_expanded-min);
+  width: 100%;
   background: var(--element-fill-brand-tertiary-default);
   --_fade-size: 0px;
   transition:
     background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
     box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing),
-    --_fade-size var(--animation-state-expand-duration) ease-in,
-    min-width 0s linear var(--animation-state-expand-duration);
+    --_fade-size var(--animation-state-expand-duration) ease-in;
 }
 
 .root.iconOnly {
-  min-width: 0;
   --_fade-size: 64px;
   transition:
     background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
@@ -81,26 +77,12 @@
   color: var(--text-neutral-secondary-default);
 }
 
-/* ── Expandable content (grid trick for smooth width animation) ── */
+/* ── Expandable content (parent drives width, content clips naturally) ── */
 
 .expandable {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex: 1 1 0%;
   min-width: 0;
-  flex-grow: 1;
-  flex-shrink: 1;
-  flex-basis: 0%;
-  transition:
-    grid-template-columns var(--animation-state-expand-duration) var(--animation-state-expand-easing),
-    flex-grow 0s;
-}
-
-.iconOnly .expandable {
-  grid-template-columns: 0fr;
-  flex-grow: 0;
-  transition:
-    grid-template-columns var(--animation-state-collapse-duration) var(--animation-state-collapse-easing),
-    flex-grow 0s linear var(--animation-state-collapse-duration);
 }
 
 .expandableClip {
@@ -116,10 +98,10 @@
 .expandableInner {
   display: flex;
   align-items: center;
-    gap: var(--spacing-sm);
+  gap: var(--spacing-sm);
   padding-left: var(--spacing-sm-extra);
-  min-width: 0;
-  width: var(--_content-width, calc(var(--_expanded-min) - var(--spacing-sm-plus) * 2 - 20px));
+  padding-right: var(--spacing-2xs);
+  width: calc(var(--nav-expanded-width, 100%) - var(--spacing-sm-plus) * 2 - 20px);
 }
 
 /* ── Label ── */
@@ -187,9 +169,6 @@
   display: flex;
 }
 
-.root.iconOnly .actionContainer {
-  display: none;
-}
 
 .actionButton {
   display: flex;
@@ -197,7 +176,7 @@
   opacity: var(--opacity-0);
   pointer-events: none;
   transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
- }
+}
 
 .root:hover .actionButton,
 .root:focus-within .actionButton {
