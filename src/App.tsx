@@ -73,6 +73,7 @@ import DataCellContentPlayground from "./pages/DataCellContentPlayground";
 import AccordionPlayground from "./pages/AccordionPlayground";
 import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import HeaderPlayground from "./pages/HeaderPlayground";
+import NavigationBrandItemPlayground from "./pages/NavigationBrandItemPlayground";
 import NavigationCategoryItemPlayground from "./pages/NavigationCategoryItemPlayground";
 import NavigationItemPlayground from "./pages/NavigationItemPlayground";
 import NavigationItemTest2Playground from "./pages/NavigationItemTest2Playground";
@@ -85,6 +86,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "accordion"
 | "grid"
 | "header"
+| "navigation-brand-item"
 | "navigation-category-item"
 | "navigation-item"
 | "navigation-item-test2"
@@ -288,6 +290,7 @@ export default function App() {
     { key: "link", label: "Link" },
     { key: "multi-select-input", label: "MultiSelectInput" },
     { key: "multi-select-option", label: "MultiSelectOpt" },
+    { key: "navigation-brand-item", label: "NavBrandItem" },
     { key: "navigation-category-item", label: "NavCategoryItem" },
     { key: "navigation-item", label: "NavItem" },
     { key: "navigation-item-test2", label: "NavItemTest2" },
@@ -419,6 +422,7 @@ export default function App() {
             {page === "generic-select-option" && <GenericSelectOptionPlayground />}
             {page === "grid" && <GridPlayground />}
             {page === "header" && <HeaderPlayground />}
+            {page === "navigation-brand-item" && <NavigationBrandItemPlayground />}
             {page === "navigation-category-item" && <NavigationCategoryItemPlayground />}
             {page === "navigation-item" && <NavigationItemPlayground />}
             {page === "navigation-item-test2" && <NavigationItemTest2Playground />}
