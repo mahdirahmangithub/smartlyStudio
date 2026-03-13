@@ -75,6 +75,7 @@ import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import HeaderPlayground from "./pages/HeaderPlayground";
 import NavigationCategoryItemPlayground from "./pages/NavigationCategoryItemPlayground";
 import NavigationItemPlayground from "./pages/NavigationItemPlayground";
+import NavigationItemTest2Playground from "./pages/NavigationItemTest2Playground";
 import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlayground";
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
 import "./App.css";
@@ -86,6 +87,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "header"
 | "navigation-category-item"
 | "navigation-item"
+| "navigation-item-test2"
 | "navigation-sub-item"
 | "navigation-profile-item"
 | "ai-text-generation"
@@ -288,6 +290,7 @@ export default function App() {
     { key: "multi-select-option", label: "MultiSelectOpt" },
     { key: "navigation-category-item", label: "NavCategoryItem" },
     { key: "navigation-item", label: "NavItem" },
+    { key: "navigation-item-test2", label: "NavItemTest2" },
     { key: "navigation-profile-item", label: "NavProfileItem" },
     { key: "navigation-sub-item", label: "NavSubItem" },
     { key: "navigation-select-option", label: "NavOpt" },
@@ -418,6 +421,7 @@ export default function App() {
             {page === "header" && <HeaderPlayground />}
             {page === "navigation-category-item" && <NavigationCategoryItemPlayground />}
             {page === "navigation-item" && <NavigationItemPlayground />}
+            {page === "navigation-item-test2" && <NavigationItemTest2Playground />}
             {page === "navigation-profile-item" && <NavigationProfileItemPlayground />}
             {page === "navigation-sub-item" && <NavigationSubItemPlayground />}
             {page === "navigation-select-option" && <NavigationSelectOptionPlayground />}

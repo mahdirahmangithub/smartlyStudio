@@ -1,4 +1,4 @@
-import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { NavigationProfileItem } from "../components/NavigationProfileItem";
 
 const WRAPPER_PADDING = 16;
@@ -182,31 +182,37 @@ function ParentDrivenDemo() {
   const [checked, setChecked] = useState(false);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
-  const [liveWidth, setLiveWidth] = useState(expandedWidth);
+  const isTransitioningRef = useRef(false);
+
+  useLayoutEffect(() => {
+    isTransitioningRef.current = true;
+    const el = wrapperRef.current;
+    if (!el) return;
+    const onEnd = (e: TransitionEvent) => {
+      if (e.propertyName === "width") isTransitioningRef.current = false;
+    };
+    el.addEventListener("transitionend", onEnd);
+    return () => el.removeEventListener("transitionend", onEnd);
+  }, [expanded]);
 
   useEffect(() => {
     const el = wrapperRef.current;
     if (!el || !expanded) return;
-    let latestWidth = expandedWidth;
     const ro = new ResizeObserver(([entry]) => {
-      const w = Math.round(entry.contentBoxSize[0].inlineSize) + WRAPPER_PADDING * 2;
-      latestWidth = w;
-      setLiveWidth(w);
+      if (isTransitioningRef.current) return;
+      const w = Math.round(entry.borderBoxSize[0].inlineSize);
+      setExpandedWidth((prev) => (prev === w ? prev : w));
     });
     ro.observe(el);
-    return () => {
-      ro.disconnect();
-      setExpandedWidth(latestWidth);
-    };
+    return () => ro.disconnect();
   }, [expanded]);
 
   const handleWidthInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = Number(e.target.value);
-    setExpandedWidth(v);
-    setLiveWidth(v);
+    setExpandedWidth(Number(e.target.value));
   }, []);
 
-  const navExpandedWidth = (expanded ? liveWidth : expandedWidth) - WRAPPER_PADDING * 2;
+  const WRAPPER_BORDER = 1;
+  const navExpandedWidth = expandedWidth - WRAPPER_PADDING * 2 - WRAPPER_BORDER * 2;
 
   const wrapperStyle: Record<string, unknown> = {
     "--nav-expanded-width": `${navExpandedWidth}px`,
