@@ -12,6 +12,8 @@ export interface RowContainerProps
   alignment?: RowContainerAlignment;
   density?: RowContainerDensity;
   wrap?: boolean;
+  /** When true, the container and its children stretch to fill the full width */
+  fullWidth?: boolean;
   /** Surface hint forwarded to ScrollFade for fade-overlay colours */
   surface?: ScrollFadeSurface;
   children: ReactNode;
@@ -49,6 +51,7 @@ export const RowContainer = forwardRef<HTMLDivElement, RowContainerProps>(
       alignment = "left",
       density = "none",
       wrap = false,
+      fullWidth = false,
       surface = "auto",
       paddingTop,
       paddingBottom,
@@ -69,6 +72,7 @@ export const RowContainer = forwardRef<HTMLDivElement, RowContainerProps>(
     const itemsClassName = cx(
       styles.items,
       wrap && styles.itemsWrap,
+      fullWidth && styles.fullWidth,
       DENSITY_CLASS[density],
       ALIGN_CLASS[alignment]
     );

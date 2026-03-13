@@ -1,0 +1,63 @@
+/* ── Root ── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  padding-bottom: var(--spacing-md);
+  padding-inline: var(--spacing-md);
+}
+
+.densityLg {
+  padding-bottom: var(--spacing-xl);
+  padding-inline: var(--spacing-xl);
+}
+
+.hasDivider { padding-top: var(--spacing-md); }
+.hasDivider.densityLg { padding-top: var(--spacing-xl); }
+
+/* ── Content row ── */
+
+.content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.contentFullWidth {
+  composes: content;
+  height: var(--spacing-2xl);
+}
+
+/* ── Left group ── */
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+/* ── Right group ── */
+
+.right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1 1 0%;
+  min-width: 0;
+}
+
+/* ── Divider ── */
+
+.divider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}

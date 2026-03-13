@@ -48,6 +48,15 @@
   flex: 1;
 }
 
+.fullWidth {
+  width: 100%;
+}
+
+.fullWidth > * {
+  flex: 1;
+  min-width: 0;
+}
+
 /* ── density (gap) ─────────────────────────────────────────────────────── */
 
 .densityNone { gap: var(--spacing-none); }

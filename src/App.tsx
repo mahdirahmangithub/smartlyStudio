@@ -59,7 +59,9 @@ import MultiSelectInputPlayground from "./pages/MultiSelectInputPlayground";
 import ComboboxPlayground from "./pages/ComboboxPlayground";
 import SliderPlayground from "./pages/SliderPlayground";
 import InlineMessagePlayground from "./pages/InlineMessagePlayground";
+import DrawerPlayground from "./pages/DrawerPlayground";
 import FieldsetPlayground from "./pages/FieldsetPlayground";
+import FooterPlayground from "./pages/FooterPlayground";
 import TitleTextPlayground from "./pages/TitleTextPlayground";
 import BodyTextPlayground from "./pages/BodyTextPlayground";
 import LinkPlayground from "./pages/LinkPlayground";
@@ -86,6 +88,8 @@ type Theme = "light" | "dark" | "dusk";
 type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
 | "accordion"
 | "grid"
+| "drawer"
+| "footer"
 | "global-navigation-bar"
 | "header"
 | "navigation-brand-item"
@@ -270,12 +274,14 @@ export default function App() {
     { key: "data-cell-content", label: "DataCellContent" },
     { key: "data-table", label: "DataTable" },
     { key: "divider", label: "Divider" },
+    { key: "drawer", label: "Drawer" },
     { key: "dropdown", label: "Dropdown" },
     { key: "expandable-badge", label: "ExpandableBadge" },
     { key: "expander", label: "Expander" },
     { key: "fieldset", label: "Fieldset" },
     { key: "file-attachment", label: "FileAttachment" },
     { key: "file-type-thumbnail", label: "FileTypeThumb" },
+    { key: "footer", label: "Footer" },
     { key: "generic-select-option", label: "GenericOpt" },
     { key: "global-navigation-bar", label: "GlobalNavBar" },
     { key: "grid", label: "Grid" },
@@ -423,6 +429,8 @@ export default function App() {
             {page === "multi-select-option" && <MultiSelectOptionPlayground />}
             {page === "single-select-option" && <SingleSelectOptionPlayground />}
             {page === "generic-select-option" && <GenericSelectOptionPlayground />}
+            {page === "drawer" && <DrawerPlayground />}
+            {page === "footer" && <FooterPlayground />}
             {page === "global-navigation-bar" && <GlobalNavigationBarPlayground />}
             {page === "grid" && <GridPlayground />}
             {page === "header" && <HeaderPlayground />}

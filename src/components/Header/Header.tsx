@@ -122,7 +122,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
             )}
 
             <div className={styles.title}>
-              <TitleText size={titleSizeMap[size]} title={title} as="h1" />
+              <TitleText size={titleSizeMap[size]} title={title} as="h2" />
             </div>
 
             {(slot || actions || onClose) && (
