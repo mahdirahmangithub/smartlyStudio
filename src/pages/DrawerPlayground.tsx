@@ -1,5 +1,5 @@
 import { type CSSProperties, useState } from "react";
-import { Drawer, type DrawerDensity, type DrawerMode } from "../components/Drawer";
+import { Drawer, type DrawerDensity } from "../components/Drawer";
 import { Button } from "../components/Button";
 import { BodyText } from "../components/BodyText";
 
