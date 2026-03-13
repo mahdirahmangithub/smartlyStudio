@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import { useRef, useLayoutEffect } from "react";
 
 /**
  * Drives a height + opacity expand/collapse animation on a container element.
@@ -13,14 +13,16 @@ import { useRef, useEffect } from "react";
  */
 export function useCollapsible(expanded: boolean) {
   const ref = useRef<HTMLDivElement>(null);
-  const initialRender = useRef(true);
+  const prevExpandedRef = useRef(expanded);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
 
-    if (initialRender.current) {
-      initialRender.current = false;
+    const prev = prevExpandedRef.current;
+    prevExpandedRef.current = expanded;
+
+    if (prev === expanded) {
       el.style.height = expanded ? "auto" : "0px";
       el.style.opacity = expanded ? "var(--opacity-100)" : "var(--opacity-0)";
       return;

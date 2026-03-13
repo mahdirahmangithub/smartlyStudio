@@ -66,8 +66,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  width: calc(var(--nav-expanded-width, 100%) - var(--spacing-sm-plus) * 2);
-  flex-shrink: 0;
+  width: 100%;
 }
 
 /* ── Leading icon ── */
