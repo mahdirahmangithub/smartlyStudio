@@ -18,7 +18,7 @@ const FRUITS = [
 
 const PAGES = [
   { label: "Dashboard", icon: "dashboard" },
-  { label: "Analytics", icon: "bar_chart" },
+  { label: "Analytics", icon: "stacked_bar_chart" },
   { label: "Settings", icon: "settings" },
   { label: "Profile", icon: "person" },
   { label: "Notifications", icon: "notifications" },

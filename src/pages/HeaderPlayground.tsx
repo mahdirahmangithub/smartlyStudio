@@ -144,7 +144,7 @@ function ThumbnailDemo() {
             <Thumbnail
               size="md"
               type="icon"
-              icon={<Icon name="Campaign" size={24} />}
+              icon={<Icon name="campaign" size={24} />}
             />
           }
           onClose={() => console.log("close")}
