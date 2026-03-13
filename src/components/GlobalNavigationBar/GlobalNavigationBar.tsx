@@ -13,6 +13,7 @@ import { NavigationBrandItem } from "../NavigationBrandItem";
 import { NavigationItem } from "../NavigationItem";
 import { NavigationProfileItem } from "../NavigationProfileItem";
 import { ScrollFade } from "../ScrollFade";
+import { useSmartHover } from "../../hooks/useSmartHover";
 import styles from "./GlobalNavigationBar.module.css";
 
 const NavBarContext = createContext(false);
@@ -58,6 +59,12 @@ export interface GlobalNavigationBarProps
   secondaryLabel?: string;
   /** Callback when secondary profile is clicked */
   onSecondaryProfileClick?: () => void;
+  /** Layer 1 — ms the cursor must dwell before expanding (0 = disabled) */
+  dwellDelay?: number;
+  /** Layer 2 — px/ms velocity threshold; faster crossings are ignored (0 = disabled) */
+  velocityThreshold?: number;
+  /** Layer 3 — ms grace period before collapsing on leave (0 = disabled) */
+  exitGrace?: number;
 }
 
 export const GlobalNavigationBar = forwardRef<HTMLElement, GlobalNavigationBarProps>(
@@ -78,6 +85,9 @@ export const GlobalNavigationBar = forwardRef<HTMLElement, GlobalNavigationBarPr
       secondaryInitials,
       secondaryLabel = "Workspace",
       onSecondaryProfileClick,
+      dwellDelay = 320,
+      velocityThreshold = 0.6,
+      exitGrace = 180,
       className,
       ...rest
     },
@@ -85,8 +95,16 @@ export const GlobalNavigationBar = forwardRef<HTMLElement, GlobalNavigationBarPr
   ) {
     const [expanded, setExpanded] = useState(false);
 
-    const handleMouseEnter = useCallback(() => setExpanded(true), []);
-    const handleMouseLeave = useCallback(() => setExpanded(false), []);
+    const onEnter = useCallback(() => setExpanded(true), []);
+    const onLeave = useCallback(() => setExpanded(false), []);
+
+    const smartHover = useSmartHover({
+      onEnter,
+      onLeave,
+      dwellDelay,
+      velocityThreshold,
+      exitGrace,
+    });
 
     const iconOnly = !expanded;
 
@@ -100,8 +118,9 @@ export const GlobalNavigationBar = forwardRef<HTMLElement, GlobalNavigationBarPr
             expanded && styles.expanded,
             className,
           )}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          onMouseEnter={smartHover.onMouseEnter}
+          onMouseMove={smartHover.onMouseMove}
+          onMouseLeave={smartHover.onMouseLeave}
           {...rest}
         >
           <div className={styles.bar}>

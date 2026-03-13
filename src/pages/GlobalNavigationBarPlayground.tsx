@@ -1,4 +1,4 @@
-import { type CSSProperties, useCallback, useState } from "react";
+import { type CSSProperties, useCallback, useMemo, useState } from "react";
 import { GlobalNavigationBar, useNavBarExpanded } from "../components/GlobalNavigationBar";
 import { Icon } from "../components/Icon";
 import type { IconName } from "../components/Icon";
@@ -165,62 +165,184 @@ const cardStyle: CSSProperties = {
   marginTop: 12,
 };
 
+const DEFAULTS = {
+  dwellDelay: 320,
+  velocityThreshold: 0.6,
+  exitGrace: 180,
+};
+
+const controlRow: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 12,
+  marginBottom: 6,
+};
+
+const labelStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  fontSize: 13,
+  cursor: "pointer",
+  userSelect: "none",
+};
+
+const sliderWrap: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 6,
+  fontSize: 12,
+  opacity: 0.8,
+};
+
 function FullPageDemo() {
+  const [dwellEnabled, setDwellEnabled] = useState(true);
+  const [dwellDelay, setDwellDelay] = useState(DEFAULTS.dwellDelay);
+  const [velocityEnabled, setVelocityEnabled] = useState(true);
+  const [velocityThreshold, setVelocityThreshold] = useState(DEFAULTS.velocityThreshold);
+  const [exitGraceEnabled, setExitGraceEnabled] = useState(true);
+  const [exitGrace, setExitGrace] = useState(DEFAULTS.exitGrace);
+
+  const hoverProps = useMemo(
+    () => ({
+      dwellDelay: dwellEnabled ? dwellDelay : 0,
+      velocityThreshold: velocityEnabled ? velocityThreshold : 0,
+      exitGrace: exitGraceEnabled ? exitGrace : 0,
+    }),
+    [dwellEnabled, dwellDelay, velocityEnabled, velocityThreshold, exitGraceEnabled, exitGrace],
+  );
+
   return (
-    <div
-      style={{
-        position: "relative",
-        height: 840,
-        borderRadius: 12,
-        overflow: "hidden",
-        background: "var(--element-surface-default)",
-      }}
-    >
-      <GlobalNavigationBar
-        brandBadge
-        onBrandClick={() => console.log("Brand clicked")}
-        inboxBadgeCount={2}
-        onSearchClick={() => console.log("Search clicked")}
-        onInboxClick={() => console.log("Inbox clicked")}
-        onHelpClick={() => console.log("Help clicked")}
-        profileAvatarSrc="https://i.pravatar.cc/80?img=12"
-        profileLabel="Mahdi Rahman"
-        onProfileClick={() => console.log("Profile clicked")}
-        secondaryInitials="ES"
-        secondaryLabel="Smartly.io"
-        onSecondaryProfileClick={() => console.log("Secondary profile clicked")}
-        style={{
-          position: "absolute",
-          top: "var(--spacing-md)",
-          left: "var(--spacing-md)",
-          bottom: "var(--spacing-md)",
-        }}
-      >
-        <NavContent />
-      </GlobalNavigationBar>
+    <>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4, marginBottom: 12 }}>
+        <div style={controlRow}>
+          <label style={labelStyle}>
+            <input
+              type="checkbox"
+              checked={dwellEnabled}
+              onChange={(e) => setDwellEnabled(e.target.checked)}
+            />
+            Dwell Delay
+          </label>
+          <div style={{ ...sliderWrap, opacity: dwellEnabled ? 0.8 : 0.3 }}>
+            <input
+              type="range"
+              min={50}
+              max={800}
+              step={10}
+              value={dwellDelay}
+              disabled={!dwellEnabled}
+              onChange={(e) => setDwellDelay(Number(e.target.value))}
+            />
+            <span style={{ minWidth: 48 }}>{dwellDelay}ms</span>
+          </div>
+        </div>
+
+        <div style={controlRow}>
+          <label style={labelStyle}>
+            <input
+              type="checkbox"
+              checked={velocityEnabled}
+              onChange={(e) => setVelocityEnabled(e.target.checked)}
+            />
+            Velocity Gate
+          </label>
+          <div style={{ ...sliderWrap, opacity: velocityEnabled ? 0.8 : 0.3 }}>
+            <input
+              type="range"
+              min={0.1}
+              max={2}
+              step={0.05}
+              value={velocityThreshold}
+              disabled={!velocityEnabled}
+              onChange={(e) => setVelocityThreshold(Number(e.target.value))}
+            />
+            <span style={{ minWidth: 64 }}>{velocityThreshold.toFixed(2)} px/ms</span>
+          </div>
+        </div>
+
+        <div style={controlRow}>
+          <label style={labelStyle}>
+            <input
+              type="checkbox"
+              checked={exitGraceEnabled}
+              onChange={(e) => setExitGraceEnabled(e.target.checked)}
+            />
+            Exit Grace
+          </label>
+          <div style={{ ...sliderWrap, opacity: exitGraceEnabled ? 0.8 : 0.3 }}>
+            <input
+              type="range"
+              min={0}
+              max={400}
+              step={10}
+              value={exitGrace}
+              disabled={!exitGraceEnabled}
+              onChange={(e) => setExitGrace(Number(e.target.value))}
+            />
+            <span style={{ minWidth: 48 }}>{exitGrace}ms</span>
+          </div>
+        </div>
+      </div>
 
       <div
         style={{
-          marginLeft: 80,
-          padding: 24,
-          height: "100%",
-          boxSizing: "border-box",
-          overflow: "auto",
+          position: "relative",
+          height: 840,
+          borderRadius: 12,
+          overflow: "hidden",
+          background: "var(--element-surface-default)",
         }}
       >
-        {Array.from({ length: 8 }, (_, i) => (
-          <div
-            key={i}
-            style={{
-              height: 60,
-              borderRadius: 8,
-              background: "var(--element-fill-neutral-tertiary-default)",
-              marginBottom: 8,
-            }}
-          />
-        ))}
+        <GlobalNavigationBar
+          brandBadge
+          onBrandClick={() => console.log("Brand clicked")}
+          inboxBadgeCount={2}
+          onSearchClick={() => console.log("Search clicked")}
+          onInboxClick={() => console.log("Inbox clicked")}
+          onHelpClick={() => console.log("Help clicked")}
+          profileAvatarSrc="https://i.pravatar.cc/80?img=12"
+          profileLabel="Mahdi Rahman"
+          onProfileClick={() => console.log("Profile clicked")}
+          secondaryInitials="ES"
+          secondaryLabel="Smartly.io"
+          onSecondaryProfileClick={() => console.log("Secondary profile clicked")}
+          dwellDelay={hoverProps.dwellDelay}
+          velocityThreshold={hoverProps.velocityThreshold}
+          exitGrace={hoverProps.exitGrace}
+          style={{
+            position: "absolute",
+            top: "var(--spacing-md)",
+            left: "var(--spacing-md)",
+            bottom: "var(--spacing-md)",
+          }}
+        >
+          <NavContent />
+        </GlobalNavigationBar>
+
+        <div
+          style={{
+            marginLeft: 80,
+            padding: 24,
+            height: "100%",
+            boxSizing: "border-box",
+            overflow: "auto",
+          }}
+        >
+          {Array.from({ length: 8 }, (_, i) => (
+            <div
+              key={i}
+              style={{
+                height: 60,
+                borderRadius: 8,
+                background: "var(--element-fill-neutral-tertiary-default)",
+                marginBottom: 8,
+              }}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -232,8 +354,8 @@ export default function GlobalNavigationBarPlayground() {
       <section style={sectionStyle}>
         <h2>Full Page Layout</h2>
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
-          Fixed nav bar on the left. Hover to expand (320px), mouse-leave to collapse (64px).
-          Content area is offset 80px. The nav overlays content on expand.
+          Toggle smart hover layers below to test different intent-detection combinations.
+          Uncheck all for instant hover (original behaviour).
         </p>
         <div style={cardStyle}>
           <FullPageDemo />
