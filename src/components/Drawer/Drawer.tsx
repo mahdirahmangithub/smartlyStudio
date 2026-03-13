@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useCallback,
   useEffect,
   useId,
   useRef,
@@ -66,6 +67,12 @@ export interface DrawerProps
   width?: number | string;
   /** Show resize handle on the left edge */
   resizable?: boolean;
+  /** Minimum width in px when resizing (default 280) */
+  minWidth?: number;
+  /** Maximum width in px when resizing (default 960) */
+  maxWidth?: number;
+  /** Called with the new width (px) after a resize ends */
+  onWidthChange?: (width: number) => void;
   /** Show a backdrop behind the drawer in overlay mode (default true) */
   backdrop?: boolean;
 }
@@ -91,6 +98,9 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       placement = "viewport",
       width,
       resizable = false,
+      minWidth = 280,
+      maxWidth = 960,
+      onWidthChange,
       backdrop: showBackdrop = true,
       className,
       style,
@@ -102,6 +112,8 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
     const panelRef = useRef<HTMLElement>(null);
     const portalAnchorRef = useRef<HTMLSpanElement>(null);
     const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
+    const [resizedWidth, setResizedWidth] = useState<number | null>(null);
+    const [isResizing, setIsResizing] = useState(false);
 
     const isOverlay = mode === "overlay";
     const isContained = placement === "container";
@@ -150,12 +162,60 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       };
     }, [isOverlay, open, isContained]);
 
+    // Reset resized width when the controlled `width` prop changes
+    useEffect(() => {
+      setResizedWidth(null);
+    }, [width]);
+
+    const rafId = useRef(0);
+
+    const handleResizePointerDown = useCallback(
+      (e: React.PointerEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        const panel = panelRef.current;
+        const handle = e.currentTarget;
+        if (!panel) return;
+
+        const startX = e.clientX;
+        const startWidth = panel.getBoundingClientRect().width;
+
+        setIsResizing(true);
+        handle.setPointerCapture(e.pointerId);
+
+        const onMove = (ev: PointerEvent) => {
+          cancelAnimationFrame(rafId.current);
+          rafId.current = requestAnimationFrame(() => {
+            const delta = startX - ev.clientX;
+            const clamped = Math.min(maxWidth, Math.max(minWidth, startWidth + delta));
+            panel.style.width = `${clamped}px`;
+          });
+        };
+
+        const onUp = () => {
+          cancelAnimationFrame(rafId.current);
+          setIsResizing(false);
+          const finalWidth = panel.getBoundingClientRect().width;
+          setResizedWidth(finalWidth);
+          onWidthChange?.(finalWidth);
+          handle.removeEventListener("pointermove", onMove);
+          handle.removeEventListener("pointerup", onUp);
+          handle.removeEventListener("lostpointercapture", onUp);
+        };
+
+        handle.addEventListener("pointermove", onMove);
+        handle.addEventListener("pointerup", onUp);
+        handle.addEventListener("lostpointercapture", onUp);
+      },
+      [minWidth, maxWidth, onWidthChange],
+    );
+
     const anchor = <span ref={portalAnchorRef} style={{ display: "none" }} />;
 
+    const resolvedWidth = resizedWidth ?? width;
     const panelStyle = {
       ...style,
-      ...(width != null
-        ? { width: typeof width === "number" ? `${width}px` : width }
+      ...(resolvedWidth != null
+        ? { width: typeof resolvedWidth === "number" ? `${resolvedWidth}px` : resolvedWidth }
         : undefined),
     };
 
@@ -182,6 +242,7 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
         className={cx(
           styles.panel,
           open && styles.open,
+          isResizing && styles.resizing,
           isContained && styles.contained,
           mode === "push" && styles.push,
           className,
@@ -189,7 +250,13 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
         style={panelStyle}
         {...rest}
       >
-        {resizable && <div className={styles.resizeHandle} aria-hidden="true" />}
+        {resizable && (
+          <div
+            className={styles.resizeHandle}
+            aria-hidden="true"
+            onPointerDown={handleResizePointerDown}
+          />
+        )}
 
         {hasHeader && (
           <Header

@@ -59,6 +59,14 @@
     visibility 0s 0s;
 }
 
+/* ── Resizing — disable transitions during drag ── */
+
+.panel.resizing {
+  transition: none;
+  will-change: width;
+  user-select: none;
+}
+
 /* ── Contained panel (within a parent container) ── */
 
 .panel.contained {
@@ -127,15 +135,35 @@
 .resizeHandle {
   position: absolute;
   top: 0;
-  left: 0;
+  left: calc((var(--space-sm-plus) / 2) * -1);
   bottom: 0;
-  width: var(--spacing-xs);
-  cursor: col-resize;
+  width: var(--space-sm-plus);
+  cursor: ew-resize;
   z-index: var(--z-index-above);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+ 
+.resizeHandle::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  height: calc(100% - 8px);
+  width: 3px;
+  background-color: var(--element-fill-brand-primary-default);
+  opacity: var(--opacity-0);
+  border-radius: var(--radius-full);
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+  pointer-events: none;
 }
 
-.resizeHandle:hover,
-.resizeHandle:active {
-  background: var(--element-fill-brand-primary-default);
-  opacity: var(--opacity-20);
+.resizeHandle:hover::after,
+.resizeHandle:active::after {
+  opacity: var(--opacity-100);
+}
+
+.resizing .resizeHandle::after {
+  opacity: var(--opacity-100);
 }

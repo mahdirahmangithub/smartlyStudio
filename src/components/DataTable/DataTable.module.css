@@ -262,7 +262,7 @@
   top: 0;
   bottom: 0;
   width: var(--spacing-sm-plus);
-  cursor: col-resize;
+  cursor: ew-resize;
   user-select: none;
   touch-action: none;
   z-index: 1;
