@@ -164,6 +164,7 @@ export function AccordionItem({
         role="region"
         className={styles.content}
         aria-hidden={!expanded}
+        inert={!expanded ? true : undefined}
       >
         <div className={styles.contentInner}>
           {maxContentHeight != null ? (

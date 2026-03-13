@@ -239,6 +239,7 @@ export const NavigationCategoryItem = forwardRef<
           role="region"
           className={styles.contentPanel}
           aria-hidden={!expanded || iconOnly}
+          inert={!expanded || iconOnly ? true : undefined}
         >
           <div className={styles.contentInner}>{children}</div>
         </div>
