@@ -1,0 +1,69 @@
+/* ── Positioning wrapper ── */
+
+.root {
+  position: fixed;
+  top: var(--spacing-md);
+  left: var(--spacing-md);
+  bottom: var(--spacing-md);
+  z-index: var(--z-index-navigation);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Nav bar surface ── */
+
+.bar {
+  display: flex;
+  flex-direction: column;
+  width: var(--spacing-6xl);
+  height: 100%;
+  padding: var(--spacing-sm-extra);
+  background: var(--element-surface-over);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transition: width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing);
+  --nav-expanded-width: 296px;
+}
+
+.root.expanded .bar {
+  width: 320px;
+  transition: width var(--animation-state-expand-duration) var(--animation-state-expand-easing);
+  --nav-expanded-width: 296px;
+}
+
+/* ── Content slot (scrollable middle area) ── */
+
+.content {
+  flex: 1;
+  min-height: 0;
+}
+
+.scrollArea {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+}
+
+/* ── Bottom section ── */
+
+.bottom {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  flex-shrink: 0;
+}
+
+.toolsGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+
+.profileGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
