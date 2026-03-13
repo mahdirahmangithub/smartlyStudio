@@ -95,11 +95,12 @@ export const NavigationSubItem = forwardRef<HTMLDivElement, NavigationSubItemPro
         onKeyDown={handleKeyDown}
         {...rest}
       >
-        {leadingIcon && (
-          <span className={styles.leadingIcon}>{leadingIcon}</span>
-        )}
+        <span className={styles.inner}>
+          {leadingIcon && (
+            <span className={styles.leadingIcon}>{leadingIcon}</span>
+          )}
 
-        <span className={styles.content}>
+          <span className={styles.content}>
           <span className={styles.labelGroup}>
             <Tooltip
               label={label}
@@ -141,23 +142,24 @@ export const NavigationSubItem = forwardRef<HTMLDivElement, NavigationSubItemPro
               )}
             </span>
           )}
+
+          {locked && (
+            <span className={styles.lockBadge}>
+              <IconBadge size="sm" variant="neutral" emphasis="medium" round>
+                <Icon name="lock" size={12} />
+              </IconBadge>
+            </span>
+          )}
+
+          {hasBadge && (
+            <span className={styles.badge}>
+              <Badge size="md" variant="info" emphasis="high">
+                {badgeCount}
+              </Badge>
+            </span>
+          )}
         </span>
-
-        {locked && (
-          <span className={styles.lockBadge}>
-            <IconBadge size="sm" variant="neutral" emphasis="medium" round>
-              <Icon name="lock" size={12} />
-            </IconBadge>
-          </span>
-        )}
-
-        {hasBadge && (
-          <span className={styles.badge}>
-            <Badge size="md" variant="info" emphasis="high">
-              {badgeCount}
-            </Badge>
-          </span>
-        )}
+        </span>
       </div>
     );
   },

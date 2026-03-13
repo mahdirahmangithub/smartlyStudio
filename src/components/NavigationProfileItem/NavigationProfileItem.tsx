@@ -1,8 +1,5 @@
 import {
   forwardRef,
-  useEffect,
-  useLayoutEffect,
-  useRef,
   type HTMLAttributes,
   type KeyboardEvent,
 } from "react";
@@ -55,45 +52,6 @@ export const NavigationProfileItem = forwardRef<
 ) {
   const [labelRef, isLabelTruncated] =
     useIsTruncated<HTMLSpanElement>(iconOnly ? undefined : label);
-  const clipRef = useRef<HTMLSpanElement>(null);
-  const innerRef = useRef<HTMLSpanElement>(null);
-
-  useLayoutEffect(() => {
-    const clip = clipRef.current;
-    const inner = innerRef.current;
-    if (!clip || !inner || iconOnly) return;
-
-    const w = clip.getBoundingClientRect().width;
-    if (w > 0) {
-      inner.style.setProperty("--_content-width", `${w}px`);
-    }
-  }, [iconOnly]);
-
-  useEffect(() => {
-    const clip = clipRef.current;
-    const inner = innerRef.current;
-    if (!clip || !inner || iconOnly) return;
-
-    let locked = true;
-    const grid = clip.parentElement;
-
-    const unlock = () => { locked = false; };
-    grid?.addEventListener("transitionend", unlock, { once: true });
-
-    const ro = new ResizeObserver(() => {
-      if (locked) return;
-      const w = clip.getBoundingClientRect().width;
-      if (w > 0) {
-        inner.style.setProperty("--_content-width", `${w}px`);
-      }
-    });
-    ro.observe(clip);
-
-    return () => {
-      grid?.removeEventListener("transitionend", unlock);
-      ro.disconnect();
-    };
-  }, [iconOnly]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget) return;
@@ -130,8 +88,8 @@ export const NavigationProfileItem = forwardRef<
       </span>
 
       <span className={styles.expandable}>
-        <span ref={clipRef} className={styles.expandableClip}>
-          <span ref={innerRef} className={styles.expandableInner}>
+        <span className={styles.expandableClip}>
+          <span className={styles.expandableInner}>
             <Tooltip
               label={label}
               disabled={!isLabelTruncated || iconOnly}

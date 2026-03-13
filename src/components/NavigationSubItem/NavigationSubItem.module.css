@@ -1,3 +1,9 @@
+@property --_fade-size {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
 /* ── Root ── */
 
 .root {
@@ -10,11 +16,14 @@
   cursor: pointer;
   border: none;
   text-align: start;
-  gap: var(--spacing-sm);
+  width: 100%;
   background: var(--element-fill-brand-tertiary-default);
+  -webkit-mask-image: linear-gradient(to right, var(--color-black-black) calc(100% - var(--_fade-size)), var(--color-black-opacity-0) 100%);
+  mask-image: linear-gradient(to right, var(--color-black-black) calc(100% - var(--_fade-size)), var(--color-black-opacity-0) 100%);
   transition:
     background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
-    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing);
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing),
+    --_fade-size var(--animation-state-expand-duration) var(--animation-state-expand-easing);
 }
 
 .root.checked {
@@ -49,6 +58,16 @@
 
 .root.checked:focus-visible {
   background: var(--element-fill-brand-tertiary-active-hover);
+}
+
+/* ── Inner (fixed-width row so content doesn't shrink during fade) ── */
+
+.inner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: calc(var(--nav-expanded-width, 100%) - var(--spacing-sm-plus) * 2);
+  flex-shrink: 0;
 }
 
 /* ── Leading icon ── */

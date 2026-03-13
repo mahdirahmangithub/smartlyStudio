@@ -1,6 +1,11 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { NavigationCategoryItem } from "../components/NavigationCategoryItem";
+import { NavigationSubItem } from "../components/NavigationSubItem";
 import { Icon } from "../components/Icon";
+
+const WRAPPER_PADDING = 16;
+const COLLAPSED_WIDTH = 72;
+const EXPANDED_WIDTH = 296;
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
 const cardStyle: CSSProperties = {
@@ -59,16 +64,28 @@ function PropsPlayground() {
       </div>
 
       <div style={{ flex: 1, display: "flex", alignItems: "start" }}>
-        <NavigationCategoryItem
-          label={label}
-          leadingIcon={<Icon name="favorite_fill" size={20} />}
-          iconOnly={iconOnly}
-          checked={checked}
-          expanded={expanded}
-          badgeCount={badge ? 2 : undefined}
-          locked={locked}
-          onClick={() => setExpanded((e) => !e)}
-        />
+        <div style={{
+          "--nav-expanded-width": `${EXPANDED_WIDTH}px`,
+          width: iconOnly ? 40 : EXPANDED_WIDTH,
+          transition: iconOnly
+            ? "width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)"
+            : "width var(--animation-state-expand-duration) var(--animation-state-expand-easing)",
+        } as React.CSSProperties}>
+          <NavigationCategoryItem
+            label={label}
+            leadingIcon={<Icon name="favorite_fill" size={20} />}
+            iconOnly={iconOnly}
+            checked={checked}
+            expanded={expanded}
+            badgeCount={badge ? 2 : undefined}
+            locked={locked}
+            onClick={() => setExpanded((e) => !e)}
+          >
+            <NavigationSubItem label="Overview" checked />
+            <NavigationSubItem label="Recent Activity" />
+            <NavigationSubItem label="Shared With Me" badgeCount="New" />
+          </NavigationCategoryItem>
+        </div>
       </div>
     </div>
   );
@@ -86,7 +103,7 @@ function BasicDemo() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 296 }}>
+    <div style={{ "--nav-expanded-width": `${EXPANDED_WIDTH}px`, display: "flex", flexDirection: "column", gap: 8, maxWidth: EXPANDED_WIDTH } as React.CSSProperties}>
       {items.map((item, i) => (
         <NavigationCategoryItem
           key={i}
@@ -96,7 +113,11 @@ function BasicDemo() {
           badgeCount={item.badge}
           locked={item.locked}
           onClick={() => toggle(i)}
-        />
+        >
+          <NavigationSubItem label="Sub Item 1" />
+          <NavigationSubItem label="Sub Item 2" checked />
+          <NavigationSubItem label="Sub Item 3" />
+        </NavigationCategoryItem>
       ))}
     </div>
   );
@@ -111,7 +132,16 @@ function IconOnlyDemo() {
         <input type="checkbox" checked={iconOnly} onChange={(e) => setIconOnly(e.target.checked)} />
         iconOnly
       </label>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, width: iconOnly ? "fit-content" : 296 }}>
+      <div style={{
+        "--nav-expanded-width": `${EXPANDED_WIDTH}px`,
+        display: "flex",
+        flexDirection: "column",
+        gap: 8,
+        width: iconOnly ? 40 : EXPANDED_WIDTH,
+        transition: iconOnly
+          ? "width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)"
+          : "width var(--animation-state-expand-duration) var(--animation-state-expand-easing)",
+      } as React.CSSProperties}>
         <NavigationCategoryItem
           label="Favorites"
           leadingIcon={<Icon name="favorite_fill" size={20} />}
@@ -144,7 +174,7 @@ function CheckedDemo() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8, maxWidth: 296 }}>
+    <div style={{ "--nav-expanded-width": `${EXPANDED_WIDTH}px`, display: "flex", flexDirection: "column", gap: 8, maxWidth: EXPANDED_WIDTH } as React.CSSProperties}>
       {items.map((item, i) => (
         <NavigationCategoryItem
           key={i}
@@ -158,10 +188,103 @@ function CheckedDemo() {
   );
 }
 
+function ParentDrivenDemo() {
+  const [expanded, setExpanded] = useState(false);
+  const [expandedWidth, setExpandedWidth] = useState(320);
+  const [accordionOpen, setAccordionOpen] = useState(false);
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [liveWidth, setLiveWidth] = useState(expandedWidth);
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el || !expanded) return;
+    let latestWidth = expandedWidth;
+    const ro = new ResizeObserver(([entry]) => {
+      const w = Math.round(entry.contentBoxSize[0].inlineSize) + WRAPPER_PADDING * 2;
+      latestWidth = w;
+      setLiveWidth(w);
+    });
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      setExpandedWidth(latestWidth);
+    };
+  }, [expanded]);
+
+  const handleWidthInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = Number(e.target.value);
+    setExpandedWidth(v);
+    setLiveWidth(v);
+  }, []);
+
+  const navExpandedWidth = (expanded ? liveWidth : expandedWidth) - WRAPPER_PADDING * 2;
+
+  const wrapperStyle: Record<string, unknown> = {
+    "--nav-expanded-width": `${navExpandedWidth}px`,
+    width: expanded ? expandedWidth : COLLAPSED_WIDTH,
+    padding: WRAPPER_PADDING,
+    borderRadius: 12,
+    background: "var(--element-surface-base)",
+    border: "1px solid var(--element-outline-neutral-default)",
+    overflow: "hidden",
+    transition: expanded
+      ? "width var(--animation-state-expand-duration) var(--animation-state-expand-easing)"
+      : "width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)",
+    resize: expanded ? "horizontal" : "none",
+    minWidth: expanded ? COLLAPSED_WIDTH : undefined,
+    maxWidth: expanded ? 600 : undefined,
+  };
+
+  return (
+    <>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 16 }}>
+        <button onClick={() => setExpanded((v) => !v)}>
+          {expanded ? "Collapse" : "Expand"}
+        </button>
+        <label style={controlRow}>
+          Width:
+          <input
+            type="number"
+            value={expandedWidth}
+            onChange={handleWidthInput}
+            style={{ width: 60 }}
+          />
+        </label>
+      </div>
+
+      <div ref={wrapperRef} style={wrapperStyle}>
+        <NavigationCategoryItem
+          label="Favorites"
+          leadingIcon={<Icon name="favorite_fill" size={20} />}
+          iconOnly={!expanded}
+          expanded={accordionOpen}
+          badgeCount={3}
+          onClick={() => setAccordionOpen((v) => !v)}
+        >
+          <NavigationSubItem label="All Favorites" checked />
+          <NavigationSubItem label="Recent" />
+          <NavigationSubItem label="Shared" badgeCount="New" />
+        </NavigationCategoryItem>
+      </div>
+    </>
+  );
+}
+
 export default function NavigationCategoryItemPlayground() {
   return (
     <>
       <h1>NavigationCategoryItem</h1>
+
+      <section style={sectionStyle}>
+        <h2>Parent-Driven Expansion</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Parent wrapper drives the width transition. Resizable from the right edge when expanded. Badge animates between positions via FLIP.
+        </p>
+        <div style={cardStyle}>
+          <ParentDrivenDemo />
+        </div>
+      </section>
 
       <section style={sectionStyle}>
         <h2>Props Playground</h2>

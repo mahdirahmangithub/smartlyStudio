@@ -1,6 +1,10 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { NavigationItem } from "../components/NavigationItem";
 import { Icon } from "../components/Icon";
+
+const WRAPPER_PADDING = 16;
+const COLLAPSED_WIDTH = 72;
+const EXPANDED_WIDTH = 296;
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
 const cardStyle: CSSProperties = {
@@ -78,7 +82,13 @@ function PropsPlayground() {
       </div>
 
       <div style={{ flex: 1, display: "flex", alignItems: "start" }}>
-        <div style={{ width: iconOnly ? "auto" : 296, transition: "width 300ms ease" }}>
+        <div style={{
+          "--nav-expanded-width": `${EXPANDED_WIDTH}px`,
+          width: iconOnly ? 40 : EXPANDED_WIDTH,
+          transition: iconOnly
+            ? "width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)"
+            : "width var(--animation-state-expand-duration) var(--animation-state-expand-easing)",
+        } as React.CSSProperties}>
           <NavigationItem
             label={label}
             leadingIcon={<Icon name="dashboard" size={20} />}
@@ -110,7 +120,7 @@ function BasicDemo() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+    <div style={{ "--nav-expanded-width": `${EXPANDED_WIDTH}px`, display: "flex", flexDirection: "column", gap: 4, maxWidth: EXPANDED_WIDTH } as React.CSSProperties}>
       {items.map((item) => (
         <NavigationItem
           key={item.id}
@@ -145,7 +155,16 @@ function IconOnlyToggleDemo() {
         />
         Icon-only mode
       </label>
-      <div style={{ display: "flex", flexDirection: "column", gap: 4, width: iconOnly ? "auto" : 296, transition: "width 300ms ease" }}>
+      <div style={{
+        "--nav-expanded-width": `${EXPANDED_WIDTH}px`,
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+        width: iconOnly ? 40 : EXPANDED_WIDTH,
+        transition: iconOnly
+          ? "width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)"
+          : "width var(--animation-state-expand-duration) var(--animation-state-expand-easing)",
+      } as React.CSSProperties}>
         {items.map((item) => (
           <NavigationItem
             key={item.id}
@@ -165,7 +184,7 @@ function BadgeLockDemo() {
   const [checked, setChecked] = useState<string | null>(null);
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+    <div style={{ "--nav-expanded-width": `${EXPANDED_WIDTH}px`, display: "flex", flexDirection: "column", gap: 4, maxWidth: EXPANDED_WIDTH } as React.CSSProperties}>
       <NavigationItem
         label="Inbox"
         leadingIcon={<Icon name="inbox" size={20} />}
@@ -205,7 +224,16 @@ function IconOnlyBadgeDemo() {
         />
         Icon-only mode
       </label>
-      <div style={{ display: "flex", flexDirection: "column", gap: 4, width: iconOnly ? "auto" : 296, transition: "width 300ms ease" }}>
+      <div style={{
+        "--nav-expanded-width": `${EXPANDED_WIDTH}px`,
+        display: "flex",
+        flexDirection: "column",
+        gap: 4,
+        width: iconOnly ? 40 : EXPANDED_WIDTH,
+        transition: iconOnly
+          ? "width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)"
+          : "width var(--animation-state-expand-duration) var(--animation-state-expand-easing)",
+      } as React.CSSProperties}>
         <NavigationItem
           label="Inbox"
           leadingIcon={<Icon name="inbox" size={20} />}
@@ -250,7 +278,7 @@ function PinnedActionsDemo() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+    <div style={{ "--nav-expanded-width": `${EXPANDED_WIDTH}px`, display: "flex", flexDirection: "column", gap: 4, maxWidth: EXPANDED_WIDTH } as React.CSSProperties}>
       {items.map((item) => {
         const isPinned = pinnedItems.has(item.id);
         return (
@@ -271,7 +299,7 @@ function PinnedActionsDemo() {
 
 function ExternalLinkDemo() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+    <div style={{ "--nav-expanded-width": `${EXPANDED_WIDTH}px`, display: "flex", flexDirection: "column", gap: 4, maxWidth: EXPANDED_WIDTH } as React.CSSProperties}>
       <NavigationItem
         label="Documentation"
         leadingIcon={<Icon name="description" size={20} />}
@@ -286,10 +314,120 @@ function ExternalLinkDemo() {
   );
 }
 
+function ParentDrivenDemo() {
+  const [expanded, setExpanded] = useState(false);
+  const [expandedWidth, setExpandedWidth] = useState(320);
+  const [checked, setChecked] = useState(false);
+  const [badgeCount, setBadgeCount] = useState("3");
+  const [pinned, setPinned] = useState(false);
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [liveWidth, setLiveWidth] = useState(expandedWidth);
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el || !expanded) return;
+    let latestWidth = expandedWidth;
+    const ro = new ResizeObserver(([entry]) => {
+      const w = Math.round(entry.contentBoxSize[0].inlineSize) + WRAPPER_PADDING * 2;
+      latestWidth = w;
+      setLiveWidth(w);
+    });
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      setExpandedWidth(latestWidth);
+    };
+  }, [expanded]);
+
+  const handleWidthInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = Number(e.target.value);
+    setExpandedWidth(v);
+    setLiveWidth(v);
+  }, []);
+
+  const parsedBadge =
+    badgeCount === ""
+      ? undefined
+      : isNaN(Number(badgeCount))
+        ? badgeCount
+        : Number(badgeCount);
+
+  const navExpandedWidth = (expanded ? liveWidth : expandedWidth) - WRAPPER_PADDING * 2;
+
+  const wrapperStyle: Record<string, unknown> = {
+    "--nav-expanded-width": `${navExpandedWidth}px`,
+    width: expanded ? expandedWidth : COLLAPSED_WIDTH,
+    padding: WRAPPER_PADDING,
+    borderRadius: 12,
+    background: "var(--element-surface-base)",
+    border: "1px solid var(--element-outline-neutral-default)",
+    overflow: "hidden",
+    transition: expanded
+      ? "width var(--animation-state-expand-duration) var(--animation-state-expand-easing)"
+      : "width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)",
+    resize: expanded ? "horizontal" : "none",
+    minWidth: expanded ? COLLAPSED_WIDTH : undefined,
+    maxWidth: expanded ? 600 : undefined,
+  };
+
+  return (
+    <>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 16 }}>
+        <button onClick={() => setExpanded((v) => !v)}>
+          {expanded ? "Collapse" : "Expand"}
+        </button>
+        <label style={controlRow}>
+          Width:
+          <input
+            type="number"
+            value={expandedWidth}
+            onChange={handleWidthInput}
+            style={{ width: 60 }}
+          />
+        </label>
+        <label style={controlRow}>
+          Badge:
+          <input value={badgeCount} onChange={(e) => setBadgeCount(e.target.value)} style={{ width: 50 }} />
+        </label>
+        <label style={controlRow}>
+          <input type="checkbox" checked={pinned} onChange={(e) => setPinned(e.target.checked)} />
+          Pinned
+        </label>
+      </div>
+
+      <div ref={wrapperRef} style={wrapperStyle}>
+        <NavigationItem
+          label="Home"
+          leadingIcon={<Icon name="home" size={20} />}
+          iconOnly={!expanded}
+          checked={checked}
+          badgeCount={parsedBadge}
+          pinned={pinned}
+          actionIcon={pinned ? "keep_off" : "keep"}
+          actionLabel={pinned ? "Unpin" : "Pin"}
+          onAction={() => setPinned((v) => !v)}
+          onClick={() => setChecked((v) => !v)}
+        />
+      </div>
+    </>
+  );
+}
+
 export default function NavigationItemPlayground() {
   return (
     <>
       <h1>NavigationItem</h1>
+
+      <section style={sectionStyle}>
+        <h2>Parent-Driven Expansion</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Parent wrapper drives the width transition. Resizable from the right edge when expanded. Badge animates between positions via FLIP.
+        </p>
+        <div style={cardStyle}>
+          <ParentDrivenDemo />
+        </div>
+      </section>
 
       <section style={sectionStyle}>
         <h2>Props Playground</h2>

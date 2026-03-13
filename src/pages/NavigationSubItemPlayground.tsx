@@ -1,6 +1,10 @@
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 import { NavigationSubItem } from "../components/NavigationSubItem";
 import { Icon } from "../components/Icon";
+
+const WRAPPER_PADDING = 16;
+const COLLAPSED_WIDTH = 72;
+const EXPANDED_WIDTH = 296;
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
 const cardStyle: CSSProperties = {
@@ -78,7 +82,10 @@ function PropsPlayground() {
       </div>
 
       <div style={{ flex: 1, display: "flex", alignItems: "start" }}>
-        <div style={{ width: 296 }}>
+        <div style={{
+          "--nav-expanded-width": `${EXPANDED_WIDTH}px`,
+          width: EXPANDED_WIDTH,
+        } as React.CSSProperties}>
           <NavigationSubItem
             label={label}
             leadingIcon={hasLeadingIcon ? <Icon name="favorite_fill" size={20} /> : undefined}
@@ -99,7 +106,7 @@ function PropsPlayground() {
 
 function BasicDemo() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296, "--nav-expanded-width": `${EXPANDED_WIDTH}px` } as React.CSSProperties}>
       <NavigationSubItem
         label="Home"
         leadingIcon={<Icon name="home" size={20} />}
@@ -123,7 +130,7 @@ function BasicDemo() {
 
 function NoIconDemo() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296, "--nav-expanded-width": `${EXPANDED_WIDTH}px` } as React.CSSProperties}>
       <NavigationSubItem label="Overview" />
       <NavigationSubItem label="Campaign Performance" checked />
       <NavigationSubItem label="Audience Insights & Segmentation" />
@@ -134,7 +141,7 @@ function NoIconDemo() {
 
 function BadgeLockDemo() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296, "--nav-expanded-width": `${EXPANDED_WIDTH}px` } as React.CSSProperties}>
       <NavigationSubItem
         label="Notifications"
         leadingIcon={<Icon name="notifications" size={20} />}
@@ -176,7 +183,7 @@ function PinnedActionsDemo() {
   ];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296, "--nav-expanded-width": `${EXPANDED_WIDTH}px` } as React.CSSProperties}>
       {items.map((item) => {
         const isPinned = pinnedItems.has(item.id);
         return (
@@ -197,7 +204,7 @@ function PinnedActionsDemo() {
 
 function ExternalLinkDemo() {
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 4, maxWidth: 296, "--nav-expanded-width": `${EXPANDED_WIDTH}px` } as React.CSSProperties}>
       <NavigationSubItem
         label="Documentation"
         leadingIcon={<Icon name="description" size={20} />}
@@ -208,6 +215,110 @@ function ExternalLinkDemo() {
         externalLink
       />
     </div>
+  );
+}
+
+function ParentDrivenDemo() {
+  const [expanded, setExpanded] = useState(true);
+  const [expandedWidth, setExpandedWidth] = useState(320);
+
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [liveWidth, setLiveWidth] = useState(expandedWidth);
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el || !expanded) return;
+    let latestWidth = expandedWidth;
+    const ro = new ResizeObserver(([entry]) => {
+      const w = Math.round(entry.contentBoxSize[0].inlineSize) + WRAPPER_PADDING * 2;
+      latestWidth = w;
+      setLiveWidth(w);
+    });
+    ro.observe(el);
+    return () => {
+      ro.disconnect();
+      setExpandedWidth(latestWidth);
+    };
+  }, [expanded]);
+
+  const handleWidthInput = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = Number(e.target.value);
+    setExpandedWidth(v);
+    setLiveWidth(v);
+  }, []);
+
+  const navExpandedWidth = (expanded ? liveWidth : expandedWidth) - WRAPPER_PADDING * 2;
+
+  const wrapperStyle: Record<string, unknown> = {
+    "--nav-expanded-width": `${navExpandedWidth}px`,
+    "--_fade-size": expanded ? "0px" : "64px",
+    width: expanded ? expandedWidth : COLLAPSED_WIDTH,
+    padding: WRAPPER_PADDING,
+    borderRadius: 12,
+    background: "var(--element-surface-base)",
+    border: "1px solid var(--element-outline-neutral-default)",
+    overflow: "hidden",
+    transition: expanded
+      ? "width var(--animation-state-expand-duration) var(--animation-state-expand-easing)"
+      : "width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)",
+    resize: expanded ? "horizontal" : "none",
+    minWidth: expanded ? COLLAPSED_WIDTH : undefined,
+    maxWidth: expanded ? 600 : undefined,
+  };
+
+  const itemsStyle: Record<string, unknown> = {
+    display: "flex",
+    flexDirection: "column",
+    gap: 4,
+    overflow: "hidden",
+    opacity: expanded ? 1 : 0,
+    maxHeight: expanded ? 999 : 0,
+    transition: expanded
+      ? "opacity var(--animation-state-expand-duration) var(--animation-state-expand-easing), max-height var(--animation-state-expand-duration) var(--animation-state-expand-easing)"
+      : "opacity var(--animation-state-collapse-duration) var(--animation-state-collapse-easing), max-height var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)",
+  };
+
+  return (
+    <>
+      <div style={{ display: "flex", gap: 12, flexWrap: "wrap", alignItems: "center", marginBottom: 16 }}>
+        <button onClick={() => setExpanded((v) => !v)}>
+          {expanded ? "Collapse" : "Expand"}
+        </button>
+        <label style={controlRow}>
+          Width:
+          <input
+            type="number"
+            value={expandedWidth}
+            onChange={handleWidthInput}
+            style={{ width: 60 }}
+          />
+        </label>
+      </div>
+
+      <div ref={wrapperRef} style={wrapperStyle}>
+        <div style={itemsStyle}>
+          <NavigationSubItem
+            label="Home"
+            leadingIcon={<Icon name="home" size={20} />}
+            checked
+          />
+          <NavigationSubItem
+            label="Campaigns"
+            leadingIcon={<Icon name="rocket" size={20} />}
+            badgeCount={3}
+          />
+          <NavigationSubItem
+            label="Analytics & Reporting Dashboard"
+            leadingIcon={<Icon name="dashboard" size={20} />}
+            locked
+          />
+          <NavigationSubItem
+            label="Settings"
+            leadingIcon={<Icon name="settings" size={20} />}
+          />
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -273,6 +384,17 @@ export default function NavigationSubItemPlayground() {
         </p>
         <div style={cardStyle}>
           <ExternalLinkDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Parent-Driven Collapse</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Parent controls width and fade. Sub-items inherit <code>--_fade-size</code> and fade
+          uniformly (icon + content) on collapse. Resize when expanded.
+        </p>
+        <div style={cardStyle}>
+          <ParentDrivenDemo />
         </div>
       </section>
     </>

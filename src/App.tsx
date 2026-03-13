@@ -75,7 +75,6 @@ import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import HeaderPlayground from "./pages/HeaderPlayground";
 import NavigationCategoryItemPlayground from "./pages/NavigationCategoryItemPlayground";
 import NavigationItemPlayground from "./pages/NavigationItemPlayground";
-import NavigationItemTestPlayground from "./pages/NavigationItemTestPlayground";
 import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlayground";
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
 import "./App.css";
@@ -90,7 +89,6 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navigation-sub-item"
 | "navigation-profile-item"
 | "ai-text-generation"
-| "nav-item-test"
 
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
@@ -247,7 +245,6 @@ export default function App() {
   }, []);
 
   const pages: { key: Page; label: string }[] = [
-    { key: "nav-item-test", label: "NavItem Test" },
     { key: "accordion", label: "Accordion" },
     { key: "add-item-option", label: "AddItemOpt" },
     { key: "ai-text-generation", label: "AI TextGen" },
@@ -458,7 +455,6 @@ export default function App() {
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
             {page === "ai-text-generation" && <AITextGenerationPlayground />}
-            {page === "nav-item-test" && <NavigationItemTestPlayground />}
           </div>
         </main>
       </div>
