@@ -11,7 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { Divider } from "../Divider";
-import { Icon } from "../Icon";
+import { Icon, type IconName } from "../Icon";
 import { IconButton } from "../IconButton";
 import { TitleText } from "../TitleText";
 import styles from "./Sidebar.module.css";
@@ -379,7 +379,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
                       variant="neutral"
                       emphasis="low"
                       hideTooltip
-                      icon={<Icon name={triggerIcon as "dock_collapsed"} size={20} />}
+                      icon={<Icon name={triggerIcon as IconName} size={20} />}
                       aria-label={
                         collapsible
                           ? expanded

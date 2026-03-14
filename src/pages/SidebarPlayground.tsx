@@ -194,7 +194,7 @@ function PersistentCollapsedOnlyDemo() {
           <SidebarNavContent />
         </Sidebar>
         <AppShell.Content>
-          <PageContent label="Page content area" />
+          <PageContent />
         </AppShell.Content>
       </AppShell>
     </div>

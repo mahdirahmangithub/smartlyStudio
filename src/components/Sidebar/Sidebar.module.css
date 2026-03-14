@@ -137,7 +137,7 @@
 .resizeHandle {
   position: absolute;
   top: 0;
-  right: calc((var(--space-sm-plus) / 2) * -1);
+  right: calc(((var(--space-sm-plus) / 2) - var(--space-hair-line)) * -1);
   bottom: 0;
   width: var(--space-sm-plus);
   cursor: ew-resize;
