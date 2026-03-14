@@ -11,6 +11,7 @@ import {
 import { createPortal } from "react-dom";
 import { Header } from "../Header";
 import { Footer } from "../Footer";
+import { Dimmer } from "../Dimmer";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import styles from "./Drawer.module.css";
 
@@ -403,33 +404,23 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
 
     if (isOverlay) {
       if (isContained) {
-        const containedBackdrop = showBackdrop ? (
-          <div
-            className={styles.containedBackdrop}
-            data-open={open ? "" : undefined}
-            onClick={onClose}
-            aria-hidden="true"
-          />
-        ) : null;
-
         return (
           <>
-            {containedBackdrop}
+            {showBackdrop && (
+              <Dimmer
+                open={open}
+                position="absolute"
+                enterDuration="var(--animation-drawer-enter-duration)"
+                enterEasing="var(--animation-drawer-enter-easing)"
+                exitDuration="var(--animation-drawer-exit-duration)"
+                exitEasing="var(--animation-drawer-exit-easing)"
+                onClick={onClose}
+              />
+            )}
             <div className={styles.containedSlot}>{panel}</div>
           </>
         );
       }
-
-      const backdrop = showBackdrop ? (
-        <div
-          className={cx(
-            styles.backdrop,
-            isActive && styles.active,
-          )}
-          onClick={onClose}
-          aria-hidden="true"
-        />
-      ) : null;
 
       return (
         <>
@@ -437,7 +428,17 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
           {portalTarget &&
             createPortal(
               <>
-                {backdrop}
+                {showBackdrop && (
+                  <Dimmer
+                    open={isActive}
+                    position="fixed"
+                    enterDuration="var(--animation-drawer-enter-duration)"
+                    enterEasing="var(--animation-drawer-enter-easing)"
+                    exitDuration="var(--animation-drawer-exit-duration)"
+                    exitEasing="var(--animation-drawer-exit-easing)"
+                    onClick={onClose}
+                  />
+                )}
                 {panel}
               </>,
               portalTarget,
