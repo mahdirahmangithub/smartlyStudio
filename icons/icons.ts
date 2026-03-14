@@ -18336,6 +18336,23 @@ meta threads, meta-threads",
 </svg>
 `,
   },
+  "dock_collapsed": {
+    description: "sidebar_collapsed",
+    category: "custom",
+    svg: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M7 7C7.55228 7 8 7.44772 8 8V16C8 16.5523 7.55228 17 7 17C6.44772 17 6 16.5523 6 16V8C6 7.44772 6.44772 7 7 7Z" fill="#444546"/>
+<path fill-rule="evenodd" clip-rule="evenodd" d="M20 3C20.55 3 21.0204 3.19622 21.4121 3.58789C21.8038 3.97956 22 4.45 22 5V19C22 19.55 21.8038 20.0204 21.4121 20.4121C21.0204 20.8038 20.55 21 20 21H4C3.45 21 2.97956 20.8038 2.58789 20.4121C2.19622 20.0204 2 19.55 2 19V5C2 4.45 2.19622 3.97956 2.58789 3.58789C2.97956 3.19622 3.45 3 4 3H20ZM4 19H20V5H4V19Z" fill="#444546"/>
+</svg>
+`,
+  },
+  "dock_expanded": {
+    description: "sidebar_expanded",
+    category: "custom",
+    svg: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M4 21C3.45 21 2.97917 20.8042 2.5875 20.4125C2.19583 20.0208 2 19.55 2 19V5C2 4.45 2.19583 3.97917 2.5875 3.5875C2.97917 3.19583 3.45 3 4 3H20C20.55 3 21.0208 3.19583 21.4125 3.5875C21.8042 3.97917 22 4.45 22 5V19C22 19.55 21.8042 20.0208 21.4125 20.4125C21.0208 20.8042 20.55 21 20 21H4ZM8 19V5H4V19H8ZM10 19H20V5H10V19Z" fill="#444546"/>
+</svg>
+`,
+  },
 } as const;
 
 export type IconName = keyof typeof iconMeta;
