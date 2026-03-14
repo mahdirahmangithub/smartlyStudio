@@ -20,7 +20,7 @@
   --animation-drawer-enter-easing: var(--motion-easing-emphasized);
   --animation-drawer-enter-duration: var(--motion-duration-normal-lg);
   --animation-drawer-exit-easing: var(--motion-easing-exit);
-  --animation-drawer-exit-duration: var(--motion-duration-fast-xl);
+  --animation-drawer-exit-duration: var(--motion-duration-normal-md);
 
   /* modal */
   --animation-modal-enter-easing: var(--motion-easing-enter);
@@ -38,7 +38,7 @@
 
   /* tooltip */
   --animation-tooltip-enter-easing: var(--motion-easing-enter);
-  --animation-tooltip-enter-duration: var(--motion-duration-fast-sm);
+  --animation-tooltip-enter-duration: var(--motion-duration-fast-xl);
   --animation-tooltip-exit-easing: var(--motion-easing-exit);
-  --animation-tooltip-exit-duration: var(--motion-duration-fast-xs);
+  --animation-tooltip-exit-duration: var(--motion-duration-fast-md);
 }

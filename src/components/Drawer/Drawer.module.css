@@ -1,4 +1,4 @@
-/* ── Overlay backdrop ── */
+/* ── Overlay backdrop (CSS-controlled — opacity fade is reliable) ── */
 
 .backdrop {
   position: fixed;
@@ -8,13 +8,12 @@
   opacity: var(--opacity-0);
   visibility: hidden;
   pointer-events: none;
-  will-change: opacity;
   transition:
     opacity var(--animation-drawer-exit-duration) var(--animation-drawer-exit-easing),
     visibility 0s var(--animation-drawer-exit-duration);
 }
 
-.backdrop.open {
+.backdrop.active {
   opacity: var(--opacity-100);
   visibility: visible;
   pointer-events: auto;
@@ -23,13 +22,25 @@
     visibility 0s 0s;
 }
 
-/* ── Contained backdrop ── */
+/* ── Contained backdrop — no visibility trick, pure opacity ── */
 
-.backdrop.contained {
+.containedBackdrop {
   position: absolute;
+  inset: 0;
+  z-index: var(--z-index-dialog);
+  background: var(--element-overlay-default);
+  opacity: var(--opacity-0);
+  pointer-events: none;
+  transition: opacity var(--animation-drawer-enter-duration) var(--animation-drawer-enter-easing);
+}
+
+.containedBackdrop[data-open] {
+  opacity: var(--opacity-100);
+  pointer-events: auto;
 }
 
 /* ── Panel ── */
+/* For viewport overlay + push: JS controls transform, visibility, transition */
 
 .panel {
   display: flex;
@@ -42,35 +53,57 @@
   width: 420px;
   background: var(--element-surface-over);
   box-shadow: var(--shadow-md);
+  outline: none;
   transform: translateX(100%);
   visibility: hidden;
-  will-change: transform;
-  outline: none;
-  transition:
-    transform var(--animation-drawer-exit-duration) var(--animation-drawer-exit-easing),
-    visibility 0s var(--animation-drawer-exit-duration);
-}
-
-.panel.open {
-  transform: translateX(0);
-  visibility: visible;
-  transition:
-    transform var(--animation-drawer-enter-duration) var(--animation-drawer-enter-easing),
-    visibility 0s 0s;
 }
 
 /* ── Resizing — disable transitions during drag ── */
 
 .panel.resizing {
-  transition: none;
+  transition: none !important;
   will-change: width;
   user-select: none;
 }
 
-/* ── Contained panel (within a parent container) ── */
+/* ── Contained overlay — wrapper approach ── */
+/* The slot clips the off-screen panel via overflow:hidden, eliminating the need
+   for visibility:hidden. The compositing layer stays alive at all times,
+   giving us reliable, interruptible, pure-CSS transitions. */
 
-.panel.contained {
+.containedSlot {
   position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: var(--z-index-dialog);
+}
+
+.containedSlot .panel {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--element-surface-over);
+  box-shadow: none;
+  outline: none;
+  visibility: visible;
+  pointer-events: none;
+  transform: translateX(100%);
+  transition:
+    transform var(--animation-drawer-enter-duration) var(--animation-drawer-enter-easing),
+    box-shadow 0s var(--animation-drawer-enter-duration);
+}
+
+.containedSlot .panel[data-open] {
+  transform: none;
+  pointer-events: auto;
+  box-shadow: var(--shadow-md);
+  transition:
+    transform var(--animation-drawer-enter-duration) var(--animation-drawer-enter-easing),
+    box-shadow 0s 0s;
 }
 
 /* ── Push mode — no shadow, part of document flow ── */
@@ -145,7 +178,7 @@
   justify-content: center;
   touch-action: none;
 }
- 
+
 .resizeHandle::after {
   content: "";
   position: absolute;

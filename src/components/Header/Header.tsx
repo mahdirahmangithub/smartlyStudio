@@ -25,6 +25,8 @@ export interface HeaderProps
   title: string;
   /** Description text below the title */
   description?: string;
+  /** Id applied to the description element — for aria-describedby */
+  descriptionId?: string;
   /** Leading thumbnail element (typically Thumbnail component) */
   thumbnail?: ReactNode;
   /** Callback for back button — shows a back chevron when provided */
@@ -78,6 +80,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
       density = "sm",
       title,
       description,
+      descriptionId,
       thumbnail,
       onBack,
       onClose,
@@ -150,7 +153,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
           {description && (
             <div className={styles.descriptionRow}>
               {hasLeading && <span className={styles.descriptionSpacer} />}
-              <div className={styles.descriptionText}>
+              <div id={descriptionId} className={styles.descriptionText}>
                 <BodyText size={bodySizeMap[size]} emphasis="medium">
                   {description}
                 </BodyText>

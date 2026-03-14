@@ -22,58 +22,40 @@ export type DrawerDensity = "none" | "sm" | "lg";
 export type DrawerMode = "overlay" | "push";
 export type DrawerPlacement = "viewport" | "container";
 
+type SlidePhase = "idle" | "entering" | "open" | "exiting";
+
 export interface DrawerProps
   extends Omit<HTMLAttributes<HTMLElement>, "title"> {
-  /** Whether the drawer is open */
   open: boolean;
-  /** Called when the drawer requests to close (Escape, backdrop click) */
   onClose?: () => void;
-  /** Density controls internal padding and header/footer density */
   density?: DrawerDensity;
 
-  /** Header title */
   title?: string;
-  /** Header description */
   description?: string;
-  /** Header size — forwarded to the internal Header component */
   headerSize?: "sm" | "md" | "lg" | "xl" | "2xl";
-  /** Custom slot content in the header */
   headerSlot?: ReactNode;
-  /** Action buttons in the header */
   headerActions?: ReactNode;
-  /** Show back button in header */
   onBack?: () => void;
 
-  /** Footer primary actions (right side) */
   footerActions?: ReactNode;
-  /** Footer secondary actions (left side) */
   footerExtraAction?: ReactNode;
-  /** Footer slot content */
   footerSlot?: ReactNode;
-  /** When true, footer action buttons stretch to full width */
   footerFullWidth?: boolean;
 
-  /** Content rendered inside the scrollable area */
   children?: ReactNode;
-  /** Enable ScrollFade on the content area — consumer wraps children in ScrollFade */
   scrollFade?: boolean;
 
-  /** Overlay (default) floats above content; push shifts content to the left */
   mode?: DrawerMode;
-  /** viewport renders at the page level; container renders within the nearest positioned parent */
   placement?: DrawerPlacement;
 
-  /** Panel width (px or CSS value) */
+  /** Accessible label — used when no `title` is provided */
+  ariaLabel?: string;
+
   width?: number | string;
-  /** Show resize handle on the left edge */
   resizable?: boolean;
-  /** Minimum width in px when resizing (default 280) */
   minWidth?: number;
-  /** Maximum width in px when resizing (default 960) */
   maxWidth?: number;
-  /** Called with the new width (px) after a resize ends */
   onWidthChange?: (width: number) => void;
-  /** Show a backdrop behind the drawer in overlay mode (default true) */
   backdrop?: boolean;
 }
 
@@ -94,6 +76,7 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       footerSlot,
       footerFullWidth,
       children,
+      ariaLabel,
       mode = "overlay",
       placement = "viewport",
       width,
@@ -109,6 +92,7 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
     ref,
   ) {
     const titleId = useId();
+    const descId = useId();
     const panelRef = useRef<HTMLElement>(null);
     const portalAnchorRef = useRef<HTMLSpanElement>(null);
     const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
@@ -117,12 +101,90 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
 
     const isOverlay = mode === "overlay";
     const isContained = placement === "container";
+    const isContainedOverlay = isContained && isOverlay;
     const headerFooterDensity = density === "lg" ? "lg" : "sm";
     const hasHeader = title != null;
     const hasFooter = footerActions != null || footerExtraAction != null;
 
-    // Resolve portal target: nearest ancestor with data-theme, or body
+    /* ────────────────────────────────────────────
+     * Phase state machine (JS-controlled transitions)
+     * Only used for viewport overlay + push modes.
+     * Contained overlay uses a wrapper + pure CSS transitions.
+     * ──────────────────────────────────────────── */
+
+    const [phase, setPhase] = useState<SlidePhase>("idle");
+    const prevOpenRef = useRef(false);
+
     useEffect(() => {
+      if (isContainedOverlay) return;
+      if (open !== prevOpenRef.current) {
+        if (open) {
+          setPhase((p) =>
+            p === "idle" || p === "exiting" ? "entering" : p,
+          );
+        } else {
+          setPhase((p) =>
+            p === "entering" || p === "open" ? "exiting" : p,
+          );
+        }
+        prevOpenRef.current = open;
+      }
+    }, [open, isContainedOverlay]);
+
+    useEffect(() => {
+      if (isContainedOverlay) return;
+      const panel = panelRef.current;
+      if (!panel) return;
+
+      if (phase === "entering") {
+        const isHidden =
+          !panel.style.visibility || panel.style.visibility === "hidden";
+
+        if (isHidden) {
+          panel.style.transition = "none";
+          panel.style.transform = "translateX(100%)";
+          panel.style.visibility = "visible";
+          // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+          panel.scrollTop; // forced reflow — commit off-screen position before transition
+        }
+
+        panel.style.transition =
+          "transform var(--animation-drawer-enter-duration) var(--animation-drawer-enter-easing)";
+        panel.style.transform = "none";
+      } else if (phase === "exiting") {
+        panel.style.transition =
+          "transform var(--animation-drawer-exit-duration) var(--animation-drawer-exit-easing)";
+        panel.style.transform = "translateX(100%)";
+      } else if (phase === "idle") {
+        panel.style.transition = "none";
+        panel.style.transform = "translateX(100%)";
+        panel.style.visibility = "hidden";
+      } else if (phase === "open") {
+        panel.style.transition = "";
+      }
+    }, [phase, isContainedOverlay]);
+
+    const handlePanelTransitionEnd = useCallback(
+      (e: React.TransitionEvent) => {
+        if (e.target !== panelRef.current || e.propertyName !== "transform")
+          return;
+        setPhase((p) => {
+          if (p === "entering") return "open";
+          if (p === "exiting") return "idle";
+          return p;
+        });
+      },
+      [],
+    );
+
+    const isActive = isContainedOverlay
+      ? open
+      : phase === "entering" || phase === "open";
+
+    /* ──────────────── Portal target ──────────────── */
+
+    useEffect(() => {
+      if (isContainedOverlay) return;
       const anchor = portalAnchorRef.current;
       if (!anchor) return;
       let el: HTMLElement | null = anchor.parentElement;
@@ -134,14 +196,46 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
         el = el.parentElement;
       }
       setPortalTarget(document.body);
-    }, []);
+    }, [isContainedOverlay]);
 
-    // Focus trap for overlay mode
-    useFocusTrap(panelRef, isOverlay && open);
+    /* ──────────────── Focus trap ──────────────── */
 
-    // Escape to close
+    const [containedFocusReady, setContainedFocusReady] = useState(false);
+
     useEffect(() => {
-      if (!open || !onClose) return;
+      if (!isContainedOverlay) {
+        setContainedFocusReady(false);
+        return;
+      }
+      if (!open) {
+        setContainedFocusReady(false);
+        return;
+      }
+      let id1: number;
+      let id2: number;
+      id1 = requestAnimationFrame(() => {
+        id2 = requestAnimationFrame(() => {
+          setContainedFocusReady(true);
+        });
+      });
+      return () => {
+        cancelAnimationFrame(id1);
+        cancelAnimationFrame(id2);
+      };
+    }, [open, isContainedOverlay]);
+
+    const shouldTrapFocus =
+      isOverlay &&
+      (isContainedOverlay
+        ? containedFocusReady && showBackdrop
+        : isActive);
+
+    useFocusTrap(panelRef, shouldTrapFocus);
+
+    /* ──────────────── Escape to close ──────────────── */
+
+    useEffect(() => {
+      if (!isActive || !onClose) return;
       const handleKey = (e: KeyboardEvent) => {
         if (e.key === "Escape") {
           e.stopPropagation();
@@ -150,19 +244,21 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       };
       document.addEventListener("keydown", handleKey);
       return () => document.removeEventListener("keydown", handleKey);
-    }, [open, onClose]);
+    }, [isActive, onClose]);
 
-    // Body scroll lock for viewport overlay
+    /* ──────────────── Body scroll lock ──────────────── */
+
     useEffect(() => {
-      if (!isOverlay || !open || isContained) return;
+      if (!isOverlay || isContained || phase === "idle") return;
       const prev = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = prev;
       };
-    }, [isOverlay, open, isContained]);
+    }, [isOverlay, isContained, phase]);
 
-    // Reset resized width when the controlled `width` prop changes
+    /* ──────────────── Resize ──────────────── */
+
     useEffect(() => {
       setResizedWidth(null);
     }, [width]);
@@ -186,7 +282,10 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
           cancelAnimationFrame(rafId.current);
           rafId.current = requestAnimationFrame(() => {
             const delta = startX - ev.clientX;
-            const clamped = Math.min(maxWidth, Math.max(minWidth, startWidth + delta));
+            const clamped = Math.min(
+              maxWidth,
+              Math.max(minWidth, startWidth + delta),
+            );
             panel.style.width = `${clamped}px`;
           });
         };
@@ -209,13 +308,20 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       [minWidth, maxWidth, onWidthChange],
     );
 
+    /* ──────────────── Render ──────────────── */
+
     const anchor = <span ref={portalAnchorRef} style={{ display: "none" }} />;
 
     const resolvedWidth = resizedWidth ?? width;
     const panelStyle = {
       ...style,
       ...(resolvedWidth != null
-        ? { width: typeof resolvedWidth === "number" ? `${resolvedWidth}px` : resolvedWidth }
+        ? {
+            width:
+              typeof resolvedWidth === "number"
+                ? `${resolvedWidth}px`
+                : resolvedWidth,
+          }
         : undefined),
     };
 
@@ -229,25 +335,29 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
     const panel = (
       <aside
         ref={(node) => {
-          (panelRef as React.MutableRefObject<HTMLElement | null>).current = node;
+          (panelRef as React.MutableRefObject<HTMLElement | null>).current =
+            node;
           if (typeof ref === "function") ref(node);
-          else if (ref) (ref as React.MutableRefObject<HTMLElement | null>).current = node;
+          else if (ref)
+            (ref as React.MutableRefObject<HTMLElement | null>).current = node;
         }}
-        role="dialog"
-        aria-modal={isOverlay || undefined}
+        role={isOverlay ? "dialog" : "complementary"}
+        aria-modal={(isOverlay && !isContained) || undefined}
         aria-labelledby={hasHeader ? titleId : undefined}
-        aria-hidden={!open}
-        inert={!open || undefined}
+        aria-label={!hasHeader ? ariaLabel : undefined}
+        aria-describedby={description ? descId : undefined}
+        aria-hidden={!isActive}
+        inert={!isActive || undefined}
         tabIndex={-1}
         className={cx(
           styles.panel,
-          open && styles.open,
           isResizing && styles.resizing,
-          isContained && styles.contained,
           mode === "push" && styles.push,
           className,
         )}
         style={panelStyle}
+        data-open={isContainedOverlay && open ? "" : undefined}
+        onTransitionEnd={isContainedOverlay ? undefined : handlePanelTransitionEnd}
         {...rest}
       >
         {resizable && (
@@ -265,6 +375,7 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
             density={headerFooterDensity}
             title={title!}
             description={description}
+            descriptionId={description ? descId : undefined}
             divider
             slot={headerSlot}
             actions={headerActions}
@@ -291,27 +402,34 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
     );
 
     if (isOverlay) {
+      if (isContained) {
+        const containedBackdrop = showBackdrop ? (
+          <div
+            className={styles.containedBackdrop}
+            data-open={open ? "" : undefined}
+            onClick={onClose}
+            aria-hidden="true"
+          />
+        ) : null;
+
+        return (
+          <>
+            {containedBackdrop}
+            <div className={styles.containedSlot}>{panel}</div>
+          </>
+        );
+      }
+
       const backdrop = showBackdrop ? (
         <div
           className={cx(
             styles.backdrop,
-            open && styles.open,
-            isContained && styles.contained,
+            isActive && styles.active,
           )}
           onClick={onClose}
           aria-hidden="true"
         />
       ) : null;
-
-      if (isContained) {
-        return (
-          <>
-            {anchor}
-            {backdrop}
-            {panel}
-          </>
-        );
-      }
 
       return (
         <>
