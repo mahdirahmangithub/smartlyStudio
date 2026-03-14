@@ -1,3 +1,9 @@
+@property --_header-fade {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
 /* ── Root (flex spacer — controls how much page content is pushed) ── */
 
 .root {
@@ -61,25 +67,33 @@
 }
 
 .headerContent {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding-right:0;
-  width: 0;
-  flex: 0 0 0;
+  flex: 1 1 0%;
   min-width: 0;
   overflow: hidden;
+  --_header-fade: 48px;
+  -webkit-mask-image: linear-gradient(to right, var(--color-black-black) calc(100% - var(--_header-fade)), var(--color-black-opacity-0) 100%);
+  mask-image: linear-gradient(to right, var(--color-black-black) calc(100% - var(--_header-fade)), var(--color-black-opacity-0) 100%);
+  transition: --_header-fade var(--animation-state-collapse-duration) var(--animation-state-collapse-easing);
 }
 
 .headerContent.expanded {
-  padding-right: var(--spacing-xs);
-  flex: 1;
-  width: auto;
+  --_header-fade: 0px;
+  transition: --_header-fade var(--animation-state-expand-duration) var(--animation-state-expand-easing);
+}
+
+.headerContentInner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+   width: calc(var(--nav-expanded-width, 100%) - 40px - var(--spacing-xs));
 }
 
 .titleArea {
   flex: 1;
   min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .actionsArea {

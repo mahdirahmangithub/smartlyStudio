@@ -350,20 +350,22 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
               <div className={styles.header}>
                 {hasHeaderContent && (
                   <div className={cx(styles.headerContent, expanded && styles.expanded)}>
-                    {title && (
-                      <div className={styles.titleArea}>
-                        <TitleText
-                          size="xs"
-                          as="h2"
-                          title={title}
-                          description={description}
-                          leadingIcon={titleIcon}
-                        />
-                      </div>
-                    )}
-                    {headerActions && (
-                      <div className={styles.actionsArea}>{headerActions}</div>
-                    )}
+                    <div className={styles.headerContentInner}>
+                      {title && (
+                        <div className={styles.titleArea}>
+                          <TitleText
+                            size="xs"
+                            as="h2"
+                            title={title}
+                            description={description}
+                            leadingIcon={titleIcon}
+                          />
+                        </div>
+                      )}
+                      {headerActions && (
+                        <div className={styles.actionsArea}>{headerActions}</div>
+                      )}
+                    </div>
                   </div>
                 )}
 
