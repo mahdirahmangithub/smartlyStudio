@@ -1,0 +1,83 @@
+/* ── Centering overlay ── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-index-dialog);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.overlay.active {
+  pointer-events: auto;
+}
+
+/* ── Panel ── */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  background: var(--element-surface-over);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+  outline: none;
+  overflow: clip;
+  transform: scale(0.94);
+  opacity: var(--opacity-0);
+  visibility: hidden;
+}
+
+/* ── Size variants ── */
+
+.sm { width: 400px; }
+.md { width: 600px; }
+.lg { width: 800px; }
+.xl { width: 1000px; }
+
+/* ── Content area ── */
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.content::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Content density padding (top + inline only; bottom is on contentInner) ── */
+
+.contentNone {
+  padding: var(--spacing-none);
+}
+
+.contentSm {
+  padding-top: var(--spacing-md);
+  padding-inline: var(--spacing-md);
+}
+
+.contentLg {
+  padding-top: var(--spacing-xl);
+  padding-inline: var(--spacing-xl);
+}
+
+/* ── Content inner — bottom padding scrolls with content ── */
+
+.contentInner {
+  min-height: 100%;
+}
+
+.contentNone .contentInner,
+.contentSm .contentInner {
+  padding-bottom: var(--spacing-md);
+}
+
+.contentLg .contentInner {
+  padding-bottom: var(--spacing-xl);
+}
