@@ -117,6 +117,8 @@
   overflow-x: hidden;
   overflow-y: auto;
   position: relative;
+  margin-inline: calc(-1 * var(--spacing-xs));
+  padding-inline: var(--spacing-xs);
 }
 
 /* ── Right-edge divider ── */
