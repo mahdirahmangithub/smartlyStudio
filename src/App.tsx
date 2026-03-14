@@ -84,6 +84,7 @@ import NavigationItemPlayground from "./pages/NavigationItemPlayground";
 import NavigationItemTest2Playground from "./pages/NavigationItemTest2Playground";
 import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlayground";
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
+import SidebarPlayground from "./pages/SidebarPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
@@ -102,6 +103,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navigation-item-test2"
 | "navigation-sub-item"
 | "navigation-profile-item"
+| "sidebar"
 | "ai-text-generation"
 
 
@@ -327,6 +329,7 @@ export default function App() {
     { key: "select-input", label: "SelectInput" },
     { key: "select-option-header", label: "SelectOptHeader" },
     { key: "shimmer", label: "Shimmer" },
+    { key: "sidebar", label: "Sidebar" },
     { key: "single-select-option", label: "SingleSelectOpt" },
     { key: "slider", label: "Slider" },
     { key: "spinner", label: "Spinner" },
@@ -480,6 +483,7 @@ export default function App() {
             {page === "animated-icons" && <AnimatedIconsPlayground />}
             {page === "typography" && <TypographyPlayground />}
             {page === "shimmer" && <ShimmerPlayground />}
+            {page === "sidebar" && <SidebarPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
             {page === "ai-text-generation" && <AITextGenerationPlayground />}
