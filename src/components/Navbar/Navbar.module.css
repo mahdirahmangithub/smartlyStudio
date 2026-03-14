@@ -1,0 +1,42 @@
+/* ── Root ── */
+
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  min-height: var(--spacing-7xl);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--element-surface-over);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ── Position variants ── */
+
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-index-navigation);
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--z-index-navigation);
+}
+
+/* ── Logo area ── */
+
+.logo {
+  flex-shrink: 0;
+}
+
+/* ── Content area ── */
+
+.content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}

@@ -15,6 +15,8 @@ export interface NavigationBrandItemProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {
   /** Compact mode — shows only the logo circle */
   iconOnly?: boolean;
+  /** Completely removes the logotype section (not just hidden/clipped) */
+  hideLogotype?: boolean;
   /** Shows a notification dot badge on the logo */
   badge?: boolean;
   onClick?: () => void;
@@ -24,6 +26,7 @@ export const NavigationBrandItem = forwardRef<HTMLDivElement, NavigationBrandIte
   function NavigationBrandItem(
     {
       iconOnly = false,
+      hideLogotype = false,
       badge = false,
       onClick,
       className,
@@ -67,15 +70,17 @@ export const NavigationBrandItem = forwardRef<HTMLDivElement, NavigationBrandIte
           )}
         </span>
 
-        <span className={styles.expandable}>
-          <span className={styles.expandableClip}>
-            <span className={styles.expandableInner}>
-              <span className={styles.logotype}>
-                <Icon name="smartly-type" width={54} height={8} />
+        {!hideLogotype && (
+          <span className={styles.expandable}>
+            <span className={styles.expandableClip}>
+              <span className={styles.expandableInner}>
+                <span className={styles.logotype}>
+                  <Icon name="smartly-type" width={54} height={8} />
+                </span>
               </span>
             </span>
           </span>
-        </span>
+        )}
       </div>
     );
   },

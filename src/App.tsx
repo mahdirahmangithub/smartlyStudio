@@ -82,6 +82,7 @@ import NavigationBrandItemPlayground from "./pages/NavigationBrandItemPlayground
 import NavigationCategoryItemPlayground from "./pages/NavigationCategoryItemPlayground";
 import NavigationItemPlayground from "./pages/NavigationItemPlayground";
 import NavigationItemTest2Playground from "./pages/NavigationItemTest2Playground";
+import NavbarPlayground from "./pages/NavbarPlayground";
 import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlayground";
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
 import SidebarPlayground from "./pages/SidebarPlayground";
@@ -101,6 +102,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navigation-category-item"
 | "navigation-item"
 | "navigation-item-test2"
+| "navbar"
 | "navigation-sub-item"
 | "navigation-profile-item"
 | "sidebar"
@@ -307,6 +309,7 @@ export default function App() {
     { key: "modal", label: "Modal" },
     { key: "multi-select-input", label: "MultiSelectInput" },
     { key: "multi-select-option", label: "MultiSelectOpt" },
+    { key: "navbar", label: "Navbar" },
     { key: "navigation-brand-item", label: "NavBrandItem" },
     { key: "navigation-category-item", label: "NavCategoryItem" },
     { key: "navigation-item", label: "NavItem" },
@@ -483,6 +486,7 @@ export default function App() {
             {page === "animated-icons" && <AnimatedIconsPlayground />}
             {page === "typography" && <TypographyPlayground />}
             {page === "shimmer" && <ShimmerPlayground />}
+            {page === "navbar" && <NavbarPlayground />}
             {page === "sidebar" && <SidebarPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}

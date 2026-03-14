@@ -29,7 +29,7 @@
   top: 0;
   left: 0;
   bottom: 0;
-  z-index: var(--z-index-navigation);
+  z-index: calc(var(--z-index-navigation) + var(--z-index-below));
   display: flex;
   flex-direction: column;
   background: var(--element-surface-over);
