@@ -312,11 +312,11 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
 
     const triggerIcon = collapsible
       ? expanded
-        ? "left_panel_close"
-        : "left_panel_open"
-      : "left_panel_close";
+        ? "dock_collapsed"
+        : "dock_expanded"
+      : "dock_collapsed";
 
-    const showExpandedHeader = expanded && (title || headerActions);
+    const hasHeaderContent = title || headerActions;
 
     return (
       <SidebarContext.Provider value={{ expanded }}>
@@ -348,17 +348,13 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
             <div className={styles.panelInner}>
               {/* ── Header ── */}
               <div className={styles.header}>
-                {showExpandedHeader && (
-                  <div
-                    className={cx(
-                      styles.headerExpanded,
-                      !expanded && styles.hidden,
-                    )}
-                  >
+                {hasHeaderContent && (
+                  <div className={cx(styles.headerContent, expanded && styles.expanded)}>
                     {title && (
                       <div className={styles.titleArea}>
                         <TitleText
                           size="xs"
+                          as="h2"
                           title={title}
                           description={description}
                           leadingIcon={titleIcon}
@@ -372,12 +368,16 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
                 )}
 
                 {showTrigger && (
-                  <div className={styles.trigger}>
+                  <div
+                    className={styles.trigger}
+                    style={{ cursor: expanded ? "w-resize" : "e-resize" }}
+                  >
                     <IconButton
                       size="lg"
                       variant="neutral"
                       emphasis="low"
-                      icon={<Icon name={triggerIcon as "left_panel_close"} size={20} />}
+                      hideTooltip
+                      icon={<Icon name={triggerIcon as "dock_collapsed"} size={20} />}
                       aria-label={
                         collapsible
                           ? expanded

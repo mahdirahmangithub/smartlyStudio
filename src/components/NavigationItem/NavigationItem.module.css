@@ -160,6 +160,10 @@
   --focus-ring: inset 0 0 0 2px var(--element-outline-neutral-default);
 }
 
+.actionContainer:last-child {
+  transform: translateX(var(--spacing-2xs));
+}
+
 .actionContainer.pinned {
   display: flex;
 }

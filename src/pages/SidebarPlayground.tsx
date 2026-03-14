@@ -2,6 +2,7 @@ import { type CSSProperties, useState } from "react";
 import { AppShell } from "../components/AppShell";
 import { Divider } from "../components/Divider";
 import { Icon } from "../components/Icon";
+import { IconButton } from "../components/IconButton";
 import { NavigationCategoryItem } from "../components/NavigationCategoryItem";
 import { NavigationItem } from "../components/NavigationItem";
 import { NavigationProfileItem } from "../components/NavigationProfileItem";
@@ -148,6 +149,43 @@ function PersistentCollapsibleOverlayDemo() {
   );
 }
 
+function PersistentCollapsibleOverlayWithHeaderDemo() {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div style={cardStyle}>
+      <AppShell style={{ height: "100%", minHeight: 0 }}>
+        <Sidebar
+          expanded={expanded}
+          onExpandedChange={setExpanded}
+          collapsible
+          expandBehavior="overlay"
+          resizable
+          expandedWidth={240}
+          minWidth={240}
+          maxWidth={350}
+          title="Workspace"
+          headerActions={
+            <IconButton
+              size="lg"
+              variant="neutral"
+              emphasis="low"
+              icon={<Icon name="add" size={20} />}
+              aria-label="Add item"
+            />
+          }
+        >
+          <SidebarNavContent />
+        </Sidebar>
+        <AppShell.Content>
+          <PageContent
+            extra={<p>Expanded: <strong>{String(expanded)}</strong></p>}
+          />
+        </AppShell.Content>
+      </AppShell>
+    </div>
+  );
+}
+
 function PersistentCollapsedOnlyDemo() {
   return (
     <div style={cardStyle}>
@@ -264,6 +302,14 @@ export default function SidebarPlayground() {
           Collapsed pushes 72px, expanded overlays without pushing.
         </p>
         <PersistentCollapsibleOverlayDemo />
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Persistent + Collapsible + Overlay + Header</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Same as overlay but with title and an action button in the header.
+        </p>
+        <PersistentCollapsibleOverlayWithHeaderDemo />
       </section>
 
       <section style={sectionStyle}>

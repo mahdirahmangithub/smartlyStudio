@@ -57,25 +57,24 @@
 .header {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  flex-shrink: 0;
+   flex-shrink: 0;
 }
 
-.headerExpanded {
+.headerContent {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  flex: 1;
+  padding-right:0;
+  width: 0;
+  flex: 0 0 0;
   min-width: 0;
   overflow: hidden;
-  opacity: var(--opacity-100);
-  transition: opacity var(--animation-state-expand-duration) var(--animation-state-expand-easing);
 }
 
-.headerExpanded.hidden {
-  opacity: var(--opacity-0);
-  pointer-events: none;
-  transition: opacity var(--animation-state-collapse-duration) var(--animation-state-collapse-easing);
+.headerContent.expanded {
+  padding-right: var(--spacing-xs);
+  flex: 1;
+  width: auto;
 }
 
 .titleArea {
@@ -89,6 +88,11 @@
 
 .trigger {
   flex-shrink: 0;
+  margin-left: auto;
+}
+
+.trigger button {
+  cursor: inherit;
 }
 
 /* ── Content area ── */
