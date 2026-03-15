@@ -75,6 +75,7 @@ import TypographyPlayground from "./pages/TypographyPlayground";
 import ShimmerPlayground from "./pages/ShimmerPlayground";
 import DataCellContentPlayground from "./pages/DataCellContentPlayground";
 import AccordionPlayground from "./pages/AccordionPlayground";
+import BreadcrumbPlayground from "./pages/BreadcrumbPlayground";
 import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import GlobalNavigationBarPlayground from "./pages/GlobalNavigationBarPlayground";
 import HeaderPlayground from "./pages/HeaderPlayground";
@@ -90,6 +91,7 @@ import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
 type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
+| "breadcrumb"
 | "dimmer"
 | "modal"
 | "accordion"
@@ -270,6 +272,7 @@ export default function App() {
     { key: "avatar", label: "Avatar" },
     { key: "badge", label: "Badge" },
     { key: "body-text", label: "BodyText" },
+    { key: "breadcrumb", label: "Breadcrumb" },
     { key: "button", label: "Button" },
     { key: "button-group", label: "ButtonGroup" },
     { key: "callout", label: "Callout" },
@@ -490,6 +493,7 @@ export default function App() {
             {page === "sidebar" && <SidebarPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
+            {page === "breadcrumb" && <BreadcrumbPlayground />}
             {page === "ai-text-generation" && <AITextGenerationPlayground />}
           </div>
         </main>
