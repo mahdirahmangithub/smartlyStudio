@@ -145,9 +145,49 @@ When building or reviewing any component, verify:
 5. Does the disabled state prevent interaction AND convey disabled status (`aria-disabled` or `disabled` attribute)?
 6. Are color contrast ratios sufficient (don't rely on color alone)?
 
+#### Screen reader and WCAG review — mandatory after implementation
+
+After completing a component, **perform a dedicated review pass** for screen reader friendliness and WCAG compliance. This is not optional — treat it as a required final step before considering the component done.
+
+**Screen reader review:**
+- Navigate the component using only a screen reader (VoiceOver, NVDA, or JAWS mental model). Verify every interactive element is announced with its role, name, and state.
+- Ensure `aria-current`, `aria-selected`, `aria-checked`, `aria-expanded` and similar state attributes are present and update dynamically.
+- Confirm decorative elements (icons next to text, separators, dividers) are hidden with `aria-hidden="true"`.
+- Verify icon-only interactive elements have meaningful `aria-label` (never generic labels like "icon" or "button").
+- Check that `aria-live` regions exist for dynamic content changes (toasts, loading states, inline validation errors).
+- Ensure `role="list"` is added to `<ol>`/`<ul>` elements styled with `list-style: none` (Safari/VoiceOver strips list semantics otherwise).
+
+**WCAG 2.1 AA compliance checks:**
+- **1.3.1 Info and Relationships**: Structure and relationships conveyed visually are also available programmatically (headings, lists, tables, form labels).
+- **1.4.3 Contrast (Minimum)**: Text has at least 4.5:1 contrast ratio; large text at least 3:1. Non-text UI components and graphical objects at least 3:1 (WCAG 1.4.11).
+- **2.1.1 Keyboard**: All functionality is operable via keyboard with no keyboard traps.
+- **2.4.3 Focus Order**: Focus moves in a logical, meaningful sequence.
+- **2.4.7 Focus Visible**: Keyboard focus indicator is always visible (use `:focus-visible`, never suppress without replacement).
+- **4.1.2 Name, Role, Value**: All UI components expose their name, role, and state to assistive technology.
+
+**Common pitfalls to catch:**
+- Missing `aria-current="page"` on breadcrumb / navigation current items
+- Popover/dropdown trigger missing `aria-expanded` and `aria-haspopup`
+- Interactive elements inside non-interactive wrappers (e.g., `<a>` inside `<span>` that also has click handlers)
+- Color-only state indicators (e.g., red for error) without text or icon supplement
+- Focus ring visible on mouse click (use `:focus-visible`, not `:focus`)
+- Disabled elements still reachable via Tab (use `tabIndex={-1}` or native `disabled`)
+
 ### Always use existing DS components internally
 
 When building new components, **always compose with existing Design System components** rather than raw HTML or ad-hoc markup. If the DS already provides a sub-component (badge, icon button, tooltip, divider, etc.), use it directly inside the new component rather than accepting a raw `ReactNode` slot that forces the consumer to assemble sub-components. Bake DS primitives in; expose simple props (e.g. `badgeCount` instead of `badge?: ReactNode`, `locked: boolean` instead of `lockContent?: ReactNode`).
+
+### Icon names — always verify before using
+
+The `<Icon>` component accepts a `name` prop typed as `IconName`, derived from the keys of `iconMeta` in `src/components/Icon/iconData.ts`. **Never guess icon names.** Before using any icon name:
+
+1. **Search `iconData.ts`** for the exact name: `grep "icon_name" src/components/Icon/iconData.ts`
+2. If the name doesn't exist, **ask the user** which icon to use or search for similar names
+3. Never use `as any` to bypass the `IconName` type — if TypeScript rejects it, the icon doesn't exist
+4. Common naming pitfalls:
+   - Names use **underscores**, not camelCase (e.g., `chevron_right` not `chevronRight`)
+   - Some icons have `_fill` or `_outline` suffixes
+   - Material/Google icon names don't always match — always verify against the actual data file
 
 ### Composition over ad-hoc markup
 
