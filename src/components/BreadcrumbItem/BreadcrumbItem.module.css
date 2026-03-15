@@ -133,6 +133,10 @@
   padding-inline: var(--spacing-sm-minus);
 }
 
+.pill.iconOnly .link {
+  padding-inline: 0;
+}
+
 /* Override Link colors for non-current, non-disabled items to use secondary */
 .root:not(.current):not(.disabled) .link {
   color: var(--text-neutral-secondary-default);

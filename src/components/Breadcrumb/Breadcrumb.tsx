@@ -245,6 +245,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
             onClose={closeDropdown}
             anchorRef={collapsedBtnRef}
             placement="bottom-start"
+            width={200}
           >
             {hiddenItems.map((item, i) => {
               const p = item.props as Record<string, unknown>;
