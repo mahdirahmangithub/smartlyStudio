@@ -79,10 +79,12 @@ import BreadcrumbPlayground from "./pages/BreadcrumbPlayground";
 import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import GlobalNavigationBarPlayground from "./pages/GlobalNavigationBarPlayground";
 import HeaderPlayground from "./pages/HeaderPlayground";
+import IconContainerPlayground from "./pages/IconContainerPlayground";
 import NavigationBrandItemPlayground from "./pages/NavigationBrandItemPlayground";
 import NavigationCategoryItemPlayground from "./pages/NavigationCategoryItemPlayground";
 import NavigationItemPlayground from "./pages/NavigationItemPlayground";
 import NavigationItemTest2Playground from "./pages/NavigationItemTest2Playground";
+import NavBarContentPlayground from "./pages/NavBarContentPlayground";
 import NavbarPlayground from "./pages/NavbarPlayground";
 import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlayground";
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
@@ -91,6 +93,7 @@ import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
 type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
+| "icon-container"
 | "breadcrumb"
 | "dimmer"
 | "modal"
@@ -105,6 +108,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navigation-item"
 | "navigation-item-test2"
 | "navbar"
+| "navbar-content"
 | "navigation-sub-item"
 | "navigation-profile-item"
 | "sidebar"
@@ -300,6 +304,7 @@ export default function App() {
     { key: "header", label: "Header" },
     { key: "hint", label: "Hint" },
     { key: "icon-badge", label: "IconBadge" },
+    { key: "icon-container", label: "IconContainer" },
     { key: "icons", label: "Icons" },
     { key: "imagery", label: "Imagery" },
     { key: "inline-input", label: "InlineInput" },
@@ -313,6 +318,7 @@ export default function App() {
     { key: "multi-select-input", label: "MultiSelectInput" },
     { key: "multi-select-option", label: "MultiSelectOpt" },
     { key: "navbar", label: "Navbar" },
+    { key: "navbar-content", label: "NavBarContent" },
     { key: "navigation-brand-item", label: "NavBrandItem" },
     { key: "navigation-category-item", label: "NavCategoryItem" },
     { key: "navigation-item", label: "NavItem" },
@@ -409,8 +415,9 @@ export default function App() {
             </ContentSwitcher>
           </div>
 
-          <div className="app-content">
+          <div className="app-content" style={page === "navbar-content" ? { maxWidth: "none" } : undefined}>
             {page === "button" && <ButtonPlayground />}
+            {page === "icon-container" && <IconContainerPlayground />}
             {page === "icons" && <IconsPage />}
             {page === "scroll-fade" && <ScrollFadePage />}
             {page === "expander" && <ExpanderPlayground />}
@@ -490,6 +497,7 @@ export default function App() {
             {page === "typography" && <TypographyPlayground />}
             {page === "shimmer" && <ShimmerPlayground />}
             {page === "navbar" && <NavbarPlayground />}
+            {page === "navbar-content" && <NavBarContentPlayground />}
             {page === "sidebar" && <SidebarPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
