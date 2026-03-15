@@ -88,6 +88,7 @@ import NavBarContentPlayground from "./pages/NavBarContentPlayground";
 import NavbarPlayground from "./pages/NavbarPlayground";
 import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlayground";
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
+import ShortcutTooltipPlayground from "./pages/ShortcutTooltipPlayground";
 import SidebarPlayground from "./pages/SidebarPlayground";
 import "./App.css";
 
@@ -111,6 +112,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navbar-content"
 | "navigation-sub-item"
 | "navigation-profile-item"
+| "shortcut-tooltip"
 | "sidebar"
 | "ai-text-generation"
 
@@ -341,6 +343,7 @@ export default function App() {
     { key: "select-input", label: "SelectInput" },
     { key: "select-option-header", label: "SelectOptHeader" },
     { key: "shimmer", label: "Shimmer" },
+    { key: "shortcut-tooltip", label: "ShortcutTooltip" },
     { key: "sidebar", label: "Sidebar" },
     { key: "single-select-option", label: "SingleSelectOpt" },
     { key: "slider", label: "Slider" },
@@ -498,6 +501,7 @@ export default function App() {
             {page === "shimmer" && <ShimmerPlayground />}
             {page === "navbar" && <NavbarPlayground />}
             {page === "navbar-content" && <NavBarContentPlayground />}
+            {page === "shortcut-tooltip" && <ShortcutTooltipPlayground />}
             {page === "sidebar" && <SidebarPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}

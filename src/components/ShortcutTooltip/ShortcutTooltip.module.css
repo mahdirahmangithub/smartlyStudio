@@ -1,0 +1,55 @@
+/* ── wrapper override ─────────────────────────────────────────────────── */
+
+.wrapper {
+  border-radius: var(--radius-md);
+}
+
+/* ── content box ──────────────────────────────────────────────────────── */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-sm-minus);
+  overflow: hidden;
+}
+
+/* ── header row ──────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+/* ── label text ──────────────────────────────────────────────────────── */
+
+.label {
+  font-family: var(--type-label-xs-family);
+  font-weight: var(--type-label-xs-weight);
+  font-size: var(--type-label-xs-size);
+  line-height: var(--type-label-xs-line-height);
+  letter-spacing: var(--type-label-xs-letter-spacing);
+  padding: 0 var(--spacing-2xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.inverse .label {
+  color: var(--text-neutral-inverse-primary);
+}
+
+.neutral .label {
+  color: var(--text-neutral-primary);
+}
+
+/* ── keyboard shortcut keys row ──────────────────────────────────────── */
+
+.keys {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}

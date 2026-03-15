@@ -43,6 +43,8 @@ export interface TooltipProps {
   description?: string;
   leadingIcon?: ReactNode;
   trailingIcon?: ReactNode;
+  /** Custom content to render instead of the default TooltipContent */
+  content?: ReactNode;
   placement?: Placement;
   offsetPx?: number;
   anchor?: TooltipAnchor;
@@ -392,6 +394,7 @@ export function Tooltip({
   description,
   leadingIcon,
   trailingIcon,
+  content: customContent,
   placement = "top",
   offsetPx = 8,
   anchor = "trigger",
@@ -725,13 +728,15 @@ export function Tooltip({
             onMouseEnter={onFloatEnter}
             onMouseLeave={onFloatLeave}
           >
-            <TooltipContent
-              type={type}
-              label={label}
-              description={description}
-              leadingIcon={leadingIcon}
-              trailingIcon={trailingIcon}
-            />
+            {customContent ?? (
+              <TooltipContent
+                type={type}
+                label={label}
+                description={description}
+                leadingIcon={leadingIcon}
+                trailingIcon={trailingIcon}
+              />
+            )}
 
             {showTail && (
               <div style={tailStyle}>
