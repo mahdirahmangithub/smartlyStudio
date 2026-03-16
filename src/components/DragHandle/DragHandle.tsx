@@ -7,7 +7,7 @@ export type DragHandleSize = "sm" | "lg";
 export type DragHandleType = "dot" | "line";
 
 export interface DragHandleProps
-  extends ButtonHTMLAttributes<HTMLButtonElement> {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
   /** Visual variant */
   type?: DragHandleType;
   /** Size variant */
@@ -29,6 +29,7 @@ export const DragHandle = forwardRef<HTMLButtonElement, DragHandleProps>(
     return (
       <button
         ref={ref}
+        type="button"
         className={cx(styles.root, typeClass, variantClass, className)}
         aria-label="Drag handle"
         {...rest}
