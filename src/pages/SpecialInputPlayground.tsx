@@ -1,5 +1,6 @@
 import { useState, type CSSProperties } from "react";
 import { DateInput, type DateInputFormat, type DateInputSize, type DateValue, type DateValidationError } from "../components/DateInput";
+import { Icon } from "../components/Icon";
 import { Fieldset } from "../components/Fieldset";
 
 const SIZES: DateInputSize[] = ["md", "lg", "xl"];
@@ -53,10 +54,46 @@ function formatDateValue(dv: DateValue): string {
   return `${m}/${d}/${y}`;
 }
 
-function DateInputDemo({ format, label }: { format: DateInputFormat; label: string }) {
+type ValidationMode = "none" | "disablePast" | "disableFuture" | "disabled" | "readOnly";
+
+const VALIDATION_MODES: { value: ValidationMode; label: string }[] = [
+  { value: "none", label: "None" },
+  { value: "disablePast", label: "Disable past" },
+  { value: "disableFuture", label: "Disable future" },
+  { value: "disabled", label: "Disabled" },
+  { value: "readOnly", label: "Read-only" },
+];
+
+const HINT_BY_MODE: Record<ValidationMode, string> = {
+  none: "Try typing Feb 30 or Jun 31 to see validation",
+  disablePast: "Must be today or later",
+  disableFuture: "Must be today or earlier",
+  disabled: "",
+  readOnly: "",
+};
+
+const checkboxLabelStyle: CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 4,
+  fontSize: 13,
+  cursor: "pointer",
+  color: "var(--text-neutral-primary)",
+};
+
+function DateInputDemo() {
   const [size, setSize] = useState<DateInputSize>("lg");
+  const [mode, setMode] = useState<ValidationMode>("none");
+  const [euFormat, setEuFormat] = useState(false);
   const [val, setVal] = useState<DateValue>({});
   const [err, setErr] = useState<DateValidationError>(null);
+  const [showLeading, setShowLeading] = useState(true);
+  const [showTrailing, setShowTrailing] = useState(false);
+  const [showSuffix, setShowSuffix] = useState(false);
+  const [showClear, setShowClear] = useState(false);
+
+  const format: DateInputFormat = euFormat ? "DD/MM/YYYY" : "MM/DD/YYYY";
+  const hint = err ? VALIDATION_ERROR_MESSAGES[err] : HINT_BY_MODE[mode];
 
   return (
     <div>
@@ -71,12 +108,46 @@ function DateInputDemo({ format, label }: { format: DateInputFormat; label: stri
             <option key={s} value={s}>{s}</option>
           ))}
         </select>
+
+        <span style={captionStyle}>State</span>
+        <select
+          value={mode}
+          onChange={(e) => setMode(e.target.value as ValidationMode)}
+          style={selectStyle}
+        >
+          {VALIDATION_MODES.map((m) => (
+            <option key={m.value} value={m.value}>{m.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <div style={{ ...controlsBar, flexWrap: "wrap" }}>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={euFormat} onChange={(e) => setEuFormat(e.target.checked)} />
+          EU format (DD.MM.YYYY)
+        </label>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={showLeading} onChange={(e) => setShowLeading(e.target.checked)} />
+          Leading icon
+        </label>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={showTrailing} onChange={(e) => setShowTrailing(e.target.checked)} />
+          Trailing icon
+        </label>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={showSuffix} onChange={(e) => setShowSuffix(e.target.checked)} />
+          Suffix
+        </label>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={showClear} onChange={(e) => setShowClear(e.target.checked)} />
+          Clearable
+        </label>
       </div>
 
       <Fieldset
-        label={label}
+        label="Date"
         description="Type digits to fill, arrow keys to adjust, Tab to navigate between segments"
-        message={err ? VALIDATION_ERROR_MESSAGES[err] : "Try typing Feb 30 or Jun 31 to see validation"}
+        message={hint || undefined}
         messageType={err ? "alert" : "neutral"}
       >
         <DateInput
@@ -85,6 +156,14 @@ function DateInputDemo({ format, label }: { format: DateInputFormat; label: stri
           value={val}
           onChange={setVal}
           onValidationError={setErr}
+          disablePast={mode === "disablePast"}
+          disableFuture={mode === "disableFuture"}
+          disabled={mode === "disabled"}
+          readOnly={mode === "readOnly"}
+          leadingIcon={showLeading ? undefined : null}
+          trailingIcon={showTrailing ? <Icon name="info" size={size === "xl" ? 20 : 16} /> : undefined}
+          suffix={showSuffix ? "UTC" : undefined}
+          clearable={showClear}
         />
       </Fieldset>
       <p style={valueStyle}>Value: {formatDateValue(val)}</p>
@@ -98,18 +177,10 @@ export default function SpecialInputPlayground() {
       <h1>Special Input</h1>
 
       <section style={sectionStyle}>
-        <h2>Date Input — MM/DD/YYYY</h2>
-        <p style={captionStyle}>US date format with segmented keyboard handling and built-in validation.</p>
+        <h2>Date Input</h2>
+        <p style={captionStyle}>Segmented date input with keyboard handling and built-in validation.</p>
         <div style={cardStyle}>
-          <DateInputDemo format="MM/DD/YYYY" label="Date" />
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2>Date Input — DD/MM/YYYY</h2>
-        <p style={captionStyle}>European date format with the same keyboard and validation behavior.</p>
-        <div style={cardStyle}>
-          <DateInputDemo format="DD/MM/YYYY" label="Date" />
+          <DateInputDemo />
         </div>
       </section>
     </>
