@@ -90,6 +90,7 @@ import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlaygr
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
 import ShortcutTooltipPlayground from "./pages/ShortcutTooltipPlayground";
 import SidebarPlayground from "./pages/SidebarPlayground";
+import ToolbarButtonPlayground from "./pages/ToolbarButtonPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
@@ -114,6 +115,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navigation-profile-item"
 | "shortcut-tooltip"
 | "sidebar"
+| "toolbar-button"
 | "ai-text-generation"
 
 
@@ -357,6 +359,7 @@ export default function App() {
     { key: "title-text", label: "TitleText" },
     { key: "toggle", label: "Toggle" },
     { key: "toggle-chip", label: "ToggleChip" },
+    { key: "toolbar-button", label: "ToolbarButton" },
     { key: "tooltip", label: "Tooltip" },
     { key: "typography", label: "Typography" },
   ];
@@ -502,6 +505,7 @@ export default function App() {
             {page === "navbar" && <NavbarPlayground />}
             {page === "navbar-content" && <NavBarContentPlayground />}
             {page === "shortcut-tooltip" && <ShortcutTooltipPlayground />}
+            {page === "toolbar-button" && <ToolbarButtonPlayground />}
             {page === "sidebar" && <SidebarPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}

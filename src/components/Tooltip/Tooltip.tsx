@@ -427,6 +427,13 @@ export function Tooltip({
     [disabled, isControlled, controlledOnOpenChange, group],
   );
 
+  useEffect(() => {
+    if (disabled && !isControlled && uncontrolledOpen) {
+      setUncontrolledOpen(false);
+      group.markClosed();
+    }
+  }, [disabled, isControlled, uncontrolledOpen, group]);
+
   const effectiveShowDelay =
     showDelayProp ?? (group.shouldSkipDelay() ? 0 : config.showDelay);
   const effectiveHideDelay = hideDelayProp ?? config.hideDelay;

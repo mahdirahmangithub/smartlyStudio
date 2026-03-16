@@ -22,7 +22,13 @@ export type DropdownPlacement =
   | "bottom"
   | "top-start"
   | "top-end"
-  | "top";
+  | "top"
+  | "left-start"
+  | "left-end"
+  | "left"
+  | "right-start"
+  | "right-end"
+  | "right";
 
 export interface DropdownProps {
   open: boolean;
@@ -53,7 +59,7 @@ function cx(...classes: (string | false | undefined | null)[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-type Side = "top" | "bottom";
+type Side = "top" | "bottom" | "left" | "right";
 type Align = "start" | "end" | undefined;
 
 function splitPlacement(p: DropdownPlacement): [Side, Align] {
@@ -75,38 +81,70 @@ function calcPosition(
   const [preferredSide, align] = splitPlacement(placement);
 
   let x: number;
-  if (align === "start") {
-    x = anchorRect.left;
-  } else if (align === "end") {
-    x = anchorRect.right - panelW;
-  } else {
-    x = anchorRect.left + anchorRect.width / 2 - panelW / 2;
-  }
-
-  const yBelow = anchorRect.bottom + offset;
-  const yAbove = anchorRect.top - panelH - offset;
-
-  const overflowBelow = Math.max(0, yBelow + panelH - window.innerHeight + VP_PAD);
-  const overflowAbove = Math.max(0, VP_PAD - yAbove);
-
-  let side: Side;
   let y: number;
+  let side: Side;
 
-  if (preferredSide === "bottom") {
-    if (overflowBelow > 0 && overflowAbove < overflowBelow) {
-      side = "top";
-      y = yAbove;
+  if (preferredSide === "left" || preferredSide === "right") {
+    if (align === "start") {
+      y = anchorRect.top;
+    } else if (align === "end") {
+      y = anchorRect.bottom - panelH;
     } else {
-      side = "bottom";
-      y = yBelow;
+      y = anchorRect.top + anchorRect.height / 2 - panelH / 2;
+    }
+
+    const xLeft = anchorRect.left - panelW - offset;
+    const xRight = anchorRect.right + offset;
+    const overflowLeft = Math.max(0, VP_PAD - xLeft);
+    const overflowRight = Math.max(0, xRight + panelW - window.innerWidth + VP_PAD);
+
+    if (preferredSide === "right") {
+      if (overflowRight > 0 && overflowLeft < overflowRight) {
+        side = "left";
+        x = xLeft;
+      } else {
+        side = "right";
+        x = xRight;
+      }
+    } else {
+      if (overflowLeft > 0 && overflowRight < overflowLeft) {
+        side = "right";
+        x = xRight;
+      } else {
+        side = "left";
+        x = xLeft;
+      }
     }
   } else {
-    if (overflowAbove > 0 && overflowBelow < overflowAbove) {
-      side = "bottom";
-      y = yBelow;
+    if (align === "start") {
+      x = anchorRect.left;
+    } else if (align === "end") {
+      x = anchorRect.right - panelW;
     } else {
-      side = "top";
-      y = yAbove;
+      x = anchorRect.left + anchorRect.width / 2 - panelW / 2;
+    }
+
+    const yBelow = anchorRect.bottom + offset;
+    const yAbove = anchorRect.top - panelH - offset;
+    const overflowBelow = Math.max(0, yBelow + panelH - window.innerHeight + VP_PAD);
+    const overflowAbove = Math.max(0, VP_PAD - yAbove);
+
+    if (preferredSide === "bottom") {
+      if (overflowBelow > 0 && overflowAbove < overflowBelow) {
+        side = "top";
+        y = yAbove;
+      } else {
+        side = "bottom";
+        y = yBelow;
+      }
+    } else {
+      if (overflowAbove > 0 && overflowBelow < overflowAbove) {
+        side = "bottom";
+        y = yBelow;
+      } else {
+        side = "top";
+        y = yAbove;
+      }
     }
   }
 

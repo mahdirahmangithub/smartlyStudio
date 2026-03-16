@@ -98,3 +98,45 @@
   transform-origin: bottom center;
   animation: dropdownExitTop var(--animation-dropdown-exit-duration) var(--animation-dropdown-exit-easing) forwards;
 }
+
+/* ── left / right ────────────────────────────────────────────────────── */
+
+@keyframes dropdownEnterLeft {
+  from { opacity: var(--opacity-0); transform: scale(.94) translateX(var(--spacing-xs)); }
+  to   { opacity: var(--opacity-100); transform: scale(1) translateX(0); }
+}
+
+@keyframes dropdownExitLeft {
+  from { opacity: var(--opacity-100); transform: scale(1) translateX(0); }
+  to   { opacity: var(--opacity-0); transform: scale(.94) translateX(var(--spacing-xs)); }
+}
+
+@keyframes dropdownEnterRight {
+  from { opacity: var(--opacity-0); transform: scale(.94) translateX(var(--spacing-negative-xs)); }
+  to   { opacity: var(--opacity-100); transform: scale(1) translateX(0); }
+}
+
+@keyframes dropdownExitRight {
+  from { opacity: var(--opacity-100); transform: scale(1) translateX(0); }
+  to   { opacity: var(--opacity-0); transform: scale(.94) translateX(var(--spacing-negative-xs)); }
+}
+
+.enterLeft {
+  transform-origin: center right;
+  animation: dropdownEnterLeft var(--animation-dropdown-enter-duration) var(--animation-dropdown-enter-easing) forwards;
+}
+
+.exitLeft {
+  transform-origin: center right;
+  animation: dropdownExitLeft var(--animation-dropdown-exit-duration) var(--animation-dropdown-exit-easing) forwards;
+}
+
+.enterRight {
+  transform-origin: center left;
+  animation: dropdownEnterRight var(--animation-dropdown-enter-duration) var(--animation-dropdown-enter-easing) forwards;
+}
+
+.exitRight {
+  transform-origin: center left;
+  animation: dropdownExitRight var(--animation-dropdown-exit-duration) var(--animation-dropdown-exit-easing) forwards;
+}

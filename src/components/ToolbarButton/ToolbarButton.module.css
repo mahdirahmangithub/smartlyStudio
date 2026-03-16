@@ -1,0 +1,85 @@
+/* ── base button ──────────────────────────────────────────────────────── */
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: var(--spacing-4xl);
+  min-width: var(--spacing-4xl);
+  padding: var(--spacing-sm-plus);
+  border: none;
+  border-radius: var(--radius-lg);
+  background: var(--element-fill-neutral-tertiary-default);
+  color: var(--text-neutral-primary);
+  cursor: pointer;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  transition: background var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* ── states ───────────────────────────────────────────────────────────── */
+
+.button:hover:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-hover);
+}
+
+.button:active:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-press);
+}
+
+.button:focus-visible {
+  background: var(--element-fill-neutral-tertiary-hover);
+  outline: none;
+  box-shadow:
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+}
+
+.selected:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-press);
+}
+
+.selected:hover:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-press);
+}
+
+/* ── disabled ─────────────────────────────────────────────────────────── */
+
+.disabled {
+  background: var(--element-fill-neutral-tertiary-disable);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.disabled .iconWrap {
+  color: var(--text-neutral-disable);
+}
+
+.disabled .subToolIndicator {
+  color: var(--text-neutral-disable);
+}
+
+/* ── icon wrap ────────────────────────────────────────────────────────── */
+
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── sub-tool indicator ───────────────────────────────────────────────── */
+
+.subToolIndicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-md);
+  height: var(--spacing-md);
+  pointer-events: none;
+  color: var(--text-neutral-primary);
+}

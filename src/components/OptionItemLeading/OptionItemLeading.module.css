@@ -13,6 +13,7 @@
   width: 24px;
   padding: var(--spacing-2xs);
   box-sizing: border-box;
+  color: var(--text-neutral-secondary-default);
 }
 
 /* ── counter (flag) — 24px wide, no internal padding ──────────────────── */
