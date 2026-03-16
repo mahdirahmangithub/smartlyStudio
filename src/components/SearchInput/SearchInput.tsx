@@ -11,6 +11,7 @@ import { Icon } from "../Icon";
 import { InputClear, type InputClearSize } from "../InputClear";
 import { SearchInputAttachment, type SearchInputAttachmentSize } from "../SearchInputAttachment";
 import styles from "./SearchInput.module.css";
+import { cx } from "../../utils/cx";
 
 export type SearchInputSize = "md" | "lg" | "xl";
 
@@ -41,9 +42,6 @@ export interface SearchInputProps
   onClear?: () => void;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const CLEAR_SIZE: Record<SearchInputSize, InputClearSize> = {
   md: "sm",

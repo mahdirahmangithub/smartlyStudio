@@ -9,6 +9,7 @@ import { Tag, type TagType, type TagEmphasis } from "../Tag";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./TagSingleSelectOption.module.css";
+import { cx } from "../../utils/cx";
 
 export interface TagSingleSelectOptionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
@@ -28,9 +29,6 @@ export interface TagSingleSelectOptionProps
   onChange?: (checked: boolean) => void;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function TagSingleSelectOption({
   checked = false,

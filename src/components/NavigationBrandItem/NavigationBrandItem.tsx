@@ -6,10 +6,8 @@ import {
 import { Icon } from "../Icon";
 import { NotificationBadge } from "../NotificationBadge";
 import styles from "./NavigationBrandItem.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export interface NavigationBrandItemProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {

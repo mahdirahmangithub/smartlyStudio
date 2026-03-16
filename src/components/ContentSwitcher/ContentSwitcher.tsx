@@ -7,6 +7,7 @@ import {
   type ReactElement,
 } from "react";
 import styles from "./ContentSwitcher.module.css";
+import { cx } from "../../utils/cx";
 import type {
   ContentSwitcherItemProps,
   ContentSwitcherItemSize,
@@ -22,9 +23,6 @@ export interface ContentSwitcherProps
   disabled?: boolean;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const ContentSwitcher = forwardRef<HTMLDivElement, ContentSwitcherProps>(
   (

@@ -3,6 +3,7 @@ import { Icon } from "../Icon";
 import type { IconName } from "../Icon";
 import { IconButton } from "../IconButton";
 import styles from "./Callout.module.css";
+import { cx } from "../../utils/cx";
 
 export type CalloutType = "brand" | "info" | "success" | "warning" | "alert";
 export type CalloutSize = "sm" | "md" | "lg";
@@ -30,9 +31,6 @@ const TYPE_ICON: Record<CalloutType, IconName> = {
 const ICON_SIZE: Record<CalloutSize, number> = { lg: 24, md: 20, sm: 20 };
 const CLOSE_BTN_SIZE: Record<CalloutSize, "sm" | "md"> = { lg: "md", md: "md", sm: "sm" };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function Callout({
   type = "info",

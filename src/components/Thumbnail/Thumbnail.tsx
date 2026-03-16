@@ -9,6 +9,7 @@ import { Spinner, type SpinnerSize } from "../Spinner";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./Thumbnail.module.css";
+import { cx } from "../../utils/cx";
 
 export type ThumbnailSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 export type ThumbnailType = "media" | "icon" | "text";
@@ -30,9 +31,6 @@ export interface ThumbnailProps
   text?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const SIZE_CLASS: Record<ThumbnailSize, string> = {
   xs: styles.xs,

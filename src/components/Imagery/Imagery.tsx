@@ -8,6 +8,7 @@ import {
   type SyntheticEvent,
 } from "react";
 import styles from "./Imagery.module.css";
+import { cx } from "../../utils/cx";
 
 export type ImageryAspectRatio =
   | "1:1"
@@ -51,9 +52,6 @@ export interface ImageryProps
   >;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const RATIO_CLASS: Record<string, string> = {
   "1:1": styles["ratio-1-1"],

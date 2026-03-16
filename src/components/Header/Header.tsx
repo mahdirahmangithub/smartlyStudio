@@ -7,10 +7,8 @@ import { RowContainer } from "../RowContainer";
 import { TitleText, type TitleTextSize } from "../TitleText";
 import type { ButtonSize } from "../Button";
 import styles from "./Header.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type HeaderSize = "sm" | "md" | "lg" | "xl" | "2xl";
 export type HeaderDensity = "sm" | "lg";

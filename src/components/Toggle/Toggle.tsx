@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Toggle.module.css";
+import { cx } from "../../utils/cx";
 
 export type ToggleSize = "sm" | "lg";
 
@@ -17,9 +18,6 @@ export interface ToggleProps {
   "aria-describedby"?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function Toggle({
   checked = false,

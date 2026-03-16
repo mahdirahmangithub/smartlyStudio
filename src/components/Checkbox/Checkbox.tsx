@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Checkbox.module.css";
+import { cx } from "../../utils/cx";
 
 export type CheckboxSize = "sm" | "lg";
 
@@ -18,9 +19,6 @@ export interface CheckboxProps {
   "aria-describedby"?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function Checkbox({
   checked = false,

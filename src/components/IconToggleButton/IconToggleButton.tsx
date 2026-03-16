@@ -3,6 +3,7 @@ import type { ButtonSize } from "../Button";
 import type { ToggleButtonEmphasis } from "../ToggleButton";
 import { Tooltip } from "../Tooltip";
 import styles from "./IconToggleButton.module.css";
+import { cx } from "../../utils/cx";
 
 export interface IconToggleButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type" | "onChange"> {
@@ -18,9 +19,6 @@ export interface IconToggleButtonProps
   hideTooltip?: boolean;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const IconToggleButton = forwardRef<HTMLButtonElement, IconToggleButtonProps>(
   (

@@ -13,6 +13,7 @@ import { InputClear, type InputClearSize, type InputClearType } from "../InputCl
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./Tag.module.css";
+import { cx } from "../../utils/cx";
 
 export type TagSize = "md" | "lg";
 
@@ -120,9 +121,6 @@ function getClearVariant(variant: TagType, emphasis: TagEmphasis): InputClearTyp
   return variant as InputClearType;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const Tag = forwardRef<HTMLSpanElement, TagProps>(
   (

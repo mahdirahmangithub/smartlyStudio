@@ -1,5 +1,6 @@
 import { forwardRef, type ReactNode, type CSSProperties } from "react";
 import styles from "./TooltipContent.module.css";
+import { cx } from "../../utils/cx";
 
 export type TooltipType =
   | "inverse"
@@ -20,9 +21,6 @@ export interface TooltipContentProps {
   style?: CSSProperties;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 /**
  * Visual-only tooltip bubble. Renders the `.content` box (background, text,

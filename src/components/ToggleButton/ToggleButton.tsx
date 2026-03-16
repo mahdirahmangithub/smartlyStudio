@@ -1,6 +1,7 @@
 import { forwardRef, useState, type ButtonHTMLAttributes, type ReactNode } from "react";
 import type { ButtonSize } from "../Button";
 import styles from "./ToggleButton.module.css";
+import { cx } from "../../utils/cx";
 
 export type ToggleButtonEmphasis = "medium" | "low";
 
@@ -16,9 +17,6 @@ export interface ToggleButtonProps
   htmlType?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const ToggleButton = forwardRef<HTMLButtonElement, ToggleButtonProps>(
   (

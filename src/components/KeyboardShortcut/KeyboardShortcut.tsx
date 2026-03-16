@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from "react";
 import styles from "./KeyboardShortcut.module.css";
+import { cx } from "../../utils/cx";
 
 export type KeyboardShortcutSize = "sm" | "lg";
 
@@ -12,9 +13,6 @@ export interface KeyboardShortcutProps
   combiner?: boolean;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function KeyboardShortcut({
   keyText,

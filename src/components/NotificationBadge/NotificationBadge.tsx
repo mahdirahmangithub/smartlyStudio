@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import styles from "./NotificationBadge.module.css";
+import { cx } from "../../utils/cx";
 
 export type NotificationBadgeSize = "xs" | "sm" | "md" | "lg";
 export type NotificationBadgeType =
@@ -33,9 +34,6 @@ export interface NotificationBadgeProps
   icon?: ReactNode;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const SURFACE_TOKENS: Record<string, string> = {
   default: "--element-surface-default",

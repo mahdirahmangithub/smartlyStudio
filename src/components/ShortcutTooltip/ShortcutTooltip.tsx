@@ -2,10 +2,8 @@ import type { ReactElement } from "react";
 import { Tooltip, type Placement } from "../Tooltip/Tooltip";
 import { KeyboardShortcut } from "../KeyboardShortcut";
 import styles from "./ShortcutTooltip.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type ShortcutTooltipType = "inverse" | "neutral";
 

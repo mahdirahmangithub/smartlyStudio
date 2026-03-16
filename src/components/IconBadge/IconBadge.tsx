@@ -1,6 +1,7 @@
 import { type HTMLAttributes, type ReactNode } from "react";
 import { Tooltip } from "../Tooltip";
 import styles from "./IconBadge.module.css";
+import { cx } from "../../utils/cx";
 
 export type IconBadgeSize = "sm" | "md" | "lg";
 export type IconBadgeType = "neutral" | "brand" | "info" | "success" | "warning" | "alert";
@@ -15,9 +16,6 @@ export interface IconBadgeProps extends HTMLAttributes<HTMLSpanElement> {
   children?: ReactNode;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function IconBadge({
   size = "md",

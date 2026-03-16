@@ -1,5 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import styles from "./Button.module.css";
+import { cx } from "../../utils/cx";
 
 export type ButtonSize = "sm" | "md" | "lg";
 export type ButtonType =
@@ -22,9 +23,6 @@ export interface ButtonProps
   htmlType?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (

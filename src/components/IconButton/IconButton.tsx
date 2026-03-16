@@ -3,6 +3,7 @@ import type { ButtonType, ButtonEmphasis, ButtonSize } from "../Button";
 import { Tooltip } from "../Tooltip";
 import buttonStyles from "../Button/Button.module.css";
 import styles from "./IconButton.module.css";
+import { cx } from "../../utils/cx";
 
 export interface IconButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> {
@@ -16,9 +17,6 @@ export interface IconButtonProps
   hideTooltip?: boolean;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   (

@@ -9,6 +9,7 @@ import { Icon } from "../Icon";
 import { Imagery } from "../Imagery";
 import { NotificationBadge } from "../NotificationBadge";
 import styles from "./Avatar.module.css";
+import { cx } from "../../utils/cx";
 
 export type AvatarSize = "xs" | "sm" | "md" | "lg";
 
@@ -30,9 +31,6 @@ export interface AvatarProps
   colorSeed?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const ICON_SIZE: Record<AvatarSize, number> = { xs: 16, sm: 20, md: 24, lg: 32 };
 

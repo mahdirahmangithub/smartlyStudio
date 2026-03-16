@@ -1,5 +1,6 @@
 import { forwardRef, type HTMLAttributes } from "react";
 import styles from "./CurrencyThumbnail.module.css";
+import { cx } from "../../utils/cx";
 
 export type CurrencyThumbnailSize = "sm" | "md" | "lg";
 export type CurrencyType = "eur" | "usd" | "gbp" | "yen";
@@ -23,9 +24,6 @@ const SIZE_CLASS: Record<CurrencyThumbnailSize, string> = {
   lg: styles.lg,
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const CurrencyThumbnail = forwardRef<
   HTMLDivElement,

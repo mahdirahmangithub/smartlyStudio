@@ -10,6 +10,7 @@ import {
 } from "react";
 import { Icon } from "../Icon";
 import styles from "./ScrollFade.module.css";
+import { cx } from "../../utils/cx";
 
 export type ScrollFadeDirection = "horizontal" | "vertical";
 export type ScrollFadeSurface = "default" | "over" | "under" | "auto";
@@ -36,9 +37,6 @@ export interface ScrollFadeProps
 
 // ── helpers ────────────────────────────────────────────────────────────
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const SURFACE_TOKENS: Record<string, string> = {
   default: "--element-surface-default",

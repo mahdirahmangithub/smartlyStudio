@@ -1,9 +1,7 @@
 import { forwardRef, type HTMLAttributes, type ReactNode } from "react";
 import styles from "./Navbar.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type NavbarPosition = "static" | "sticky" | "fixed";
 

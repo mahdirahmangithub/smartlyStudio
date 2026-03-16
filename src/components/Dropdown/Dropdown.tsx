@@ -11,6 +11,7 @@ import {
 import { createPortal } from "react-dom";
 import { ScrollFade } from "../ScrollFade";
 import styles from "./Dropdown.module.css";
+import { cx } from "../../utils/cx";
 
 /* ═══════════════════════════════════════════════════════════════════════
    Types
@@ -29,6 +30,8 @@ export type DropdownPlacement =
   | "right-start"
   | "right-end"
   | "right";
+
+export type DropdownRole = "listbox" | "menu";
 
 export interface DropdownProps {
   open: boolean;
@@ -49,15 +52,14 @@ export interface DropdownProps {
   /** When ArrowUp from the first option, focus this element instead of doing nothing. */
   returnFocusRef?: RefObject<HTMLElement | null>;
   id?: string;
+  /** ARIA role for the panel — "listbox" (default) for selection, "menu" for action menus */
+  role?: DropdownRole;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
    Helpers
    ═══════════════════════════════════════════════════════════════════════ */
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 type Side = "top" | "bottom" | "left" | "right";
 type Align = "start" | "end" | undefined;
@@ -204,6 +206,7 @@ export function Dropdown({
   autoFocus = true,
   returnFocusRef,
   id,
+  role: panelRole = "listbox",
 }: DropdownProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
@@ -354,15 +357,17 @@ export function Dropdown({
      the search input (or first option) on open.
      ─────────────────────────────────────────────── */
 
+  const itemRole = panelRole === "menu" ? "menuitem" : "option";
+
   const getOptions = useCallback((): HTMLElement[] => {
     const panel = panelRef.current;
     if (!panel) return [];
     return Array.from(
       panel.querySelectorAll<HTMLElement>(
-        '[role="option"]:not([aria-disabled="true"])'
+        `[role="${itemRole}"]:not([aria-disabled="true"])`
       )
     );
-  }, []);
+  }, [itemRole]);
 
   const getHeaderInput = useCallback((): HTMLElement | null => {
     return (
@@ -410,7 +415,7 @@ export function Dropdown({
 
         let idx = opts.indexOf(active);
         if (idx < 0) {
-          const closest = active.closest('[role="option"]') as HTMLElement;
+          const closest = active.closest(`[role="${itemRole}"]`) as HTMLElement;
           if (closest) idx = opts.indexOf(closest);
         }
 
@@ -506,7 +511,7 @@ export function Dropdown({
     <div
       ref={panelRef}
       id={id}
-      role="listbox"
+      role={panelRole}
       className={cx(styles.panel, animClass, className)}
       style={panelStyle}
       data-theme={theme || undefined}

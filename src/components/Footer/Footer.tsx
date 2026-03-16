@@ -2,10 +2,8 @@ import { forwardRef, type HTMLAttributes, type ReactNode } from "react";
 import { Divider } from "../Divider";
 import { RowContainer } from "../RowContainer";
 import styles from "./Footer.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type FooterDensity = "sm" | "lg";
 

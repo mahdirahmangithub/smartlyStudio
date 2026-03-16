@@ -1,4 +1,5 @@
 import styles from "./Divider.module.css";
+import { cx } from "../../utils/cx";
 
 export type DividerType = "neutral" | "brand";
 export type DividerVariant = "normal" | "dashed" | "dotted";
@@ -13,9 +14,6 @@ export interface DividerProps {
   className?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function Divider({
   type = "neutral",

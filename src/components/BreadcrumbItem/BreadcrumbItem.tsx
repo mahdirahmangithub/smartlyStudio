@@ -3,10 +3,8 @@ import { Icon } from "../Icon";
 import { Link } from "../Link";
 import type { LinkSize } from "../Link";
 import styles from "./BreadcrumbItem.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type BreadcrumbItemSize = "sm" | "md" | "lg";
 

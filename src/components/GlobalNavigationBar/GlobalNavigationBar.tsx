@@ -15,6 +15,7 @@ import { NavigationProfileItem } from "../NavigationProfileItem";
 import { ScrollFade } from "../ScrollFade";
 import { useSmartHover } from "../../hooks/useSmartHover";
 import styles from "./GlobalNavigationBar.module.css";
+import { cx } from "../../utils/cx";
 
 const NavBarContext = createContext(false);
 
@@ -23,9 +24,6 @@ export function useNavBarExpanded(): boolean {
   return useContext(NavBarContext);
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export interface GlobalNavigationBarProps
   extends Omit<HTMLAttributes<HTMLElement>, "children"> {
@@ -85,7 +83,7 @@ export const GlobalNavigationBar = forwardRef<HTMLElement, GlobalNavigationBarPr
       secondaryInitials,
       secondaryLabel = "Workspace",
       onSecondaryProfileClick,
-      dwellDelay = 320,
+      dwellDelay = 240,
       velocityThreshold = 0.6,
       exitGrace = 180,
       className,

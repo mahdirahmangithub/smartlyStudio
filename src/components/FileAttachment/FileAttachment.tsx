@@ -4,6 +4,7 @@ import { Icon } from "../Icon";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./FileAttachment.module.css";
+import { cx } from "../../utils/cx";
 
 export type FileAttachmentState = "normal" | "loading" | "error";
 
@@ -22,9 +23,6 @@ export interface FileAttachmentProps
   onRetry?: () => void;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const FileAttachment = forwardRef<HTMLDivElement, FileAttachmentProps>(
   (

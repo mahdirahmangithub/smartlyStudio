@@ -11,6 +11,7 @@ import {
 import { Tooltip } from "../Tooltip";
 import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Slider.module.css";
+import { cx } from "../../utils/cx";
 
 /* ═══════════════════════════════════════════════════════════════════════
    Types
@@ -65,9 +66,6 @@ export type SliderProps = SingleSliderProps | RangeSliderProps;
    Utilities
    ═══════════════════════════════════════════════════════════════════════ */
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 function clamp(val: number, lo: number, hi: number) {
   return Math.min(Math.max(val, lo), hi);

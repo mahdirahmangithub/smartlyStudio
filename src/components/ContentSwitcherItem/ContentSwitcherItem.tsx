@@ -1,5 +1,6 @@
 import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import styles from "./ContentSwitcherItem.module.css";
+import { cx } from "../../utils/cx";
 
 export type ContentSwitcherItemSize = "sm" | "md" | "lg";
 export type ContentSwitcherItemEmphasis = "high" | "low";
@@ -14,9 +15,6 @@ export interface ContentSwitcherItemProps
   htmlType?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const ICON_SIZE: Record<ContentSwitcherItemSize, number> = {
   sm: 16,

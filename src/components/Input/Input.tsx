@@ -12,6 +12,7 @@ import { InputClear, type InputClearSize } from "../InputClear";
 import { useScrollFade } from "../ScrollFade";
 import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Input.module.css";
+import { cx } from "../../utils/cx";
 
 export type InputSize = "md" | "lg" | "xl";
 
@@ -32,9 +33,6 @@ const CLEAR_SIZE: Record<InputSize, InputClearSize> = {
   xl: "lg",
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (

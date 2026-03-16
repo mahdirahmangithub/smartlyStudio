@@ -19,10 +19,8 @@ import { NavigationSelectOption } from "../NavigationSelectOption";
 import type { BreadcrumbItemSize } from "../BreadcrumbItem";
 import itemStyles from "../BreadcrumbItem/BreadcrumbItem.module.css";
 import styles from "./Breadcrumb.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 /* ── Context ── */
 

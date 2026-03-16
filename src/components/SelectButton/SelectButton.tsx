@@ -3,6 +3,7 @@ import { Badge } from "../Badge";
 import { Expander } from "../Expander";
 import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./SelectButton.module.css";
+import { cx } from "../../utils/cx";
 
 export type SelectButtonSize = "sm" | "md" | "lg";
 export type SelectButtonEmphasis = "medium" | "low";
@@ -18,9 +19,6 @@ export interface SelectButtonProps
   htmlType?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const EXPANDER_SIZE: Record<SelectButtonSize, "sm" | "lg"> = {
   sm: "sm",

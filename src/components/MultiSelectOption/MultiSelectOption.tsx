@@ -8,6 +8,7 @@ import {
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./MultiSelectOption.module.css";
+import { cx } from "../../utils/cx";
 
 export interface MultiSelectOptionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
@@ -23,9 +24,6 @@ export interface MultiSelectOptionProps
   onChange?: (checked: boolean) => void;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function MultiSelectOption({
   checked = false,

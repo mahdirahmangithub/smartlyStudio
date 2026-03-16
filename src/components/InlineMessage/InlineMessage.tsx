@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Icon } from "../Icon";
 import styles from "./InlineMessage.module.css";
+import { cx } from "../../utils/cx";
 
 export type InlineMessageType =
   | "none"
@@ -43,9 +44,6 @@ export interface InlineMessageProps {
   className?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const ICON_MAP: Record<string, string> = {
   none: "chat_info",

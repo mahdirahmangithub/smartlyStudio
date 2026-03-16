@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Hint, type HintSize } from "../Hint";
 import styles from "./Label.module.css";
+import { cx } from "../../utils/cx";
 
 export type LabelSize = "sm" | "lg";
 export type LabelDensity = "none" | "xs" | "sm" | "md";
@@ -49,9 +50,6 @@ const HINT_SIZE: Record<LabelSize, HintSize> = {
   lg: "sm",
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function Label({
   label,

@@ -1,5 +1,6 @@
 import { type HTMLAttributes, type ReactNode } from "react";
 import styles from "./Badge.module.css";
+import { cx } from "../../utils/cx";
 
 export type BadgeSize = "sm" | "md" | "lg";
 export type BadgeType = "neutral" | "brand" | "info" | "success" | "warning" | "alert";
@@ -16,9 +17,6 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 const NUMERIC_RE = /^\d+$/;
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function Badge({
   size = "md",

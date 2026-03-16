@@ -1,6 +1,7 @@
 import { type HTMLAttributes, type ReactNode } from "react";
 import { Icon } from "../Icon";
 import styles from "./OptionItemTrailing.module.css";
+import { cx } from "../../utils/cx";
 
 export type OptionItemTrailingType =
   | "helper-text"
@@ -23,9 +24,6 @@ export interface OptionItemTrailingProps
   children?: ReactNode;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const TYPE_CLASS: Record<OptionItemTrailingType, string> = {
   "helper-text": styles.helperText,

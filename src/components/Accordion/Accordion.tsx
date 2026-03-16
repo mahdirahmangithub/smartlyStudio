@@ -12,10 +12,8 @@ import { ScrollFade } from "../ScrollFade";
 import { Divider } from "../Divider";
 import { useCollapsible } from "../../hooks/useCollapsible";
 import styles from "./Accordion.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export interface AccordionHeaderProps {
   /** Title displayed in the header */

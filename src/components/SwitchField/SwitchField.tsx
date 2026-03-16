@@ -1,10 +1,8 @@
 import type { ReactNode } from "react";
 import { Label, type LabelProps } from "../Label";
 import styles from "./SwitchField.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type SwitchFieldSize = "sm" | "lg";
 

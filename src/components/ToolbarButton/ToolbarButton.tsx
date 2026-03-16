@@ -14,10 +14,8 @@ import { ShortcutTooltip } from "../ShortcutTooltip";
 import { Dropdown } from "../Dropdown";
 import type { DropdownPlacement } from "../Dropdown/Dropdown";
 import styles from "./ToolbarButton.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export interface ToolbarButtonProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "type"> {

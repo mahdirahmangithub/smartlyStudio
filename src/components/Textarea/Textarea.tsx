@@ -12,6 +12,7 @@ import {
 import { useScrollFade } from "../ScrollFade";
 import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Textarea.module.css";
+import { cx } from "../../utils/cx";
 
 export type TextareaSize = "md" | "lg" | "xl";
 
@@ -33,9 +34,6 @@ export interface TextareaProps
   className?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   (

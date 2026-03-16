@@ -5,10 +5,8 @@ import {
   type ReactNode,
 } from "react";
 import styles from "./Grid.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 /* ── Container ── */
 

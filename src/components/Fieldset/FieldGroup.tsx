@@ -6,6 +6,7 @@ import {
   type InlineMessageEmphasis,
 } from "../InlineMessage";
 import styles from "./Fieldset.module.css";
+import { cx } from "../../utils/cx";
 
 export interface FieldGroupProps {
   /** Group label text. */
@@ -63,9 +64,6 @@ export interface FieldGroupProps {
   children?: ReactNode;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function FieldGroup({
   label,

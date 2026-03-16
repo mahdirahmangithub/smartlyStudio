@@ -3,6 +3,7 @@ import { Icon } from "../Icon";
 import { InputClear } from "../InputClear";
 import { Divider } from "../Divider";
 import styles from "./SearchInputAttachment.module.css";
+import { cx } from "../../utils/cx";
 
 export type SearchInputAttachmentSize = "md" | "lg";
 
@@ -21,9 +22,6 @@ export interface SearchInputAttachmentProps
   accept?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function SearchInputAttachment({
   size = "md",

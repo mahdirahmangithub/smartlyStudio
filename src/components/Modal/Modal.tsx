@@ -15,10 +15,8 @@ import { Footer } from "../Footer";
 import { Dimmer } from "../Dimmer";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import styles from "./Modal.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type ModalSize = "sm" | "md" | "lg" | "xl";
 export type ModalDensity = "none" | "sm" | "lg";

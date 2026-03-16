@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Icon, type IconName } from "../Icon";
 import { Tooltip, type Placement, type TooltipType } from "../Tooltip";
 import styles from "./Hint.module.css";
+import { cx } from "../../utils/cx";
 
 export type HintSize = "xs" | "sm" | "md" | "lg";
 
@@ -35,9 +36,6 @@ const ICON_SIZE: Record<HintSize, number> = {
   lg: 24,
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function Hint({
   size = "md",

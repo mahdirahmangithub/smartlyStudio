@@ -11,6 +11,7 @@ import { Icon } from "../Icon";
 import { useScrollFade } from "../ScrollFade";
 import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./InlineInput.module.css";
+import { cx } from "../../utils/cx";
 
 export type InlineInputSize = "sm" | "lg";
 
@@ -25,9 +26,6 @@ export interface InlineInputProps
   autoWidth?: boolean;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const InlineInput = forwardRef<HTMLInputElement, InlineInputProps>(
   (

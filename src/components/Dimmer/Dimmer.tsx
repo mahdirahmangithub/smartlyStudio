@@ -1,9 +1,7 @@
 import { forwardRef, type CSSProperties, type HTMLAttributes } from "react";
 import styles from "./Dimmer.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type DimmerEmphasis = "low" | "md" | "high";
 

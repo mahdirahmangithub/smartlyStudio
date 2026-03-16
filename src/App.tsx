@@ -47,6 +47,7 @@ import SearchInputAttachmentPlayground from "./pages/SearchInputAttachmentPlaygr
 import SearchInputPlayground from "./pages/SearchInputPlayground";
 import SelectOptionHeaderPlayground from "./pages/SelectOptionHeaderPlayground";
 import DropdownPlayground from "./pages/DropdownPlayground";
+import EntityPlayground from "./pages/EntityPlayground";
 import ThumbnailPlayground from "./pages/ThumbnailPlayground";
 import SpinnerPlayground from "./pages/SpinnerPlayground";
 import CurrencyThumbnailPlayground from "./pages/CurrencyThumbnailPlayground";
@@ -60,6 +61,7 @@ import ComboboxPlayground from "./pages/ComboboxPlayground";
 import SliderPlayground from "./pages/SliderPlayground";
 import InlineMessagePlayground from "./pages/InlineMessagePlayground";
 import DimmerPlayground from "./pages/DimmerPlayground";
+import DragHandlePlayground from "./pages/DragHandlePlayground";
 import DrawerPlayground from "./pages/DrawerPlayground";
 import ModalPlayground from "./pages/ModalPlayground";
 import FieldsetPlayground from "./pages/FieldsetPlayground";
@@ -90,6 +92,7 @@ import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlaygr
 import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
 import ShortcutTooltipPlayground from "./pages/ShortcutTooltipPlayground";
 import SidebarPlayground from "./pages/SidebarPlayground";
+import SortableListPlayground from "./pages/SortableListPlayground";
 import ToolbarButtonPlayground from "./pages/ToolbarButtonPlayground";
 import "./App.css";
 
@@ -98,6 +101,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "icon-container"
 | "breadcrumb"
 | "dimmer"
+| "drag-handle"
 | "modal"
 | "accordion"
 | "grid"
@@ -113,8 +117,10 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navbar-content"
 | "navigation-sub-item"
 | "navigation-profile-item"
+| "entity"
 | "shortcut-tooltip"
 | "sidebar"
+| "sortable-list"
 | "toolbar-button"
 | "ai-text-generation"
 
@@ -294,8 +300,10 @@ export default function App() {
     { key: "data-table", label: "DataTable" },
     { key: "dimmer", label: "Dimmer" },
     { key: "divider", label: "Divider" },
+    { key: "drag-handle", label: "DragHandle" },
     { key: "drawer", label: "Drawer" },
     { key: "dropdown", label: "Dropdown" },
+    { key: "entity", label: "Entity" },
     { key: "expandable-badge", label: "ExpandableBadge" },
     { key: "expander", label: "Expander" },
     { key: "fieldset", label: "Fieldset" },
@@ -349,6 +357,7 @@ export default function App() {
     { key: "sidebar", label: "Sidebar" },
     { key: "single-select-option", label: "SingleSelectOpt" },
     { key: "slider", label: "Slider" },
+    { key: "sortable-list", label: "SortableList" },
     { key: "spinner", label: "Spinner" },
     { key: "tag", label: "Tag" },
     { key: "tag-multi-select-option", label: "TagMultiOpt" },
@@ -478,7 +487,9 @@ export default function App() {
             {page === "search-input-attachment" && <SearchInputAttachmentPlayground />}
             {page === "search-input" && <SearchInputPlayground />}
             {page === "select-option-header" && <SelectOptionHeaderPlayground />}
+            {page === "drag-handle" && <DragHandlePlayground />}
             {page === "dropdown" && <DropdownPlayground />}
+            {page === "entity" && <EntityPlayground />}
             {page === "thumbnail" && <ThumbnailPlayground />}
             {page === "spinner" && <SpinnerPlayground />}
             {page === "currency-thumbnail" && <CurrencyThumbnailPlayground />}
@@ -507,6 +518,7 @@ export default function App() {
             {page === "shortcut-tooltip" && <ShortcutTooltipPlayground />}
             {page === "toolbar-button" && <ToolbarButtonPlayground />}
             {page === "sidebar" && <SidebarPlayground />}
+            {page === "sortable-list" && <SortableListPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
             {page === "breadcrumb" && <BreadcrumbPlayground />}

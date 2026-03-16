@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import styles from "./DataCellContent.module.css";
+import { cx } from "../../utils/cx";
 
 export type DataCellContentState = "normal" | "normal-low" | "disable";
 export type DataCellContentTextAlignment = "left" | "center" | "right";
@@ -18,9 +19,6 @@ export interface DataCellContentProps {
   className?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const STATE_CLASS: Record<DataCellContentState, string> = {
   normal: styles.normal,

@@ -1,6 +1,7 @@
 import { forwardRef, type ButtonHTMLAttributes } from "react";
 import { Icon } from "../Icon";
 import styles from "./InputClear.module.css";
+import { cx } from "../../utils/cx";
 
 export type InputClearSize = "2xs" | "xs" | "sm" | "md" | "lg";
 export type InputClearType =
@@ -28,9 +29,6 @@ const SIZE_CLASS: Record<InputClearSize, string> = {
   lg: styles.sizeLg,
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const InputClear = forwardRef<HTMLButtonElement, InputClearProps>(
   (

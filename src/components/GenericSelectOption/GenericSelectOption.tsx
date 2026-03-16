@@ -8,6 +8,7 @@ import {
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./GenericSelectOption.module.css";
+import { cx } from "../../utils/cx";
 
 export interface GenericSelectOptionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "onClick"> {
@@ -24,11 +25,10 @@ export interface GenericSelectOptionProps
   /** Show a chevron_right icon indicating a sub-menu */
   subMenu?: boolean;
   onClick?: () => void;
+  /** ARIA role for the interactive element — "option" (default) or "menuitem" */
+  itemRole?: "option" | "menuitem";
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function GenericSelectOption({
   alert = false,
@@ -40,6 +40,7 @@ export function GenericSelectOption({
   trailing,
   subMenu = false,
   onClick,
+  itemRole = "option",
   className,
   ...rest
 }: GenericSelectOptionProps) {
@@ -60,7 +61,7 @@ export function GenericSelectOption({
   return (
     <div className={cx(styles.option, className)} {...rest}>
       <div
-        role="option"
+        role={itemRole}
         aria-disabled={disabled || undefined}
         tabIndex={disabled ? -1 : 0}
         className={cx(

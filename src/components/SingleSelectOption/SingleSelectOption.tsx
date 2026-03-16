@@ -8,6 +8,7 @@ import {
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./SingleSelectOption.module.css";
+import { cx } from "../../utils/cx";
 
 export interface SingleSelectOptionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
@@ -23,9 +24,6 @@ export interface SingleSelectOptionProps
   onChange?: (checked: boolean) => void;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function SingleSelectOption({
   checked = false,

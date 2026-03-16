@@ -24,14 +24,12 @@ import { Expander } from "../Expander";
 import { DataCellContent } from "../DataCellContent";
 import { Checkbox } from "../Checkbox";
 import { Radio } from "../Radio";
+import { cx } from "../../utils/cx";
 
 /* ═══════════════════════════════════════════════════════════════
    Utilities
    ═══════════════════════════════════════════════════════════════ */
 
-function cx(...c: (string | false | undefined | null)[]) {
-  return c.filter(Boolean).join(" ");
-}
 
 const DEFAULT_COL_WIDTH = 100;
 

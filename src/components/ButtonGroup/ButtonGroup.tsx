@@ -1,6 +1,7 @@
 import { type ReactNode } from "react";
 import type { ButtonType } from "../Button";
 import styles from "./ButtonGroup.module.css";
+import { cx } from "../../utils/cx";
 
 export type ButtonGroupEmphasis = "high" | "medium";
 
@@ -11,9 +12,6 @@ export interface ButtonGroupProps {
   className?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function ButtonGroup({
   children,

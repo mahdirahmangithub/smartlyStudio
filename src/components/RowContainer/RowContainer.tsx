@@ -2,6 +2,7 @@ import { forwardRef, type HTMLAttributes, type ReactNode, type CSSProperties } f
 import { ScrollFade, type ScrollFadeSurface } from "../ScrollFade";
 import { getSpacing, type SpacingSize, type SpacingProps } from "../../utils/spacing";
 import styles from "./RowContainer.module.css";
+import { cx } from "../../utils/cx";
 
 export type RowContainerAlignment = "left" | "right" | "grow";
 export type RowContainerDensity = "none" | "xs" | "sm" | "md" | "lg";
@@ -19,9 +20,6 @@ export interface RowContainerProps
   children: ReactNode;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const DENSITY_CLASS: Record<RowContainerDensity, string> = {
   none: styles.densityNone,

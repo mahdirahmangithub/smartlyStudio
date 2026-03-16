@@ -16,6 +16,7 @@ import { Expander } from "../Expander";
 import { Dropdown } from "../Dropdown";
 import { useScrollFade } from "../ScrollFade";
 import styles from "./SelectInput.module.css";
+import { cx } from "../../utils/cx";
 
 export type SelectInputSize = "md" | "lg" | "xl";
 
@@ -43,9 +44,6 @@ const EXPANDER_SIZE: Record<SelectInputSize, "sm" | "lg"> = {
   xl: "lg",
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const SelectInput = forwardRef<HTMLInputElement, SelectInputProps>(
   (

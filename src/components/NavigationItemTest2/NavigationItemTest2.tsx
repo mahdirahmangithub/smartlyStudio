@@ -15,10 +15,8 @@ import { IconButton } from "../IconButton";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./NavigationItemTest2.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export interface NavigationItemTest2Props
   extends Omit<HTMLAttributes<HTMLDivElement>, "children"> {

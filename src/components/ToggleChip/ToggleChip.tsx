@@ -9,6 +9,7 @@ import { InputClear, type InputClearSize } from "../InputClear";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./ToggleChip.module.css";
+import { cx } from "../../utils/cx";
 
 export type ToggleChipSize = "sm" | "md" | "lg";
 export type ToggleChipEmphasis = "medium" | "low";
@@ -32,9 +33,6 @@ const INPUT_CLEAR_SIZE: Record<ToggleChipSize, InputClearSize> = {
   lg: "md",
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const ToggleChip = forwardRef<HTMLDivElement, ToggleChipProps>(
   (

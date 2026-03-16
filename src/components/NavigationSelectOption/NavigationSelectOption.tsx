@@ -3,6 +3,7 @@ import { OptionItemLeading } from "../OptionItemLeading";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./NavigationSelectOption.module.css";
+import { cx } from "../../utils/cx";
 
 export interface NavigationSelectOptionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "onClick"> {
@@ -13,9 +14,6 @@ export interface NavigationSelectOptionProps
   onClick?: () => void;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function NavigationSelectOption({
   disabled = false,

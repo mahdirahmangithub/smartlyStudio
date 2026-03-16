@@ -7,6 +7,7 @@ import {
 import { SearchInput } from "../SearchInput";
 import { Input } from "../Input";
 import styles from "./SelectOptionHeader.module.css";
+import { cx } from "../../utils/cx";
 
 export type SelectOptionHeaderType = "search" | "from-to";
 
@@ -44,9 +45,6 @@ export interface SelectOptionHeaderProps
   toRef?: Ref<HTMLInputElement>;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const SelectOptionHeader = forwardRef<
   HTMLDivElement,

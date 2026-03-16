@@ -1,5 +1,6 @@
 import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./Radio.module.css";
+import { cx } from "../../utils/cx";
 
 export type RadioSize = "sm" | "lg";
 
@@ -17,9 +18,6 @@ export interface RadioProps {
   "aria-describedby"?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function Radio({
   checked = false,

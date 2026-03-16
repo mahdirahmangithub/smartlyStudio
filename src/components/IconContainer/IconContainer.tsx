@@ -1,9 +1,7 @@
 import { Icon, type IconName } from "../Icon";
 import styles from "./IconContainer.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type IconContainerSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
 

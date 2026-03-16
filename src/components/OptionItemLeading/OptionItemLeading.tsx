@@ -1,5 +1,6 @@
 import { type HTMLAttributes, type ReactNode } from "react";
 import styles from "./OptionItemLeading.module.css";
+import { cx } from "../../utils/cx";
 
 export type OptionItemLeadingType =
   | "icon"
@@ -20,9 +21,6 @@ export interface OptionItemLeadingProps
   children: ReactNode;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const TYPE_CLASS: Record<OptionItemLeadingType, string> = {
   icon: styles.icon,

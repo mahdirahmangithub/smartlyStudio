@@ -18,6 +18,7 @@ import { Dropdown } from "../Dropdown";
 import { GenericSelectOption } from "../GenericSelectOption";
 import { NavBarCompactProvider } from "./NavBarCompactContext";
 import styles from "./NavBarContent.module.css";
+import { cx } from "../../utils/cx";
 
 /* ═══════════════════════════════════════════════════════════════════════
    Compact-mode tree transformers
@@ -117,9 +118,6 @@ function compactifyAction(node: ReactNode): ReactNode {
   });
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 /* ═══════════════════════════════════════════════════════════════════════
    Types

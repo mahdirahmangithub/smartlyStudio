@@ -7,6 +7,7 @@ import {
 } from "../InlineMessage";
 import { FieldContext } from "./FieldContext";
 import styles from "./Fieldset.module.css";
+import { cx } from "../../utils/cx";
 
 export interface FieldsetProps {
   /** Label text. When omitted the label row is hidden. */
@@ -79,9 +80,6 @@ export interface FieldsetProps {
     | ((ids: { inputId: string; hintId: string }) => ReactNode);
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function Fieldset({
   label,

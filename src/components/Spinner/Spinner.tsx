@@ -1,5 +1,6 @@
 import { forwardRef, type CSSProperties, type HTMLAttributes } from "react";
 import styles from "./Spinner.module.css";
+import { cx } from "../../utils/cx";
 
 export type SpinnerSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl";
 export type SpinnerType = "brand" | "neutral" | "inverse";
@@ -18,9 +19,6 @@ export interface SpinnerProps
   type?: SpinnerType;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 const SIZE_CLASS: Record<SpinnerSize, string> = {
   sm: styles.sm,

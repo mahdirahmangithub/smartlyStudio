@@ -1,6 +1,7 @@
 import { type HTMLAttributes } from "react";
 import { Icon } from "../Icon";
 import styles from "./AddItemOption.module.css";
+import { cx } from "../../utils/cx";
 
 export interface AddItemOptionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "onClick"> {
@@ -14,9 +15,6 @@ export interface AddItemOptionProps
   onClick?: () => void;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function AddItemOption({
   disabled = false,

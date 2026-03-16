@@ -1,6 +1,7 @@
 import { type HTMLAttributes } from "react";
 import { Divider } from "../Divider";
 import styles from "./OptionSeparator.module.css";
+import { cx } from "../../utils/cx";
 
 export type OptionSeparatorType = "divider" | "group-label";
 
@@ -12,9 +13,6 @@ export interface OptionSeparatorProps
   labelText?: string;
 }
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export function OptionSeparator({
   type = "divider",

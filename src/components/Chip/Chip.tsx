@@ -3,6 +3,7 @@ import { InputClear, type InputClearSize } from "../InputClear";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./Chip.module.css";
+import { cx } from "../../utils/cx";
 
 export type ChipSize = "sm" | "md" | "lg";
 export type ChipType = "neutral" | "brand" | "info" | "success" | "warning" | "alert";
@@ -24,9 +25,6 @@ const INPUT_CLEAR_SIZE: Record<ChipSize, InputClearSize> = {
   lg: "md",
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const Chip = forwardRef<HTMLDivElement, ChipProps>(
   (

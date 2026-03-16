@@ -4,6 +4,7 @@ import { InputClear, type InputClearSize } from "../InputClear";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./SelectChip.module.css";
+import { cx } from "../../utils/cx";
 
 export type SelectChipSize = "sm" | "md" | "lg";
 export type SelectChipType = "neutral" | "brand" | "info" | "success" | "warning" | "alert";
@@ -32,9 +33,6 @@ const ICON_SIZE: Record<SelectChipSize, number> = {
   lg: 20,
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const SelectChip = forwardRef<HTMLDivElement, SelectChipProps>(
   (

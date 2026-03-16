@@ -16,6 +16,7 @@ import { Dropdown } from "../Dropdown";
 import { useScrollFade } from "../ScrollFade";
 import { useFieldContext } from "../Fieldset/FieldContext";
 import styles from "./MultiSelectInput.module.css";
+import { cx } from "../../utils/cx";
 
 export type MultiSelectInputSize = "md" | "lg" | "xl";
 
@@ -44,9 +45,6 @@ const EXPANDER_SIZE: Record<MultiSelectInputSize, "sm" | "lg"> = {
   xl: "lg",
 };
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputProps>(
   (

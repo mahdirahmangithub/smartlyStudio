@@ -14,10 +14,8 @@ import { Footer } from "../Footer";
 import { Dimmer } from "../Dimmer";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import styles from "./Drawer.module.css";
+import { cx } from "../../utils/cx";
 
-function cx(...classes: (string | false | undefined | null)[]) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export type DrawerDensity = "none" | "sm" | "lg";
 export type DrawerMode = "overlay" | "push";
