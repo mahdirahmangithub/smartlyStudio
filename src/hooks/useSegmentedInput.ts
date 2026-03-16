@@ -244,6 +244,10 @@ export function useSegmentedInput({
       if (currentStr === "") {
         if (def.sectionType === "year") {
           newValue = new Date().getFullYear();
+        } else if (def.sectionType === "hours") {
+          newValue = new Date().getHours();
+        } else if (def.sectionType === "minutes") {
+          newValue = new Date().getMinutes();
         } else {
           newValue = delta > 0 ? def.min : max;
         }
@@ -457,5 +461,6 @@ export function useSegmentedInput({
     handleBlur,
     setRef,
     focusFirst,
+    focusSegment,
   };
 }

@@ -363,9 +363,9 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
     const handleWrapperClick = useCallback(
       (e: React.MouseEvent) => {
         if (disabled) return;
-        if (groupRef.current && !groupRef.current.contains(e.target as Node)) {
-          focusFirst();
-        }
+        const target = e.target as HTMLElement;
+        if (target.closest("[role='spinbutton'], button")) return;
+        focusFirst();
       },
       [disabled, focusFirst],
     );

@@ -1,0 +1,97 @@
+/* ── segment group ─────────────────────────────────────────────────── */
+
+.segmentGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  flex: 1 0 0;
+  min-width: 0;
+  padding-left: var(--spacing-xs);
+  font-family: var(--type-label-sm-family);
+  font-size: var(--type-label-sm-size);
+  font-weight: var(--type-label-sm-weight);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+}
+
+.xl {
+  font-family: var(--type-label-md-family);
+  font-size: var(--type-label-md-size);
+  font-weight: var(--type-label-md-weight);
+  line-height: var(--type-label-md-line-height);
+  letter-spacing: var(--type-label-md-letter-spacing);
+}
+
+/* ── numeric segment ──────────────────────────────────────────────── */
+
+.segment {
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  padding: var(--spacing-xxs) var(--spacing-px);
+  border-radius: var(--radius-sm);
+  outline: none;
+  cursor: text;
+  caret-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: var(--text-neutral-primary);
+  background: transparent;
+  transition: background var(--animation-state-change-duration) var(--animation-state-change-easing);
+  position: relative;
+  z-index: 1;
+}
+
+.segment:focus::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: var(--spacing-negative-xs);
+  bottom: var(--spacing-negative-xs);
+  left: var(--spacing-negative-2xs);
+  right: var(--spacing-negative-2xs);
+  z-index: 0;
+  background: var(--element-fill-brand-secondary-hover);
+  pointer-events: none;
+  border-radius: var(--radius-xs);
+  z-index: -1;
+}
+
+.segment[data-placeholder] {
+  color: var(--text-neutral-placeholder);
+}
+
+/* ── literal separator ────────────────────────────────────────────── */
+
+.literal {
+  color: var(--text-neutral-secondary-default);
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* ── meridiem (AM/PM) ─────────────────────────────────────────────── */
+
+.meridiem {
+  composes: segment;
+  font-variant-numeric: normal;
+  margin-left: var(--spacing-xs);
+ }
+
+/* ── disabled / readOnly ──────────────────────────────────────────── */
+
+.disabled .segment,
+.disabled .literal,
+.disabled .meridiem {
+  color: var(--text-neutral-disable);
+  cursor: default;
+}
+
+.readOnly .segment,
+.readOnly .meridiem {
+  cursor: default;
+}
