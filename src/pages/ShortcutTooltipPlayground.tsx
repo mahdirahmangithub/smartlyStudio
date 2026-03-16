@@ -31,15 +31,15 @@ export default function ShortcutTooltipPlayground() {
         <div style={cardStyle}>
           <div style={rowStyle}>
             <ShortcutTooltip label="Undo" shortcut={["⌘", "Z"]}>
-              <Button variant="neutral" emphasis="medium" label="Undo" />
+              <Button variant="neutral" emphasis="medium">Undo</Button>
             </ShortcutTooltip>
 
             <ShortcutTooltip label="Copy" shortcut={["⌘", "C"]}>
-              <Button variant="neutral" emphasis="medium" label="Copy" />
+              <Button variant="neutral" emphasis="medium">Copy</Button>
             </ShortcutTooltip>
 
             <ShortcutTooltip label="Save" shortcut={["⌘", "S"]}>
-              <Button variant="neutral" emphasis="medium" label="Save" />
+              <Button variant="neutral" emphasis="medium">Save</Button>
             </ShortcutTooltip>
 
             <ShortcutTooltip label="Search" shortcut={["⌘", "K"]}>
@@ -61,7 +61,7 @@ export default function ShortcutTooltipPlayground() {
         <div style={cardStyle}>
           <div style={rowStyle}>
             <ShortcutTooltip type="neutral" label="Undo" shortcut={["⌘", "Z"]}>
-              <Button variant="neutral" emphasis="medium" label="Undo" />
+              <Button variant="neutral" emphasis="medium">Undo</Button>
             </ShortcutTooltip>
 
             <ShortcutTooltip type="neutral" label="Edit" shortcut={["⌘", "E"]}>
@@ -73,7 +73,7 @@ export default function ShortcutTooltipPlayground() {
             </ShortcutTooltip>
 
             <ShortcutTooltip type="neutral" label="Select all" shortcut={["⌘", "A"]}>
-              <Button variant="neutral" emphasis="medium" label="Select all" />
+              <Button variant="neutral" emphasis="medium">Select all</Button>
             </ShortcutTooltip>
           </div>
         </div>
@@ -87,16 +87,16 @@ export default function ShortcutTooltipPlayground() {
         <div style={cardStyle}>
           <div style={{ ...rowStyle, justifyContent: "center" }}>
             <ShortcutTooltip label="Top" shortcut={["⌘"]} placement="top">
-              <Button variant="neutral" emphasis="medium" label="Top" />
+              <Button variant="neutral" emphasis="medium">Top</Button>
             </ShortcutTooltip>
             <ShortcutTooltip label="Bottom" shortcut={["⌘"]} placement="bottom">
-              <Button variant="neutral" emphasis="medium" label="Bottom" />
+              <Button variant="neutral" emphasis="medium">Bottom</Button>
             </ShortcutTooltip>
             <ShortcutTooltip label="Left" shortcut={["⌘"]} placement="left">
-              <Button variant="neutral" emphasis="medium" label="Left" />
+              <Button variant="neutral" emphasis="medium">Left</Button>
             </ShortcutTooltip>
             <ShortcutTooltip label="Right" shortcut={["⌘"]} placement="right">
-              <Button variant="neutral" emphasis="medium" label="Right" />
+              <Button variant="neutral" emphasis="medium">Right</Button>
             </ShortcutTooltip>
           </div>
         </div>
@@ -117,7 +117,7 @@ export default function ShortcutTooltipPlayground() {
               />
             </ShortcutTooltip>
             <ShortcutTooltip label="Escape" shortcut={["Esc"]}>
-              <Button variant="neutral" emphasis="medium" label="Close" />
+              <Button variant="neutral" emphasis="medium">Close</Button>
             </ShortcutTooltip>
           </div>
         </div>

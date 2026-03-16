@@ -30,11 +30,6 @@ const SIZE_COMPONENTS = new Set([
   "Toggle",
 ]);
 
-function isComponentNamed(el: ReactElement, name: string): boolean {
-  const type = el.type as any;
-  return type?.displayName === name || type?.name === name;
-}
-
 function getComponentName(el: ReactElement): string | undefined {
   const type = el.type as any;
   return type?.displayName || type?.name;

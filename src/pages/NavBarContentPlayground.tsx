@@ -379,7 +379,7 @@ function makeVariants(): Record<VariantKey, VariantConfig> {
         {
           id: "connected-badge",
           element: (
-            <Badge size="md" variant="positive" emphasis="medium" leadingIcon={<Icon name="check_circle" size={12} />}>
+            <Badge size="md" variant="success" emphasis="medium" leadingIcon={<Icon name="check_circle" size={12} />}>
               Connected
             </Badge>
           ),

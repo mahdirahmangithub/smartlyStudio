@@ -66,7 +66,7 @@ export const BreadcrumbItem = forwardRef<HTMLSpanElement, BreadcrumbItemProps>(
     ref,
   ) {
     const variant = basic ? styles.flat : styles.pill;
-    const isIconOnly = icon && !children;
+    const isIconOnly = !!icon && !children;
 
     const cls = cx(
       styles.root,
