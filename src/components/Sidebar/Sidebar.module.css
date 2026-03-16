@@ -153,7 +153,7 @@
   position: absolute;
   top: var(--spacing-xs);
   height: calc(100% - var(--spacing-sm));
-  width: 2px;
+  width: var(--space-2xs);
   background-color: var(--element-fill-brand-primary-default);
   opacity: var(--opacity-0);
   border-radius: var(--radius-full);

@@ -93,6 +93,7 @@ import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
 import ShortcutTooltipPlayground from "./pages/ShortcutTooltipPlayground";
 import SidebarPlayground from "./pages/SidebarPlayground";
 import SortableListPlayground from "./pages/SortableListPlayground";
+import SpecialInputPlayground from "./pages/SpecialInputPlayground";
 import ToolbarButtonPlayground from "./pages/ToolbarButtonPlayground";
 import "./App.css";
 
@@ -121,6 +122,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "shortcut-tooltip"
 | "sidebar"
 | "sortable-list"
+| "special-input"
 | "toolbar-button"
 | "ai-text-generation"
 
@@ -358,6 +360,7 @@ export default function App() {
     { key: "single-select-option", label: "SingleSelectOpt" },
     { key: "slider", label: "Slider" },
     { key: "sortable-list", label: "SortableList" },
+    { key: "special-input", label: "SpecialInput" },
     { key: "spinner", label: "Spinner" },
     { key: "tag", label: "Tag" },
     { key: "tag-multi-select-option", label: "TagMultiOpt" },
@@ -519,6 +522,7 @@ export default function App() {
             {page === "toolbar-button" && <ToolbarButtonPlayground />}
             {page === "sidebar" && <SidebarPlayground />}
             {page === "sortable-list" && <SortableListPlayground />}
+            {page === "special-input" && <SpecialInputPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
             {page === "breadcrumb" && <BreadcrumbPlayground />}

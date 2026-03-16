@@ -276,7 +276,7 @@
   position: absolute;
   top: 4px;
   height: calc(var(--table-height) - 8px);
-  width: 3px;
+  width: var(--space-2xs);
   background-color: var(--element-fill-brand-primary-default);
   opacity: var(--opacity-0);
   border-radius: var(--radius-full);
@@ -357,7 +357,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 3px;
+  height: var(--space-2xs);
   background-color: var(--element-fill-brand-primary-default);
   pointer-events: none;
   z-index: 1;
@@ -401,7 +401,7 @@
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 3px;
+  width: var(--space-2xs);
   background-color: var(--element-fill-brand-primary-default);
   pointer-events: none;
   z-index: 1;
