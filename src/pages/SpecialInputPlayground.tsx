@@ -57,10 +57,6 @@ function DateInputDemo({ format, label }: { format: DateInputFormat; label: stri
   const [size, setSize] = useState<DateInputSize>("lg");
   const [val, setVal] = useState<DateValue>({});
   const [err, setErr] = useState<DateValidationError>(null);
-  const [disabledVal] = useState<DateValue>({ month: 6, day: 15, year: 2025 });
-  const [readOnlyVal] = useState<DateValue>({ month: 3, day: 15, year: 2026 });
-  const [pastVal, setPastVal] = useState<DateValue>({});
-  const [pastErr, setPastErr] = useState<DateValidationError>(null);
 
   return (
     <div>
@@ -77,60 +73,21 @@ function DateInputDemo({ format, label }: { format: DateInputFormat; label: stri
         </select>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-        {/* Default with validation */}
-        <Fieldset
-          label={label}
-          description="Type digits to fill, arrow keys to adjust, Tab to navigate between segments"
-          message={err ? VALIDATION_ERROR_MESSAGES[err] : "Try typing Feb 30 or Jun 31 to see validation"}
-          messageType={err ? "alert" : "neutral"}
-        >
-          <DateInput
-            size={size}
-            format={format}
-            value={val}
-            onChange={setVal}
-            onValidationError={setErr}
-          />
-        </Fieldset>
-        <p style={{ ...valueStyle, marginTop: -20 }}>Value: {formatDateValue(val)}</p>
-
-        {/* Disable past */}
-        <Fieldset
-          label="Disable past"
-          message={pastErr ? VALIDATION_ERROR_MESSAGES[pastErr] : "Must be today or later"}
-          messageType={pastErr ? "alert" : "neutral"}
-        >
-          <DateInput
-            size={size}
-            format={format}
-            value={pastVal}
-            onChange={setPastVal}
-            disablePast
-            onValidationError={setPastErr}
-          />
-        </Fieldset>
-
-        {/* Disabled */}
-        <Fieldset label="Disabled">
-          <DateInput
-            size={size}
-            format={format}
-            disabled
-            defaultValue={disabledVal}
-          />
-        </Fieldset>
-
-        {/* Read-only */}
-        <Fieldset label="Read-only">
-          <DateInput
-            size={size}
-            format={format}
-            readOnly
-            defaultValue={readOnlyVal}
-          />
-        </Fieldset>
-      </div>
+      <Fieldset
+        label={label}
+        description="Type digits to fill, arrow keys to adjust, Tab to navigate between segments"
+        message={err ? VALIDATION_ERROR_MESSAGES[err] : "Try typing Feb 30 or Jun 31 to see validation"}
+        messageType={err ? "alert" : "neutral"}
+      >
+        <DateInput
+          size={size}
+          format={format}
+          value={val}
+          onChange={setVal}
+          onValidationError={setErr}
+        />
+      </Fieldset>
+      <p style={valueStyle}>Value: {formatDateValue(val)}</p>
     </div>
   );
 }
