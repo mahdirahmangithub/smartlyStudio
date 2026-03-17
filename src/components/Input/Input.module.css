@@ -194,6 +194,72 @@
   position: absolute;
 }
 
+/* ── stepper slot (numeric mode chevron up/down) ─────────────────────── */
+
+.stepperSlot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.md .stepperSlot {
+  width: 12px;
+  height: var(--spacing-md);
+  gap: var(--spacing-none);
+  margin-right: var(--spacing-negative-xs);
+}
+
+.lg .stepperSlot {
+  width: 12px;
+  height: var(--spacing-md);
+  gap: var(--spacing-xs);
+  margin-right: var(--spacing-negative-sm-minus);
+
+}
+
+.xl .stepperSlot {
+  width: 16px;
+  height: var(--spacing-lg);
+  gap: var(--spacing-xs);
+  margin-right: var(--spacing-negative-sm);
+
+}
+
+.stepperButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 0 0;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: var(--element-fill-neutral-tertiary-default);
+  cursor: pointer;
+  color: var(--text-neutral-secondary-default);
+  border-radius: var(--radius-xs);
+  transition:
+    background var(--animation-state-change-duration) var(--animation-state-change-easing),
+    color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.stepperButton:hover:not(:disabled) {
+  background: var(--element-fill-neutral-tertiary-hover);
+}
+
+.stepperButton:active:not(:disabled) {
+  background: var(--element-fill-neutral-tertiary-press);
+}
+
+.stepperButtonDisabled,
+.stepperButton:disabled {
+  background: var(--element-fill-neutral-tertiary-disable);
+  color: var(--text-neutral-disable);
+  cursor: default;
+}
+
 /* ── input value scroll fades ─────────────────────────────────────────── */
 
 .inputFade {

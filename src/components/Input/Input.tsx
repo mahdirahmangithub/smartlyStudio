@@ -9,8 +9,10 @@ import {
   type ChangeEvent,
 } from "react";
 import { InputClear, type InputClearSize } from "../InputClear";
+import { Icon } from "../Icon";
 import { useScrollFade } from "../ScrollFade";
 import { useFieldContext } from "../Fieldset/FieldContext";
+import { useNumericInput } from "../../hooks/useNumericInput";
 import styles from "./Input.module.css";
 import { cx } from "../../utils/cx";
 
@@ -25,6 +27,24 @@ export interface InputProps
   suffix?: string;
   clearable?: boolean;
   onClear?: () => void;
+  /** Enable numeric input mode */
+  numeric?: boolean;
+  /** Minimum allowed value (numeric mode) */
+  min?: number;
+  /** Maximum allowed value (numeric mode) */
+  max?: number;
+  /** Increment/decrement step (numeric mode, default 1) */
+  step?: number;
+  /** Fixed decimal places (numeric mode) */
+  precision?: number;
+  /** Format with thousand grouping separators (numeric mode) */
+  thousandSeparator?: boolean;
+  /** Show increment/decrement stepper buttons (numeric mode) */
+  stepper?: boolean;
+  /** Clamp value to min/max on blur (numeric mode, default true) */
+  clampOnBlur?: boolean;
+  /** Allow negative numbers (numeric mode, default: inferred from min) */
+  allowNegative?: boolean;
 }
 
 const CLEAR_SIZE: Record<InputSize, InputClearSize> = {
@@ -33,6 +53,11 @@ const CLEAR_SIZE: Record<InputSize, InputClearSize> = {
   xl: "lg",
 };
 
+const STEPPER_ICON_SIZE: Record<InputSize, number> = {
+  md: 12,
+  lg: 12,
+  xl: 16,
+};
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
@@ -44,11 +69,23 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       suffix,
       clearable = false,
       onClear,
+      numeric = false,
+      min,
+      max,
+      step,
+      precision,
+      thousandSeparator,
+      stepper = false,
+      clampOnBlur,
+      allowNegative,
       disabled = false,
       readOnly = false,
       value,
       defaultValue,
       onChange,
+      onBlur,
+      onFocus,
+      onKeyDown,
       className,
       id: idProp,
       "aria-describedby": ariaDescribedbyProp,
@@ -78,6 +115,36 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const currentValue = isControlled ? String(value) : internalValue;
     const hasValue = currentValue.length > 0;
 
+    /* ── Numeric mode ──────────────────────────────────────────────── */
+
+    const numericHook = useNumericInput({
+      min,
+      max,
+      step,
+      precision,
+      thousandSeparator,
+      clampOnBlur,
+      allowNegative,
+      value: isControlled ? (value as string | number | undefined) : undefined,
+      defaultValue: isControlled ? undefined : (defaultValue as string | number | undefined),
+      disabled,
+      readOnly,
+      onChange,
+      onBlur,
+      onFocus,
+      onKeyDown,
+    });
+
+    const numericRefCallback = useCallback(
+      (node: HTMLInputElement | null) => {
+        setRef(node);
+        numericHook.setInputRef(node);
+      },
+      [setRef, numericHook.setInputRef],
+    );
+
+    /* ── Scroll fades ──────────────────────────────────────────────── */
+
     const {
       showStart: showFadeStart,
       showEnd: showFadeEnd,
@@ -103,9 +170,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       };
     }, [refreshFades]);
 
+    const effectiveValue = numeric ? numericHook.displayValue : currentValue;
+
     useEffect(() => {
       requestAnimationFrame(refreshFades);
-    }, [currentValue, refreshFades]);
+    }, [effectiveValue, refreshFades]);
+
+    /* ── Text mode handlers ────────────────────────────────────────── */
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       if (!isControlled) setInternalValue(e.target.value);
@@ -113,9 +184,15 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     };
 
     const handleClear = () => {
-      if (!isControlled) {
-        setInternalValue("");
-        if (innerRef.current) innerRef.current.value = "";
+      if (numeric) {
+        numericHook.inputProps.onChange({
+          target: { value: "" },
+        } as ChangeEvent<HTMLInputElement>);
+      } else {
+        if (!isControlled) {
+          setInternalValue("");
+          if (innerRef.current) innerRef.current.value = "";
+        }
       }
       onClear?.();
       innerRef.current?.focus();
@@ -124,6 +201,39 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     const handleWrapperClick = () => {
       innerRef.current?.focus();
     };
+
+    const hasAnyValue = numeric
+      ? numericHook.displayValue.length > 0
+      : hasValue;
+
+    /* ── Build native input props ──────────────────────────────────── */
+
+    const nativeInputProps = numeric
+      ? {
+          ref: numericRefCallback,
+          className: styles.nativeInput,
+          id,
+          "aria-describedby": ariaDescribedby,
+          disabled,
+          readOnly,
+          ...numericHook.inputProps,
+          ...rest,
+        }
+      : {
+          ref: setRef,
+          className: styles.nativeInput,
+          id,
+          "aria-describedby": ariaDescribedby,
+          disabled,
+          readOnly,
+          value: isControlled ? value : undefined,
+          defaultValue: isControlled ? undefined : defaultValue,
+          onChange: handleChange,
+          onBlur,
+          onFocus,
+          onKeyDown,
+          ...rest,
+        };
 
     return (
       <div
@@ -142,18 +252,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <span className={styles.leadingIcon}>{leadingIcon}</span>
           )}
           <div className={styles.inputScrollWrapper}>
-            <input
-              ref={setRef}
-              className={styles.nativeInput}
-              id={id}
-              aria-describedby={ariaDescribedby}
-              disabled={disabled}
-              readOnly={readOnly}
-              value={isControlled ? value : undefined}
-              defaultValue={isControlled ? undefined : defaultValue}
-              onChange={handleChange}
-              {...rest}
-            />
+            <input {...nativeInputProps} />
             <div
               className={cx(
                 styles.inputFade,
@@ -179,7 +278,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
         {suffix && <span className={styles.suffix}>{suffix}</span>}
 
-        {clearable && hasValue && !disabled && !readOnly && (
+        {clearable && hasAnyValue && !disabled && !readOnly && (
           <span className={styles.clearSlot}>
             <InputClear
               size={CLEAR_SIZE[size]}
@@ -188,6 +287,37 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               onClick={handleClear}
               aria-label="Clear input"
             />
+          </span>
+        )}
+
+        {numeric && stepper && (
+          <span className={styles.stepperSlot}>
+            <button
+              type="button"
+              className={cx(
+                styles.stepperButton,
+                (disabled || readOnly || !numericHook.canIncrement) && styles.stepperButtonDisabled,
+              )}
+              tabIndex={-1}
+              aria-label="Increase value"
+              disabled={disabled || readOnly || !numericHook.canIncrement}
+              onClick={numericHook.increment}
+            >
+              <Icon name="arrow_chevron_up" size={STEPPER_ICON_SIZE[size]} />
+            </button>
+            <button
+              type="button"
+              className={cx(
+                styles.stepperButton,
+                (disabled || readOnly || !numericHook.canDecrement) && styles.stepperButtonDisabled,
+              )}
+              tabIndex={-1}
+              aria-label="Decrease value"
+              disabled={disabled || readOnly || !numericHook.canDecrement}
+              onClick={numericHook.decrement}
+            >
+              <Icon name="arrow_chevron_down" size={STEPPER_ICON_SIZE[size]} />
+            </button>
           </span>
         )}
       </div>

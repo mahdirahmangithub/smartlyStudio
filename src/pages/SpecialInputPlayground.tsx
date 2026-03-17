@@ -1,6 +1,7 @@
-import { useState, type CSSProperties } from "react";
+import { useState, type CSSProperties, type ChangeEvent } from "react";
 import { DateInput, type DateInputFormat, type DateInputSize, type DateValue, type DateValidationError } from "../components/DateInput";
 import { TimeInput, type TimeInputFormat, type TimeInputSize, type TimeValue, type TimeValidationError } from "../components/TimeInput";
+import { Input, type InputSize } from "../components/Input";
 import { Icon } from "../components/Icon";
 import { Fieldset } from "../components/Fieldset";
 
@@ -300,6 +301,134 @@ function TimeInputDemo() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   Numeric Input Demo
+   ═══════════════════════════════════════════════════════════════════════ */
+
+const NUMERIC_SIZES: InputSize[] = ["md", "lg", "xl"];
+
+type NumericStateMode = "none" | "disabled" | "readOnly";
+
+const NUMERIC_STATE_MODES: { value: NumericStateMode; label: string }[] = [
+  { value: "none", label: "None" },
+  { value: "disabled", label: "Disabled" },
+  { value: "readOnly", label: "Read-only" },
+];
+
+const PRECISION_OPTIONS = [
+  { value: "-1", label: "Auto" },
+  { value: "0", label: "0" },
+  { value: "1", label: "1" },
+  { value: "2", label: "2" },
+];
+
+function NumericInputDemo() {
+  const [size, setSize] = useState<InputSize>("lg");
+  const [mode, setMode] = useState<NumericStateMode>("none");
+  const [val, setVal] = useState("");
+  const [precisionStr, setPrecisionStr] = useState("-1");
+  const [showStepper, setShowStepper] = useState(true);
+  const [showThousands, setShowThousands] = useState(true);
+  const [showTrailing, setShowTrailing] = useState(false);
+  const [showSuffix, setShowSuffix] = useState(false);
+  const [showClear, setShowClear] = useState(false);
+  const [useMinMax, setUseMinMax] = useState(false);
+
+  const precision = precisionStr === "-1" ? undefined : Number(precisionStr);
+
+  return (
+    <div>
+      <div style={controlsBar}>
+        <span style={captionStyle}>Size</span>
+        <select
+          value={size}
+          onChange={(e) => setSize(e.target.value as InputSize)}
+          style={selectStyle}
+        >
+          {NUMERIC_SIZES.map((s) => (
+            <option key={s} value={s}>{s}</option>
+          ))}
+        </select>
+
+        <span style={captionStyle}>State</span>
+        <select
+          value={mode}
+          onChange={(e) => setMode(e.target.value as NumericStateMode)}
+          style={selectStyle}
+        >
+          {NUMERIC_STATE_MODES.map((m) => (
+            <option key={m.value} value={m.value}>{m.label}</option>
+          ))}
+        </select>
+
+        <span style={captionStyle}>Precision</span>
+        <select
+          value={precisionStr}
+          onChange={(e) => setPrecisionStr(e.target.value)}
+          style={selectStyle}
+        >
+          {PRECISION_OPTIONS.map((p) => (
+            <option key={p.value} value={p.value}>{p.label}</option>
+          ))}
+        </select>
+      </div>
+
+      <div style={{ ...controlsBar, flexWrap: "wrap" }}>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={showStepper} onChange={(e) => setShowStepper(e.target.checked)} />
+          Stepper
+        </label>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={showThousands} onChange={(e) => setShowThousands(e.target.checked)} />
+          Thousand separator
+        </label>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={useMinMax} onChange={(e) => setUseMinMax(e.target.checked)} />
+          Min/Max (0–10,000)
+        </label>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={showTrailing} onChange={(e) => setShowTrailing(e.target.checked)} />
+          Trailing icon
+        </label>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={showSuffix} onChange={(e) => setShowSuffix(e.target.checked)} />
+          Suffix ($)
+        </label>
+        <label style={checkboxLabelStyle}>
+          <input type="checkbox" checked={showClear} onChange={(e) => setShowClear(e.target.checked)} />
+          Clearable
+        </label>
+      </div>
+
+      <Fieldset
+        label="Amount"
+        description="Type digits, arrow keys to step, Shift+Arrow for ×10, Home/End for min/max"
+      >
+        <Input
+          numeric
+          size={size}
+          placeholder="Enter a number"
+          value={val}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setVal(e.target.value)}
+          step={1}
+          precision={precision}
+          thousandSeparator={showThousands}
+          stepper={showStepper}
+          min={useMinMax ? 0 : undefined}
+          max={useMinMax ? 10000 : undefined}
+          disabled={mode === "disabled"}
+          readOnly={mode === "readOnly"}
+          trailingIcon={showTrailing ? <Icon name="info" size={size === "xl" ? 20 : 16} /> : undefined}
+          suffix={showSuffix ? "$" : undefined}
+          clearable={showClear}
+          onClear={() => setVal("")}
+        />
+      </Fieldset>
+      <p style={valueStyle}>Raw value: {val || "–"}</p>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    Page
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -321,6 +450,14 @@ export default function SpecialInputPlayground() {
         <p style={captionStyle}>Segmented time input with 24h/12h format, AM/PM toggle, and built-in validation.</p>
         <div style={cardStyle}>
           <TimeInputDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Numeric Input</h2>
+        <p style={captionStyle}>Enhanced Input with numeric filtering, formatting, keyboard stepping, and stepper buttons.</p>
+        <div style={cardStyle}>
+          <NumericInputDemo />
         </div>
       </section>
     </>
