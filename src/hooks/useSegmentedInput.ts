@@ -361,7 +361,9 @@ export function useSegmentedInput({
           } else if (separatorKeys.includes(e.key)) {
             e.preventDefault();
             setCharacterQuery(null);
-            focusNextNumeric(segIdx);
+            if (valuesRef.current[segIdx] !== "") {
+              focusNextNumeric(segIdx);
+            }
           }
           break;
       }
@@ -449,6 +451,21 @@ export function useSegmentedInput({
     }
   }, [numericIndices, focusSegment]);
 
+  const focusLast = useCallback(() => {
+    if (numericIndices.length > 0) {
+      focusSegment(numericIndices[numericIndices.length - 1]);
+    }
+  }, [numericIndices, focusSegment]);
+
+  const setAllValues = useCallback(
+    (values: string[]) => {
+      valuesRef.current = values;
+      setState((prev) => ({ ...prev, sectionValues: values, characterQuery: null }));
+      onChangeRef.current?.(values);
+    },
+    [],
+  );
+
   return {
     segments,
     sectionValues: state.sectionValues,
@@ -461,6 +478,8 @@ export function useSegmentedInput({
     handleBlur,
     setRef,
     focusFirst,
+    focusLast,
     focusSegment,
+    setAllValues,
   };
 }

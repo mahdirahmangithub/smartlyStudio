@@ -305,6 +305,8 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
       handleBlur,
       setRef: setSegRef,
       focusFirst,
+      focusLast,
+      setAllValues,
     } = useSegmentedInput({
       segments: segmentDefs,
       separatorKeys: ["."],
@@ -370,6 +372,53 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
       [disabled, focusFirst],
     );
 
+    const handlePaste = useCallback(
+      (e: React.ClipboardEvent) => {
+        e.preventDefault();
+        if (disabled || readOnly) return;
+
+        const text = e.clipboardData.getData("text/plain").trim();
+        if (!text) return;
+
+        const parts = text.split(/[^0-9]+/).filter(Boolean);
+        const segOrder = format === "DD/MM/YYYY"
+          ? ["day", "month", "year"] as const
+          : ["month", "day", "year"] as const;
+
+        let parsed: Array<{ type: string; num: number }> | null = null;
+
+        if (parts.length >= 3) {
+          parsed = segOrder.map((type, i) => ({ type, num: parseInt(parts[i], 10) }));
+        } else {
+          const digits = text.replace(/\D/g, "");
+          if (digits.length >= 8) {
+            const lengths = format === "DD/MM/YYYY" ? [2, 2, 4] : [2, 2, 4];
+            let offset = 0;
+            parsed = segOrder.map((type, i) => {
+              const num = parseInt(digits.substring(offset, offset + lengths[i]), 10);
+              offset += lengths[i];
+              return { type, num };
+            });
+          }
+        }
+
+        if (!parsed) return;
+
+        const values = [...sectionValues];
+        for (const { type, num } of parsed) {
+          const segIdx = typeToIdx[type];
+          const def = segmentDefs[segIdx];
+          if (def.kind !== "numeric") continue;
+          const clamped = Math.max(def.min, Math.min(num, def.max));
+          values[segIdx] = String(clamped).padStart(def.length, "0");
+        }
+
+        setAllValues(values);
+        focusLast();
+      },
+      [disabled, readOnly, format, segmentDefs, typeToIdx, sectionValues, setAllValues, focusLast],
+    );
+
     const resolvedLeading =
       leadingIcon !== undefined
         ? leadingIcon
@@ -406,6 +455,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
               disabled && styles.disabled,
               readOnly && styles.readOnly,
             )}
+            onPaste={handlePaste}
           >
             {segments.map((def, i) => {
               if (def.kind === "literal") {

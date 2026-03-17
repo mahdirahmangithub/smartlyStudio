@@ -328,6 +328,7 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
       setRef: setSegRef,
       focusFirst,
       focusSegment,
+      setAllValues,
     } = useSegmentedInput({
       segments: segmentDefs,
       separatorKeys: [":"],
@@ -475,6 +476,84 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
       [disabled, focusFirst],
     );
 
+    const handlePaste = useCallback(
+      (e: React.ClipboardEvent) => {
+        e.preventDefault();
+        if (disabled || readOnly) return;
+
+        const text = e.clipboardData.getData("text/plain").trim();
+        if (!text) return;
+
+        // Detect AM/PM token
+        const ampmMatch = text.match(/\b(AM|PM|am|pm|a\.m\.|p\.m\.)\s*$/i);
+        const timeStr = ampmMatch ? text.slice(0, ampmMatch.index).trim() : text;
+
+        const parts = timeStr.split(/[^0-9]+/).filter(Boolean);
+
+        let hours: number | null = null;
+        let minutes: number | null = null;
+
+        if (parts.length >= 2) {
+          hours = parseInt(parts[0], 10);
+          minutes = parseInt(parts[1], 10);
+        } else {
+          const digits = timeStr.replace(/\D/g, "");
+          if (digits.length >= 4) {
+            hours = parseInt(digits.substring(0, 2), 10);
+            minutes = parseInt(digits.substring(2, 4), 10);
+          } else if (digits.length === 3) {
+            hours = parseInt(digits.substring(0, 1), 10);
+            minutes = parseInt(digits.substring(1, 3), 10);
+          }
+        }
+
+        if (hours == null || minutes == null) return;
+        minutes = Math.max(0, Math.min(59, minutes));
+
+        // Resolve meridiem and convert for 12h format
+        let pastedMeridiem: Meridiem | null = null;
+        if (ampmMatch) {
+          pastedMeridiem = ampmMatch[1].toUpperCase().startsWith("P") ? "PM" : "AM";
+        }
+
+        let displayHours: number;
+        if (is12h) {
+          if (pastedMeridiem) {
+            // User pasted explicit AM/PM — treat hours as 12h display
+            displayHours = Math.max(1, Math.min(12, hours));
+          } else if (hours > 12 || hours === 0) {
+            // 24h value pasted into 12h field — auto-convert
+            const converted = to12h(Math.max(0, Math.min(23, hours)));
+            displayHours = converted.display;
+            pastedMeridiem = converted.meridiem;
+          } else {
+            displayHours = Math.max(1, Math.min(12, hours));
+          }
+          if (pastedMeridiem) setMeridiem(pastedMeridiem);
+        } else {
+          displayHours = Math.max(0, Math.min(23, hours));
+        }
+
+        const values = [...sectionValues];
+        const hoursDef = segmentDefs[typeToIdx.hours];
+        const minutesDef = segmentDefs[typeToIdx.minutes];
+        if (hoursDef.kind === "numeric") {
+          values[typeToIdx.hours] = String(displayHours).padStart(hoursDef.length, "0");
+        }
+        if (minutesDef.kind === "numeric") {
+          values[typeToIdx.minutes] = String(minutes).padStart(minutesDef.length, "0");
+        }
+
+        setAllValues(values);
+        if (is12h) {
+          meridiemElRef.current?.focus();
+        } else {
+          focusSegment(typeToIdx.minutes);
+        }
+      },
+      [disabled, readOnly, is12h, segmentDefs, typeToIdx, sectionValues, setAllValues, setMeridiem, focusSegment],
+    );
+
     const resolvedLeading =
       leadingIcon !== undefined
         ? leadingIcon
@@ -511,6 +590,7 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
               disabled && styles.disabled,
               readOnly && styles.readOnly,
             )}
+            onPaste={handlePaste}
           >
             {segments.map((def, i) => {
               if (def.kind === "literal") {
