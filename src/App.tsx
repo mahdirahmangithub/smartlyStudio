@@ -6,6 +6,7 @@ import { ContentSwitcherItem } from "./components/ContentSwitcherItem";
 import ButtonPlayground from "./pages/ButtonPlayground";
 import ScrollFadePage from "./pages/ScrollFadePage";
 import ExpanderPlayground from "./pages/ExpanderPlayground";
+import CardPlayground from "./pages/CardPlayground";
 import CalloutPlayground from "./pages/CalloutPlayground";
 import DividerPlayground from "./pages/DividerPlayground";
 import ButtonGroupPlayground from "./pages/ButtonGroupPlayground";
@@ -94,11 +95,13 @@ import ShortcutTooltipPlayground from "./pages/ShortcutTooltipPlayground";
 import SidebarPlayground from "./pages/SidebarPlayground";
 import SortableListPlayground from "./pages/SortableListPlayground";
 import SpecialInputPlayground from "./pages/SpecialInputPlayground";
+import TestProgressiveBlurPlayground from "./pages/TestProgressiveBlurPlayground";
 import ToolbarButtonPlayground from "./pages/ToolbarButtonPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
 type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
+| "card"
 | "icon-container"
 | "breadcrumb"
 | "dimmer"
@@ -123,6 +126,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "sidebar"
 | "sortable-list"
 | "special-input"
+| "test-progressive-blur"
 | "toolbar-button"
 | "ai-text-generation"
 
@@ -292,6 +296,7 @@ export default function App() {
     { key: "button", label: "Button" },
     { key: "button-group", label: "ButtonGroup" },
     { key: "callout", label: "Callout" },
+    { key: "card", label: "Card" },
     { key: "checkbox", label: "Checkbox" },
     { key: "chip", label: "Chip" },
     { key: "combobox", label: "Combobox" },
@@ -365,6 +370,7 @@ export default function App() {
     { key: "tag", label: "Tag" },
     { key: "tag-multi-select-option", label: "TagMultiOpt" },
     { key: "tag-single-select-option", label: "TagSingleOpt" },
+    { key: "test-progressive-blur", label: "TestProgBlur" },
     { key: "textarea", label: "Textarea" },
     { key: "text-showcase", label: "TextShowcase" },
     { key: "thumbnail", label: "Thumbnail" },
@@ -440,6 +446,7 @@ export default function App() {
             {page === "scroll-fade" && <ScrollFadePage />}
             {page === "expander" && <ExpanderPlayground />}
             {page === "callout" && <CalloutPlayground />}
+            {page === "card" && <CardPlayground />}
             {page === "divider" && <DividerPlayground />}
             {page === "button-group" && <ButtonGroupPlayground />}
             {page === "input-clear" && <InputClearPlayground />}
@@ -519,6 +526,7 @@ export default function App() {
             {page === "navbar" && <NavbarPlayground />}
             {page === "navbar-content" && <NavBarContentPlayground />}
             {page === "shortcut-tooltip" && <ShortcutTooltipPlayground />}
+            {page === "test-progressive-blur" && <TestProgressiveBlurPlayground />}
             {page === "toolbar-button" && <ToolbarButtonPlayground />}
             {page === "sidebar" && <SidebarPlayground />}
             {page === "sortable-list" && <SortableListPlayground />}
