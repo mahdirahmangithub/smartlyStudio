@@ -1,2 +1,2 @@
 export { Entity } from "./Entity";
-export type { EntityProps } from "./Entity";
+export type { EntityProps, EntityLayout } from "./Entity";

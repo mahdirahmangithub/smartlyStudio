@@ -280,6 +280,78 @@ export default function EntityPlayground() {
         </div>
       </section>
 
+      {/* ── Vertical layout ──────────────────────────────────────── */}
+      <section style={sectionStyle}>
+        <h2>Vertical layout</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Leading on top, text below, actions at the bottom-right. Hidden actions reveal on hover.
+        </p>
+        <div style={cardStyle}>
+          <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+            <div style={{ width: 200 }}>
+              <Entity
+                layout="vertical"
+                leading={<Icon name="favorite" size={16} />}
+                title="Campaign Alpha"
+                description="Active · 12 ads"
+                hint="Performance hint"
+                persistentActions={
+                  <>
+                    <IconButton icon={<Icon name="favorite_fill" size={16} />} aria-label="Favorite" variant="neutral" emphasis="low" size="sm" />
+                    <IconButton icon={<Icon name="more_vert" size={16} />} aria-label="More" variant="neutral" emphasis="low" size="sm" />
+                  </>
+                }
+              />
+            </div>
+            <div style={{ width: 200 }}>
+              <Entity
+                layout="vertical"
+                leading={
+                  <Thumbnail
+                    size="md"
+                    type="media"
+                    src="https://picsum.photos/seed/vert1/80/80"
+                    alt="Preview"
+                  />
+                }
+                title="Summer visual"
+                description="1920×1080 · PNG"
+                hiddenActions={
+                  <>
+                    <IconButton icon={<Icon name="edit" size={16} />} aria-label="Edit" variant="neutral" emphasis="low" size="sm" />
+                    <IconButton icon={<Icon name="delete" size={16} />} aria-label="Delete" variant="neutral" emphasis="low" size="sm" />
+                  </>
+                }
+                persistentActions={
+                  <IconButton icon={<Icon name="more_vert" size={16} />} aria-label="More" variant="neutral" emphasis="low" size="sm" />
+                }
+              />
+            </div>
+            <div style={{ width: 200 }}>
+              <Entity
+                layout="vertical"
+                leading={<Icon name="error" size={16} />}
+                title="Upload failed"
+                description="File exceeds max size"
+                error
+                persistentActions={
+                  <IconButton icon={<Icon name="more_vert" size={16} />} aria-label="More" variant="neutral" emphasis="low" size="sm" />
+                }
+              />
+            </div>
+            <div style={{ width: 200 }}>
+              <Entity
+                layout="vertical"
+                leading={<Icon name="lock" size={16} />}
+                title="Locked campaign"
+                description="Cannot be edited"
+                disabled
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── Clickable entity ───────────────────────────────────────── */}
       <section style={sectionStyle}>
         <h2>Clickable entity</h2>

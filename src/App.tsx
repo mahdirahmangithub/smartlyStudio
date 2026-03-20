@@ -267,12 +267,112 @@ function getPageFromPath(): Page {
   return path as Page;
 }
 
+const PAGES: { key: Page; label: string }[] = [
+  { key: "accordion", label: "Accordion" },
+  { key: "add-item-option", label: "AddItemOpt" },
+  { key: "ai-text-generation", label: "AI TextGen" },
+  { key: "animated-icons", label: "AnimatedIcons" },
+  { key: "avatar", label: "Avatar" },
+  { key: "badge", label: "Badge" },
+  { key: "body-text", label: "BodyText" },
+  { key: "breadcrumb", label: "Breadcrumb" },
+  { key: "button", label: "Button" },
+  { key: "button-group", label: "ButtonGroup" },
+  { key: "callout", label: "Callout" },
+  { key: "card", label: "Card" },
+  { key: "checkbox", label: "Checkbox" },
+  { key: "chip", label: "Chip" },
+  { key: "combobox", label: "Combobox" },
+  { key: "content-switcher", label: "ContentSwitcher" },
+  { key: "content-switcher-item", label: "CSItem" },
+  { key: "currency-thumbnail", label: "CurrencyThumb" },
+  { key: "data-cell-content", label: "DataCellContent" },
+  { key: "data-table", label: "DataTable" },
+  { key: "dimmer", label: "Dimmer" },
+  { key: "divider", label: "Divider" },
+  { key: "drag-handle", label: "DragHandle" },
+  { key: "drawer", label: "Drawer" },
+  { key: "dropdown", label: "Dropdown" },
+  { key: "entity", label: "Entity" },
+  { key: "expandable-badge", label: "ExpandableBadge" },
+  { key: "expander", label: "Expander" },
+  { key: "fieldset", label: "Fieldset" },
+  { key: "file-attachment", label: "FileAttachment" },
+  { key: "file-type-thumbnail", label: "FileTypeThumb" },
+  { key: "footer", label: "Footer" },
+  { key: "generic-select-option", label: "GenericOpt" },
+  { key: "global-navigation-bar", label: "GlobalNavBar" },
+  { key: "grid", label: "Grid" },
+  { key: "header", label: "Header" },
+  { key: "hint", label: "Hint" },
+  { key: "icon-badge", label: "IconBadge" },
+  { key: "icon-container", label: "IconContainer" },
+  { key: "icons", label: "Icons" },
+  { key: "imagery", label: "Imagery" },
+  { key: "inline-input", label: "InlineInput" },
+  { key: "inline-message", label: "InlineMessage" },
+  { key: "input", label: "Input" },
+  { key: "input-clear", label: "InputClear" },
+  { key: "keyboard-shortcut", label: "KbdShortcut" },
+  { key: "label", label: "Label" },
+  { key: "link", label: "Link" },
+  { key: "modal", label: "Modal" },
+  { key: "multi-select-input", label: "MultiSelectInput" },
+  { key: "multi-select-option", label: "MultiSelectOpt" },
+  { key: "navbar", label: "Navbar" },
+  { key: "navbar-content", label: "NavBarContent" },
+  { key: "navigation-brand-item", label: "NavBrandItem" },
+  { key: "navigation-category-item", label: "NavCategoryItem" },
+  { key: "navigation-item", label: "NavItem" },
+  { key: "navigation-item-test2", label: "NavItemTest2" },
+  { key: "navigation-profile-item", label: "NavProfileItem" },
+  { key: "navigation-sub-item", label: "NavSubItem" },
+  { key: "navigation-select-option", label: "NavOpt" },
+  { key: "notification-badge", label: "NotificationBadge" },
+  { key: "option-leading", label: "OptionLeading" },
+  { key: "option-separator", label: "OptionSeparator" },
+  { key: "option-trailing", label: "OptionTrailing" },
+  { key: "radio", label: "Radio" },
+  { key: "row-container", label: "RowContainer" },
+  { key: "scroll-fade", label: "ScrollFade" },
+  { key: "search-input", label: "SearchInput" },
+  { key: "search-input-attachment", label: "SearchAttach" },
+  { key: "select", label: "Select" },
+  { key: "select-button", label: "SelectButton" },
+  { key: "select-chip", label: "SelectChip" },
+  { key: "select-input", label: "SelectInput" },
+  { key: "select-option-header", label: "SelectOptHeader" },
+  { key: "shimmer", label: "Shimmer" },
+  { key: "shortcut-tooltip", label: "ShortcutTooltip" },
+  { key: "sidebar", label: "Sidebar" },
+  { key: "single-select-option", label: "SingleSelectOpt" },
+  { key: "slider", label: "Slider" },
+  { key: "sortable-list", label: "SortableList" },
+  { key: "special-input", label: "SpecialInput" },
+  { key: "spinner", label: "Spinner" },
+  { key: "tag", label: "Tag" },
+  { key: "tag-multi-select-option", label: "TagMultiOpt" },
+  { key: "tag-single-select-option", label: "TagSingleOpt" },
+  { key: "test-progressive-blur", label: "TestProgBlur" },
+  { key: "textarea", label: "Textarea" },
+  { key: "text-showcase", label: "TextShowcase" },
+  { key: "thumbnail", label: "Thumbnail" },
+  { key: "title-text", label: "TitleText" },
+  { key: "toggle", label: "Toggle" },
+  { key: "toggle-chip", label: "ToggleChip" },
+  { key: "toolbar-button", label: "ToolbarButton" },
+  { key: "tooltip", label: "Tooltip" },
+  { key: "typography", label: "Typography" },
+  { key: "video-player", label: "VideoPlayer" },
+];
+
 export default function App() {
   const [theme, setTheme] = useState<Theme>("light");
   const [density, setDensity] = useState<"normal" | "dense">("normal");
   const [typeface, setTypeface] = useState<"mac" | "windows" | "marketing" | "inter">("mac");
   const [page, setPageState] = useState<Page>(getPageFromPath);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [navSearch, setNavSearch] = useState("");
 
   const setPage = useCallback((p: Page) => {
     setPageState(p);
@@ -286,112 +386,28 @@ export default function App() {
     return () => window.removeEventListener("popstate", onPop);
   }, []);
 
-  const pages: { key: Page; label: string }[] = [
-    { key: "accordion", label: "Accordion" },
-    { key: "add-item-option", label: "AddItemOpt" },
-    { key: "ai-text-generation", label: "AI TextGen" },
-    { key: "animated-icons", label: "AnimatedIcons" },
-    { key: "avatar", label: "Avatar" },
-    { key: "badge", label: "Badge" },
-    { key: "body-text", label: "BodyText" },
-    { key: "breadcrumb", label: "Breadcrumb" },
-    { key: "button", label: "Button" },
-    { key: "button-group", label: "ButtonGroup" },
-    { key: "callout", label: "Callout" },
-    { key: "card", label: "Card" },
-    { key: "checkbox", label: "Checkbox" },
-    { key: "chip", label: "Chip" },
-    { key: "combobox", label: "Combobox" },
-    { key: "content-switcher", label: "ContentSwitcher" },
-    { key: "content-switcher-item", label: "CSItem" },
-    { key: "currency-thumbnail", label: "CurrencyThumb" },
-    { key: "data-cell-content", label: "DataCellContent" },
-    { key: "data-table", label: "DataTable" },
-    { key: "dimmer", label: "Dimmer" },
-    { key: "divider", label: "Divider" },
-    { key: "drag-handle", label: "DragHandle" },
-    { key: "drawer", label: "Drawer" },
-    { key: "dropdown", label: "Dropdown" },
-    { key: "entity", label: "Entity" },
-    { key: "expandable-badge", label: "ExpandableBadge" },
-    { key: "expander", label: "Expander" },
-    { key: "fieldset", label: "Fieldset" },
-    { key: "file-attachment", label: "FileAttachment" },
-    { key: "file-type-thumbnail", label: "FileTypeThumb" },
-    { key: "footer", label: "Footer" },
-    { key: "generic-select-option", label: "GenericOpt" },
-    { key: "global-navigation-bar", label: "GlobalNavBar" },
-    { key: "grid", label: "Grid" },
-    { key: "header", label: "Header" },
-    { key: "hint", label: "Hint" },
-    { key: "icon-badge", label: "IconBadge" },
-    { key: "icon-container", label: "IconContainer" },
-    { key: "icons", label: "Icons" },
-    { key: "imagery", label: "Imagery" },
-    { key: "inline-input", label: "InlineInput" },
-    { key: "inline-message", label: "InlineMessage" },
-    { key: "input", label: "Input" },
-    { key: "input-clear", label: "InputClear" },
-    { key: "keyboard-shortcut", label: "KbdShortcut" },
-    { key: "label", label: "Label" },
-    { key: "link", label: "Link" },
-    { key: "modal", label: "Modal" },
-    { key: "multi-select-input", label: "MultiSelectInput" },
-    { key: "multi-select-option", label: "MultiSelectOpt" },
-    { key: "navbar", label: "Navbar" },
-    { key: "navbar-content", label: "NavBarContent" },
-    { key: "navigation-brand-item", label: "NavBrandItem" },
-    { key: "navigation-category-item", label: "NavCategoryItem" },
-    { key: "navigation-item", label: "NavItem" },
-    { key: "navigation-item-test2", label: "NavItemTest2" },
-    { key: "navigation-profile-item", label: "NavProfileItem" },
-    { key: "navigation-sub-item", label: "NavSubItem" },
-    { key: "navigation-select-option", label: "NavOpt" },
-    { key: "notification-badge", label: "NotificationBadge" },
-    { key: "option-leading", label: "OptionLeading" },
-    { key: "option-separator", label: "OptionSeparator" },
-    { key: "option-trailing", label: "OptionTrailing" },
-    { key: "radio", label: "Radio" },
-    { key: "row-container", label: "RowContainer" },
-    { key: "scroll-fade", label: "ScrollFade" },
-    { key: "search-input", label: "SearchInput" },
-    { key: "search-input-attachment", label: "SearchAttach" },
-    { key: "select", label: "Select" },
-    { key: "select-button", label: "SelectButton" },
-    { key: "select-chip", label: "SelectChip" },
-    { key: "select-input", label: "SelectInput" },
-    { key: "select-option-header", label: "SelectOptHeader" },
-    { key: "shimmer", label: "Shimmer" },
-    { key: "shortcut-tooltip", label: "ShortcutTooltip" },
-    { key: "sidebar", label: "Sidebar" },
-    { key: "single-select-option", label: "SingleSelectOpt" },
-    { key: "slider", label: "Slider" },
-    { key: "sortable-list", label: "SortableList" },
-    { key: "special-input", label: "SpecialInput" },
-    { key: "spinner", label: "Spinner" },
-    { key: "tag", label: "Tag" },
-    { key: "tag-multi-select-option", label: "TagMultiOpt" },
-    { key: "tag-single-select-option", label: "TagSingleOpt" },
-    { key: "test-progressive-blur", label: "TestProgBlur" },
-    { key: "textarea", label: "Textarea" },
-    { key: "text-showcase", label: "TextShowcase" },
-    { key: "thumbnail", label: "Thumbnail" },
-    { key: "title-text", label: "TitleText" },
-    { key: "toggle", label: "Toggle" },
-    { key: "toggle-chip", label: "ToggleChip" },
-    { key: "toolbar-button", label: "ToolbarButton" },
-    { key: "tooltip", label: "Tooltip" },
-    { key: "typography", label: "Typography" },
-    { key: "video-player", label: "VideoPlayer" },
-  ];
+  const filteredPages = useMemo(() => {
+    if (!navSearch.trim()) return PAGES;
+    const q = navSearch.toLowerCase();
+    return PAGES.filter((p) => p.label.toLowerCase().includes(q) || p.key.toLowerCase().includes(q));
+  }, [navSearch]);
 
   return (
     <div className="app" data-theme={theme} data-density={density} data-typeface={typeface}>
       <div className="app-shell">
         {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
         <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
+          <div className="sidebar-search">
+            <input
+              type="text"
+              className="sidebar-search-input"
+              placeholder="Search…"
+              value={navSearch}
+              onChange={(e) => setNavSearch(e.target.value)}
+            />
+          </div>
           <nav className="sidebar-nav">
-            {pages.map((p) => (
+            {filteredPages.map((p) => (
               <button
                 key={p.key}
                 className={`sidebar-btn ${page === p.key ? "active" : ""}`}

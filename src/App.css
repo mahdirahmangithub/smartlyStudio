@@ -44,11 +44,39 @@
   overflow-y: auto;
 }
 
+.sidebar-search {
+  padding: 12px 8px 0;
+  position: sticky;
+  top: 0;
+  background: var(--element-surface-default);
+  z-index: 1;
+}
+
+.sidebar-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
+  border: 1px solid var(--element-outline-neutral-default);
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  background: var(--element-surface-default);
+  color: var(--text-neutral-primary);
+  outline: none;
+}
+
+.sidebar-search-input:focus {
+  border-color: var(--element-outline-brand-active);
+}
+
+.sidebar-search-input::placeholder {
+  color: var(--text-neutral-tertiary-default);
+}
+
 .sidebar-nav {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  padding: 16px 8px;
+  padding: 8px 8px 16px;
 }
 
 .sidebar-btn {

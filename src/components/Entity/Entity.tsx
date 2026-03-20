@@ -9,8 +9,12 @@ import styles from "./Entity.module.css";
 import { cx } from "../../utils/cx";
 
 
+export type EntityLayout = "horizontal" | "vertical";
+
 export interface EntityProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "title"> {
+  /** Layout direction — horizontal (default) or vertical */
+  layout?: EntityLayout;
   /** Leading element — an Icon (16px), large Icon (20px), Thumbnail (md), or any ReactNode */
   leading?: ReactNode;
   /** Title text (truncated to 1 line) */
@@ -36,6 +40,7 @@ export interface EntityProps
 export const Entity = forwardRef<HTMLDivElement, EntityProps>(
   (
     {
+      layout = "horizontal",
       leading,
       title,
       hint,
@@ -53,12 +58,14 @@ export const Entity = forwardRef<HTMLDivElement, EntityProps>(
   ) => {
     const hasActions = !!(persistentActions || hiddenActions);
     const interactive = !!onClick && !disabled;
+    const isVertical = layout === "vertical";
 
     return (
       <div
         ref={ref}
         className={cx(
           styles.root,
+          isVertical && styles.vertical,
           error && styles.error,
           disabled && styles.disabled,
           interactive && styles.interactive,

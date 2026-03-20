@@ -82,6 +82,19 @@
   -webkit-box-orient: vertical;
 }
 
+/* ── vertical layout ──────────────────────────────────────────────── */
+
+.vertical .base {
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.vertical .leadingText {
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
 /* ── error state ──────────────────────────────────────────────────── */
 
 .error .title {

@@ -23,6 +23,7 @@ import type { BodyTextSize } from "../components/BodyText";
 import { ActionCard, type ActionCardVariant } from "../components/ActionCard";
 import { ImageCard, type ImageCardVariant } from "../components/ImageCard";
 import { MediaCard, type MediaCardVariant } from "../components/MediaCard";
+import { HeroCard, type HeroCardSize } from "../components/HeroCard";
 import { SelectChip } from "../components/SelectChip";
 import { Tag } from "../components/Tag";
 import { Icon } from "../components/Icon";
@@ -581,6 +582,45 @@ function MediaCardDemo() {
   );
 }
 
+/* ── Hero Card Demo ── */
+
+function HeroCardDemo() {
+  const [size, setSize] = useState<HeroCardSize>("sm");
+  const [showMedia, setShowMedia] = useState(true);
+  const [showTitle, setShowTitle] = useState(true);
+  const [showDesc, setShowDesc] = useState(true);
+  const [showFooter, setShowFooter] = useState(true);
+  return (
+    <div style={cardStyle}>
+      <div style={{ display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap", marginBottom: 16 }}>
+        <label>
+          Size:{" "}
+          <select value={size} onChange={(e) => setSize(e.target.value as HeroCardSize)}>
+            <option value="sm">sm</option>
+            <option value="lg">lg</option>
+          </select>
+        </label>
+        <label><input type="checkbox" checked={showMedia} onChange={(e) => setShowMedia(e.target.checked)} /> Media</label>
+        <label><input type="checkbox" checked={showTitle} onChange={(e) => setShowTitle(e.target.checked)} /> Title</label>
+        <label><input type="checkbox" checked={showDesc} onChange={(e) => setShowDesc(e.target.checked)} /> Description</label>
+        <label><input type="checkbox" checked={showFooter} onChange={(e) => setShowFooter(e.target.checked)} /> Footer (lg only)</label>
+      </div>
+      <div style={{ maxWidth: 720 }}>
+        <HeroCard
+          size={size}
+          title={showTitle ? "Welcome back" : undefined}
+          description={showDesc ? "Pick up where you left off. Your recent projects are waiting for you to continue building great things." : undefined}
+          mediaWidth="20%"
+          footer={showFooter ? { actions: <Button variant="brand" emphasis="high">Get Started</Button>, extraAction: <Button variant="neutral" emphasis="low">Learn More</Button> } : undefined}
+          onClick={() => alert("Hero card clicked")}
+        >
+          {showMedia ? <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop" alt="Mountains" /> : undefined}
+        </HeroCard>
+      </div>
+    </div>
+  );
+}
+
 export default function CardPlayground() {
   return (
     <>
@@ -618,6 +658,14 @@ export default function CardPlayground() {
           Card with media, selectable checkbox, pretitle (SelectChip), title (sm), and optional slot. Fixed density (sm), radius (lg), no inset, no footer.
         </p>
         <MediaCardDemo />
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Hero Card</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Horizontal trailing card (elevated only). sm = inset + density sm, lg = no inset + density lg with footer.
+        </p>
+        <HeroCardDemo />
       </section>
 
     </>
