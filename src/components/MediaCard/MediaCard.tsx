@@ -10,7 +10,7 @@ import {
   CardTitle,
   CardSlot,
 } from "../Card";
-import type { CardMediaContentType, CardMediaBarProps } from "../Card";
+import type { CardMediaContentType, CardMediaContentProps, CardMediaBarProps } from "../Card";
 import type { ImageryAspectRatio } from "../Imagery";
 import { VideoPlayer, type VideoPlayerRadius } from "../VideoPlayer";
 import styles from "./MediaCard.module.css";
@@ -39,7 +39,7 @@ export interface MediaCardVideoProps {
 }
 
 export interface MediaCardProps
-  extends Omit<React.HTMLAttributes<HTMLElement>, "title" | "children"> {
+  extends Omit<React.HTMLAttributes<HTMLElement>, "title" | "children" | "slot"> {
   variant?: MediaCardVariant;
   /** Whether the card is selected (enables checkbox in media bar) */
   selected?: boolean;
@@ -127,9 +127,7 @@ export const MediaCard = forwardRef<HTMLElement, MediaCardProps>(
         {...rest}
       >
         <CardMedia>
-          <CardMediaContent type={mediaType} aspectRatio={aspectRatio}>
-            {children}
-          </CardMediaContent>
+          <CardMediaContent {...{ type: mediaType, aspectRatio, children } as CardMediaContentProps} />
           <CardMediaBar
             leading={mediaBarLeading}
             trailing={mediaBarTrailing}

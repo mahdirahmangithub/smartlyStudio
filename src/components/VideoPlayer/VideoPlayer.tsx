@@ -14,7 +14,7 @@ import styles from "./VideoPlayer.module.css";
 export type VideoPlayerRadius = "sm" | "md" | "full";
 
 export interface VideoPlayerProps
-  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children"> {
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, "children" | "onVolumeChange"> {
   /** Border-radius: sm (4px), md (8px), full (pill) */
   radius?: VideoPlayerRadius;
   /** Total duration in seconds */

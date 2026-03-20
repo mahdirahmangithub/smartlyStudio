@@ -26,6 +26,7 @@ import { MediaCard, type MediaCardVariant } from "../components/MediaCard";
 import { SelectChip } from "../components/SelectChip";
 import { Tag } from "../components/Tag";
 import { Icon } from "../components/Icon";
+import type { IconName } from "../components/Icon";
 import { IconButton } from "../components/IconButton";
 import { Avatar } from "../components/Avatar";
 import { Imagery } from "../components/Imagery";
@@ -59,7 +60,7 @@ function getLeading(type: LeadingType, titleSize: CardTitleSize): ReactNode | un
         />
       );
     case "avatar":
-      return <Avatar size={AVATAR_SIZE[titleSize]} label="User" />;
+      return <Avatar size={AVATAR_SIZE[titleSize]} alt="User" />;
     default:
       return undefined;
   }
@@ -333,7 +334,7 @@ function ActionCardDemo() {
   const [showThumbnail, setShowThumbnail] = useState(true);
   const [showDescription, setShowDescription] = useState(true);
 
-  const actions = [
+  const actions: { icon: IconName; title: string; description: string }[] = [
     { icon: "bolt", title: "Quick action", description: "Perform a common task with one click" },
     { icon: "send", title: "Send message", description: "Compose and send a new message" },
     { icon: "settings", title: "Settings", description: "Manage your account preferences" },

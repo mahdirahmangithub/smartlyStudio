@@ -523,7 +523,7 @@ const TITLE_SIZE_MAP: Record<CardTitleSize, TitleTextSize> = {
   sm: "2xs",
 };
 
-export interface CardTitleProps extends React.HTMLAttributes<HTMLDivElement> {
+export interface CardTitleProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "title"> {
   /** Visual size — controls typography and gap */
   size?: CardTitleSize;
   /** Title text content */
