@@ -97,6 +97,7 @@ import SortableListPlayground from "./pages/SortableListPlayground";
 import SpecialInputPlayground from "./pages/SpecialInputPlayground";
 import TestProgressiveBlurPlayground from "./pages/TestProgressiveBlurPlayground";
 import ToolbarButtonPlayground from "./pages/ToolbarButtonPlayground";
+import VideoPlayerPlayground from "./pages/VideoPlayerPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
@@ -129,6 +130,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "test-progressive-blur"
 | "toolbar-button"
 | "ai-text-generation"
+| "video-player"
 
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
@@ -380,6 +382,7 @@ export default function App() {
     { key: "toolbar-button", label: "ToolbarButton" },
     { key: "tooltip", label: "Tooltip" },
     { key: "typography", label: "Typography" },
+    { key: "video-player", label: "VideoPlayer" },
   ];
 
   return (
@@ -522,6 +525,7 @@ export default function App() {
             {page === "data-table" && <DataTablePlayground />}
             {page === "animated-icons" && <AnimatedIconsPlayground />}
             {page === "typography" && <TypographyPlayground />}
+            {page === "video-player" && <VideoPlayerPlayground />}
             {page === "shimmer" && <ShimmerPlayground />}
             {page === "navbar" && <NavbarPlayground />}
             {page === "navbar-content" && <NavBarContentPlayground />}

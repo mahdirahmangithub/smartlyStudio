@@ -70,7 +70,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLElement> {
   inset?: boolean;
 }
 
-const INTERACTIVE_SELECTORS = "a[href],button,input,select,textarea,[role='button'],[role='checkbox'],[role='radio'],[role='switch']";
+const INTERACTIVE_SELECTORS = "a[href],button,input,select,textarea,[role='button'],[role='checkbox'],[role='radio'],[role='switch'],[role='combobox'],[role='listbox'],[role='menu'],[role='menuitem'],[tabindex='0']";
 
 function isInteractiveChild(target: EventTarget | null, container: HTMLElement): boolean {
   let el = target as HTMLElement | null;

@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from "react";
+import { useState, useRef, useEffect, useCallback, type CSSProperties, type ReactNode } from "react";
 import {
   Card,
   CardMedia,
@@ -22,6 +22,9 @@ import type { ImageryAspectRatio } from "../components/Imagery";
 import type { BodyTextSize } from "../components/BodyText";
 import { ActionCard, type ActionCardVariant } from "../components/ActionCard";
 import { ImageCard, type ImageCardVariant } from "../components/ImageCard";
+import { MediaCard, type MediaCardVariant } from "../components/MediaCard";
+import { SelectChip } from "../components/SelectChip";
+import { Tag } from "../components/Tag";
 import { Icon } from "../components/Icon";
 import { IconButton } from "../components/IconButton";
 import { Avatar } from "../components/Avatar";
@@ -433,6 +436,146 @@ function ImageCardDemo() {
           </ImageCard>
         ))}
       </div>
+      <h3 style={{ margin: "16px 0 8px", fontSize: 14 }}>16:9 Aspect Ratio</h3>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
+        {images.slice(0, 2).map((img, i) => (
+          <ImageCard
+            key={i}
+            variant={icVariant}
+            radius={icRadius}
+            aspectRatio="16:9"
+            title={showTitle ? img.title : undefined}
+            description={showDescription ? img.description : undefined}
+            onClick={() => alert(`${img.title} clicked`)}
+          >
+            <img src={img.src} alt={img.title} />
+          </ImageCard>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MediaCardDemo() {
+  const [mcVariant, setMcVariant] = useState<MediaCardVariant>("outline");
+  const [mcSelected, setMcSelected] = useState<Record<number, boolean>>({});
+  const [showPretitle, setShowPretitle] = useState(true);
+  const [showTitle, setShowTitle] = useState(true);
+  const [showSlot, setShowSlot] = useState(false);
+  const [selectable, setSelectable] = useState(true);
+  const [mcDisabled, setMcDisabled] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoPlaying, setVideoPlaying] = useState(false);
+  const [videoVolume, setVideoVolume] = useState(0.7);
+  const [videoTime, setVideoTime] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
+
+  const handleVideoPlayPause = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); setVideoPlaying(true); }
+    else { v.pause(); setVideoPlaying(false); }
+  }, []);
+
+  const handleVideoVolume = useCallback((vol: number) => {
+    setVideoVolume(vol);
+    if (videoRef.current) videoRef.current.volume = vol;
+  }, []);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.volume = videoVolume;
+    const onTime = () => setVideoTime(v.currentTime);
+    const onMeta = () => setVideoDuration(v.duration);
+    const onEnd = () => { setVideoPlaying(false); setVideoTime(0); };
+    v.addEventListener("timeupdate", onTime);
+    v.addEventListener("loadedmetadata", onMeta);
+    v.addEventListener("ended", onEnd);
+    return () => {
+      v.removeEventListener("timeupdate", onTime);
+      v.removeEventListener("loadedmetadata", onMeta);
+      v.removeEventListener("ended", onEnd);
+    };
+  }, [videoVolume]);
+
+  const images = [
+    { src: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=600&h=340&fit=crop", title: "Mountain Lake" },
+    { src: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=600&h=340&fit=crop", title: "Golden Valley" },
+    { src: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=600&h=340&fit=crop", title: "Green Hills" },
+  ];
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 12 }}>
+        <label style={{ fontSize: 13 }}>
+          Variant:{" "}
+          <select value={mcVariant} onChange={(e) => setMcVariant(e.target.value as MediaCardVariant)}>
+            <option value="outline">outline</option>
+            <option value="elevated">elevated</option>
+          </select>
+        </label>
+        <label style={{ fontSize: 13 }}>
+          <input type="checkbox" checked={selectable} onChange={(e) => setSelectable(e.target.checked)} /> Selectable
+        </label>
+        <label style={{ fontSize: 13 }}>
+          <input type="checkbox" checked={mcDisabled} onChange={(e) => setMcDisabled(e.target.checked)} /> Disabled
+        </label>
+        <label style={{ fontSize: 13 }}>
+          <input type="checkbox" checked={showPretitle} onChange={(e) => setShowPretitle(e.target.checked)} /> Pretitle
+        </label>
+        <label style={{ fontSize: 13 }}>
+          <input type="checkbox" checked={showTitle} onChange={(e) => setShowTitle(e.target.checked)} /> Title
+        </label>
+        <label style={{ fontSize: 13 }}>
+          <input type="checkbox" checked={showSlot} onChange={(e) => setShowSlot(e.target.checked)} /> Slot
+        </label>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: 16 }}>
+        {images.map((img, i) => (
+          <MediaCard
+            key={i}
+            variant={mcVariant}
+            disabled={mcDisabled}
+            selected={selectable ? !!mcSelected[i] : undefined}
+            onSelectChange={(checked) => setMcSelected((s) => ({ ...s, [i]: checked }))}
+            aspectRatio="1:1"
+            pretitle={showPretitle ? <SelectChip size="sm" variant="info" emphasis="low">Category</SelectChip> : undefined}
+            title={showTitle ? img.title : undefined}
+            slot={showSlot ? <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><Tag size="md" variant="neutral" label="Design" /><Tag size="md" variant="neutral" label="Photo" /></div> : undefined}
+            onClick={() => {
+              if (selectable) setMcSelected((s) => ({ ...s, [i]: !s[i] }));
+            }}
+          >
+            <img src={img.src} alt={img.title} />
+          </MediaCard>
+        ))}
+        <MediaCard
+          variant={mcVariant}
+          disabled={mcDisabled}
+          selected={selectable ? !!mcSelected[3] : undefined}
+          onSelectChange={(checked) => setMcSelected((s) => ({ ...s, 3: checked }))}
+          aspectRatio="1:1"
+          pretitle={showPretitle ? <SelectChip size="sm" variant="info" emphasis="low">Video</SelectChip> : undefined}
+          title={showTitle ? "Big Buck Bunny" : undefined}
+          slot={showSlot ? <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}><Tag size="md" variant="neutral" label="Animation" /><Tag size="md" variant="neutral" label="Video" /></div> : undefined}
+          onClick={() => {
+            if (selectable) setMcSelected((s) => ({ ...s, 3: !s[3] }));
+          }}
+          video={{
+            duration: videoDuration,
+            currentTime: videoTime,
+            playing: videoPlaying,
+            volume: videoVolume,
+            onPlayPause: handleVideoPlayPause,
+            onVolumeChange: handleVideoVolume,
+            onAction: () => videoRef.current?.requestFullscreen?.(),
+          }}
+        >
+          <video ref={videoRef} src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" playsInline preload="metadata" />
+        </MediaCard>
+      </div>
     </div>
   );
 }
@@ -467,6 +610,15 @@ export default function CardPlayground() {
         </p>
         <ImageCardDemo />
       </section>
+
+      <section style={sectionStyle}>
+        <h2>Media Card</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Card with media, selectable checkbox, pretitle (SelectChip), title (sm), and optional slot. Fixed density (sm), radius (lg), no inset, no footer.
+        </p>
+        <MediaCardDemo />
+      </section>
+
     </>
   );
 }
