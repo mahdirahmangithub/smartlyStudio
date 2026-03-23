@@ -1,0 +1,124 @@
+/* ── Root ─────────────────────────────────────────────────────────── */
+
+.root {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* ── Gutter spacer (aligns with line number column) ──────────────── */
+
+.gutter {
+  flex-shrink: 0;
+  width: 32px;
+  align-self: stretch;
+}
+
+/* ── Line number ─────────────────────────────────────────────────── */
+
+.lineNumber {
+  flex-shrink: 0;
+  text-align: right;
+  color: var(--text-neutral-disable);
+  user-select: none;
+  white-space: nowrap;
+}
+
+.lineNumber.sizeLg {
+  font-family: var(--type-code-lg-family);
+  font-weight: var(--type-code-lg-weight);
+  font-size: var(--type-code-lg-size);
+  line-height: var(--type-code-lg-line-height);
+  letter-spacing: var(--type-code-lg-letter-spacing);
+}
+
+.lineNumber.sizeMd {
+  font-family: var(--type-code-md-family);
+  font-weight: var(--type-code-md-weight);
+  font-size: var(--type-code-md-size);
+  line-height: var(--type-code-md-line-height);
+  letter-spacing: var(--type-code-md-letter-spacing);
+}
+
+.lineNumber.sizeSm {
+  font-family: var(--type-code-sm-family);
+  font-weight: var(--type-code-sm-weight);
+  font-size: var(--type-code-sm-size);
+  line-height: var(--type-code-sm-line-height);
+  letter-spacing: var(--type-code-sm-letter-spacing);
+}
+
+/* ── Code content ────────────────────────────────────────────────── */
+
+.code {
+  position: relative;
+  flex: 1 0 0;
+  min-width: 0;
+  min-height: 0;
+  white-space: pre;
+}
+
+.code.sizeLg {
+  font-family: var(--type-code-lg-family);
+  font-weight: var(--type-code-lg-weight);
+  font-size: var(--type-code-lg-size);
+  line-height: var(--type-code-lg-line-height);
+  letter-spacing: var(--type-code-lg-letter-spacing);
+}
+
+.code.sizeMd {
+  font-family: var(--type-code-md-family);
+  font-weight: var(--type-code-md-weight);
+  font-size: var(--type-code-md-size);
+  line-height: var(--type-code-md-line-height);
+  letter-spacing: var(--type-code-md-letter-spacing);
+}
+
+.code.sizeSm {
+  font-family: var(--type-code-sm-family);
+  font-weight: var(--type-code-sm-weight);
+  font-size: var(--type-code-sm-size);
+  line-height: var(--type-code-sm-line-height);
+  letter-spacing: var(--type-code-sm-letter-spacing);
+}
+
+/* ── Highlight layer (inside .code, extends 8px beyond) ──────────── */
+
+.highlight {
+  position: absolute;
+  inset: 0 calc(-1 * var(--spacing-sm));
+  display: flex;
+  pointer-events: none;
+}
+
+.highlightIndicator {
+  flex-shrink: 0;
+  width: var(--spacing-2xs);
+  align-self: stretch;
+}
+
+.highlightBackground {
+  flex: 1 0 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* ── Highlight color variants ────────────────────────────────────── */
+
+.highlightNeutral > .highlightIndicator    { background: var(--element-fill-neutral-primary-default); }
+.highlightNeutral > .highlightBackground   { background: var(--element-fill-neutral-tertiary-active-default); }
+
+.highlightBrand > .highlightIndicator      { background: var(--element-fill-brand-primary-default); }
+.highlightBrand > .highlightBackground     { background: var(--element-fill-brand-tertiary-active-default); }
+
+.highlightInfo > .highlightIndicator       { background: var(--element-fill-info-primary-default); }
+.highlightInfo > .highlightBackground      { background: var(--element-fill-info-tertiary-active-default); }
+
+.highlightSuccess > .highlightIndicator    { background: var(--element-fill-success-primary-default); }
+.highlightSuccess > .highlightBackground   { background: var(--element-fill-success-tertiary-active-default); }
+
+.highlightWarning > .highlightIndicator    { background: var(--element-fill-warning-primary-default); }
+.highlightWarning > .highlightBackground   { background: var(--element-fill-warning-tertiary-active-default); }
+
+.highlightAlert > .highlightIndicator      { background: var(--element-fill-alert-primary-default); }
+.highlightAlert > .highlightBackground     { background: var(--element-fill-alert-tertiary-active-default); }

@@ -1,0 +1,12 @@
+/* ── Syntax token colors ──────────────────────────────────────────── */
+
+.keyword     { color: var(--text-info-default); }
+.string      { color: var(--text-success-default); }
+.template    { color: var(--text-success-default); }
+.interpolation { color: var(--text-brand-default); }
+.comment     { color: var(--text-neutral-placeholder); }
+.number      { color: var(--text-warning-default); }
+.operator    { color: var(--text-neutral-primary); }
+.punctuation { color: var(--text-neutral-secondary-default); }
+.function    { color: var(--text-brand-default); }
+.plain       { color: var(--text-neutral-primary); }

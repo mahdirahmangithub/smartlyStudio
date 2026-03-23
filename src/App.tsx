@@ -7,7 +7,9 @@ import ButtonPlayground from "./pages/ButtonPlayground";
 import ScrollFadePage from "./pages/ScrollFadePage";
 import ExpanderPlayground from "./pages/ExpanderPlayground";
 import CardPlayground from "./pages/CardPlayground";
+import CodeBlockPlayground from "./pages/CodeBlockPlayground";
 import ContainerPlayground from "./pages/ContainerPlayground";
+import CopyButtonPlayground from "./pages/CopyButtonPlayground";
 import CalloutPlayground from "./pages/CalloutPlayground";
 import DividerPlayground from "./pages/DividerPlayground";
 import ButtonGroupPlayground from "./pages/ButtonGroupPlayground";
@@ -104,6 +106,8 @@ import "./App.css";
 type Theme = "light" | "dark" | "dusk";
 type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
 | "card"
+| "code-block"
+| "copy-button"
 | "icon-container"
 | "breadcrumb"
 | "dimmer"
@@ -281,10 +285,12 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "button-group", label: "ButtonGroup" },
   { key: "callout", label: "Callout" },
   { key: "card", label: "Card" },
+  { key: "code-block", label: "CodeBlock" },
   { key: "checkbox", label: "Checkbox" },
   { key: "chip", label: "Chip" },
   { key: "combobox", label: "Combobox" },
   { key: "container", label: "Container" },
+  { key: "copy-button", label: "CopyButton" },
   { key: "content-switcher", label: "ContentSwitcher" },
   { key: "content-switcher-item", label: "CSItem" },
   { key: "currency-thumbnail", label: "CurrencyThumb" },
@@ -468,7 +474,9 @@ export default function App() {
             {page === "expander" && <ExpanderPlayground />}
             {page === "callout" && <CalloutPlayground />}
             {page === "card" && <CardPlayground />}
+            {page === "code-block" && <CodeBlockPlayground />}
             {page === "container" && <ContainerPlayground />}
+            {page === "copy-button" && <CopyButtonPlayground />}
             {page === "divider" && <DividerPlayground />}
             {page === "button-group" && <ButtonGroupPlayground />}
             {page === "input-clear" && <InputClearPlayground />}
