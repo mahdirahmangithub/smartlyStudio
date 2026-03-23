@@ -138,6 +138,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
           isStatic && styles.static,
           className,
         )}
+        role={interactive && onClick ? "button" : undefined}
         aria-disabled={disabled || undefined}
         aria-selected={selected != null ? selected : undefined}
         tabIndex={interactive ? 0 : undefined}

@@ -6,7 +6,7 @@
   flex-direction: column;
   gap: var(--spacing-sm);
   align-items: flex-end;
-  background: var(--element-surface-under);
+  background: var(--element-surface-over);
   border: var(--spacing-hair-line) solid var(--element-divider-neutral-default);
   border-radius: var(--radius-2xl);
   padding: var(--spacing-md);
@@ -236,7 +236,7 @@
 .showMoreFaderColor {
   position: absolute;
   inset: 0;
-  background: var(--element-surface-under);
+  background: var(--element-surface-over);
   mask-image: linear-gradient(to bottom, transparent, black);
   -webkit-mask-image: linear-gradient(to bottom, transparent, black);
 }
@@ -249,7 +249,7 @@
 .showMoreMask {
   width: 100%;
   height: var(--spacing-md);
-  background: var(--element-surface-under);
+  background: var(--element-surface-over);
 }
 
 /* ── Version switch ──────────────────────────────────────────────── */
