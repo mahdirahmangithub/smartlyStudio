@@ -301,6 +301,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
       getDisplayText,
       getSegmentProps,
       handleKeyDown,
+      handleBeforeInput,
       handleFocus,
       handleBlur,
       setRef: setSegRef,
@@ -467,17 +468,26 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
               }
 
               const segProps = getSegmentProps(i);
+              const numDef = def as import("../../hooks/useSegmentedInput").NumericSegmentDef;
               return (
-                <span
-                  key={i}
-                  ref={setSegRef(i)}
-                  className={styles.segment}
-                  {...segProps}
-                  onKeyDown={(e) => handleKeyDown(i, e)}
-                  onFocus={() => handleFocus(i)}
-                  onBlur={() => handleBlur(i)}
-                >
-                  {getDisplayText(i)}
+                <span key={i} className={styles.segmentCell}>
+                  <input
+                    ref={setSegRef(i)}
+                    className={styles.segment}
+                    type="text"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    spellCheck={false}
+                    enterKeyHint="next"
+                    size={numDef.length}
+                    value={getDisplayText(i)}
+                    onChange={() => {}}
+                    {...segProps}
+                    onBeforeInput={(e) => handleBeforeInput(i, e)}
+                    onKeyDown={(e) => handleKeyDown(i, e)}
+                    onFocus={() => handleFocus(i)}
+                    onBlur={() => handleBlur(i)}
+                  />
                 </span>
               );
             })}

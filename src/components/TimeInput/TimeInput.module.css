@@ -22,9 +22,39 @@
   letter-spacing: var(--type-label-md-letter-spacing);
 }
 
-/* ── numeric segment ──────────────────────────────────────────────── */
+/* ── segment cell (wrapper for ::before focus highlight) ──────────── */
+
+.segmentCell {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+}
+
+.segmentCell:focus-within::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: var(--spacing-negative-xs);
+  bottom: var(--spacing-negative-xs);
+  left: var(--spacing-negative-2xs);
+  right: var(--spacing-negative-2xs);
+  background: var(--element-fill-brand-secondary-hover);
+  pointer-events: none;
+  border-radius: var(--radius-xs);
+  z-index: -1;
+}
+
+/* ── numeric segment (input) ─────────────────────────────────────── */
 
 .segment {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  margin: 0;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: content-box;
+  field-sizing: content;
   font-variant-numeric: tabular-nums;
   text-align: center;
   padding: var(--spacing-xxs) var(--spacing-px);
@@ -42,23 +72,6 @@
   color: var(--text-neutral-primary);
   background: transparent;
   transition: background var(--animation-state-change-duration) var(--animation-state-change-easing);
-  position: relative;
-  z-index: 1;
-}
-
-.segment:focus::before {
-  content: "";
-  display: block;
-  position: absolute;
-  top: var(--spacing-negative-xs);
-  bottom: var(--spacing-negative-xs);
-  left: var(--spacing-negative-2xs);
-  right: var(--spacing-negative-2xs);
-  z-index: 0;
-  background: var(--element-fill-brand-secondary-hover);
-  pointer-events: none;
-  border-radius: var(--radius-xs);
-  z-index: -1;
 }
 
 .segment[data-placeholder] {
@@ -80,7 +93,23 @@
   composes: segment;
   font-variant-numeric: normal;
   margin-left: var(--spacing-xs);
- }
+  position: relative;
+  z-index: 1;
+}
+
+.meridiem:focus::before {
+  content: "";
+  display: block;
+  position: absolute;
+  top: var(--spacing-negative-xs);
+  bottom: var(--spacing-negative-xs);
+  left: var(--spacing-negative-2xs);
+  right: var(--spacing-negative-2xs);
+  background: var(--element-fill-brand-secondary-hover);
+  pointer-events: none;
+  border-radius: var(--radius-xs);
+  z-index: -1;
+}
 
 /* ── disabled / readOnly ──────────────────────────────────────────── */
 
@@ -89,6 +118,11 @@
 .disabled .meridiem {
   color: var(--text-neutral-disable);
   cursor: default;
+}
+
+.disabled .segmentCell:focus-within::before,
+.disabled .meridiem:focus::before {
+  display: none;
 }
 
 .readOnly .segment,

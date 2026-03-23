@@ -98,7 +98,7 @@ export function useSegmentedInput({
   const queryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
-  const segmentRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const segmentRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const onChangeRef = useRef(onSectionsChange);
   onChangeRef.current = onSectionsChange;
@@ -375,6 +375,35 @@ export function useSegmentedInput({
     ],
   );
 
+  /* ── beforeinput (mobile virtual-keyboard fallback) ──────────────── */
+
+  const handleBeforeInput = useCallback(
+    (segIdx: number, e: React.FormEvent<HTMLInputElement>) => {
+      e.preventDefault();
+      if (disabled || readOnly) return;
+
+      const native = e.nativeEvent as InputEvent;
+      const data = native.data;
+
+      if (data && data >= "0" && data <= "9") {
+        applyNumericEditing(segIdx, data);
+      } else if (native.inputType === "deleteContentBackward") {
+        setCharacterQuery(null);
+        if (valuesRef.current[segIdx] !== "") {
+          updateSectionValue(segIdx, "");
+        } else {
+          focusPrevNumeric(segIdx);
+        }
+      } else if (native.inputType === "deleteContentForward") {
+        setCharacterQuery(null);
+        if (valuesRef.current[segIdx] !== "") {
+          updateSectionValue(segIdx, "");
+        }
+      }
+    },
+    [disabled, readOnly, applyNumericEditing, setCharacterQuery, updateSectionValue, focusPrevNumeric],
+  );
+
   /* ── focus / blur ────────────────────────────────────────────────── */
 
   const handleFocus = useCallback((segIdx: number) => {
@@ -439,7 +468,7 @@ export function useSegmentedInput({
   );
 
   const setRef = useCallback(
-    (segIdx: number) => (el: HTMLSpanElement | null) => {
+    (segIdx: number) => (el: HTMLInputElement | null) => {
       segmentRefs.current[segIdx] = el;
     },
     [],
@@ -474,6 +503,7 @@ export function useSegmentedInput({
     isPlaceholder,
     getSegmentProps,
     handleKeyDown,
+    handleBeforeInput,
     handleFocus,
     handleBlur,
     setRef,
