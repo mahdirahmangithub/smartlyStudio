@@ -7,6 +7,7 @@ import ButtonPlayground from "./pages/ButtonPlayground";
 import ScrollFadePage from "./pages/ScrollFadePage";
 import ExpanderPlayground from "./pages/ExpanderPlayground";
 import CardPlayground from "./pages/CardPlayground";
+import ContainerPlayground from "./pages/ContainerPlayground";
 import CalloutPlayground from "./pages/CalloutPlayground";
 import DividerPlayground from "./pages/DividerPlayground";
 import ButtonGroupPlayground from "./pages/ButtonGroupPlayground";
@@ -283,6 +284,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "checkbox", label: "Checkbox" },
   { key: "chip", label: "Chip" },
   { key: "combobox", label: "Combobox" },
+  { key: "container", label: "Container" },
   { key: "content-switcher", label: "ContentSwitcher" },
   { key: "content-switcher-item", label: "CSItem" },
   { key: "currency-thumbnail", label: "CurrencyThumb" },
@@ -466,6 +468,7 @@ export default function App() {
             {page === "expander" && <ExpanderPlayground />}
             {page === "callout" && <CalloutPlayground />}
             {page === "card" && <CardPlayground />}
+            {page === "container" && <ContainerPlayground />}
             {page === "divider" && <DividerPlayground />}
             {page === "button-group" && <ButtonGroupPlayground />}
             {page === "input-clear" && <InputClearPlayground />}
