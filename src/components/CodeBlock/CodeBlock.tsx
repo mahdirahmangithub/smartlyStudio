@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useId,
   useMemo,
   useState,
   type ReactNode,
@@ -49,6 +50,10 @@ export interface CodeBlockProps {
 
   /** Label for the current version (e.g. "Version 1") */
   versionLabel?: string;
+  /** Called when the version label button is clicked (e.g. to open a version picker dropdown) */
+  onVersionClick?: () => void;
+  /** Ref forwarded to the version label button (useful as dropdown anchor) */
+  versionRef?: React.RefObject<HTMLButtonElement | null>;
   onPrevVersion?: () => void;
   onNextVersion?: () => void;
   hasPrevVersion?: boolean;
@@ -92,6 +97,8 @@ export const CodeBlock = forwardRef<HTMLElement, CodeBlockProps>(
       onShowMore,
 
       versionLabel,
+      onVersionClick,
+      versionRef,
       onPrevVersion,
       onNextVersion,
       hasPrevVersion = false,
@@ -132,54 +139,60 @@ export const CodeBlock = forwardRef<HTMLElement, CodeBlockProps>(
 
     const hasHeader = title != null;
     const hasVersion = versionLabel != null;
+    const autoId = useId();
+    const titleId = hasHeader ? `${id ?? autoId}-title` : undefined;
 
     const versionControls = hasVersion && (
-      <div className={styles.versionSwitch}>
+      <nav className={styles.versionSwitch} aria-label="Version navigation">
         <IconButton
           size="md"
           variant="neutral"
           emphasis="low"
-          icon={<Icon name="chevron_left" size={20} />}
+          icon={<Icon name="chevron_left" size={16} />}
           aria-label="Previous version"
           onClick={onPrevVersion}
           disabled={!hasPrevVersion}
         />
         <Button
+          ref={versionRef}
           variant="neutral"
           emphasis="low"
           size="md"
+          aria-haspopup="listbox"
+          onClick={onVersionClick}
         >
-          {versionLabel}
+          <span aria-live="polite">{versionLabel}</span>
         </Button>
         <IconButton
           size="md"
           variant="neutral"
           emphasis="low"
-          icon={<Icon name="chevron_right" size={20} />}
+          icon={<Icon name="chevron_right" size={16} />}
           aria-label="Next version"
           onClick={onNextVersion}
           disabled={!hasNextVersion}
         />
-      </div>
+      </nav>
     );
 
     return (
       <section
         ref={ref}
         id={id}
-        aria-label={title ?? "Code block"}
+        aria-labelledby={titleId}
+        aria-label={hasHeader ? undefined : "Code block"}
         className={cx(styles.root, SIZE_ROOT_CLASS[size], className)}
       >
         {hasHeader && (
-          <div className={styles.header}>
+          <header className={styles.header}>
             <div className={styles.headerText}>
-              <div className={styles.headerTitle}>{title}</div>
+              <h2 id={titleId} className={styles.headerTitle}>{title}</h2>
               {description && (
-                <div className={styles.headerDescription}>{description}</div>
+                <p className={styles.headerDescription}>{description}</p>
               )}
             </div>
             {actions && <div className={styles.headerActions}>{actions}</div>}
-          </div>
+          </header>
         )}
 
         <div className={styles.codeSection}>
@@ -196,7 +209,7 @@ export const CodeBlock = forwardRef<HTMLElement, CodeBlockProps>(
             </div>
           )}
 
-          <div className={styles.codeLines}>
+          <pre className={styles.codeLines}>
             {displayedLines.map((line, i) => {
               const lineNum = i + 1;
               const hl = highlightMap?.get(lineNum);
@@ -211,7 +224,7 @@ export const CodeBlock = forwardRef<HTMLElement, CodeBlockProps>(
                 />
               );
             })}
-          </div>
+          </pre>
         </div>
 
         {hasShowMore && (
@@ -231,6 +244,7 @@ export const CodeBlock = forwardRef<HTMLElement, CodeBlockProps>(
               trailingIcon={<Icon name="arrow_chevron_down" size={16} />}
               onClick={handleShowMore}
               className={styles.showMoreBtn}
+              aria-expanded={false}
             >
               Show more
             </Button>

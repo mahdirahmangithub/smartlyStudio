@@ -1,6 +1,8 @@
-import { type CSSProperties, useState, useCallback } from "react";
+import { type CSSProperties, useState, useCallback, useRef } from "react";
 import { CodeBlock, type CodeBlockSize, type HighlightType, type LineHighlight } from "../components/CodeBlock";
 import { CopyButton } from "../components/CopyButton";
+import { Dropdown } from "../components/Dropdown";
+import { SingleSelectOption } from "../components/SingleSelectOption";
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
 const cardStyle: CSSProperties = {
@@ -92,6 +94,8 @@ function ConfigurableDemo() {
   const [visibleLines, setVisibleLines] = useState<number | undefined>(6);
   const [showVersion, setShowVersion] = useState(false);
   const [versionIdx, setVersionIdx] = useState(0);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const versionBtnRef = useRef<HTMLButtonElement>(null);
 
   const handlePrev = useCallback(
     () => setVersionIdx((i) => Math.max(0, i - 1)),
@@ -168,21 +172,47 @@ function ConfigurableDemo() {
           Version switch
         </label>
       </div>
-      <CodeBlock
-        code={code}
-        size={size}
-        showLineNumbers={showLineNumbers}
-        title={showHeader ? "Counter.tsx" : undefined}
-        description={showHeader && showDescription ? "React component" : undefined}
-        actions={showHeader ? <CopyButton value={code} /> : undefined}
-        enableSyntax={enableSyntax}
-        visibleLines={visibleLines}
-        versionLabel={showVersion ? `Version ${versionIdx + 1}` : undefined}
-        onPrevVersion={showVersion ? handlePrev : undefined}
-        onNextVersion={showVersion ? handleNext : undefined}
-        hasPrevVersion={showVersion && versionIdx > 0}
-        hasNextVersion={showVersion && versionIdx < VERSION_SNIPPETS.length - 1}
-      />
+      <div style={{ position: "relative" }}>
+        <CodeBlock
+          code={code}
+          size={size}
+          showLineNumbers={showLineNumbers}
+          title={showHeader ? "Counter.tsx" : undefined}
+          description={showHeader && showDescription ? "React component" : undefined}
+          actions={showHeader ? <CopyButton value={code} /> : undefined}
+          enableSyntax={enableSyntax}
+          visibleLines={visibleLines}
+          versionLabel={showVersion ? `Version ${versionIdx + 1}` : undefined}
+          onVersionClick={showVersion ? () => setDropdownOpen((o) => !o) : undefined}
+          versionRef={versionBtnRef}
+          onPrevVersion={showVersion ? handlePrev : undefined}
+          onNextVersion={showVersion ? handleNext : undefined}
+          hasPrevVersion={showVersion && versionIdx > 0}
+          hasNextVersion={showVersion && versionIdx < VERSION_SNIPPETS.length - 1}
+        />
+        {showVersion && (
+          <Dropdown
+            open={dropdownOpen}
+            onClose={() => setDropdownOpen(false)}
+            anchorRef={versionBtnRef}
+            placement="top-end"
+            width={160}
+          >
+            {VERSION_SNIPPETS.map((_, i) => (
+              <SingleSelectOption
+                key={i}
+                labelText={`Version ${i + 1}`}
+                description={false}
+                checked={i === versionIdx}
+                onChange={() => {
+                  setVersionIdx(i);
+                  setDropdownOpen(false);
+                }}
+              />
+            ))}
+          </Dropdown>
+        )}
+      </div>
     </div>
   );
 }
@@ -267,6 +297,8 @@ function ShowMoreDemo() {
 
 function VersionSwitchDemo() {
   const [versionIdx, setVersionIdx] = useState(0);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const versionBtnRef = useRef<HTMLElement>(null);
 
   const handlePrev = useCallback(
     () => setVersionIdx((i) => Math.max(0, i - 1)),
@@ -278,18 +310,42 @@ function VersionSwitchDemo() {
   );
 
   return (
-    <CodeBlock
-      code={VERSION_SNIPPETS[versionIdx]}
-      showLineNumbers
-      title="greet.ts"
-      description="Evolution of a function"
-      actions={<CopyButton value={VERSION_SNIPPETS[versionIdx]} />}
-      versionLabel={`Version ${versionIdx + 1}`}
-      onPrevVersion={handlePrev}
-      onNextVersion={handleNext}
-      hasPrevVersion={versionIdx > 0}
-      hasNextVersion={versionIdx < VERSION_SNIPPETS.length - 1}
-    />
+    <div style={{ position: "relative" }}>
+      <CodeBlock
+        code={VERSION_SNIPPETS[versionIdx]}
+        showLineNumbers
+        title="greet.ts"
+        description="Evolution of a function"
+        actions={<CopyButton value={VERSION_SNIPPETS[versionIdx]} />}
+        versionLabel={`Version ${versionIdx + 1}`}
+        onVersionClick={() => setDropdownOpen((o) => !o)}
+        versionRef={versionBtnRef}
+        onPrevVersion={handlePrev}
+        onNextVersion={handleNext}
+        hasPrevVersion={versionIdx > 0}
+        hasNextVersion={versionIdx < VERSION_SNIPPETS.length - 1}
+      />
+      <Dropdown
+        open={dropdownOpen}
+        onClose={() => setDropdownOpen(false)}
+        anchorRef={versionBtnRef}
+        placement="top-end"
+        width={160}
+      >
+        {VERSION_SNIPPETS.map((_, i) => (
+          <SingleSelectOption
+            key={i}
+            labelText={`Version ${i + 1}`}
+            description={false}
+            checked={i === versionIdx}
+            onChange={() => {
+              setVersionIdx(i);
+              setDropdownOpen(false);
+            }}
+          />
+        ))}
+      </Dropdown>
+    </div>
   );
 }
 

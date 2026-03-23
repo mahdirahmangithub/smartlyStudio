@@ -50,7 +50,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
       emphasis = "low",
       children,
       iconSize,
-      feedbackDuration = 1500,
+      feedbackDuration = 1000,
       onCopy,
       "aria-label": ariaLabel = "Copy",
       ...rest

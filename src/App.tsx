@@ -10,6 +10,7 @@ import CardPlayground from "./pages/CardPlayground";
 import CodeBlockPlayground from "./pages/CodeBlockPlayground";
 import ContainerPlayground from "./pages/ContainerPlayground";
 import CopyButtonPlayground from "./pages/CopyButtonPlayground";
+import InlineCodePlayground from "./pages/InlineCodePlayground";
 import CalloutPlayground from "./pages/CalloutPlayground";
 import DividerPlayground from "./pages/DividerPlayground";
 import ButtonGroupPlayground from "./pages/ButtonGroupPlayground";
@@ -108,6 +109,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "card"
 | "code-block"
 | "copy-button"
+| "inline-code"
 | "icon-container"
 | "breadcrumb"
 | "dimmer"
@@ -317,6 +319,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "icon-container", label: "IconContainer" },
   { key: "icons", label: "Icons" },
   { key: "imagery", label: "Imagery" },
+  { key: "inline-code", label: "InlineCode" },
   { key: "inline-input", label: "InlineInput" },
   { key: "inline-message", label: "InlineMessage" },
   { key: "input", label: "Input" },
@@ -523,6 +526,7 @@ export default function App() {
             {page === "tag-single-select-option" && <TagSingleSelectOptionPlayground />}
             {page === "add-item-option" && <AddItemOptionPlayground />}
             {page === "option-separator" && <OptionSeparatorPlayground />}
+            {page === "inline-code" && <InlineCodePlayground />}
             {page === "inline-input" && <InlineInputPlayground />}
             {page === "search-input-attachment" && <SearchInputAttachmentPlayground />}
             {page === "search-input" && <SearchInputPlayground />}

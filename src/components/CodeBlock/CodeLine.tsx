@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { tokenizeLine, type SyntaxToken } from "../../utils/syntaxTokenizer";
 import styles from "./CodeLine.module.css";
+import blockStyles from "./CodeBlock.module.css";
 import syntaxStyles from "./syntax.module.css";
 import { cx } from "../../utils/cx";
 
@@ -43,6 +44,15 @@ const HIGHLIGHT_CLASS: Record<HighlightType, string> = {
   alert: styles.highlightAlert,
 };
 
+const HIGHLIGHT_LABEL: Record<HighlightType, string> = {
+  neutral: "Highlighted",
+  brand: "Highlighted",
+  info: "Info",
+  success: "Added",
+  warning: "Warning",
+  alert: "Removed",
+};
+
 const TOKEN_CLASS: Record<SyntaxToken["type"], string> = {
   keyword: syntaxStyles.keyword,
   string: syntaxStyles.string,
@@ -77,13 +87,18 @@ export function CodeLine({
 
       <code className={cx(styles.code, SIZE_CLASS[size])}>
         {highlight && (
-          <div
-            className={cx(styles.highlight, HIGHLIGHT_CLASS[highlightType])}
-            aria-hidden="true"
-          >
-            {showIndicator && <div className={styles.highlightIndicator} />}
-            <div className={styles.highlightBackground} />
-          </div>
+          <>
+            <div
+              className={cx(styles.highlight, HIGHLIGHT_CLASS[highlightType])}
+              aria-hidden="true"
+            >
+              {showIndicator && <div className={styles.highlightIndicator} />}
+              <div className={styles.highlightBackground} />
+            </div>
+            <span className={blockStyles.srOnly}>
+              {HIGHLIGHT_LABEL[highlightType]}:
+            </span>
+          </>
         )}
         {tokens
           ? tokens.map((t, i) => (
