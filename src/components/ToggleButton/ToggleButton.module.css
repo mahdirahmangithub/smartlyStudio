@@ -117,9 +117,9 @@
    ============================================================ */
 
 .medium                                      { background: var(--element-fill-neutral-tertiary-default); border-color: var(--element-outline-neutral-default); color: var(--text-neutral-secondary-default); }
-.medium:hover:not(:disabled)                 { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); }
-.medium:active:not(:disabled)                { background: var(--element-fill-neutral-tertiary-press); border-color: var(--element-outline-neutral-press); }
-.medium:focus-visible:not(:disabled)         { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); }
+.medium:hover:not(:disabled)                 { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-secondary-hover); }
+.medium:active:not(:disabled)                { background: var(--element-fill-neutral-tertiary-press); border-color: var(--element-outline-neutral-press); color: var(--text-neutral-secondary-press); }
+.medium:focus-visible:not(:disabled)         { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-secondary-hover); }
 .medium:disabled                             { background: var(--element-fill-neutral-tertiary-disable); border-color: var(--element-outline-neutral-disable); color: var(--text-neutral-disable); cursor: not-allowed; }
 
 /* ============================================================
@@ -140,9 +140,9 @@
    LOW EMPHASIS — UNCHECKED
    ============================================================ */
 .low                                      { background: var(--element-fill-neutral-tertiary-default); color: var(--text-neutral-secondary-default); }
-.low:hover:not(:disabled)                 { background: var(--element-fill-neutral-tertiary-hover); }
-.low:active:not(:disabled)                { background: var(--element-fill-neutral-tertiary-press); }
-.low:focus-visible:not(:disabled)         { background: var(--element-fill-neutral-tertiary-hover); }
+.low:hover:not(:disabled)                 { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-secondary-hover); }
+.low:active:not(:disabled)                { background: var(--element-fill-neutral-tertiary-press); color: var(--text-neutral-secondary-press); }
+.low:focus-visible:not(:disabled)         { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-secondary-hover); }
 .low:disabled                             { background: var(--element-fill-neutral-tertiary-disable); color: var(--text-neutral-disable); cursor: not-allowed; }
 
 /* ============================================================

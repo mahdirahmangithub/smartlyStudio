@@ -192,7 +192,7 @@ function makeVariants(): Record<VariantKey, VariantConfig> {
       ),
       description: (
         <>
-          <IconContainer name="Meta_color" size="md" />
+          <IconContainer name="Meta" size="md" />
           <Tag size="md" variant="neutral" emphasis="low" label="645226 Hotels" leadingIcon={<Icon name="hotel" size={12} />} />
           <Link size="md" type="brand" strong icon>34 campaigns</Link>
         </>
@@ -436,10 +436,10 @@ function makeVariants(): Record<VariantKey, VariantConfig> {
       ),
       description: (
         <>
-          <IconContainer name="YouTube_color" size="md" />
-          <IconContainer name="Meta_color" size="md" />
-          <IconContainer name="Snapchat_color" size="md" />
-          <IconContainer name="Google_color" size="md" />
+          <IconContainer name="YouTube" size="md" />
+          <IconContainer name="Meta" size="md" />
+          <IconContainer name="Snapchat" size="md" />
+          <IconContainer name="Google" size="md" />
           <Tag size="md" variant="brand" emphasis="low" label="(GMT+02:00) Helsinki Time" leadingIcon={<Icon name="public" size={12} />} />
         </>
       ),
@@ -474,7 +474,7 @@ function makeVariants(): Record<VariantKey, VariantConfig> {
       ),
       description: (
         <>
-          <IconContainer name="YouTube_color" size="md" />
+          <IconContainer name="YouTube" size="md" />
           <span>Description</span>
         </>
       ),
@@ -497,7 +497,7 @@ function makeVariants(): Record<VariantKey, VariantConfig> {
       ),
       description: (
         <>
-          <IconContainer name="YouTube_color" size="md" />
+          <IconContainer name="YouTube" size="md" />
           <span>Description</span>
         </>
       ),
@@ -573,7 +573,7 @@ function makeVariants(): Record<VariantKey, VariantConfig> {
       left: (
         <Breadcrumb size="md">
           <BreadcrumbItem>Reporting</BreadcrumbItem>
-          <BreadcrumbItem icon={<IconContainer name="Meta_color" size="sm" />}>Report name</BreadcrumbItem>
+          <BreadcrumbItem icon={<IconContainer name="Meta" size="sm" />}>Report name</BreadcrumbItem>
           <BreadcrumbItem current>MJ_NL_THINK_FB/IG_Engagement_jun24</BreadcrumbItem>
         </Breadcrumb>
       ),
@@ -717,7 +717,7 @@ function makeVariants(): Record<VariantKey, VariantConfig> {
           <TitleText
             size="xs"
             title="Campaign name"
-            leadingIcon={<IconContainer name="Meta_color" size="md" />}
+            leadingIcon={<IconContainer name="Meta" size="md" />}
           />
           <IconButton
             size="md"

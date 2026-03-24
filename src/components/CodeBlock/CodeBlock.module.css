@@ -13,6 +13,8 @@
   overflow: clip;
 }
 
+
+
 /* ── Visually hidden (screen-reader only) ────────────────────────── */
 
 .srOnly {
@@ -143,7 +145,10 @@
   overflow-x: auto;
   overflow-y: hidden;
 }
-
+.codeSection ::selection {
+  color: var(--text-neutral-inverse-primary);
+  background: var(--element-fill-neutral-primary-default);
+}
 /* ── Line numbers column ─────────────────────────────────────────── */
 
 .lineNumbers {

@@ -150,10 +150,10 @@
 .medium.brand:focus-visible:not(:disabled)        { background: var(--element-fill-brand-tertiary-hover); border-color: var(--element-outline-brand-hover); color: var(--text-brand-hover); }
 .medium.brand:disabled                            { background: var(--element-fill-brand-tertiary-disable); border-color: var(--element-outline-brand-disable); color: var(--text-brand-disable); cursor: not-allowed; }
 
-.medium.neutral                                    { background: var(--element-fill-neutral-tertiary-default); border-color: var(--element-outline-neutral-default); color: var(--text-neutral-primary); }
-.medium.neutral:hover:not(:disabled)               { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-primary); }
-.medium.neutral:active:not(:disabled)              { background: var(--element-fill-neutral-tertiary-press); border-color: var(--element-outline-neutral-press); color: var(--text-neutral-primary); }
-.medium.neutral:focus-visible:not(:disabled)       { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-primary); }
+.medium.neutral                                    { background: var(--element-fill-neutral-tertiary-default); border-color: var(--element-outline-neutral-default); color: var(--text-neutral-secondary-default); }
+.medium.neutral:hover:not(:disabled)               { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-secondary-hover); }
+.medium.neutral:active:not(:disabled)              { background: var(--element-fill-neutral-tertiary-press); border-color: var(--element-outline-neutral-press); color: var(--text-neutral-secondary-press); }
+.medium.neutral:focus-visible:not(:disabled)       { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-secondary-hover); }
 .medium.neutral:disabled                           { background: var(--element-fill-neutral-tertiary-disable); border-color: var(--element-outline-neutral-disable); color: var(--text-neutral-disable); cursor: not-allowed; }
 
 .medium.info                                      { background: var(--element-fill-info-tertiary-default); border-color: var(--element-outline-info-default); color: var(--text-info-default); }
@@ -195,10 +195,10 @@
 .low.brand:focus-visible:not(:disabled)         { background: var(--element-fill-brand-tertiary-hover); color: var(--text-brand-hover); }
 .low.brand:disabled                             { background: var(--element-fill-brand-tertiary-disable); color: var(--text-brand-disable); cursor: not-allowed; }
 
-.low.neutral                                    { background: var(--element-fill-neutral-tertiary-default); color: var(--text-neutral-primary); }
-.low.neutral:hover:not(:disabled)               { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-primary); }
-.low.neutral:active:not(:disabled)              { background: var(--element-fill-neutral-tertiary-press); color: var(--text-neutral-primary); }
-.low.neutral:focus-visible:not(:disabled)       { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-primary); }
+.low.neutral                                    { background: var(--element-fill-neutral-tertiary-default); color: var(--text-neutral-secondary-default); }
+.low.neutral:hover:not(:disabled)               { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-secondary-hover); }
+.low.neutral:active:not(:disabled)              { background: var(--element-fill-neutral-tertiary-press); color: var(--text-neutral-secondary-press); }
+.low.neutral:focus-visible:not(:disabled)       { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-secondary-hover); }
 .low.neutral:disabled                           { background: var(--element-fill-neutral-tertiary-disable); color: var(--text-neutral-disable); cursor: not-allowed; }
 
 .low.info                                       { background: var(--element-fill-info-tertiary-default); color: var(--text-info-default); }

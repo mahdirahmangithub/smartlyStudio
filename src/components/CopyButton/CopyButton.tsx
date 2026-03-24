@@ -82,7 +82,7 @@ export const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
 
     const animatedIcon = (
       <span className={cx(styles.iconSwap, copied && styles.copied)}>
-        <Icon name="content_copy" size={resolvedIconSize} className={styles.copyIcon} />
+        <Icon name="content_copy_alt" size={resolvedIconSize} className={styles.copyIcon} />
         <Icon name="check" size={resolvedIconSize} className={styles.checkIcon} />
       </span>
     );
