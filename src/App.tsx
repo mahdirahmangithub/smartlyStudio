@@ -5,6 +5,7 @@ import { ContentSwitcher } from "./components/ContentSwitcher";
 import { ContentSwitcherItem } from "./components/ContentSwitcherItem";
 import ButtonPlayground from "./pages/ButtonPlayground";
 import ScrollFadePage from "./pages/ScrollFadePage";
+import EmptyStatePlayground from "./pages/EmptyStatePlayground";
 import ExpanderPlayground from "./pages/ExpanderPlayground";
 import CardPlayground from "./pages/CardPlayground";
 import CodeBlockPlayground from "./pages/CodeBlockPlayground";
@@ -22,6 +23,7 @@ import BadgePlayground from "./pages/BadgePlayground";
 import IconBadgePlayground from "./pages/IconBadgePlayground";
 import NotificationBadgePlayground from "./pages/NotificationBadgePlayground";
 import ExpandableBadgePlayground from "./pages/ExpandableBadgePlayground";
+import IllustrationPlayground from "./pages/IllustrationPlayground";
 import ImageryPlayground from "./pages/ImageryPlayground";
 import AvatarPlayground from "./pages/AvatarPlayground";
 import ContentSwitcherItemPlayground from "./pages/ContentSwitcherItemPlayground";
@@ -112,6 +114,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "copy-button"
 | "inline-code"
 | "icon-container"
+| "illustration"
 | "breadcrumb"
 | "dimmer"
 | "drag-handle"
@@ -130,6 +133,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navbar-content"
 | "navigation-sub-item"
 | "navigation-profile-item"
+| "empty-state"
 | "entity"
 | "shortcut-tooltip"
 | "sidebar"
@@ -306,6 +310,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "drag-handle", label: "DragHandle" },
   { key: "drawer", label: "Drawer" },
   { key: "dropdown", label: "Dropdown" },
+  { key: "empty-state", label: "EmptyState" },
   { key: "entity", label: "Entity" },
   { key: "expandable-badge", label: "ExpandableBadge" },
   { key: "expander", label: "Expander" },
@@ -321,6 +326,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "icon-badge", label: "IconBadge" },
   { key: "icon-container", label: "IconContainer" },
   { key: "icons", label: "Icons" },
+  { key: "illustration", label: "Illustration" },
   { key: "imagery", label: "Imagery" },
   { key: "inline-code", label: "InlineCode" },
   { key: "inline-input", label: "InlineInput" },
@@ -495,6 +501,7 @@ export default function App() {
             {page === "icon-badge" && <IconBadgePlayground />}
             {page === "notification-badge" && <NotificationBadgePlayground />}
             {page === "expandable-badge" && <ExpandableBadgePlayground />}
+            {page === "illustration" && <IllustrationPlayground />}
             {page === "imagery" && <ImageryPlayground />}
             {page === "avatar" && <AvatarPlayground />}
             {page === "content-switcher-item" && <ContentSwitcherItemPlayground />}
@@ -537,6 +544,7 @@ export default function App() {
             {page === "select-option-header" && <SelectOptionHeaderPlayground />}
             {page === "drag-handle" && <DragHandlePlayground />}
             {page === "dropdown" && <DropdownPlayground />}
+            {page === "empty-state" && <EmptyStatePlayground />}
             {page === "entity" && <EntityPlayground />}
             {page === "thumbnail" && <ThumbnailPlayground />}
             {page === "spinner" && <SpinnerPlayground />}
