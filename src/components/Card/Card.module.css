@@ -20,6 +20,10 @@
   transition-timing-function: var(--animation-state-change-easing);
 
   outline: none;
+  cursor: default;
+}
+
+.card:not(.static):not(.disabled) {
   cursor: pointer;
 }
 
@@ -129,14 +133,9 @@
 .disabled {
   background: var(--element-surface-under);
   cursor: not-allowed;
-  pointer-events: none;
 }
 
 /* ── Static ── */
-
-.static {
-  cursor: default;
-}
 
 /* ── Selected indicator ── */
 
@@ -265,6 +264,7 @@
 
 .pretitle {
   order: -1;
+  margin: 0;
 }
 
 /* ── Body ── */

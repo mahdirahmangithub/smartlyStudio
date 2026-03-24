@@ -140,7 +140,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
         )}
         role={interactive && onClick ? "button" : undefined}
         aria-disabled={disabled || undefined}
-        aria-selected={selected != null ? selected : undefined}
+        aria-pressed={selected != null ? selected : undefined}
         tabIndex={interactive ? 0 : undefined}
         onClick={interactive ? handleClick : undefined}
         onKeyDown={interactive ? handleKeyDown : undefined}
@@ -332,10 +332,10 @@ function renderOverlayContent(props: CardMediaContentProps, disabled: boolean): 
     case "loading": {
       const { label = "Loading..." } = props;
       return (
-        <>
+        <span role="status" style={{ display: "contents" }}>
           <Spinner size="lg" type={disabled ? "neutral" : "brand"} />
           <span className={styles.mediaContentLoadingLabel}>{label}</span>
-        </>
+        </span>
       );
     }
     case "error": {
@@ -346,7 +346,7 @@ function renderOverlayContent(props: CardMediaContentProps, disabled: boolean): 
         retryLabel = "Retry",
       } = props;
       return (
-        <>
+        <span role="alert" style={{ display: "contents" }}>
           <Icon
             name="warning_fill"
             size={24}
@@ -366,7 +366,7 @@ function renderOverlayContent(props: CardMediaContentProps, disabled: boolean): 
               {retryLabel}
             </Button>
           )}
-        </>
+        </span>
       );
     }
     default:
@@ -395,7 +395,7 @@ export const CardMediaBar = forwardRef<HTMLDivElement, CardMediaBarProps>(
     return (
       <div ref={ref} className={cx(styles.mediaBar, className)} data-theme="light" {...rest}>
         <ProgressiveBlur position="top">
-          <div className={styles.mediaBarContent}>
+          <div className={styles.mediaBarContent} role="toolbar" aria-label="Card actions">
             <div className={styles.mediaBarLeading}>
               {selectable && (
                 <div className={styles.mediaBarSwitch}>
@@ -404,6 +404,7 @@ export const CardMediaBar = forwardRef<HTMLDivElement, CardMediaBarProps>(
                     checked={!!selected}
                     disabled={disabled}
                     onChange={(checked) => onSelectChange?.(checked)}
+                    aria-label="Select"
                   />
                 </div>
               )}
@@ -443,14 +444,14 @@ CardContent.displayName = "CardContent";
 /* ── CardPretitle ── */
 
 export interface CardPretitleProps
-  extends React.HTMLAttributes<HTMLDivElement> {}
+  extends React.HTMLAttributes<HTMLParagraphElement> {}
 
-export const CardPretitle = forwardRef<HTMLDivElement, CardPretitleProps>(
+export const CardPretitle = forwardRef<HTMLParagraphElement, CardPretitleProps>(
   function CardPretitle({ className, children, ...rest }, ref) {
     return (
-      <div ref={ref} className={cx(styles.pretitle, className)} {...rest}>
+      <p ref={ref} className={cx(styles.pretitle, className)} {...rest}>
         {children}
-      </div>
+      </p>
     );
   },
 );
