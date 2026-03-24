@@ -298,7 +298,7 @@ function ShowMoreDemo() {
 function VersionSwitchDemo() {
   const [versionIdx, setVersionIdx] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const versionBtnRef = useRef<HTMLElement>(null);
+  const versionBtnRef = useRef<HTMLButtonElement>(null);
 
   const handlePrev = useCallback(
     () => setVersionIdx((i) => Math.max(0, i - 1)),

@@ -260,7 +260,7 @@ function HeaderSlotsDemo() {
           title="With Slot & Actions"
           description="Full header features"
           collapsible
-          headerSlot={<Tag size="sm" label="New" />}
+          headerSlot={<Tag size="md" label="New" />}
           headerActions={
             <IconButton
               icon={<Icon name="more_horiz" size={16} />}

@@ -137,6 +137,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "test-progressive-blur"
 | "toolbar-button"
 | "ai-text-generation"
+| "container"
 | "video-player"
 
 
