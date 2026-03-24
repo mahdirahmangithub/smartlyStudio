@@ -146,17 +146,28 @@
   justify-content: flex-end;
   padding-right: var(--spacing-2xs);
   max-width: 0;
+  opacity: 0;
   overflow: hidden;
-  mask-image: linear-gradient(to right, transparent, var(--color-black-black) 16px, var(--color-black-black));
-  transition: max-width var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+  transition:
+    opacity var(--animation-state-micro-duration) var(--animation-state-micro-easing),
+    max-width 0s var(--animation-state-micro-duration);
 }
 
 .root:hover:not(.disabled) .hiddenActions {
   max-width: 300px;
-  mask-image: none;
+  opacity: 1;
   transition:
-    max-width var(--animation-state-micro-duration) var(--animation-state-micro-easing),
-    mask-image 0s var(--animation-state-micro-duration);
+    max-width var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+  animation: revealEdge var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+}
+
+@keyframes revealEdge {
+  from {
+    mask-image: linear-gradient(to right, transparent, var(--color-black-black) 16px, var(--color-black-black));
+  }
+  to {
+    mask-image: none;
+  }
 }
 
 .hiddenActions > * {
