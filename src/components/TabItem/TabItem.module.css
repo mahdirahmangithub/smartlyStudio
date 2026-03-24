@@ -1,0 +1,129 @@
+/* ── root (button) ─────────────────────────────────────────────────────── */
+
+.tabItem {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  position: relative;
+  box-sizing: border-box;
+  background: none;
+  border: none;
+  padding: var(--spacing-sm) 0 calc(var(--spacing-sm) - var(--spacing-2xs)) 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  flex-shrink: 0;
+  border-bottom: var(--spacing-2xs) solid transparent;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.fullWidth {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── indicator (bottom border) ─────────────────────────────────────────── */
+
+.tabItem:not(.checked):hover:not(:disabled) {
+  border-bottom-color: var(--element-outline-neutral-hover);
+}
+
+.tabItem:not(.checked):active:not(:disabled) {
+  border-bottom-color: var(--element-outline-neutral-press);
+}
+
+.checked {
+  border-bottom-color: var(--element-outline-brand-active);
+}
+
+.checked:disabled {
+  border-bottom-color: var(--element-outline-brand-disable);
+}
+
+/* ── base (inner visual container) ─────────────────────────────────────── */
+
+.base {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm-minus);
+  min-height: var(--spacing-4xl);
+  padding: var(--spacing-sm-plus);
+  border-radius: var(--radius-lg);
+  overflow: clip;
+  transition:
+    background var(--animation-state-change-duration) var(--animation-state-change-easing),
+    color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* ── unchecked states ──────────────────────────────────────────────────── */
+
+.tabItem .base                                { background: var(--element-fill-neutral-tertiary-default); color: var(--text-neutral-secondary-default); }
+.tabItem:hover:not(:disabled) .base           { background: var(--element-fill-neutral-tertiary-hover);   color: var(--text-neutral-secondary-hover); }
+.tabItem:active:not(:disabled) .base          { background: var(--element-fill-neutral-tertiary-press);   color: var(--text-neutral-secondary-press); }
+
+/* ── checked states ────────────────────────────────────────────────────── */
+
+.checked .base                                { background: var(--element-fill-brand-tertiary-default);   color: var(--text-brand-default); }
+.checked:hover:not(:disabled) .base           { background: var(--element-fill-neutral-tertiary-hover);   color: var(--text-brand-hover); }
+.checked:active:not(:disabled) .base          { background: var(--element-fill-neutral-tertiary-press);   color: var(--text-brand-press); }
+
+/* ── focus ring (on base, not the outer button) ────────────────────────── */
+
+.tabItem:focus-visible {
+  outline: none;
+}
+
+.tabItem:focus-visible:not(:disabled) .base {
+  background: var(--element-fill-neutral-tertiary-hover);
+  box-shadow: var(--focus-ring,
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
+}
+
+.tabItem:not(.checked):focus-visible:not(:disabled) .base {
+  color: var(--text-neutral-secondary-hover);
+}
+
+.checked:focus-visible:not(:disabled) .base {
+  color: var(--text-brand-hover);
+}
+
+/* ── disabled ──────────────────────────────────────────────────────────── */
+
+.tabItem:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.tabItem:disabled .base {
+  background: var(--element-fill-neutral-tertiary-default);
+  color: var(--text-neutral-disable);
+}
+
+/* ── icon slot ─────────────────────────────────────────────────────────── */
+
+.iconSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ── label ─────────────────────────────────────────────────────────────── */
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 var(--spacing-2xs);
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+}

@@ -100,6 +100,7 @@ import SidebarPlayground from "./pages/SidebarPlayground";
 import SortableListPlayground from "./pages/SortableListPlayground";
 import SpecialInputPlayground from "./pages/SpecialInputPlayground";
 import TestProgressiveBlurPlayground from "./pages/TestProgressiveBlurPlayground";
+import TabBarPlayground from "./pages/TabBarPlayground";
 import ToolbarButtonPlayground from "./pages/ToolbarButtonPlayground";
 import VideoPlayerPlayground from "./pages/VideoPlayerPlayground";
 import "./App.css";
@@ -134,6 +135,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "sidebar"
 | "sortable-list"
 | "special-input"
+| "tab-bar"
 | "test-progressive-blur"
 | "toolbar-button"
 | "ai-text-generation"
@@ -362,6 +364,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "sortable-list", label: "SortableList" },
   { key: "special-input", label: "SpecialInput" },
   { key: "spinner", label: "Spinner" },
+  { key: "tab-bar", label: "TabBar" },
   { key: "tag", label: "Tag" },
   { key: "tag-multi-select-option", label: "TagMultiOpt" },
   { key: "tag-single-select-option", label: "TagSingleOpt" },
@@ -566,6 +569,7 @@ export default function App() {
             {page === "toolbar-button" && <ToolbarButtonPlayground />}
             {page === "sidebar" && <SidebarPlayground />}
             {page === "sortable-list" && <SortableListPlayground />}
+            {page === "tab-bar" && <TabBarPlayground />}
             {page === "special-input" && <SpecialInputPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
