@@ -28,6 +28,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  pointer-events: none;
 }
 
 .sm .iconWrap { width: 16px; height: 16px; }
