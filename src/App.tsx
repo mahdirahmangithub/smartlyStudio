@@ -103,6 +103,7 @@ import SortableListPlayground from "./pages/SortableListPlayground";
 import SpecialInputPlayground from "./pages/SpecialInputPlayground";
 import TestProgressiveBlurPlayground from "./pages/TestProgressiveBlurPlayground";
 import TabBarPlayground from "./pages/TabBarPlayground";
+import ToastPlayground from "./pages/ToastPlayground";
 import ToolbarButtonPlayground from "./pages/ToolbarButtonPlayground";
 import VideoPlayerPlayground from "./pages/VideoPlayerPlayground";
 import "./App.css";
@@ -141,6 +142,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "special-input"
 | "tab-bar"
 | "test-progressive-blur"
+| "toast"
 | "toolbar-button"
 | "ai-text-generation"
 | "container"
@@ -379,6 +381,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "text-showcase", label: "TextShowcase" },
   { key: "thumbnail", label: "Thumbnail" },
   { key: "title-text", label: "TitleText" },
+  { key: "toast", label: "Toast" },
   { key: "toggle", label: "Toggle" },
   { key: "toggle-chip", label: "ToggleChip" },
   { key: "toolbar-button", label: "ToolbarButton" },
@@ -574,6 +577,7 @@ export default function App() {
             {page === "navbar-content" && <NavBarContentPlayground />}
             {page === "shortcut-tooltip" && <ShortcutTooltipPlayground />}
             {page === "test-progressive-blur" && <TestProgressiveBlurPlayground />}
+            {page === "toast" && <ToastPlayground />}
             {page === "toolbar-button" && <ToolbarButtonPlayground />}
             {page === "sidebar" && <SidebarPlayground />}
             {page === "sortable-list" && <SortableListPlayground />}

@@ -1,0 +1,154 @@
+/* ── Toast Root ── */
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  min-width: 400px;
+  max-width: 688px;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-default);
+  box-sizing: border-box;
+}
+
+/* ── Type variants ── */
+.neutral,
+.success,
+.alert {
+  background: var(--element-surface-over);
+  outline: var(--spacing-hair-line) solid var(--element-divider-neutral-default);
+  outline-offset: calc(-1 * var(--spacing-hair-line));
+}
+
+/* ── Icon wrapper ── */
+.icon {
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.neutral .icon {
+  color: var(--text-neutral-secondary-default);
+}
+
+.success .icon {
+  color: var(--text-success-default);
+}
+
+.alert .icon {
+  color: var(--text-alert-default);
+}
+
+/* ── Content + Action container ── */
+.contentAction {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  flex: 1 0 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+.contentAction.horizontal {
+  gap: 0;
+}
+
+.contentAction.vertical {
+  gap: var(--spacing-md);
+}
+
+/* ── Content row (title + close) ── */
+.content {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+/* ── Text column (title + description) ── */
+.text {
+  display: flex;
+  flex-direction: column;
+  flex: 1 0 0;
+  min-width: 0;
+  min-height: 0;
+}
+
+.text.horizontal {
+  gap: 0;
+}
+
+.text.vertical {
+  gap: var(--spacing-2xs);
+}
+
+/* ── Title ── */
+.title {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: var(--spacing-sm-minus) 0;
+}
+
+.titleText {
+  flex: 1 0 0;
+  min-width: 0;
+  min-height: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--type-label-strong-md-family);
+  font-weight: var(--type-label-strong-md-weight);
+  font-size: var(--type-label-strong-md-size);
+  line-height: var(--type-label-strong-md-line-height);
+  letter-spacing: var(--type-label-strong-md-letter-spacing);
+}
+
+.neutral .titleText {
+  color: var(--text-neutral-primary);
+}
+
+.success .titleText {
+  color: var(--text-success-default);
+}
+
+.alert .titleText {
+  color: var(--text-alert-default);
+}
+
+/* ── Description ── */
+.description {
+  width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--type-body-md-family);
+  font-weight: var(--type-body-md-weight);
+  font-size: var(--type-body-md-size);
+  line-height: var(--type-body-md-line-height);
+  letter-spacing: var(--type-body-md-letter-spacing);
+}
+
+.neutral .description,
+.success .description,
+.alert .description {
+  color: var(--text-neutral-tertiary-default);
+}
+
+/* ── Actions ── */
+.actions {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.actions.fullWidth {
+  width: 100%;
+}
