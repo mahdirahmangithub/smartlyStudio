@@ -14,6 +14,7 @@ import {
 import { createPortal } from "react-dom";
 import { TooltipContent, type TooltipType } from "./TooltipContent";
 import { useTooltipConfig, useTooltipGroup } from "./TooltipProvider";
+import { useGlidePosition } from "../../hooks/useGlidePosition";
 import contentStyles from "./TooltipContent.module.css";
 
 /* ═══════════════════════════════════════════════════════════════════ */
@@ -446,6 +447,7 @@ export function Tooltip({
   const hideTimerRef = useRef<number>(undefined);
   const mouseRef = useRef<{ x: number; y: number } | null>(null);
   const rafRef = useRef<number>(undefined);
+  const isCursorMode = anchor === "cursor";
 
   /* ── animation mount / unmount ───────────────── */
 
@@ -464,16 +466,21 @@ export function Tooltip({
 
     if (isOpen && !wasOpen) {
       setIsMounted(true);
-      setAnim("enter");
+      setAnim(isCursorMode ? "idle" : "enter");
     } else if (!isOpen && wasOpen) {
-      setAnim("exit");
-      exitTimerRef.current = window.setTimeout(
-        () => setIsMounted(false),
-        EXIT_MS + 50,
-      );
+      if (isCursorMode) {
+        setIsMounted(false);
+        setAnim("idle");
+      } else {
+        setAnim("exit");
+        exitTimerRef.current = window.setTimeout(
+          () => setIsMounted(false),
+          EXIT_MS + 50,
+        );
+      }
     }
     return () => clearTimeout(exitTimerRef.current);
-  }, [isOpen]);
+  }, [isOpen, isCursorMode]);
 
   const onAnimEnd = useCallback(() => {
     if (anim === "enter") {
@@ -543,6 +550,13 @@ export function Tooltip({
       cancelAnimationFrame(rafRef.current!);
     };
   }, [isMounted]);
+
+  const smoothXY = useGlidePosition(
+    pos.x,
+    pos.y,
+    isCursorMode && isMounted,
+    floatingRef,
+  );
 
   /* ── theme tracking ─────────────────────────── */
 
@@ -673,18 +687,28 @@ export function Tooltip({
   const isH = side === "top" || side === "bottom";
 
   const capSide = side.charAt(0).toUpperCase() + side.slice(1);
-  const animClass =
-    anim === "enter"
+  const animClass = isCursorMode
+    ? ""
+    : anim === "enter"
       ? contentStyles[`enter${capSide}`] ?? ""
       : anim === "exit"
         ? contentStyles[`exit${capSide}`] ?? ""
         : "";
 
-  const floatStyle: CSSProperties = {
-    position: "fixed",
-    top: Math.round(pos.y),
-    left: Math.round(pos.x),
-  };
+  const floatStyle: CSSProperties = isCursorMode
+    ? {
+        position: "fixed",
+        top: 0,
+        left: 0,
+        transform: `translate3d(${Math.round(smoothXY?.x ?? pos.x)}px, ${Math.round(smoothXY?.y ?? pos.y)}px, 0)`,
+        willChange: "transform",
+        pointerEvents: "none",
+      }
+    : {
+        position: "fixed",
+        top: Math.round(pos.y),
+        left: Math.round(pos.x),
+      };
 
   const tailStyle: CSSProperties = {
     position: "absolute",

@@ -75,6 +75,7 @@ import FieldsetPlayground from "./pages/FieldsetPlayground";
 import FooterPlayground from "./pages/FooterPlayground";
 import TitleTextPlayground from "./pages/TitleTextPlayground";
 import BodyTextPlayground from "./pages/BodyTextPlayground";
+import LineChartPlayground from "./pages/LineChartPlayground";
 import LinkPlayground from "./pages/LinkPlayground";
 import TextShowcase from "./pages/TextShowcase";
 import TextareaPlayground from "./pages/TextareaPlayground";
@@ -117,6 +118,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "inline-code"
 | "icon-container"
 | "illustration"
+| "line-chart"
 | "breadcrumb"
 | "dimmer"
 | "drag-handle"
@@ -339,6 +341,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "input-clear", label: "InputClear" },
   { key: "keyboard-shortcut", label: "KbdShortcut" },
   { key: "label", label: "Label" },
+  { key: "line-chart", label: "LineChart" },
   { key: "link", label: "Link" },
   { key: "modal", label: "Modal" },
   { key: "multi-select-input", label: "MultiSelectInput" },
@@ -568,6 +571,7 @@ export default function App() {
             {page === "fieldset" && <FieldsetPlayground />}
             {page === "title-text" && <TitleTextPlayground />}
             {page === "body-text" && <BodyTextPlayground />}
+            {page === "line-chart" && <LineChartPlayground />}
             {page === "link" && <LinkPlayground />}
             {page === "text-showcase" && <TextShowcase />}
             {page === "textarea" && <TextareaPlayground />}
