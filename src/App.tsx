@@ -100,6 +100,7 @@ import NavigationSubItemPlayground from "./pages/NavigationSubItemPlayground";
 import ShortcutTooltipPlayground from "./pages/ShortcutTooltipPlayground";
 import SidebarPlayground from "./pages/SidebarPlayground";
 import SortableListPlayground from "./pages/SortableListPlayground";
+import StepperPlayground from "./pages/StepperPlayground";
 import SpecialInputPlayground from "./pages/SpecialInputPlayground";
 import TestProgressiveBlurPlayground from "./pages/TestProgressiveBlurPlayground";
 import TabBarPlayground from "./pages/TabBarPlayground";
@@ -146,6 +147,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "toolbar-button"
 | "ai-text-generation"
 | "container"
+| "stepper"
 | "video-player"
 
 
@@ -372,6 +374,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "sortable-list", label: "SortableList" },
   { key: "special-input", label: "SpecialInput" },
   { key: "spinner", label: "Spinner" },
+  { key: "stepper", label: "Stepper" },
   { key: "tab-bar", label: "TabBar" },
   { key: "tag", label: "Tag" },
   { key: "tag-multi-select-option", label: "TagMultiOpt" },
@@ -583,6 +586,7 @@ export default function App() {
             {page === "sortable-list" && <SortableListPlayground />}
             {page === "tab-bar" && <TabBarPlayground />}
             {page === "special-input" && <SpecialInputPlayground />}
+            {page === "stepper" && <StepperPlayground />}
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
             {page === "breadcrumb" && <BreadcrumbPlayground />}
