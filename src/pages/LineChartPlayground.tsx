@@ -297,6 +297,7 @@ function SparklineCard() {
                 showAxes={false}
                 showLegend={false}
                 showTooltip={false}
+                showAreaFill
               />
             </CardBody>
           </CardContent>
