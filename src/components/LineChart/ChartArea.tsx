@@ -102,18 +102,22 @@ export function ChartArea<D>({
           <>
             <GridRows
               scale={yScale}
-              width={innerWidth}
+              left={0.5}
+              width={innerWidth - 1}
               numTicks={numYTicks}
               stroke="var(--element-divider-neutral-weak)"
               strokeWidth={1}
+              strokeLinecap="round"
             />
             <GridColumns
               scale={xScale}
-              height={innerHeight}
+              top={0.5}
+              height={innerHeight - 1}
               numTicks={numXTicks}
               stroke="var(--element-divider-neutral-weak)"
               strokeWidth={1}
               strokeDasharray="4 4"
+              strokeLinecap="round"
             />
           </>
         )}
@@ -135,13 +139,22 @@ export function ChartArea<D>({
           );
         })}
 
+        <line
+          x1={0.5}
+          x2={innerWidth - 0.5}
+          y1={innerHeight}
+          y2={innerHeight}
+          stroke="var(--element-divider-neutral-default)"
+          strokeWidth={1}
+          strokeLinecap="round"
+        />
         <AxisBottom
           top={innerHeight}
           scale={xScale}
           numTicks={numXTicks}
           tickFormat={xTickFormat}
-          stroke="var(--element-divider-neutral-default)"
-          strokeWidth={1}
+          stroke="transparent"
+          strokeWidth={0}
           tickStroke="transparent"
           tickLength={0}
           tickLabelProps={{

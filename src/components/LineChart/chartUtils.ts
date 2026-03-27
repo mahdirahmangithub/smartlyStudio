@@ -1,11 +1,17 @@
 import { scaleLinear, scaleTime } from "@visx/scale";
 import { bisector, extent } from "d3-array";
 
+export interface ConfidenceBand<D = any> {
+  upper: (d: D) => number;
+  lower: (d: D) => number;
+}
+
 export interface Series<D = any> {
   id: string;
   label: string;
   data: D[];
   color?: string;
+  confidenceBand?: ConfidenceBand<D>;
 }
 
 export interface Margin {
@@ -33,6 +39,15 @@ export const CATEGORICAL_HOVER_TOKENS = [
   "--data-viz-categorical-4-hover",
   "--data-viz-categorical-5-hover",
   "--data-viz-categorical-6-hover",
+] as const;
+
+export const CATEGORICAL_DISABLE_TOKENS = [
+  "--data-viz-categorical-1-disable",
+  "--data-viz-categorical-2-disable",
+  "--data-viz-categorical-3-disable",
+  "--data-viz-categorical-4-disable",
+  "--data-viz-categorical-5-disable",
+  "--data-viz-categorical-6-disable",
 ] as const;
 
 export const CATEGORICAL_WEAK_TOKENS = [

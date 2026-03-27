@@ -1,6 +1,7 @@
 import { type CSSProperties, useMemo } from "react";
 import { LineChart } from "../components/LineChart";
 import type { Series } from "../components/LineChart";
+import { Card, CardContent, CardBody, CardTitle } from "../components/Card";
 import { curveMonotoneX, curveLinear, curveCardinal } from "@visx/curve";
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
@@ -62,7 +63,7 @@ function MultiLineDemo() {
     () => [
       { id: "revenue", label: "Revenue", data: generateData(30, 100, 10) },
       { id: "costs", label: "Costs", data: generateData(30, 60, 8) },
-      { id: "profit", label: "Profit", data: generateData(30, 40, 12) },
+      { id: "profit", label: "Profit", data: generateData(30, 40, 12), color: "var(--data-viz-success-default)" },
     ],
     []
   );
@@ -74,6 +75,7 @@ function MultiLineDemo() {
       yAccessor={yAccessor}
       curve={curveMonotoneX}
       height={350}
+      showAreaFill
     />
   );
 }
@@ -217,10 +219,107 @@ function NoAnimationDemo() {
   );
 }
 
+interface ForecastPoint {
+  date: Date;
+  value: number;
+  upper: number;
+  lower: number;
+}
+
+function generateForecastData(points: number): ForecastPoint[] {
+  const now = new Date();
+  const data: ForecastPoint[] = [];
+  let value = 100;
+  for (let i = 0; i < points; i++) {
+    value += (Math.random() - 0.45) * 8;
+    const t = i / (points - 1);
+    const spread = t * t * 8;
+    data.push({
+      date: new Date(now.getTime() - (points - i) * 24 * 60 * 60 * 1000),
+      value: Math.round(value * 100) / 100,
+      upper: Math.round((value + spread) * 100) / 100,
+      lower: Math.round((value - spread) * 100) / 100,
+    });
+  }
+  return data;
+}
+
+function ConfidenceBandDemo() {
+  const data = useMemo(() => generateForecastData(30), []);
+  const series = useMemo<Series<ForecastPoint>[]>(
+    () => [
+      {
+        id: "forecast",
+        label: "Forecast",
+        data,
+        color: "var(--data-viz-brand-default)",
+        confidenceBand: {
+          upper: (d) => d.upper,
+          lower: (d) => d.lower,
+        },
+      },
+    ],
+    [data]
+  );
+
+  return (
+    <LineChart<ForecastPoint>
+      series={series}
+      xAccessor={(d) => d.date}
+      yAccessor={(d) => d.value}
+      curve={curveMonotoneX}
+      height={350}
+    />
+  );
+}
+
+function SparklineCard() {
+  return (
+    <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+      {["Revenue", "Impressions", "Conversions"].map((label, i) => (
+        <Card key={label} variant="elevated" radius="lg" isStatic style={{ width: 240 }}>
+          <CardContent>
+            <CardBody>
+              <CardTitle size="sm" title={label} />
+              <LineChart
+                series={[{
+                  id: label,
+                  label,
+                  data: generateData(30, 50 + i * 20, 6 + i * 2),
+                  color: i === 0 ? "var(--data-viz-brand-default)" : i === 1 ? "var(--data-viz-info-default)" : "var(--data-viz-success-default)",
+                }]}
+                xAccessor={xAccessor}
+                yAccessor={yAccessor}
+                curve={curveMonotoneX}
+                height={64}
+                margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+                showGrid={false}
+                showAxes={false}
+                showLegend={false}
+                showTooltip={false}
+              />
+            </CardBody>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
 export default function LineChartPlayground() {
   return (
     <>
       <h1>LineChart</h1>
+
+      <section style={sectionStyle}>
+        <h2>Sparkline Cards</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Minimal chart in a card — no axes, grid, tooltip, or legend.
+        </p>
+        <div style={cardStyle}>
+          <SparklineCard />
+        </div>
+      </section>
 
       <section style={sectionStyle}>
         <h2>Basic Single Line</h2>
@@ -279,6 +378,16 @@ export default function LineChartPlayground() {
         </p>
         <div style={cardStyle}>
           <ZoomDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Confidence Band</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Forecast line with shaded upper/lower confidence band. Band widens over time.
+        </p>
+        <div style={cardStyle}>
+          <ConfidenceBandDemo />
         </div>
       </section>
 

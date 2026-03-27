@@ -6,42 +6,50 @@ export interface CrosshairPoint {
   color: string;
 }
 
-export interface CrosshairProps {
+export interface CrosshairLineProps {
   x: number;
   height: number;
-  points: CrosshairPoint[];
 }
 
-export function Crosshair({ x, height, points }: CrosshairProps) {
+export function CrosshairLine({ x, height }: CrosshairLineProps) {
   return (
-    <g>
-      <line
-        x1={x}
-        x2={x}
-        y1={0}
-        y2={height}
-        className={styles.crosshairLine}
-      />
+    <line
+      x1={x}
+      x2={x}
+      y1={0}
+      y2={height}
+      className={styles.crosshairLine}
+    />
+  );
+}
+
+export interface CrosshairDotsProps {
+  points: CrosshairPoint[];
+  offsetLeft: number;
+  offsetTop: number;
+}
+
+export function CrosshairDots({ points, offsetLeft, offsetTop }: CrosshairDotsProps) {
+  return (
+    <>
       {points.map((pt, i) => (
-        <g key={i} className={styles.crosshairDot}>
-          <circle
-            cx={pt.x}
-            cy={pt.y}
-            r={5}
-            fill="var(--element-surface-over)"
-            stroke="var(--element-divider-neutral-weak)"
-            strokeWidth={0.5}
-            className={styles.crosshairDotBg}
-          />
-          <circle
-            cx={pt.x}
-            cy={pt.y}
-            r={3}
-            fill={pt.color}
-            className={styles.crosshairDotInner}
-          />
-        </g>
+        <div
+          key={i}
+          className={styles.indicator}
+          style={{
+            left: offsetLeft + pt.x,
+            top: offsetTop + pt.y,
+          }}
+        >
+          <div className={styles.indicatorBase}>
+            <div className={styles.indicatorBg} />
+            <div
+              className={styles.indicatorDot}
+              style={{ background: pt.color }}
+            />
+          </div>
+        </div>
       ))}
-    </g>
+    </>
   );
 }

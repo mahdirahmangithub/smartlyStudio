@@ -52,28 +52,63 @@
   pointer-events: none;
 }
 
-.crosshairDot {
+/* ── Chart indicator (HTML, matches Figma chart_indicator_base) ── */
+
+.indicator {
+  position: absolute;
+  transform: translate(-50%, -50%);
   pointer-events: none;
-  filter: drop-shadow(var(--shadow-default));
+  box-shadow: var(--shadow-default);
+  border-radius: var(--radius-full);
+  z-index: 5;
 }
 
-.crosshairDotBg {
+.indicatorBase {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-full);
+  backdrop-filter: blur(0.6px);
+  -webkit-backdrop-filter: blur(0.6px);
+}
+
+.indicatorBg {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background: var(--element-surface-over);
+  border: var(--spacing-hair-line) solid var(--element-divider-neutral-weak);
   opacity: var(--opacity-64);
-  pointer-events: none;
 }
 
-.crosshairDotInner {
-  pointer-events: none;
+.indicatorDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+  position: relative;
+}
+
+/* ── Tooltip wrapper reset (strip SDS Tooltip's visual shell) ── */
+
+.tooltipWrapper {
+  background: none !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
 }
 
 /* ── Tooltip content ── */
 
 .tooltipBox {
   background: var(--element-surface-over);
-  border: var(--spacing-px) solid var(--element-divider-neutral-default);
-  border-radius: var(--radius-md);
+  border: var(--spacing-hair-line) solid var(--element-divider-neutral-default);
+  border-radius: var(--radius-lg);
   padding: var(--spacing-sm) var(--spacing-sm-plus);
-  box-shadow: var(--shadow-default);
+  box-shadow: var(--shadow-xl);
   pointer-events: none;
   white-space: nowrap;
 }
