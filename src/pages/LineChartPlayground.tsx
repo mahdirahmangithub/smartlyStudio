@@ -1,8 +1,15 @@
-import { type CSSProperties, useMemo } from "react";
-import { LineChart } from "../components/LineChart";
-import type { Series } from "../components/LineChart";
+import { type CSSProperties, useMemo, useState, createContext, useContext } from "react";
+import { LineChart as LineChartBase } from "../components/LineChart";
+import type { Series, LineChartProps } from "../components/LineChart";
+import { Icon } from "../components/Icon";
 import { Card, CardContent, CardBody, CardTitle } from "../components/Card";
 import { curveMonotoneX, curveLinear, curveCardinal } from "@visx/curve";
+
+const ChartOptsCtx = createContext({ edgeFade: false, showXGrid: true, showYGrid: true });
+function LineChart<D = any>(props: LineChartProps<D>) {
+  const opts = useContext(ChartOptsCtx);
+  return <LineChartBase<D> edgeFade={opts.edgeFade} showXGrid={opts.showXGrid} showYGrid={opts.showYGrid} {...props} />;
+}
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
 const cardStyle: CSSProperties = {
@@ -135,8 +142,8 @@ function CurveComparisonDemo() {
 function BrushDemo() {
   const series = useMemo<Series<DataPoint>[]>(
     () => [
-      { id: "impressions", label: "Impressions", data: generateData(90, 5000, 500) },
-      { id: "clicks", label: "Clicks", data: generateData(90, 300, 40) },
+      { id: "impressions", label: "Impressions", data: generateData(90, 20, 4) },
+      { id: "clicks", label: "Clicks", data: generateData(90, 15, 5) },
     ],
     []
   );
@@ -148,6 +155,7 @@ function BrushDemo() {
       yAccessor={yAccessor}
       curve={curveMonotoneX}
       height={350}
+      showAreaFill
       enableBrush
     />
   );
@@ -170,6 +178,29 @@ function ZoomDemo() {
       height={350}
       enableZoom
       showLegend={false}
+    />
+  );
+}
+
+function IconIndicatorDemo() {
+  const series = useMemo<Series<DataPoint>[]>(
+    () => [
+      { id: "meta", label: "Meta", data: generateData(30, 80, 8), icon: <Icon name="Meta_color" size={8} /> },
+      { id: "reddit", label: "Reddit", data: generateData(30, 60, 10), icon: <Icon name="Reddit_color" size={8} /> },
+      { id: "tiktok", label: "TikTok", data: generateData(30, 45, 6), icon: <Icon name="TikTok_color" size={8} /> },
+      { id: "snapchat", label: "Snapchat", data: generateData(30, 70, 9), icon: <Icon name="Snapchat_color" size={8} /> },
+    ],
+    []
+  );
+
+  return (
+    <LineChart
+      series={series}
+      xAccessor={xAccessor}
+      yAccessor={yAccessor}
+      curve={curveMonotoneX}
+      height={350}
+      showAreaFill
     />
   );
 }
@@ -281,7 +312,8 @@ function SparklineCard() {
           <CardContent>
             <CardBody>
               <CardTitle size="sm" title={label} />
-              <LineChart
+              <LineChartBase
+                edgeFade={useContext(ChartOptsCtx).edgeFade}
                 series={[{
                   id: label,
                   label,
@@ -308,9 +340,27 @@ function SparklineCard() {
 }
 
 export default function LineChartPlayground() {
+  const [edgeFade, setEdgeFade] = useState(false);
+  const [showXGrid, setShowXGrid] = useState(true);
+  const [showYGrid, setShowYGrid] = useState(true);
   return (
+    <ChartOptsCtx.Provider value={{ edgeFade, showXGrid, showYGrid }}>
     <>
       <h1>LineChart</h1>
+      <div style={{ display: "flex", gap: 16, marginBottom: 16, fontSize: 13 }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <input type="checkbox" checked={edgeFade} onChange={(e) => setEdgeFade(e.target.checked)} />
+          Edge Fade
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <input type="checkbox" checked={showXGrid} onChange={(e) => setShowXGrid(e.target.checked)} />
+          X Grid (dashed)
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+          <input type="checkbox" checked={showYGrid} onChange={(e) => setShowYGrid(e.target.checked)} />
+          Y Grid (solid)
+        </label>
+      </div>
 
       <section style={sectionStyle}>
         <h2>Sparkline Cards</h2>
@@ -339,6 +389,16 @@ export default function LineChartPlayground() {
         </p>
         <div style={cardStyle}>
           <MultiLineDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Icon Indicators</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Each series has a custom icon in the crosshair indicator instead of a color dot.
+        </p>
+        <div style={cardStyle}>
+          <IconIndicatorDemo />
         </div>
       </section>
 
@@ -402,5 +462,6 @@ export default function LineChartPlayground() {
         </div>
       </section>
     </>
+    </ChartOptsCtx.Provider>
   );
 }

@@ -11,6 +11,7 @@ export interface Series<D = any> {
   label: string;
   data: D[];
   color?: string;
+  icon?: React.ReactNode;
   confidenceBand?: ConfidenceBand<D>;
 }
 

@@ -18,7 +18,9 @@ export interface ChartBrushProps<D> {
   width: number;
   marginLeft: number;
   hiddenSeries?: Set<string>;
+  domain: [Date, Date] | [number, number] | null;
   onChange: (domain: [Date, Date] | [number, number] | null) => void;
+  xTickFormat?: (value: any) => string;
 }
 
 export function ChartBrush<D>({
@@ -28,11 +30,14 @@ export function ChartBrush<D>({
   width,
   marginLeft,
   hiddenSeries,
+  domain,
   onChange,
+  xTickFormat,
 }: ChartBrushProps<D>) {
   const containerRef = useRef<HTMLDivElement>(null);
   const innerWidth = width - marginLeft;
   const [selection, setSelection] = useState<{ x0: number; x1: number } | null>(null);
+  const [hoveredHandle, setHoveredHandle] = useState<"left" | "right" | null>(null);
   const dragRef = useRef<{ type: "move" | "left" | "right"; startX: number; startSel: { x0: number; x1: number } } | null>(null);
 
   const visibleSeries = useMemo(
@@ -60,6 +65,18 @@ export function ChartBrush<D>({
     [allYValues]
   );
 
+  useEffect(() => {
+    if (!domain) {
+      setSelection(null);
+      return;
+    }
+    const x0 = xScale(domain[0]) ?? 0;
+    const x1 = xScale(domain[1]) ?? 0;
+    if (!dragRef.current) {
+      setSelection({ x0, x1 });
+    }
+  }, [domain, xScale]);
+
   const emitDomain = useCallback(
     (sel: { x0: number; x1: number } | null) => {
       if (!sel) {
@@ -86,6 +103,7 @@ export function ChartBrush<D>({
       e.stopPropagation();
       if (!selection) return;
       dragRef.current = { type, startX: e.clientX, startSel: { ...selection } };
+      if (type === "left" || type === "right") setHoveredHandle(type);
     },
     [selection]
   );
@@ -202,13 +220,36 @@ export function ChartBrush<D>({
               const rect = e.currentTarget.getBoundingClientRect();
               const x = e.clientX - rect.left;
               const edge = 8;
-              if (x < edge || x > rect.width - edge) {
+              if (x < edge) {
                 e.currentTarget.style.cursor = "ew-resize";
+                setHoveredHandle("left");
+              } else if (x > rect.width - edge) {
+                e.currentTarget.style.cursor = "ew-resize";
+                setHoveredHandle("right");
               } else {
                 e.currentTarget.style.cursor = "grab";
+                setHoveredHandle(null);
               }
             }}
-          />
+            onMouseLeave={() => setHoveredHandle(null)}
+          >
+            {selection && hoveredHandle === "left" && (
+              <div className={styles.brushHandleTooltip} style={{ right: "100%", marginRight: 8, top: "50%", transform: "translateY(-50%)" }}>
+                {(() => {
+                  const val = xScale.invert(selection.x0);
+                  return xTickFormat ? xTickFormat(val) : val instanceof Date ? val.toLocaleDateString() : String(Math.round(val as number));
+                })()}
+              </div>
+            )}
+            {selection && hoveredHandle === "right" && (
+              <div className={styles.brushHandleTooltip} style={{ left: "100%", marginLeft: 8, top: "50%", transform: "translateY(-50%)" }}>
+                {(() => {
+                  const val = xScale.invert(selection.x1);
+                  return xTickFormat ? xTickFormat(val) : val instanceof Date ? val.toLocaleDateString() : String(Math.round(val as number));
+                })()}
+              </div>
+            )}
+          </div>
       )}
     </div>
   );

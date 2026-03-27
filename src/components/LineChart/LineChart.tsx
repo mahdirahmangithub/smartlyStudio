@@ -17,9 +17,6 @@ import {
   buildTimeScale,
   buildLinearScale,
   getSeriesColor,
-  getSeriesHoverColor,
-  getSeriesWeakColor,
-  isCategoricalColor,
   createBisector,
   findNearestDatum,
   type Series,
@@ -37,8 +34,16 @@ export interface LineChartProps<D = any> {
   curve?: CurveFactory;
   animate?: boolean;
   showGrid?: boolean;
+  /** Show horizontal grid rows (y-axis grid lines) */
+  showYGrid?: boolean;
+  /** Show vertical grid columns (x-axis dashed lines) */
+  showXGrid?: boolean;
   showAxes?: boolean;
   showAreaFill?: boolean;
+  /** Fade the lines and area fills at the left/right edges */
+  edgeFade?: boolean;
+  /** Width of the fade area in pixels */
+  edgeFadeWidth?: number;
   showLegend?: boolean;
   showTooltip?: boolean;
   enableZoom?: boolean;
@@ -61,8 +66,12 @@ function LineChartInner<D>({
   curve,
   animate = true,
   showGrid = true,
+  showYGrid,
+  showXGrid,
   showAxes = true,
   showAreaFill = false,
+  edgeFade = false,
+  edgeFadeWidth = 40,
   showLegend = true,
   showTooltip = true,
   enableZoom = false,
@@ -92,8 +101,6 @@ function LineChartInner<D>({
   } | null>(null);
   const dragRef = useRef<{ startX: number; startY: number; startTx: number; startTy: number } | null>(null);
   const zoomDivRef = useRef<HTMLDivElement>(null);
-  const zoomStateRef = useRef(zoomState);
-  zoomStateRef.current = zoomState;
   const containerRef = useRef<HTMLDivElement>(null);
   const clipId = useId().replace(/:/g, "");
 
@@ -129,6 +136,17 @@ function LineChartInner<D>({
     () => visibleSeries.flatMap((s) => s.data.map(yAccessor)),
     [visibleSeries, yAccessor]
   );
+
+  const fullXExtent = useMemo(() => {
+    if (allXValues.length === 0) return null;
+    const isTime = allXValues[0] instanceof Date;
+    if (isTime) {
+      const times = (allXValues as Date[]).map((d) => d.getTime());
+      return { min: Math.min(...times), max: Math.max(...times), isTime: true };
+    }
+    const nums = allXValues as number[];
+    return { min: Math.min(...nums), max: Math.max(...nums), isTime: false };
+  }, [allXValues]);
 
   const baseXScale = useMemo(() => {
     if (brushDomain) {
@@ -189,15 +207,14 @@ function LineChartInner<D>({
         ? tooltipYFormat(yVal)
         : yVal.toLocaleString();
       entries.push({ label: s.label, value: fmtY, color });
-      points.push({ x: xPos, y: yPos, color });
+      points.push({ x: xPos, y: yPos, color, icon: s.icon });
     }
 
-    const xVal = xScale.invert(hoverX);
     const header = tooltipXFormat
-      ? tooltipXFormat(xVal)
-      : xVal instanceof Date
-        ? xVal.toLocaleDateString()
-        : String(Math.round(xVal as number));
+      ? tooltipXFormat(xValue)
+      : xValue instanceof Date
+        ? xValue.toLocaleDateString()
+        : String(Math.round(xValue as number));
 
     const snappedX = points.length > 0 ? points[0].x : hoverX;
 
@@ -280,31 +297,34 @@ function LineChartInner<D>({
           })}
         </defs>
 
-        {showGrid && (
-          <>
-            <GridRows
-              scale={yScale}
-              left={0.5}
-              width={innerWidth - 1}
-              numTicks={numYTicks}
-              stroke="var(--element-divider-neutral-weak)"
-              strokeWidth={1}
-              strokeLinecap="round"
-            />
-            <GridColumns
-              scale={xScale}
-              top={0.5}
-              height={innerHeight - 1}
-              numTicks={numXTicks}
-              stroke="var(--element-divider-neutral-weak)"
-              strokeWidth={1}
-              strokeDasharray="4 4"
-              strokeLinecap="round"
-            />
-          </>
+        {(showYGrid ?? showGrid) && (
+          <GridRows
+            scale={yScale}
+            left={0.5}
+            width={innerWidth - 1}
+            numTicks={numYTicks}
+            stroke="var(--element-divider-neutral-weak)"
+            strokeWidth={1}
+            strokeLinecap="round"
+          />
+        )}
+        {(showXGrid ?? showGrid) && (
+          <GridColumns
+            scale={xScale}
+            top={0.5}
+            height={innerHeight - 1}
+            numTicks={numXTicks}
+            stroke="var(--element-divider-neutral-weak)"
+            strokeWidth={1}
+            strokeDasharray="4 4"
+            strokeLinecap="round"
+          />
         )}
 
-        <g clipPath={`url(#${clipId})`}>
+        <g clipPath={`url(#${clipId})`} style={edgeFade ? {
+          maskImage: `linear-gradient(to right, transparent 0px, black ${edgeFadeWidth}px, black calc(100% - ${edgeFadeWidth}px), transparent 100%)`,
+          WebkitMaskImage: `linear-gradient(to right, transparent 0px, black ${edgeFadeWidth}px, black calc(100% - ${edgeFadeWidth}px), transparent 100%)`,
+        } : undefined}>
           {showAreaFill && (
             <g
               style={{
@@ -352,18 +372,9 @@ function LineChartInner<D>({
             const baseColor = getSeriesColor(seriesIndex, s.color);
             const isHovering = visibleSeries.length > 1 && tooltipData && tooltipData.hoveredSeriesIndex >= 0;
             const isThisHovered = isHovering && tooltipData.hoveredSeriesIndex === i;
-            const isCat = isCategoricalColor(s.color);
 
-            let color = baseColor;
-            let opacity = 1;
-            if (isHovering) {
-              if (isThisHovered) {
-                color = isCat ? getSeriesHoverColor(seriesIndex) : baseColor;
-              } else {
-                color = isCat ? getSeriesWeakColor(seriesIndex) : baseColor;
-                opacity = isCat ? 1 : 0.32;
-              }
-            }
+            const color = baseColor;
+            const opacity = isHovering && !isThisHovered ? 0.32 : 1;
 
             return (
               <AnimatedLine
@@ -439,6 +450,34 @@ function LineChartInner<D>({
             marginLeft={margin.left}
             marginTop={margin.top}
             onHover={setHoverPos}
+            panEnabled={enableBrush && !!brushDomain}
+            onPan={(dx) => {
+              setBrushDomain((prev) => {
+                if (!prev) return prev;
+                const scale = xScale;
+                const d0 = scale.invert(0);
+                const d1 = scale.invert(-dx);
+                const isTime = d0 instanceof Date;
+                const shift = isTime
+                  ? (d1 as Date).getTime() - (d0 as Date).getTime()
+                  : (d1 as number) - (d0 as number);
+                const prevMin = isTime ? (prev[0] as Date).getTime() : (prev[0] as number);
+                const prevMax = isTime ? (prev[1] as Date).getTime() : (prev[1] as number);
+                const span = prevMax - prevMin;
+                let newMin = prevMin + shift;
+                let newMax = prevMax + shift;
+
+                if (fullXExtent) {
+                  if (newMin < fullXExtent.min) { newMin = fullXExtent.min; newMax = fullXExtent.min + span; }
+                  if (newMax > fullXExtent.max) { newMax = fullXExtent.max; newMin = fullXExtent.max - span; }
+                }
+
+                if (isTime) {
+                  return [new Date(newMin), new Date(newMax)];
+                }
+                return [newMin, newMax];
+              });
+            }}
           />
         )}
       </Group>
@@ -539,6 +578,7 @@ function LineChartInner<D>({
             width={width}
             marginLeft={margin.left}
             hiddenSeries={hiddenSeries}
+            domain={brushDomain}
             onChange={setBrushDomain}
           />
         )}

@@ -32,6 +32,7 @@
   line-height: var(--type-number-xs-line-height);
   letter-spacing: var(--type-number-xs-letter-spacing);
   fill: var(--text-neutral-tertiary-default);
+  user-select: none;
 }
 
 .axisLine {
@@ -83,11 +84,21 @@
 }
 
 .indicatorDot {
-  width: 6px;
-  height: 6px;
+  width: var(--spacing-sm-minus);
+  height: var(--spacing-sm-minus);
   border-radius: var(--radius-full);
   flex-shrink: 0;
   position: relative;
+}
+
+.indicatorIcon {
+  width: var(--spacing-sm-plus);
+  height: var(--spacing-sm-plus);
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ── Tooltip wrapper reset (strip SDS Tooltip's visual shell) ── */
@@ -207,8 +218,8 @@
 .brushSvg {
   display: block;
   pointer-events: none;
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 6%, black 20%, black 80%, transparent 98%);
+  mask-image: linear-gradient(to right, transparent 6%, black 20%, black 80%, transparent 98%);
 }
 
 .brushSelection {
@@ -239,6 +250,24 @@
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-default);
   pointer-events: none;
+}
+
+.brushHandleTooltip {
+  position: absolute;
+  background: var(--element-surface-over);
+  border: var(--spacing-hair-line) solid var(--element-divider-neutral-default);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-2xs) var(--spacing-xs);
+  box-shadow: var(--shadow-default);
+  font-family: var(--type-number-xs-family);
+  font-size: var(--type-number-xs-size);
+  line-height: var(--type-number-xs-line-height);
+  letter-spacing: var(--type-number-xs-letter-spacing);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-neutral-secondary-default);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
 }
 
 .brushSelection::before {

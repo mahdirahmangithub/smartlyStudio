@@ -13,13 +13,25 @@ export interface HoverOverlayProps {
   marginLeft: number;
   marginTop: number;
   onHover: (pos: HoverPosition | null) => void;
+  onPan?: (dx: number) => void;
+  panEnabled?: boolean;
 }
 
-export function HoverOverlay({ width, height, marginLeft, marginTop, onHover }: HoverOverlayProps) {
-  const rectRef = useRef<SVGRectElement>(null);
+export function HoverOverlay({
+  width,
+  height,
+  marginLeft,
+  marginTop,
+  onHover,
+  onPan,
+  panEnabled = false,
+}: HoverOverlayProps) {
+  const onPanRef = useRef(onPan);
+  onPanRef.current = onPan;
+  const lastXRef = useRef(0);
 
   const handleMove = useCallback(
-    (event: React.MouseEvent<SVGRectElement> | React.TouchEvent<SVGRectElement>) => {
+    (event: React.MouseEvent<SVGRectElement>) => {
       const point = localPoint(event);
       if (point) {
         onHover({ x: point.x - marginLeft, y: point.y - marginTop });
@@ -34,13 +46,29 @@ export function HoverOverlay({ width, height, marginLeft, marginTop, onHover }: 
 
   return (
     <rect
-      ref={rectRef}
       width={width}
       height={height}
       className={styles.hoverRect}
+      style={{ cursor: panEnabled ? "grab" : undefined }}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      onTouchMove={handleMove}
+      onMouseDown={(e) => {
+        if (!panEnabled) return;
+        e.preventDefault();
+        lastXRef.current = e.clientX;
+        const move = (ev: MouseEvent) => {
+          const dx = ev.clientX - lastXRef.current;
+          lastXRef.current = ev.clientX;
+          onPanRef.current?.(dx);
+        };
+        const up = () => {
+          window.removeEventListener("mousemove", move);
+          window.removeEventListener("mouseup", up);
+        };
+        window.addEventListener("mousemove", move);
+        window.addEventListener("mouseup", up);
+      }}
+      onTouchMove={handleMove as any}
       onTouchEnd={handleLeave}
     />
   );

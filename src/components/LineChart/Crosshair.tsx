@@ -1,9 +1,11 @@
+import type { ReactNode } from "react";
 import styles from "./LineChart.module.css";
 
 export interface CrosshairPoint {
   x: number;
   y: number;
   color: string;
+  icon?: ReactNode;
 }
 
 export interface CrosshairLineProps {
@@ -42,11 +44,20 @@ export function CrosshairDots({ points, offsetLeft, offsetTop }: CrosshairDotsPr
           }}
         >
           <div className={styles.indicatorBase}>
-            <div className={styles.indicatorBg} />
             <div
-              className={styles.indicatorDot}
-              style={{ background: pt.color }}
+              className={styles.indicatorBg}
+              style={pt.icon ? { borderColor: pt.color, opacity: "var(--opacity-88)" } : undefined}
             />
+            {pt.icon ? (
+              <div className={styles.indicatorIcon}>
+                {pt.icon}
+              </div>
+            ) : (
+              <div
+                className={styles.indicatorDot}
+                style={{ background: pt.color }}
+              />
+            )}
           </div>
         </div>
       ))}
