@@ -249,7 +249,7 @@ function LineChartInner<D>({
           <clipPath id={clipId}>
             <rect width={innerWidth} height={innerHeight} />
           </clipPath>
-          {showAreaFill && visibleSeries.map((s, i) => {
+          {showAreaFill && visibleSeries.map((s) => {
             const seriesIndex = series.indexOf(s);
             const color = getSeriesColor(seriesIndex, s.color);
             const gradientId = `${clipId}-grad-${seriesIndex}`;
@@ -294,7 +294,7 @@ function LineChartInner<D>({
                 transition: "opacity 600ms var(--motion-easing-enter)",
               }}
             >
-              {visibleSeries.map((s, i) => {
+              {visibleSeries.map((s) => {
                 const seriesIndex = series.indexOf(s);
                 const gradientId = `${clipId}-grad-${seriesIndex}`;
                 return (
@@ -312,7 +312,7 @@ function LineChartInner<D>({
               })}
             </g>
           )}
-          {visibleSeries.map((s, i) => {
+          {visibleSeries.map((s) => {
             if (!s.confidenceBand) return null;
             const seriesIndex = series.indexOf(s);
             const color = getSeriesColor(seriesIndex, s.color);

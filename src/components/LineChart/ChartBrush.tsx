@@ -81,7 +81,7 @@ export function ChartBrush<D>({
   return (
     <svg width={width} height={BRUSH_HEIGHT}>
       <Group left={BRUSH_MARGIN.left} top={BRUSH_MARGIN.top}>
-        {visibleSeries.map((s, i) => {
+        {visibleSeries.map((s) => {
           const seriesIndex = series.indexOf(s);
           const color = getSeriesColor(seriesIndex, s.color);
           return (
