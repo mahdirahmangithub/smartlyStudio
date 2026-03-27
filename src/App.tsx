@@ -55,6 +55,7 @@ import SearchInputPlayground from "./pages/SearchInputPlayground";
 import SelectOptionHeaderPlayground from "./pages/SelectOptionHeaderPlayground";
 import DropdownPlayground from "./pages/DropdownPlayground";
 import EntityPlayground from "./pages/EntityPlayground";
+import FeedbackBooleanPlayground from "./pages/FeedbackBooleanPlayground";
 import ThumbnailPlayground from "./pages/ThumbnailPlayground";
 import SpinnerPlayground from "./pages/SpinnerPlayground";
 import CurrencyThumbnailPlayground from "./pages/CurrencyThumbnailPlayground";
@@ -139,6 +140,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navigation-profile-item"
 | "empty-state"
 | "entity"
+| "feedback-boolean"
 | "shortcut-tooltip"
 | "sidebar"
 | "sortable-list"
@@ -320,6 +322,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "entity", label: "Entity" },
   { key: "expandable-badge", label: "ExpandableBadge" },
   { key: "expander", label: "Expander" },
+  { key: "feedback-boolean", label: "FeedbackBoolean" },
   { key: "fieldset", label: "Fieldset" },
   { key: "file-attachment", label: "FileAttachment" },
   { key: "file-type-thumbnail", label: "FileTypeThumb" },
@@ -555,6 +558,7 @@ export default function App() {
             {page === "dropdown" && <DropdownPlayground />}
             {page === "empty-state" && <EmptyStatePlayground />}
             {page === "entity" && <EntityPlayground />}
+            {page === "feedback-boolean" && <FeedbackBooleanPlayground />}
             {page === "thumbnail" && <ThumbnailPlayground />}
             {page === "spinner" && <SpinnerPlayground />}
             {page === "currency-thumbnail" && <CurrencyThumbnailPlayground />}

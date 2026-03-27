@@ -17,6 +17,9 @@ import {
   buildTimeScale,
   buildLinearScale,
   getSeriesColor,
+  getSeriesHoverColor,
+  getSeriesWeakColor,
+  isCategoricalColor,
   createBisector,
   findNearestDatum,
   type Series,
@@ -77,7 +80,8 @@ function LineChartInner<D>({
 }: LineChartProps<D> & { width: number; height: number }) {
   const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set());
   const [drawComplete, setDrawComplete] = useState(!animate);
-  const [hoverX, setHoverX] = useState<number | null>(null);
+  const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
+  const hoverX = hoverPos?.x ?? null;
   const [brushDomain, setBrushDomain] = useState<
     [Date, Date] | [number, number] | null
   >(null);
@@ -196,7 +200,20 @@ function LineChartInner<D>({
         : String(Math.round(xVal as number));
 
     const snappedX = points.length > 0 ? points[0].x : hoverX;
-    return { entries, points, header, x: snappedX };
+
+    let hoveredSeriesIndex = -1;
+    if (hoverPos && points.length > 0) {
+      let minDist = Infinity;
+      for (let j = 0; j < points.length; j++) {
+        const dist = Math.abs(points[j].y - hoverPos.y);
+        if (dist < minDist) {
+          minDist = dist;
+          hoveredSeriesIndex = j;
+        }
+      }
+    }
+
+    return { entries, points, header, x: snappedX, hoveredSeriesIndex };
   }, [
     hoverX,
     showTooltip,
@@ -209,6 +226,7 @@ function LineChartInner<D>({
     bisectorFn,
     tooltipXFormat,
     tooltipYFormat,
+    hoverPos,
   ]);
 
   useEffect(() => {
@@ -255,8 +273,8 @@ function LineChartInner<D>({
             const gradientId = `${clipId}-grad-${seriesIndex}`;
             return (
               <linearGradient key={gradientId} id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor={color} stopOpacity={0.8} />
-                <stop offset="100%" stopColor={color} stopOpacity={0.08} />
+                <stop offset="0%" stopColor={color} stopOpacity={0.32} />
+                <stop offset="100%" stopColor={color} stopOpacity={0} />
               </linearGradient>
             );
           })}
@@ -290,7 +308,7 @@ function LineChartInner<D>({
           {showAreaFill && (
             <g
               style={{
-                opacity: drawComplete ? 0.08 : 0,
+                opacity: drawComplete ? 0.24 : 0,
                 transition: "opacity 600ms var(--motion-easing-enter)",
               }}
             >
@@ -331,7 +349,22 @@ function LineChartInner<D>({
           })}
           {visibleSeries.map((s, i) => {
             const seriesIndex = series.indexOf(s);
-            const color = getSeriesColor(seriesIndex, s.color);
+            const baseColor = getSeriesColor(seriesIndex, s.color);
+            const isHovering = visibleSeries.length > 1 && tooltipData && tooltipData.hoveredSeriesIndex >= 0;
+            const isThisHovered = isHovering && tooltipData.hoveredSeriesIndex === i;
+            const isCat = isCategoricalColor(s.color);
+
+            let color = baseColor;
+            let opacity = 1;
+            if (isHovering) {
+              if (isThisHovered) {
+                color = isCat ? getSeriesHoverColor(seriesIndex) : baseColor;
+              } else {
+                color = isCat ? getSeriesWeakColor(seriesIndex) : baseColor;
+                opacity = isCat ? 1 : 0.32;
+              }
+            }
+
             return (
               <AnimatedLine
                 key={s.id}
@@ -339,6 +372,8 @@ function LineChartInner<D>({
                 xAccessor={(d) => xScale(xAccessor(d)) ?? 0}
                 yAccessor={(d) => yScale(yAccessor(d)) ?? 0}
                 color={color}
+                strokeWidth={isThisHovered ? 2.5 : 2}
+                opacity={opacity}
                 curve={curve}
                 animate={animate && !zoomState}
                 delay={i * 150}
@@ -402,7 +437,8 @@ function LineChartInner<D>({
             width={innerWidth}
             height={innerHeight}
             marginLeft={margin.left}
-            onHover={setHoverX}
+            marginTop={margin.top}
+            onHover={setHoverPos}
           />
         )}
       </Group>
@@ -495,22 +531,23 @@ function LineChartInner<D>({
           />
         )}
 
-        {showLegend && (
-          <ChartLegend
-            series={series}
-            hiddenSeries={hiddenSeries}
-            onToggle={toggleSeries}
-          />
-        )}
-
         {enableBrush && (
           <ChartBrush
             series={series}
             xAccessor={xAccessor}
             yAccessor={yAccessor}
             width={width}
+            marginLeft={margin.left}
             hiddenSeries={hiddenSeries}
             onChange={setBrushDomain}
+          />
+        )}
+
+        {showLegend && (
+          <ChartLegend
+            series={series}
+            hiddenSeries={hiddenSeries}
+            onToggle={toggleSeries}
           />
         )}
       </div>

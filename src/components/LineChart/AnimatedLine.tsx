@@ -34,6 +34,7 @@ export interface AnimatedLineProps<D> {
   yAccessor: (d: D) => number;
   color: string;
   strokeWidth?: number;
+  opacity?: number;
   curve?: CurveFactory;
   animate?: boolean;
   delay?: number;
@@ -45,6 +46,7 @@ export function AnimatedLine<D>({
   yAccessor,
   color,
   strokeWidth = 2,
+  opacity = 1,
   curve,
   animate = true,
   delay = 0,
@@ -80,8 +82,12 @@ export function AnimatedLine<D>({
             fill="none"
             stroke={color}
             strokeWidth={strokeWidth}
+            opacity={opacity}
             strokeLinecap="round"
             strokeLinejoin="round"
+            style={{
+              transition: "stroke 200ms var(--animation-state-change-easing), opacity 200ms var(--animation-state-change-easing), stroke-width 200ms var(--animation-state-change-easing)",
+            }}
             strokeDasharray={animate && length > 0 ? length : undefined}
             strokeDashoffset={
               animate && length > 0

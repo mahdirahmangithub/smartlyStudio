@@ -200,20 +200,53 @@
 
 .brushContainer {
   position: relative;
+  cursor: crosshair;
+  user-select: none;
 }
 
-.brushOverlay {
-  fill: var(--element-fill-brand-tertiary-default);
+.brushSvg {
+  display: block;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
 }
 
 .brushSelection {
-  fill: var(--element-fill-brand-tertiary-hover);
-  stroke: var(--element-outline-brand-default);
-  stroke-width: var(--spacing-px);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--util-subtle-inverse-strongest);
+  border: var(--spacing-hair-line) solid var(--element-divider-neutral-weak);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-default);
+  cursor: grab;
 }
 
-.brushHandle {
-  fill: var(--element-fill-brand-primary-default);
+.brushSelection:active {
+  cursor: grabbing;
+}
+
+.brushSelection::before,
+.brushSelection::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--spacing-xs);
+  height: var(--spacing-xl);
+  background: var(--element-surface-over);
+  border: var(--spacing-hair-line) solid var(--element-divider-neutral-weak);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-default);
+  pointer-events: none;
+}
+
+.brushSelection::before {
+  left: calc(-1 * var(--spacing-2xs));
+}
+
+.brushSelection::after {
+  right: calc(-1 * var(--spacing-2xs));
 }
 
 /* ── Zoom ── */

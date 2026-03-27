@@ -81,6 +81,20 @@ export function getSeriesColor(index: number, override?: string): string {
   return colors[index % colors.length];
 }
 
+export function isCategoricalColor(override?: string): boolean {
+  return !override;
+}
+
+export function getSeriesHoverColor(index: number, override?: string): string {
+  if (override) return override;
+  return `var(${CATEGORICAL_HOVER_TOKENS[index % CATEGORICAL_HOVER_TOKENS.length]})`;
+}
+
+export function getSeriesWeakColor(index: number, override?: string): string {
+  if (override) return override;
+  return `var(${CATEGORICAL_WEAK_TOKENS[index % CATEGORICAL_WEAK_TOKENS.length]})`;
+}
+
 export function buildTimeScale(
   data: Date[],
   width: number
