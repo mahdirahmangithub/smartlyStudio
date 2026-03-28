@@ -7,7 +7,7 @@ import {
   getSeriesColor,
   type Series,
 } from "./chartUtils";
-import styles from "./LineChart.module.css";
+import styles from "./ChartContainer.module.css";
 
 const BRUSH_HEIGHT = 40;
 

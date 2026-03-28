@@ -9,8 +9,8 @@ import {
   getSeriesColor,
   type Series,
   type Margin,
-} from "./chartUtils";
-import styles from "./LineChart.module.css";
+} from "../ChartPrimitives/chartUtils";
+import styles from "../ChartPrimitives/ChartContainer.module.css";
 import type { CurveFactory } from "d3-shape";
 
 export interface ChartAreaProps<D> {

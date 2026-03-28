@@ -13,6 +13,8 @@ export interface Series<D = any> {
   color?: string;
   icon?: React.ReactNode;
   confidenceBand?: ConfidenceBand<D>;
+  /** Which Y axis this series binds to. Defaults to "left". */
+  yAxis?: "left" | "right";
 }
 
 export interface Margin {
@@ -113,12 +115,17 @@ export function buildLinearScale(
   nice = true
 ) {
   const [min = 0, max = 0] = extent(data) as [number, number];
-  const padding = (max - min) * 0.05 || 1;
-  const scale = scaleLinear<number>({
-    domain: [min - padding, max + padding],
+  let lo = min;
+  let hi = max;
+  if (nice) {
+    const niced = scaleLinear<number>({ domain: [lo, hi], range: [height, 0] }).nice();
+    [lo, hi] = niced.domain() as [number, number];
+  }
+  const padding = (hi - lo) * 0.1 || 1;
+  return scaleLinear<number>({
+    domain: [lo - padding, hi + padding],
     range: [height, 0],
   });
-  return nice ? scale.nice() : scale;
 }
 
 export function createBisector<D>(accessor: (d: D) => Date | number) {

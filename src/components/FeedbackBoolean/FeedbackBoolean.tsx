@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { IconButton } from "../IconButton";
-import { Icon } from "../Icon";
 import { RowContainer, type RowContainerDensity } from "../RowContainer";
 import type { ButtonSize } from "../Button";
 import { cx } from "../../utils/cx";

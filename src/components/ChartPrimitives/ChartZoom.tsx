@@ -1,4 +1,4 @@
-import styles from "./LineChart.module.css";
+import styles from "./ChartContainer.module.css";
 
 export interface ChartZoomControlsProps {
   onZoomIn: () => void;

@@ -229,6 +229,33 @@ function ManySeriesDemo() {
   );
 }
 
+function DualAxisDemo() {
+  const series = useMemo<Series<DataPoint>[]>(
+    () => [
+      { id: "spend", label: "Spend ($)", data: generateData(30, 5000, 600) },
+      { id: "ctr", label: "CTR (%)", data: generateData(30, 3, 0.5), yAxis: "right" },
+    ],
+    []
+  );
+
+  return (
+    <LineChart
+      series={series}
+      xAccessor={xAccessor}
+      yAccessor={yAccessor}
+      curve={curveMonotoneX}
+      height={350}
+      showAreaFill
+      tooltipYFormat={(v) => `$${v.toLocaleString()}`}
+      tooltipYRightFormat={(v) => `${v.toFixed(2)}%`}
+      yTickFormat={(v) => `$${(v / 1000).toFixed(0)}k`}
+      yRightTickFormat={(v) => `${v.toFixed(1)}%`}
+      yLeftTitle="Spend"
+      yRightTitle="Click-through rate"
+    />
+  );
+}
+
 function NoAnimationDemo() {
   const series = useMemo<Series<DataPoint>[]>(
     () => [
@@ -449,6 +476,16 @@ export default function LineChartPlayground() {
         </p>
         <div style={cardStyle}>
           <ConfidenceBandDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Dual Y-Axis</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Spend on the left axis ($), CTR on the right axis (%). Each series scales independently.
+        </p>
+        <div style={cardStyle}>
+          <DualAxisDemo />
         </div>
       </section>
 

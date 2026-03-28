@@ -101,71 +101,94 @@
   justify-content: center;
 }
 
-/* ── Tooltip wrapper reset (strip SDS Tooltip's visual shell) ── */
+/* ── Tooltip wrapper – frosted glass ── */
 
 .tooltipWrapper {
-  background: none !important;
-  border: none !important;
+  background: transparent !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: var(--spacing-hair-line) solid var(--element-divider-neutral-weak) !important;
   outline: none !important;
-  box-shadow: none !important;
-  border-radius: 0 !important;
+  box-shadow: var(--shadow-xl) !important;
+  border-radius: var(--radius-lg) !important;
   padding: 0 !important;
+  overflow: hidden !important;
 }
 
 /* ── Tooltip content ── */
 
 .tooltipBox {
-  background: var(--element-surface-over);
-  border: var(--spacing-hair-line) solid var(--element-divider-neutral-default);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-sm) var(--spacing-sm-plus);
-  box-shadow: var(--shadow-xl);
+  position: relative;
   pointer-events: none;
   white-space: nowrap;
 }
 
 .tooltipHeader {
-  font-family: var(--type-body-sm-family);
-  font-weight: var(--type-body-sm-weight);
-  font-size: var(--type-body-sm-size);
-  line-height: var(--type-body-sm-line-height);
-  color: var(--text-neutral-tertiary-default);
-  margin-bottom: var(--spacing-2xs);
+  padding: var(--spacing-sm-plus);
+  border-bottom: var(--spacing-hair-line) solid var(--element-divider-neutral-default);
+  font-variant-numeric: tabular-nums;
+  
 }
+
+.tooltipEntity span {
+    font-family: var(--type-number-strong-xs-family);
+    font-weight: var(--type-number-strong-xs-weight);
+    font-size: var(--type-number-strong-xs-size);
+    line-height: var(--type-number-strong-xs-line-height);
+    letter-spacing: var(--type-number-strong-xs-letter-spacing);
+    font-variant-numeric: tabular-nums;
+  }
+
+.tooltipAxisTitle {
+  display: block;
+  font-family: var(--type-caption-strong-sm-family);
+  font-weight: var(--type-caption-strong-sm-weight);
+  font-size: var(--type-caption-strong-sm-size);
+  line-height: var(--type-caption-strong-sm-line-height);
+  letter-spacing: var(--type-caption-strong-sm-letter-spacing);
+  color: var(--text-neutral-placeholder);
+  padding-bottom: var(--spacing-2xs);
+}
+
+.tooltipLegends {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm-extra) var(--spacing-sm-extra) var(--spacing-sm-extra) var(--spacing-sm-plus);
+ }
 
 .tooltipRow {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  justify-content: space-between;
+  gap: var(--spacing-lg);
 }
 
-.tooltipRow + .tooltipRow {
-  margin-top: var(--spacing-2xs);
-}
+.tooltipBadge {
+  color: var(--text-neutral-tertiary-default) !important;
+  font-family: var(--type-label-xs-family);
+  font-weight: var(--type-label-xs-weight);
+  font-size: var(--type-label-xs-size);
+  line-height: var(--type-label-xs-line-height);
+  letter-spacing: var(--type-label-xs-letter-spacing);
+  gap: var(--spacing-sm-minus);
+ }
 
-.tooltipSwatch {
+.tooltipDot {
+  display: block;
   width: var(--spacing-sm);
   height: var(--spacing-sm);
   border-radius: var(--radius-full);
-  flex-shrink: 0;
-}
-
-.tooltipLabel {
-  font-family: var(--type-body-sm-family);
-  font-weight: var(--type-body-sm-weight);
-  font-size: var(--type-body-sm-size);
-  line-height: var(--type-body-sm-line-height);
-  color: var(--text-neutral-secondary-default);
 }
 
 .tooltipValue {
-  font-family: var(--type-label-strong-md-family);
-  font-weight: var(--type-label-strong-md-weight);
-  font-size: var(--type-body-sm-size);
-  line-height: var(--type-body-sm-line-height);
-  color: var(--text-neutral-primary-default);
-  margin-left: auto;
-  padding-left: var(--spacing-md);
+  font-family: var(--type-number-strong-xs-family);
+  font-weight: var(--type-number-strong-xs-weight);
+  font-size: var(--type-number-strong-xs-size);
+  line-height: var(--type-number-strong-xs-line-height);
+  letter-spacing: var(--type-number-strong-xs-letter-spacing);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-neutral-primary);
 }
 
 /* ── Legend ── */

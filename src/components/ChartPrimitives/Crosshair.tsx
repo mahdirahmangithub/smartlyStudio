@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import styles from "./LineChart.module.css";
+import styles from "./ChartContainer.module.css";
 
 export interface CrosshairPoint {
   x: number;

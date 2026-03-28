@@ -1,6 +1,6 @@
 import { useCallback, useRef } from "react";
 import { localPoint } from "@visx/event";
-import styles from "./LineChart.module.css";
+import styles from "./ChartContainer.module.css";
 
 export interface HoverPosition {
   x: number;

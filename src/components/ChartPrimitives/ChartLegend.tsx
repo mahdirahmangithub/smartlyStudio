@@ -1,6 +1,6 @@
 import { cx } from "../../utils/cx";
 import { getSeriesColor, type Series } from "./chartUtils";
-import styles from "./LineChart.module.css";
+import styles from "./ChartContainer.module.css";
 
 export interface ChartLegendProps<D> {
   series: Series<D>[];
