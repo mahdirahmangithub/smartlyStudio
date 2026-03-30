@@ -191,7 +191,6 @@ function BarChartInner<D>({
       const rect = e.currentTarget.getBoundingClientRect();
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
-      setHoverPos({ x: mx, y: my });
 
       const catPos = isVertical ? mx : my;
       const step = categoryScale.step();
@@ -298,7 +297,6 @@ function BarChartInner<D>({
   const handleMouseLeave = useCallback(() => {
     setHoverCategory(null);
     setHoverSeriesId(null);
-    setHoverPos(null);
   }, []);
 
   const tooltipData = useMemo(() => {
