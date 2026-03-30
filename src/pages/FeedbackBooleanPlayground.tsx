@@ -91,7 +91,7 @@ function PreselectedDemo() {
 export default function FeedbackBooleanPlayground() {
   return (
     <>
-      <h1>FeedbackBoolean</h1>
+      <h1>FeedbackBoolean (with svg morph)</h1>
 
       <section style={sectionStyle}>
         <h2>Sizes</h2>
