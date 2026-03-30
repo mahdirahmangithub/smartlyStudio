@@ -121,6 +121,7 @@
   position: relative;
   pointer-events: none;
   white-space: nowrap;
+  background-color: color-mix(in srgb, var(--element-surface-over) 48%, transparent);
 }
 
 .tooltipHeader {

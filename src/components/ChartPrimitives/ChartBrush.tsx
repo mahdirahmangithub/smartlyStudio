@@ -10,6 +10,9 @@ import {
 import styles from "./ChartContainer.module.css";
 
 const BRUSH_HEIGHT = 40;
+const RULER_HEIGHT = 16;
+const RULER_MINOR_HEIGHT = 8;
+const RULER_MINOR_OFFSET = (RULER_HEIGHT - RULER_MINOR_HEIGHT) / 2;
 
 export interface ChartBrushProps<D> {
   series: Series<D>[];
@@ -17,10 +20,13 @@ export interface ChartBrushProps<D> {
   yAccessor: (d: D) => number;
   width: number;
   marginLeft: number;
+  marginRight?: number;
   hiddenSeries?: Set<string>;
   domain: [Date, Date] | [number, number] | null;
   onChange: (domain: [Date, Date] | [number, number] | null) => void;
   xTickFormat?: (value: any) => string;
+  /** Pixel x-positions of the main chart's visible x-axis ticks, used for major ruler ticks. */
+  majorTickPositions?: number[];
 }
 
 export function ChartBrush<D>({
@@ -29,13 +35,15 @@ export function ChartBrush<D>({
   yAccessor,
   width,
   marginLeft,
+  marginRight = 0,
   hiddenSeries,
   domain,
   onChange,
   xTickFormat,
+  majorTickPositions,
 }: ChartBrushProps<D>) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const innerWidth = width - marginLeft;
+  const innerWidth = width - marginLeft - marginRight;
   const [selection, setSelection] = useState<{ x0: number; x1: number } | null>(null);
   const [hoveredHandle, setHoveredHandle] = useState<"left" | "right" | null>(null);
   const dragRef = useRef<{ type: "move" | "left" | "right"; startX: number; startSel: { x0: number; x1: number } } | null>(null);
@@ -64,6 +72,21 @@ export function ChartBrush<D>({
     () => buildLinearScale(allYValues, BRUSH_HEIGHT - 8),
     [allYValues]
   );
+
+  const minorTickCount = useMemo(
+    () => Math.max(10, Math.floor(innerWidth / 8)),
+    [innerWidth]
+  );
+
+  const rulerTicks = useMemo(() => {
+    if (innerWidth <= 0) return [];
+    const majors = (majorTickPositions ?? []).filter((x) => x >= 0 && x <= innerWidth);
+    const minorTicks = (xScale.ticks(minorTickCount) as (Date | number)[])
+      .map((tick) => ({ x: xScale(tick) ?? 0, isMajor: false }))
+      .filter(({ x }) => x >= 0 && x <= innerWidth && !majors.some((mx) => Math.abs(mx - x) < 4));
+    const majorTicks = majors.map((x) => ({ x, isMajor: true }));
+    return [...minorTicks, ...majorTicks].sort((a, b) => a.x - b.x);
+  }, [xScale, innerWidth, minorTickCount, majorTickPositions]);
 
   useEffect(() => {
     if (!domain) {
@@ -173,7 +196,7 @@ export function ChartBrush<D>({
     <div
       ref={containerRef}
       className={styles.brushContainer}
-      style={{ height: BRUSH_HEIGHT, marginTop: 8 }}
+      style={{ height: BRUSH_HEIGHT, marginTop: -16}}
       onMouseDown={handleBgMouseDown}
     >
       <svg
@@ -181,6 +204,20 @@ export function ChartBrush<D>({
         height={BRUSH_HEIGHT}
         className={styles.brushSvg}
       >
+        <Group left={marginLeft} top={(BRUSH_HEIGHT - RULER_HEIGHT) / 2}>
+          {rulerTicks.map(({ x, isMajor }, i) => (
+            <line
+              key={`${isMajor ? "M" : "m"}-${i}`}
+              x1={x}
+              x2={x}
+              y1={isMajor ? 0 : RULER_MINOR_OFFSET}
+              y2={isMajor ? RULER_HEIGHT : RULER_HEIGHT - RULER_MINOR_OFFSET}
+              stroke={"var(--element-divider-neutral-default)"}
+              strokeWidth={isMajor ? "var(--spacing-px)" : "var(--spacing-hair-line)"}
+              strokeLinecap="round"
+            />
+          ))}
+        </Group>
         <Group left={marginLeft} top={4}>
           {visibleSeries.map((s) => {
             const seriesIndex = series.indexOf(s);

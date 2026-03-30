@@ -97,7 +97,7 @@
 }
 
 .outline.dragging {
-  border-color: var(--element-outline-neutral-press);
+  border-color: var(--element-outline-neutral-default);
 }
 
 /* ── placeholder state (source position while dragging) ──────────── */
@@ -134,6 +134,17 @@
 .outline.dropAbove::after,
 .outline.dropBelow::after {
   --_indicator-border-offset: var(--spacing-px);
+}
+
+/* ── shift mode ──────────────────────────────────────────────────── */
+
+.shiftGrabbable {
+  cursor: grab;
+  user-select: none;
+}
+
+.dragging.shiftGrabbable {
+  cursor: grabbing;
 }
 
 /* ── disabled state ──────────────────────────────────────────────── */

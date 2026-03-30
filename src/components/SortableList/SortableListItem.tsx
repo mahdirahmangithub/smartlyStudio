@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useRef } from "react";
+import { type ReactNode, useCallback, useEffect, useRef } from "react";
 import { DragHandleMenu } from "../DragHandleMenu";
 import { useSortableList } from "./SortableListContext";
 import styles from "./SortableListItem.module.css";
@@ -28,14 +28,25 @@ export function SortableListItem({
   const handleRef = useRef<HTMLButtonElement>(null);
   const itemRef = useRef<HTMLDivElement>(null);
 
-  const isSourcePlaceholder = ctx != null && ctx.draggingIndex === index;
-  const isDropTarget = ctx != null && ctx.dropTargetIndex === index && ctx.draggingIndex !== index;
+  const isShift = ctx?.behavior === "shift";
+  const isDragging = ctx != null && ctx.draggingIndex === index;
+  const isSourcePlaceholder = !isShift && isDragging;
+  const isShiftDragging = isShift && isDragging;
+  const isDropTarget = !isShift && ctx != null && ctx.dropTargetIndex === index && ctx.draggingIndex !== index;
   const showDropAbove = isDropTarget && ctx!.dropPosition === "above";
   const showDropBelow = isDropTarget && ctx!.dropPosition === "below";
 
+  useEffect(() => {
+    if (!ctx) return;
+    ctx.registerItem(index, itemRef.current);
+    return () => ctx.registerItem(index, null);
+  }, [ctx, index]);
+
+  /* ── HTML5 DnD handlers (indicator mode) ───────────────────────── */
+
   const handleDragStart = useCallback(
     (e: React.DragEvent) => {
-      if (disabled || !ctx) {
+      if (disabled || !ctx || isShift) {
         e.preventDefault();
         return;
       }
@@ -61,28 +72,39 @@ export function SortableListItem({
 
       ctx.onDragStart(index, el, e);
     },
-    [ctx, disabled, index],
+    [ctx, disabled, index, isShift],
   );
 
   const handleDragOver = useCallback(
     (e: React.DragEvent) => {
-      if (!ctx || disabled) return;
+      if (!ctx || disabled || isShift) return;
       ctx.onDragOver(index, e);
     },
-    [ctx, disabled, index],
+    [ctx, disabled, index, isShift],
   );
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
-      if (!ctx) return;
+      if (!ctx || isShift) return;
       ctx.onDrop(e);
     },
-    [ctx],
+    [ctx, isShift],
   );
 
   const handleDragEnd = useCallback(() => {
+    if (isShift) return;
     ctx?.onDragEnd();
-  }, [ctx]);
+  }, [ctx, isShift]);
+
+  /* ── pointer handler for shift mode ────────────────────────────── */
+
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!ctx || disabled || !isShift) return;
+      ctx.onPointerDragStart(index, e);
+    },
+    [ctx, disabled, index, isShift],
+  );
 
   return (
     <div
@@ -90,23 +112,29 @@ export function SortableListItem({
       role="listitem"
       aria-roledescription="sortable item"
       aria-disabled={disabled || undefined}
-      draggable={!disabled && ctx != null}
-      onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
-      onDrop={handleDrop}
-      onDragEnd={handleDragEnd}
+      draggable={!isShift && !disabled && ctx != null}
+      onDragStart={!isShift ? handleDragStart : undefined}
+      onDragOver={!isShift ? handleDragOver : undefined}
+      onDrop={!isShift ? handleDrop : undefined}
+      onDragEnd={!isShift ? handleDragEnd : undefined}
+      onPointerDown={isShift ? handlePointerDown : undefined}
       className={cx(
         styles.root,
         outline && styles.outline,
         disabled && styles.disabled,
         isSourcePlaceholder && styles.placeholder,
+        isShiftDragging && styles.dragging,
         showDropAbove && styles.dropAbove,
         showDropBelow && styles.dropBelow,
+        isShift && !disabled && styles.shiftGrabbable,
         className,
       )}
+      style={isShift ? { touchAction: "none" } : undefined}
     >
       {ctx && !disabled && (
-        <div className={styles.handle}>
+        <div
+          className={styles.handle}
+        >
           <DragHandleMenu
             ref={handleRef}
             type="dot"

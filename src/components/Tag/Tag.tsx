@@ -29,7 +29,9 @@ export type TagType =
   | "cat-3"
   | "cat-4"
   | "cat-5"
-  | "cat-6";
+  | "cat-6"
+  | "cat-7"
+  | "cat-8";
 
 export type TagEmphasis = "high" | "low";
 export type TagSurface = "auto" | "default" | "over" | "under";
@@ -60,6 +62,8 @@ const TYPE_CLASS: Record<TagType, string> = {
   "cat-4": styles.cat4,
   "cat-5": styles.cat5,
   "cat-6": styles.cat6,
+  "cat-7": styles.cat7,
+  "cat-8": styles.cat8,
 };
 
 const INPUT_CLEAR_SIZE: Record<TagSize, InputClearSize> = {
@@ -116,8 +120,9 @@ function detectSurface(element: HTMLElement): string {
 }
 
 function getClearVariant(variant: TagType, emphasis: TagEmphasis): InputClearType {
-  if (emphasis === "high") return "inverse";
+  if (variant === "cat-7" || variant === "cat-8") return "inverse";
   if (variant.startsWith("cat-")) return "neutral";
+  if (emphasis === "high") return "inverse";
   return variant as InputClearType;
 }
 

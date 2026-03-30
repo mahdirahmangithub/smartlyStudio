@@ -1,8 +1,10 @@
 import { createContext, useContext } from "react";
 
 export type DropPosition = "above" | "below" | null;
+export type SortBehavior = "indicator" | "shift";
 
 export interface SortableListContextValue {
+  behavior: SortBehavior;
   total: number;
   draggingIndex: number | null;
   dropTargetIndex: number | null;
@@ -15,6 +17,8 @@ export interface SortableListContextValue {
   onDragOver: (index: number, e: React.DragEvent) => void;
   onDragEnd: () => void;
   onDrop: (e: React.DragEvent) => void;
+  registerItem: (index: number, el: HTMLElement | null) => void;
+  onPointerDragStart: (index: number, e: React.PointerEvent) => void;
 }
 
 export const SortableListContext = createContext<SortableListContextValue | null>(null);

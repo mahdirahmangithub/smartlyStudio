@@ -66,6 +66,11 @@ function LineChartContent<D>({
   const getIdx = (s: (typeof allSeries)[number]) =>
     seriesIndexMap.get(s.id) ?? 0;
 
+  const areaFillSeries = useMemo(
+    () => visibleSeries.filter((s) => showAreaFill || s.areaFill),
+    [visibleSeries, showAreaFill],
+  );
+
   const [drawComplete, setDrawComplete] = useState(!animate);
 
   useEffect(() => {
@@ -81,9 +86,9 @@ function LineChartContent<D>({
 
   return (
     <>
-      {showAreaFill && (
+      {areaFillSeries.length > 0 && (
         <defs>
-          {visibleSeries.map((s) => {
+          {areaFillSeries.map((s) => {
             const idx = getIdx(s);
             const color = getSeriesColor(idx, s.color);
             const gradientId = `${clipId}-grad-${idx}`;
@@ -97,14 +102,14 @@ function LineChartContent<D>({
         </defs>
       )}
 
-      {showAreaFill && (
+      {areaFillSeries.length > 0 && (
         <g
           style={{
             opacity: drawComplete ? 0.24 : 0,
             transition: "opacity 600ms var(--motion-easing-enter)",
           }}
         >
-          {visibleSeries.map((s) => {
+          {areaFillSeries.map((s) => {
             const idx = getIdx(s);
             const gradientId = `${clipId}-grad-${idx}`;
             const scale = s.yAxis === "right" && yRightScale ? yRightScale : yScale;
@@ -153,7 +158,7 @@ function LineChartContent<D>({
           tooltipData.hoveredSeriesIndex >= 0;
         const isThisHovered =
           isHovering && tooltipData!.hoveredSeriesIndex === i;
-        const opacity = isHovering && !isThisHovered ? 0.32 : 1;
+        const opacity = isHovering && !isThisHovered ? 0.24 : 1;
         const scale = s.yAxis === "right" && yRightScale ? yRightScale : yScale;
 
         return (

@@ -28,9 +28,9 @@ export type { ChartTooltipContentProps, TooltipEntry } from "./ChartTooltip";
 export {
   buildTimeScale,
   buildLinearScale,
+  buildBandScale,
+  buildLinearScaleForBars,
   getSeriesColor,
-  getSeriesHoverColor,
-  getSeriesWeakColor,
   getCategoricalColors,
   invalidateColorCache,
   isCategoricalColor,
@@ -38,8 +38,23 @@ export {
   findNearestDatum,
   DEFAULT_MARGIN,
   CATEGORICAL_TOKENS,
-  CATEGORICAL_HOVER_TOKENS,
-  CATEGORICAL_DISABLE_TOKENS,
-  CATEGORICAL_WEAK_TOKENS,
 } from "./chartUtils";
 export type { Series, Margin, ConfidenceBand } from "./chartUtils";
+
+export {
+  getCategoricalPalette,
+  getCategoricalColor,
+  getSequentialPalette,
+  getDivergentPalette,
+  getSemanticColor,
+  getColorInterpolator,
+  resolveColorScheme,
+  invalidateDataVizCache,
+  setOklchEnhancement,
+  isOklchEnhanced,
+} from "./dataVizPalette";
+export type {
+  SemanticHue,
+  DivergentHue,
+  ColorScheme,
+} from "./dataVizPalette";

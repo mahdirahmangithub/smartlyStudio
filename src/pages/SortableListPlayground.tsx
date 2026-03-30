@@ -105,6 +105,35 @@ function OutlineDemo() {
   );
 }
 
+function ShiftDemo({ outline = false }: { outline?: boolean }) {
+  const [items, setItems] = useState(ITEMS);
+
+  const handleReorder = useCallback((from: number, to: number) => {
+    setItems((prev) => reorder(prev, from, to));
+  }, []);
+
+  return (
+    <SortableList onReorder={handleReorder} total={items.length} behavior="shift">
+      {items.map((item, i) => (
+        <SortableListItem key={item.id} index={i} outline={outline}>
+          <Entity
+            leading={<Icon name={item.icon as never} size={16} />}
+            title={item.title}
+            description={item.description}
+            hiddenActions={
+              <>
+                <IconButton icon={<Icon name="favorite" size={16} />} aria-label="Favorite" variant="neutral" emphasis="low" size="sm" />
+                <IconButton icon={<Icon name="delete" size={16} />} aria-label="Delete" variant="neutral" emphasis="low" size="sm" />
+                <IconButton icon={<Icon name="more_vert" size={16} />} aria-label="More" variant="neutral" emphasis="low" size="sm" />
+              </>
+            }
+          />
+        </SortableListItem>
+      ))}
+    </SortableList>
+  );
+}
+
 function DisabledDemo() {
   const [items, setItems] = useState(ITEMS_WITH_DISABLED);
 
@@ -160,6 +189,26 @@ export default function SortableListPlayground() {
         </p>
         <div style={cardStyle}>
           <OutlineDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Shift behavior (no outline)</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Grab from anywhere on the item. Items shift in real-time as you drag.
+        </p>
+        <div style={cardStyle}>
+          <ShiftDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Shift behavior (outline)</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Same natural reorder with outline variant.
+        </p>
+        <div style={cardStyle}>
+          <ShiftDemo outline />
         </div>
       </section>
 

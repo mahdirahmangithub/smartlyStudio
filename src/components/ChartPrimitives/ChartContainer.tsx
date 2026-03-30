@@ -218,6 +218,13 @@ function ChartContainerInner<D>({
     return buildLinearScale([x0 as number, x1 as number], innerWidth, false);
   }, [baseXScale, zoomState, innerWidth]);
 
+  const visibleXTickPositions = useMemo(
+    () => (xScale.ticks(numXTicks) as (Date | number)[]).map(
+      (tick) => xScale(tick) ?? 0
+    ),
+    [xScale, numXTicks]
+  );
+
   const yScale = useMemo(() => {
     if (!zoomState) return baseYScale;
     const { k, ty } = zoomState;
@@ -543,9 +550,11 @@ function ChartContainerInner<D>({
             yAccessor={yAccessor}
             width={width}
             marginLeft={effectiveMargin.left}
+            marginRight={effectiveMargin.right}
             hiddenSeries={hiddenSeries}
             domain={brushDomain}
             onChange={setBrushDomain}
+            majorTickPositions={visibleXTickPositions}
           />
         )}
 

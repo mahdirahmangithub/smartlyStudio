@@ -9,7 +9,7 @@ import {
   getSeriesColor,
   type Series,
   type Margin,
-} from "../ChartPrimitives/chartUtils";
+} from "../ChartPrimitives";
 import styles from "../ChartPrimitives/ChartContainer.module.css";
 import type { CurveFactory } from "d3-shape";
 

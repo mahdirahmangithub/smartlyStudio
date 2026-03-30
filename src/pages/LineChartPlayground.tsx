@@ -1,6 +1,7 @@
-import { type CSSProperties, useMemo, useState, createContext, useContext } from "react";
+import { type CSSProperties, useMemo, useState, useCallback, createContext, useContext } from "react";
 import { LineChart as LineChartBase } from "../components/LineChart";
 import type { Series, LineChartProps } from "../components/LineChart";
+import { setOklchEnhancement, isOklchEnhanced } from "../components/ChartPrimitives";
 import { Icon } from "../components/Icon";
 import { Card, CardContent, CardBody, CardTitle } from "../components/Card";
 import { curveMonotoneX, curveLinear, curveCardinal } from "@visx/curve";
@@ -208,12 +209,14 @@ function IconIndicatorDemo() {
 function ManySeriesDemo() {
   const series = useMemo<Series<DataPoint>[]>(
     () => [
-      { id: "s1", label: "Campaign A", data: generateData(30, 80, 8) },
-      { id: "s2", label: "Campaign B", data: generateData(30, 60, 12) },
+      { id: "s1", label: "Campaign A", data: generateData(30, 80, 8), areaFill: true },
+      { id: "s2", label: "Campaign B", data: generateData(30, 60, 12), areaFill: true },
       { id: "s3", label: "Campaign C", data: generateData(30, 100, 6) },
       { id: "s4", label: "Campaign D", data: generateData(30, 45, 10) },
       { id: "s5", label: "Campaign E", data: generateData(30, 70, 9) },
       { id: "s6", label: "Campaign F", data: generateData(30, 55, 7) },
+      { id: "s7", label: "Campaign G", data: generateData(30, 90, 11) },
+      { id: "s8", label: "Campaign H", data: generateData(30, 35, 7) },
     ],
     []
   );
@@ -355,7 +358,6 @@ function SparklineCard() {
                 showGrid={false}
                 showAxes={false}
                 showLegend={false}
-                showTooltip={false}
                 showAreaFill
               />
             </CardBody>
@@ -370,10 +372,25 @@ export default function LineChartPlayground() {
   const [edgeFade, setEdgeFade] = useState(false);
   const [showXGrid, setShowXGrid] = useState(true);
   const [showYGrid, setShowYGrid] = useState(true);
+  const [oklch, setOklch] = useState(isOklchEnhanced);
+  const [, rerender] = useState(0);
+  const toggleOklch = useCallback(() => {
+    const next = !oklch;
+    setOklchEnhancement(next);
+    setOklch(next);
+    rerender((n) => n + 1);
+  }, [oklch]);
+
   return (
     <ChartOptsCtx.Provider value={{ edgeFade, showXGrid, showYGrid }}>
     <>
       <h1>LineChart</h1>
+      <div style={{ display: "flex", gap: 16, marginBottom: 16, fontSize: 13 }}>
+        <label style={{ fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6, background: oklch ? "rgba(80,180,80,0.1)" : "rgba(0,0,0,0.04)" }}>
+          <input type="checkbox" checked={oklch} onChange={toggleOklch} style={{ width: 16, height: 16 }} />
+          OKLCH Enhanced Colors
+        </label>
+      </div>
       <div style={{ display: "flex", gap: 16, marginBottom: 16, fontSize: 13 }}>
         <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
           <input type="checkbox" checked={edgeFade} onChange={(e) => setEdgeFade(e.target.checked)} />
@@ -396,6 +413,16 @@ export default function LineChartPlayground() {
         </p>
         <div style={cardStyle}>
           <SparklineCard />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>8 Series (Full Categorical Palette)</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          All 8 categorical colors. Click legend items to show/hide series.
+        </p>
+        <div style={cardStyle}>
+          <ManySeriesDemo />
         </div>
       </section>
 
@@ -426,16 +453,6 @@ export default function LineChartPlayground() {
         </p>
         <div style={cardStyle}>
           <IconIndicatorDemo />
-        </div>
-      </section>
-
-      <section style={sectionStyle}>
-        <h2>6 Series (Full Categorical Palette)</h2>
-        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
-          All 6 categorical colors. Click legend items to show/hide series.
-        </p>
-        <div style={cardStyle}>
-          <ManySeriesDemo />
         </div>
       </section>
 

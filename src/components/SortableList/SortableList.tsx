@@ -1,6 +1,7 @@
 import {
   type ReactNode,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -9,6 +10,7 @@ import {
   SortableListContext,
   type SortableListContextValue,
   type DropPosition,
+  type SortBehavior,
 } from "./SortableListContext";
 import styles from "./SortableList.module.css";
 import { cx } from "../../utils/cx";
@@ -21,6 +23,8 @@ export interface SortableListProps {
   total: number;
   /** Gap between items — any CSS length value (default: var(--spacing-sm)) */
   gap?: string;
+  /** "indicator" shows a drop line; "shift" reorders items in real-time */
+  behavior?: SortBehavior;
   children: ReactNode;
   className?: string;
 }
@@ -29,6 +33,7 @@ export function SortableList({
   onReorder,
   total,
   gap = "var(--spacing-sm)",
+  behavior = "indicator",
   children,
   className,
 }: SortableListProps) {
@@ -84,7 +89,7 @@ export function SortableList({
     [onReorder, total, announce],
   );
 
-  /* ── native HTML5 DnD ──────────────────────────────────────────── */
+  /* ── native HTML5 DnD (indicator mode) ─────────────────────────── */
 
   const onDragStart = useCallback(
     (index: number, _handleEl: HTMLElement, e: React.DragEvent) => {
@@ -161,10 +166,182 @@ export function SortableList({
     e.dataTransfer.dropEffect = "move";
   }, []);
 
+  /* ── pointer-based shift mode ──────────────────────────────────── */
+
+  const DRAG_THRESHOLD = 4;
+
+  const itemEls = useRef<Map<number, HTMLElement>>(new Map());
+  const pendingDrag = useRef<{
+    index: number;
+    pointerId: number;
+    startX: number;
+    startY: number;
+  } | null>(null);
+  const shiftState = useRef<{
+    fromIndex: number;
+    startY: number;
+    rects: { index: number; top: number; height: number; midY: number }[];
+    order: number[];
+    gapPx: number;
+  } | null>(null);
+
+  const registerItem = useCallback((index: number, el: HTMLElement | null) => {
+    if (el) itemEls.current.set(index, el);
+    else itemEls.current.delete(index);
+  }, []);
+
+  const computeGapPx = useCallback(() => {
+    const els = itemEls.current;
+    if (els.size < 2) return 0;
+    const sorted = [...els.entries()].sort((a, b) => a[0] - b[0]);
+    const r0 = sorted[0][1].getBoundingClientRect();
+    const r1 = sorted[1][1].getBoundingClientRect();
+    return r1.top - r0.bottom;
+  }, []);
+
+  const applyShiftTransforms = useCallback((
+    order: number[],
+    fromIndex: number,
+    rects: { index: number; top: number; height: number }[],
+    gapPx: number,
+  ) => {
+    const rectByIndex = new Map<number, { top: number; height: number }>();
+    rects.forEach((r) => rectByIndex.set(r.index, r));
+
+    const baseTop = rects[0]?.top ?? 0;
+    let accum = baseTop;
+    const targetTop = new Map<number, number>();
+    for (const idx of order) {
+      targetTop.set(idx, accum);
+      accum += (rectByIndex.get(idx)?.height ?? 0) + gapPx;
+    }
+
+    for (const idx of order) {
+      if (idx === fromIndex) continue;
+      const el = itemEls.current.get(idx);
+      if (!el) continue;
+      const orig = rectByIndex.get(idx)!;
+      const displacement = targetTop.get(idx)! - orig.top;
+      el.style.transform = displacement ? `translateY(${displacement}px)` : "";
+    }
+  }, []);
+
+  const activateDrag = useCallback((index: number, startY: number) => {
+    const el = itemEls.current.get(index);
+    if (!el) return;
+
+    const rects = [...itemEls.current.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([idx, itemEl]) => {
+        const r = itemEl.getBoundingClientRect();
+        return { index: idx, top: r.top, height: r.height, midY: r.top + r.height / 2 };
+      });
+
+    const gapPx = computeGapPx();
+    const order = rects.map((r) => r.index);
+
+    shiftState.current = { fromIndex: index, startY, rects, order, gapPx };
+    setDraggingIndex(index);
+
+    for (const [, itemEl] of itemEls.current) {
+      if (itemEl !== el) {
+        itemEl.style.transition = "transform 200ms ease";
+      }
+    }
+    el.style.transition = "none";
+    el.style.zIndex = "10";
+    el.style.position = "relative";
+  }, [computeGapPx]);
+
+  const onPointerDragStart = useCallback((index: number, e: React.PointerEvent) => {
+    if (behavior !== "shift") return;
+
+    const el = itemEls.current.get(index);
+    if (!el) return;
+
+    pendingDrag.current = {
+      index,
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+    };
+  }, [behavior]);
+
+  useEffect(() => {
+    if (behavior !== "shift") return;
+
+    const handlePointerMove = (e: PointerEvent) => {
+      const pending = pendingDrag.current;
+      if (pending && !shiftState.current) {
+        const dx = e.clientX - pending.startX;
+        const dy = e.clientY - pending.startY;
+        if (Math.abs(dx) < DRAG_THRESHOLD && Math.abs(dy) < DRAG_THRESHOLD) return;
+
+        const el = itemEls.current.get(pending.index);
+        if (el) el.setPointerCapture(pending.pointerId);
+        activateDrag(pending.index, pending.startY);
+      }
+
+      const s = shiftState.current;
+      if (!s) return;
+
+      const deltaY = e.clientY - s.startY;
+      const grabbedEl = itemEls.current.get(s.fromIndex);
+      if (grabbedEl) {
+        grabbedEl.style.transform = `translateY(${deltaY}px)`;
+      }
+
+      const grabbedRect = s.rects.find((r) => r.index === s.fromIndex)!;
+      const grabbedCenter = grabbedRect.midY + deltaY;
+
+      const newOrder: { index: number; center: number }[] = s.rects.map((r) => ({
+        index: r.index,
+        center: r.index === s.fromIndex ? grabbedCenter : r.midY,
+      }));
+      newOrder.sort((a, b) => a.center - b.center);
+      s.order = newOrder.map((o) => o.index);
+
+      applyShiftTransforms(s.order, s.fromIndex, s.rects, s.gapPx);
+    };
+
+    const handlePointerUp = () => {
+      pendingDrag.current = null;
+
+      const s = shiftState.current;
+      if (!s) return;
+
+      const fromIndex = s.fromIndex;
+      const toIndex = s.order.indexOf(fromIndex);
+
+      for (const [, el] of itemEls.current) {
+        el.style.transform = "";
+        el.style.transition = "";
+        el.style.zIndex = "";
+        el.style.position = "";
+      }
+
+      shiftState.current = null;
+      setDraggingIndex(null);
+
+      if (fromIndex !== toIndex) {
+        onReorder(fromIndex, toIndex);
+        announce(`Item moved from position ${fromIndex + 1} to position ${toIndex + 1}`);
+      }
+    };
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [behavior, onReorder, announce, applyShiftTransforms, activateDrag]);
+
   /* ── context value ─────────────────────────────────────────────── */
 
   const ctxValue = useMemo<SortableListContextValue>(
     () => ({
+      behavior,
       total,
       draggingIndex,
       dropTargetIndex,
@@ -177,8 +354,11 @@ export function SortableList({
       onDragOver,
       onDragEnd,
       onDrop,
+      registerItem,
+      onPointerDragStart,
     }),
     [
+      behavior,
       total,
       draggingIndex,
       dropTargetIndex,
@@ -191,6 +371,8 @@ export function SortableList({
       onDragOver,
       onDragEnd,
       onDrop,
+      registerItem,
+      onPointerDragStart,
     ],
   );
 
@@ -201,8 +383,8 @@ export function SortableList({
         aria-roledescription="sortable list"
         className={cx(styles.root, className)}
         style={{ "--sortable-list-gap": gap } as React.CSSProperties}
-        onDragOver={handleContainerDragOver}
-        onDrop={onDrop}
+        onDragOver={behavior === "indicator" ? handleContainerDragOver : undefined}
+        onDrop={behavior === "indicator" ? onDrop : undefined}
       >
         {children}
       </div>

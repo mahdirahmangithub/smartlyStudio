@@ -76,11 +76,14 @@ import FieldsetPlayground from "./pages/FieldsetPlayground";
 import FooterPlayground from "./pages/FooterPlayground";
 import TitleTextPlayground from "./pages/TitleTextPlayground";
 import BodyTextPlayground from "./pages/BodyTextPlayground";
+import BarChartPlayground from "./pages/BarChartPlayground";
 import LineChartPlayground from "./pages/LineChartPlayground";
+import PieChartPlayground from "./pages/PieChartPlayground";
 import LinkPlayground from "./pages/LinkPlayground";
 import TextShowcase from "./pages/TextShowcase";
 import TextareaPlayground from "./pages/TextareaPlayground";
 import DataTablePlayground from "./pages/DataTablePlayground";
+import DataVizColorsPlayground from "./pages/DataVizColorsPlayground";
 import AnimatedIconsPlayground from "./pages/AnimatedIconsPlayground";
 import TypographyPlayground from "./pages/TypographyPlayground";
 import ShimmerPlayground from "./pages/ShimmerPlayground";
@@ -113,13 +116,16 @@ import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
 type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
+| "data-viz-colors"
 | "card"
 | "code-block"
 | "copy-button"
 | "inline-code"
 | "icon-container"
 | "illustration"
+| "bar-chart"
 | "line-chart"
+| "pie-chart"
 | "breadcrumb"
 | "dimmer"
 | "drag-handle"
@@ -296,6 +302,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "animated-icons", label: "AnimatedIcons" },
   { key: "avatar", label: "Avatar" },
   { key: "badge", label: "Badge" },
+  { key: "bar-chart", label: "BarChart" },
   { key: "body-text", label: "BodyText" },
   { key: "breadcrumb", label: "Breadcrumb" },
   { key: "button", label: "Button" },
@@ -313,6 +320,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "currency-thumbnail", label: "CurrencyThumb" },
   { key: "data-cell-content", label: "DataCellContent" },
   { key: "data-table", label: "DataTable" },
+  { key: "data-viz-colors", label: "DataVizColors" },
   { key: "dimmer", label: "Dimmer" },
   { key: "divider", label: "Divider" },
   { key: "drag-handle", label: "DragHandle" },
@@ -362,6 +370,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "option-leading", label: "OptionLeading" },
   { key: "option-separator", label: "OptionSeparator" },
   { key: "option-trailing", label: "OptionTrailing" },
+  { key: "pie-chart", label: "PieChart" },
   { key: "radio", label: "Radio" },
   { key: "row-container", label: "RowContainer" },
   { key: "scroll-fade", label: "ScrollFade" },
@@ -575,11 +584,14 @@ export default function App() {
             {page === "fieldset" && <FieldsetPlayground />}
             {page === "title-text" && <TitleTextPlayground />}
             {page === "body-text" && <BodyTextPlayground />}
+            {page === "bar-chart" && <BarChartPlayground />}
             {page === "line-chart" && <LineChartPlayground />}
+            {page === "pie-chart" && <PieChartPlayground />}
             {page === "link" && <LinkPlayground />}
             {page === "text-showcase" && <TextShowcase />}
             {page === "textarea" && <TextareaPlayground />}
             {page === "data-table" && <DataTablePlayground />}
+            {page === "data-viz-colors" && <DataVizColorsPlayground />}
             {page === "animated-icons" && <AnimatedIconsPlayground />}
             {page === "typography" && <TypographyPlayground />}
             {page === "video-player" && <VideoPlayerPlayground />}
