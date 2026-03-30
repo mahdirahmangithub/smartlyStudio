@@ -110,7 +110,6 @@ function BarChartInner<D>({
   const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set());
   const [hoverCategory, setHoverCategory] = useState<string | null>(null);
   const [hoverSeriesId, setHoverSeriesId] = useState<string | null>(null);
-  const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
   const clipId = useId().replace(/:/g, "");
   const [animateIn, setAnimateIn] = useState(!animate);
 
@@ -163,7 +162,7 @@ function BarChartInner<D>({
     if (variant === "stacked") {
       return categories.map((cat) => {
         let sum = 0;
-        seriesLookups.forEach((lookup, idx) => {
+        seriesLookups.forEach((lookup) => {
           const d = lookup.map.get(cat);
           if (d) sum += yAccessor(d);
         });
