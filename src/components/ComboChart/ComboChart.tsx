@@ -181,7 +181,6 @@ function ComboChartInner<D>({
     [lineSeries, categoryAccessor]
   );
 
-  const innerWidth = width - margin.left - margin.right;
   const innerHeight = height - margin.top - margin.bottom;
 
   const rightMargin = useMemo(
@@ -469,8 +468,6 @@ function ComboChartInner<D>({
       );
     }
   });
-
-  const bandCenter = categoryScale.bandwidth() / 2;
 
   const highlightX = hoverCategory ? (categoryScale(hoverCategory) ?? 0) : 0;
 

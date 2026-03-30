@@ -207,7 +207,6 @@ function BarChartInner<D>({
           setHoverCategory(cat);
 
           const crossPos = isVertical ? my : mx;
-          const bw = categoryScale.bandwidth();
           let foundSeries: string | null = null;
 
           if (variant === "grouped" && groupScale) {

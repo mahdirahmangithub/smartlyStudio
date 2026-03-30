@@ -154,7 +154,7 @@ function PieChartInner({
     data.map((_, i) => ({
       w: targetWeights[i],
       config: TOGGLE_SPRING,
-      onChange: ({ value }: { value: { w: number } }) => {
+      onChange: ({ value }: { value: Record<string, number> }) => {
         weightsRef.current[i] = value.w;
         if (!rafPending.current) {
           rafPending.current = true;
