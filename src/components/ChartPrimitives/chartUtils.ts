@@ -6,6 +6,9 @@ export interface ConfidenceBand<D = any> {
   lower: (d: D) => number;
 }
 
+export type LineDash = "dotted" | "dashed" | "dash-dot";
+export type BarFillPattern = "dotted" | "hatch-right" | "hatch-left";
+
 export interface Series<D = any> {
   id: string;
   label: string;
@@ -17,6 +20,10 @@ export interface Series<D = any> {
   yAxis?: "left" | "right";
   /** Show area gradient fill under this series line. */
   areaFill?: boolean;
+  /** Stroke dash style for line charts. Omit for solid. */
+  dash?: LineDash;
+  /** Fill pattern overlay for bar charts. Omit for solid fill. */
+  fillPattern?: BarFillPattern;
 }
 
 export interface Margin {

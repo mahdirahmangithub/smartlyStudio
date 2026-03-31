@@ -91,6 +91,7 @@ export const ToggleChip = forwardRef<HTMLDivElement, ToggleChipProps>(
         )}
         onClick={handleClick}
         onKeyDown={(e) => {
+          if (e.target !== e.currentTarget) return;
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
             handleClick(e as unknown as MouseEvent<HTMLDivElement>);

@@ -1,13 +1,14 @@
 import { useState, useCallback, useMemo, useRef, useId, useEffect } from "react";
 import { ParentSize } from "@visx/responsive";
 import { Group } from "@visx/group";
+import { scaleLinear } from "@visx/scale";
 import { ChartAxes } from "./ChartAxes";
 import { ChartGrid } from "./ChartGrid";
 import { HoverOverlay } from "./HoverOverlay";
 import { CrosshairLine, CrosshairDots, type CrosshairPoint } from "./Crosshair";
 import { ChartTooltipContent, type TooltipEntry } from "./ChartTooltip";
 import { Tooltip } from "../Tooltip";
-import { ChartLegend } from "./ChartLegend";
+import { ChartLegend, type LegendLayout } from "./ChartLegend";
 import { ChartBrush } from "./ChartBrush";
 import { ChartZoomControls } from "./ChartZoom";
 import {
@@ -20,6 +21,7 @@ import {
   type Margin,
   DEFAULT_MARGIN,
 } from "./chartUtils";
+import { useSeriesAnimation, type DomainTarget } from "../../hooks/useSeriesAnimation";
 import { cx } from "../../utils/cx";
 import styles from "./ChartContainer.module.css";
 
@@ -43,6 +45,8 @@ export interface ChartRenderContext<D = any> {
   visibleSeries: Series<D>[];
   allSeries: Series<D>[];
   hiddenSeries: Set<string>;
+  /** Spring weight (0..1) for a series — use for opacity fading during hide/show. */
+  getWeight: (s: Series<D>) => number;
   tooltipData: TooltipState | null;
   clipId: string;
   animate: boolean;
@@ -61,6 +65,7 @@ export interface ChartContainerProps<D = any> {
   edgeFade?: boolean;
   edgeFadeWidth?: number;
   showLegend?: boolean;
+  legendLayout?: LegendLayout;
   showTooltip?: boolean;
   enableZoom?: boolean;
   enableBrush?: boolean;
@@ -94,6 +99,7 @@ function ChartContainerInner<D>({
   edgeFade = false,
   edgeFadeWidth = 40,
   showLegend = true,
+  legendLayout,
   showTooltip = true,
   enableZoom = false,
   enableBrush = false,
@@ -140,15 +146,30 @@ function ChartContainerInner<D>({
     });
   }, []);
 
-  const visibleSeries = useMemo(
-    () => series.filter((s) => !hiddenSeries.has(s.id)),
-    [series, hiddenSeries]
+  const hasRightAxis = useMemo(
+    () => series.some((s) => s.yAxis === "right"),
+    [series]
   );
 
-  const hasRightAxis = useMemo(
-    () => visibleSeries.some((s) => s.yAxis === "right"),
-    [visibleSeries]
+  const computeDomainValues = useCallback(
+    (targetVisible: Series<D>[], axis: "left" | "right"): DomainTarget | null => {
+      const filtered = targetVisible.filter((s) =>
+        axis === "right" ? s.yAxis === "right" : s.yAxis !== "right",
+      );
+      if (axis === "right" && !hasRightAxis) return null;
+      if (filtered.length === 0 && axis === "right") return null;
+      const values = filtered.flatMap((s) => s.data.map(yAccessor));
+      return { values, includeZero: false, padding: 0.1 };
+    },
+    [hasRightAxis, yAccessor],
   );
+
+  const { getWeight, visibleSeries, renderTick, leftDomain, rightDomain } =
+    useSeriesAnimation<D, Series<D>>({
+      series,
+      hiddenSeries,
+      computeDomainValues,
+    });
 
   const effectiveMargin = useMemo(() => {
     if (!hasRightAxis || margin.right >= 48) return margin;
@@ -161,15 +182,6 @@ function ChartContainerInner<D>({
   const allXValues = useMemo(
     () => visibleSeries.flatMap((s) => s.data.map(xAccessor)),
     [visibleSeries, xAccessor]
-  );
-
-  const leftYValues = useMemo(
-    () => visibleSeries.filter((s) => s.yAxis !== "right").flatMap((s) => s.data.map(yAccessor)),
-    [visibleSeries, yAccessor]
-  );
-  const rightYValues = useMemo(
-    () => visibleSeries.filter((s) => s.yAxis === "right").flatMap((s) => s.data.map(yAccessor)),
-    [visibleSeries, yAccessor]
   );
 
   const fullXExtent = useMemo(() => {
@@ -196,15 +208,17 @@ function ChartContainerInner<D>({
     return buildLinearScale(allXValues as number[], innerWidth, true);
   }, [allXValues, innerWidth, brushDomain]);
 
-  const baseYScale = useMemo(
-    () => buildLinearScale(leftYValues.length > 0 ? leftYValues : rightYValues, innerHeight),
-    [leftYValues, rightYValues, innerHeight]
-  );
+  const baseYScale = useMemo(() => {
+    const dom = leftDomain ?? rightDomain ?? [0, 1];
+    return scaleLinear<number>({ domain: dom, range: [innerHeight, 0] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [innerHeight, renderTick]);
 
-  const baseYRightScale = useMemo(
-    () => rightYValues.length > 0 ? buildLinearScale(rightYValues, innerHeight) : null,
-    [rightYValues, innerHeight]
-  );
+  const baseYRightScale = useMemo(() => {
+    if (!rightDomain) return null;
+    return scaleLinear<number>({ domain: rightDomain, range: [innerHeight, 0] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [innerHeight, renderTick]);
 
   const xScale = useMemo(() => {
     if (!zoomState) return baseXScale;
@@ -262,7 +276,7 @@ function ChartContainerInner<D>({
       const yPos = scale(yVal) ?? 0;
       const fmt = s.yAxis === "right" && tooltipYRightFormat ? tooltipYRightFormat : tooltipYFormat;
       const fmtY = fmt ? fmt(yVal) : yVal.toLocaleString();
-      entries.push({ label: s.label, value: fmtY, color, axis: s.yAxis ?? "left" });
+      entries.push({ label: s.label, value: fmtY, color, axis: s.yAxis ?? "left", dash: s.dash });
       points.push({ x: xPos, y: yPos, color, icon: s.icon });
     }
 
@@ -340,6 +354,7 @@ function ChartContainerInner<D>({
     visibleSeries,
     allSeries: series,
     hiddenSeries,
+    getWeight,
     tooltipData,
     clipId,
     animate,
@@ -563,6 +578,7 @@ function ChartContainerInner<D>({
             series={series}
             hiddenSeries={hiddenSeries}
             onToggle={toggleSeries}
+            layout={legendLayout}
           />
         )}
       </div>

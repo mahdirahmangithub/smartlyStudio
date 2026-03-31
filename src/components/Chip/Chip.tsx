@@ -16,6 +16,7 @@ export interface ChipProps extends HTMLAttributes<HTMLDivElement> {
   leadingIcon?: ReactNode;
   "aria-label"?: string;
   onRemove?: () => void;
+  removeTooltip?: string;
   disabled?: boolean;
 }
 
@@ -35,6 +36,7 @@ export const Chip = forwardRef<HTMLDivElement, ChipProps>(
       leadingIcon,
       "aria-label": ariaLabel,
       onRemove,
+      removeTooltip,
       disabled = false,
       children,
       className,
@@ -49,6 +51,7 @@ export const Chip = forwardRef<HTMLDivElement, ChipProps>(
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+      if (e.target !== e.currentTarget) return;
       if (onClick && (e.key === "Enter" || e.key === " ")) {
         e.preventDefault();
         onClick(e as unknown as MouseEvent<HTMLDivElement>);
@@ -86,14 +89,27 @@ export const Chip = forwardRef<HTMLDivElement, ChipProps>(
 
         {onRemove && (
           <span className={styles.clearSlot}>
-            <InputClear
-              size={INPUT_CLEAR_SIZE[size]}
-              variant={variant}
-              round
-              onClick={handleRemoveClick}
-              disabled={disabled}
-              aria-label="Remove"
-            />
+            {removeTooltip ? (
+              <Tooltip type="inverse" label={removeTooltip} placement="top" showTail={false}>
+                <InputClear
+                  size={INPUT_CLEAR_SIZE[size]}
+                  variant={variant}
+                  round
+                  onClick={handleRemoveClick}
+                  disabled={disabled}
+                  aria-label={removeTooltip}
+                />
+              </Tooltip>
+            ) : (
+              <InputClear
+                size={INPUT_CLEAR_SIZE[size]}
+                variant={variant}
+                round
+                onClick={handleRemoveClick}
+                disabled={disabled}
+                aria-label="Remove"
+              />
+            )}
           </span>
         )}
       </div>

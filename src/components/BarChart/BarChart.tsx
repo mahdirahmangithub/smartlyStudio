@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useId, useEffect } from "react";
 import { ParentSize } from "@visx/responsive";
 import { Group } from "@visx/group";
-import { scaleBand } from "@visx/scale";
+import { scaleLinear } from "@visx/scale";
 import { ChartAxes } from "../ChartPrimitives/ChartAxes";
 import { ChartGrid } from "../ChartPrimitives/ChartGrid";
 import { ChartLegend } from "../ChartPrimitives/ChartLegend";
@@ -9,12 +9,13 @@ import { ChartTooltipContent, type TooltipEntry } from "../ChartPrimitives/Chart
 import { Tooltip } from "../Tooltip";
 import {
   buildBandScale,
-  buildLinearScaleForBars,
   getSeriesColor,
   type Series,
   type Margin,
+  type BarFillPattern,
   DEFAULT_MARGIN,
 } from "../ChartPrimitives";
+import { useSeriesAnimation, type DomainTarget } from "../../hooks/useSeriesAnimation";
 import { cx } from "../../utils/cx";
 import styles from "../ChartPrimitives/ChartContainer.module.css";
 
@@ -39,6 +40,76 @@ function roundedRectPath(
     tl ? `A${tl},${tl} 0 0 1 ${x + tl},${y}` : `L${x},${y}`,
     "Z",
   ].join("");
+}
+
+function computeGroupLayout(
+  bandStart: number,
+  bandWidth: number,
+  weights: number[],
+  padding: number,
+): { pos: number; size: number }[] {
+  const total = weights.reduce((a, b) => a + b, 0);
+  if (total === 0) return weights.map(() => ({ pos: bandStart, size: 0 }));
+  const result: { pos: number; size: number }[] = [];
+  let cursor = bandStart;
+  for (let i = 0; i < weights.length; i++) {
+    const slotWidth = (weights[i] / total) * bandWidth;
+    const barSize = slotWidth * (1 - padding);
+    const pad = slotWidth * padding / 2;
+    result.push({ pos: cursor + pad, size: barSize });
+    cursor += slotWidth;
+  }
+  return result;
+}
+
+const FILL_PATTERN_DEFS: Record<BarFillPattern, string> = {
+  dotted: "bar-pat-dotted",
+  "hatch-right": "bar-pat-hatch-right",
+  "hatch-left": "bar-pat-hatch-left",
+};
+
+function FillPatternDefs({ prefix }: { prefix: string }) {
+  return (
+    <>
+      <pattern
+        id={`${prefix}-bar-pat-dotted`}
+        x={0}
+        y={0}
+        width={4}
+        height={4}
+        patternUnits="userSpaceOnUse"
+        patternContentUnits="userSpaceOnUse"
+      >
+        <circle cx={2} cy={2} r={0.9} fill="var(--util-subtle-inverse-strongest)" />
+      </pattern>
+      <pattern
+        id={`${prefix}-bar-pat-hatch-right`}
+        patternUnits="userSpaceOnUse"
+        width={2}
+        height={6}
+        patternTransform="rotate(-45 2 2)"
+      >
+        <path d="M -1,2 l 6,0" stroke="var(--util-subtle-inverse-strongest)" strokeWidth={1} />
+      </pattern>
+      <pattern
+        id={`${prefix}-bar-pat-hatch-left`}
+        patternUnits="userSpaceOnUse"
+        width={2}
+        height={6}
+        patternTransform="rotate(45 2 2)"
+      >
+        <path d="M -1,2 l 6,0" stroke="var(--util-subtle-inverse-strongest)" strokeWidth={1} />
+      </pattern>
+    </>
+  );
+}
+
+function getPatternFill(
+  pattern: BarFillPattern | undefined,
+  prefix: string,
+): string | undefined {
+  if (!pattern) return undefined;
+  return `url(#${prefix}-${FILL_PATTERN_DEFS[pattern]})`;
 }
 
 export type BarVariant = "simple" | "grouped" | "stacked";
@@ -130,15 +201,41 @@ function BarChartInner<D>({
     });
   }, []);
 
-  const visibleSeries = useMemo(
-    () => series.filter((s) => !hiddenSeries.has(s.id)),
-    [series, hiddenSeries]
-  );
-
   const categories = useMemo(
     () => (series[0]?.data.map(categoryAccessor) ?? []),
     [series, categoryAccessor]
   );
+
+  const computeDomainValues = useCallback(
+    (targetVisible: Series<D>[], axis: "left" | "right"): DomainTarget | null => {
+      if (axis === "right") return null;
+      let values: number[];
+      if (variant === "stacked") {
+        const lookups = targetVisible.map((s) => {
+          const m = new Map<string, D>();
+          s.data.forEach((d) => m.set(categoryAccessor(d), d));
+          return m;
+        });
+        values = categories.map((cat) => {
+          let sum = 0;
+          lookups.forEach((m) => { const d = m.get(cat); if (d) sum += yAccessor(d); });
+          return sum;
+        });
+      } else {
+        values = targetVisible.flatMap((s) => s.data.map(yAccessor));
+      }
+      return { values, includeZero: true };
+    },
+    [variant, categories, categoryAccessor, yAccessor],
+  );
+
+  const { getWeight, visibleSeries, renderTick, leftDomain } = useSeriesAnimation({
+    series,
+    hiddenSeries,
+    computeDomainValues,
+  });
+
+  // ── Derived data ──
 
   const seriesLookups = useMemo<CategoryLookup<D>[]>(
     () =>
@@ -158,33 +255,14 @@ function BarChartInner<D>({
     [categories, isVertical ? innerWidth : innerHeight, barPadding]
   );
 
-  const allValues = useMemo(() => {
-    if (variant === "stacked") {
-      return categories.map((cat) => {
-        let sum = 0;
-        seriesLookups.forEach((lookup) => {
-          const d = lookup.map.get(cat);
-          if (d) sum += yAccessor(d);
-        });
-        return sum;
-      });
-    }
-    return visibleSeries.flatMap((s) => s.data.map(yAccessor));
-  }, [variant, categories, seriesLookups, visibleSeries, yAccessor]);
+  const valueScale = useMemo(() => {
+    const [lo, hi] = leftDomain ?? [0, 1];
+    const range: [number, number] = isVertical ? [innerHeight, 0] : [0, innerWidth];
+    return scaleLinear<number>({ domain: [lo, hi], range });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVertical, innerHeight, innerWidth, renderTick]);
 
-  const valueScale = useMemo(
-    () => buildLinearScaleForBars(allValues, isVertical ? innerHeight : innerWidth, true, isVertical),
-    [allValues, isVertical, innerHeight, innerWidth]
-  );
-
-  const groupScale = useMemo(() => {
-    if (variant !== "grouped" || visibleSeries.length <= 1) return null;
-    return scaleBand<string>({
-      domain: visibleSeries.map((s) => s.id),
-      range: [0, categoryScale.bandwidth()],
-      padding: groupPadding,
-    });
-  }, [variant, visibleSeries, categoryScale, groupPadding]);
+  // ── Mouse interaction ──
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<SVGRectElement>) => {
@@ -207,25 +285,27 @@ function BarChartInner<D>({
           const crossPos = isVertical ? my : mx;
           let foundSeries: string | null = null;
 
-          if (variant === "grouped" && groupScale) {
-            for (const s of visibleSeries) {
-              const lookup = seriesLookups[visibleSeries.indexOf(s)];
-              const d = lookup?.map.get(cat);
+          if (variant === "grouped" && visibleSeries.length > 0) {
+            const bw = categoryScale.bandwidth();
+            const gw = visibleSeries.map((s) => getWeight(s));
+            const layout = computeGroupLayout(bandStart, bw, gw, groupPadding);
+            for (let si = 0; si < visibleSeries.length; si++) {
+              const s = visibleSeries[si];
+              const d = seriesLookups[si]?.map.get(cat);
               if (!d) continue;
-              const val = yAccessor(d);
-              const barStart = bandStart + (groupScale(s.id) ?? 0);
-              const barEnd = barStart + groupScale.bandwidth();
+              const val = yAccessor(d) * gw[si];
+              const { pos, size } = layout[si];
               if (isVertical) {
                 const barTop = Math.min(valueScale(val) ?? 0, valueScale(0) ?? 0);
                 const barBottom = Math.max(valueScale(val) ?? 0, valueScale(0) ?? 0);
-                if (mx >= barStart && mx <= barEnd && my >= barTop && my <= barBottom) {
+                if (mx >= pos && mx <= pos + size && my >= barTop && my <= barBottom) {
                   foundSeries = s.id;
                   break;
                 }
               } else {
                 const barLeft = Math.min(valueScale(val) ?? 0, valueScale(0) ?? 0);
                 const barRight = Math.max(valueScale(val) ?? 0, valueScale(0) ?? 0);
-                if (my >= barStart && my <= barEnd && mx >= barLeft && mx <= barRight) {
+                if (my >= pos && my <= pos + size && mx >= barLeft && mx <= barRight) {
                   foundSeries = s.id;
                   break;
                 }
@@ -233,9 +313,9 @@ function BarChartInner<D>({
             }
           } else if (variant === "stacked") {
             let cumulative = 0;
-            for (const s of visibleSeries) {
-              const lookup = seriesLookups[visibleSeries.indexOf(s)];
-              const d = lookup?.map.get(cat);
+            for (let si = 0; si < visibleSeries.length; si++) {
+              const s = visibleSeries[si];
+              const d = seriesLookups[si]?.map.get(cat);
               if (!d) continue;
               const val = yAccessor(d);
               const y0 = cumulative;
@@ -260,8 +340,7 @@ function BarChartInner<D>({
           } else {
             if (visibleSeries.length === 1) {
               const s = visibleSeries[0];
-              const lookup = seriesLookups[0];
-              const d = lookup?.map.get(cat);
+              const d = seriesLookups[0]?.map.get(cat);
               if (d) {
                 const val = yAccessor(d);
                 if (isVertical) {
@@ -291,7 +370,7 @@ function BarChartInner<D>({
         setHoverSeriesId(null);
       }
     },
-    [isVertical, categoryScale, categories, barPadding, variant, groupScale, visibleSeries, seriesLookups, yAccessor, valueScale]
+    [isVertical, categoryScale, categories, barPadding, groupPadding, variant, visibleSeries, seriesLookups, yAccessor, valueScale, getWeight]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -306,12 +385,11 @@ function BarChartInner<D>({
     visibleSeries.forEach((s, i) => {
       const globalIdx = series.indexOf(s);
       const color = getSeriesColor(globalIdx, s.color);
-      const lookup = seriesLookups[i];
-      const d = lookup.map.get(hoverCategory);
+      const d = seriesLookups[i]?.map.get(hoverCategory);
       if (!d) return;
       const val = yAccessor(d);
       const fmt = tooltipValueFormat ? tooltipValueFormat(val) : val.toLocaleString();
-      entries.push({ label: s.label, value: fmt, color });
+      entries.push({ label: s.label, value: fmt, color, fillPattern: s.fillPattern });
     });
 
     const header = tooltipCategoryFormat
@@ -322,6 +400,8 @@ function BarChartInner<D>({
   }, [hoverCategory, showTooltip, visibleSeries, series, seriesLookups, yAccessor, tooltipValueFormat, tooltipCategoryFormat]);
 
   if (innerWidth <= 0 || innerHeight <= 0) return null;
+
+  // ── Bar rendering ──
 
   const xScale = isVertical ? categoryScale : valueScale;
   const yScale = isVertical ? valueScale : categoryScale;
@@ -366,6 +446,10 @@ function BarChartInner<D>({
 
   const bars: React.ReactNode[] = [];
 
+  const groupWeights = variant === "grouped"
+    ? visibleSeries.map((s) => getWeight(s))
+    : null;
+
   categories.forEach((cat, catIdx) => {
     const isCatHovered = hoverCategory === cat;
 
@@ -374,10 +458,9 @@ function BarChartInner<D>({
       visibleSeries.forEach((s, si) => {
         const globalIdx = series.indexOf(s);
         const color = getSeriesColor(globalIdx, s.color);
-        const lookup = seriesLookups[si];
-        const d = lookup.map.get(cat);
+        const d = seriesLookups[si]?.map.get(cat);
         if (!d) return;
-        const val = yAccessor(d);
+        const val = yAccessor(d) * getWeight(s);
         const y0 = cumValue;
         const y1 = cumValue + val;
         cumValue = y1;
@@ -394,67 +477,90 @@ function BarChartInner<D>({
           const top = valueScale(y1) ?? 0;
           const bottom = valueScale(y0) ?? 0;
           const h = Math.max(0, bottom - top);
+          const pathD = roundedRectPath(x, top, bw, h, barRadius, { tl: rEnd > 0, tr: rEnd > 0, bl: rBase > 0, br: rBase > 0 });
           bars.push(
             <path
               key={`${s.id}-${cat}`}
-              d={roundedRectPath(x, top, bw, h, barRadius, { tl: rEnd > 0, tr: rEnd > 0, bl: rBase > 0, br: rBase > 0 })}
+              d={pathD}
               fill={color}
+              stroke="var(--element-surface-default)"
+              strokeWidth={4}
+              paintOrder="stroke"
               style={style}
             />
           );
+          const pFill = getPatternFill(s.fillPattern, clipId);
+          if (pFill) {
+            bars.push(
+              <path key={`${s.id}-${cat}-pat`} d={pathD} fill={pFill} style={style} />
+            );
+          }
         } else {
           const y = categoryScale(cat) ?? 0;
           const bw = categoryScale.bandwidth();
           const x0 = valueScale(y0) ?? 0;
           const x1 = valueScale(y1) ?? 0;
           const w = Math.max(0, x1 - x0);
+          const pathD = roundedRectPath(x0, y, w, bw, barRadius, { tr: rEnd > 0, br: rEnd > 0, tl: rBase > 0, bl: rBase > 0 });
           bars.push(
             <path
               key={`${s.id}-${cat}`}
-              d={roundedRectPath(x0, y, w, bw, barRadius, { tr: rEnd > 0, br: rEnd > 0, tl: rBase > 0, bl: rBase > 0 })}
+              d={pathD}
               fill={color}
+              stroke="var(--element-surface-default)"
+              strokeWidth={4}
+              paintOrder="stroke"
               style={style}
             />
           );
+          const pFill = getPatternFill(s.fillPattern, clipId);
+          if (pFill) {
+            bars.push(
+              <path key={`${s.id}-${cat}-pat`} d={pathD} fill={pFill} style={style} />
+            );
+          }
         }
       });
-    } else if (variant === "grouped" && groupScale) {
+    } else if (variant === "grouped" && groupWeights) {
+      const catStart = categoryScale(cat) ?? 0;
+      const layout = computeGroupLayout(catStart, categoryScale.bandwidth(), groupWeights, groupPadding);
+
       visibleSeries.forEach((s, si) => {
         const globalIdx = series.indexOf(s);
         const color = getSeriesColor(globalIdx, s.color);
-        const lookup = seriesLookups[si];
-        const d = lookup.map.get(cat);
+        const d = seriesLookups[si]?.map.get(cat);
         if (!d) return;
-        const val = yAccessor(d);
+        const val = yAccessor(d) * groupWeights[si];
         const style = getBarStyle(catIdx, isCatHovered, s.id);
         const allCorners = roundBase;
+        const { pos, size } = layout[si];
 
         if (isVertical) {
-          const x = (categoryScale(cat) ?? 0) + (groupScale(s.id) ?? 0);
-          const bw = groupScale.bandwidth();
           const barY = val >= 0 ? (valueScale(val) ?? 0) : zeroPos;
           const barH = Math.abs((valueScale(val) ?? 0) - zeroPos);
+          const pathD = roundedRectPath(pos, barY, size, barH, barRadius, { tl: true, tr: true, bl: allCorners, br: allCorners });
           bars.push(
-            <path
-              key={`${s.id}-${cat}`}
-              d={roundedRectPath(x, barY, bw, barH, barRadius, { tl: true, tr: true, bl: allCorners, br: allCorners })}
-              fill={color}
-              style={style}
-            />
+            <path key={`${s.id}-${cat}`} d={pathD} fill={color} style={style} />
           );
+          const pFill = getPatternFill(s.fillPattern, clipId);
+          if (pFill) {
+            bars.push(
+              <path key={`${s.id}-${cat}-pat`} d={pathD} fill={pFill} style={style} />
+            );
+          }
         } else {
-          const y = (categoryScale(cat) ?? 0) + (groupScale(s.id) ?? 0);
-          const bw = groupScale.bandwidth();
           const barX = val >= 0 ? zeroPos : (valueScale(val) ?? 0);
           const barW = Math.abs((valueScale(val) ?? 0) - zeroPos);
+          const pathD = roundedRectPath(barX, pos, barW, size, barRadius, { tr: true, br: true, tl: allCorners, bl: allCorners });
           bars.push(
-            <path
-              key={`${s.id}-${cat}`}
-              d={roundedRectPath(barX, y, barW, bw, barRadius, { tr: true, br: true, tl: allCorners, bl: allCorners })}
-              fill={color}
-              style={style}
-            />
+            <path key={`${s.id}-${cat}`} d={pathD} fill={color} style={style} />
           );
+          const pFill = getPatternFill(s.fillPattern, clipId);
+          if (pFill) {
+            bars.push(
+              <path key={`${s.id}-${cat}-pat`} d={pathD} fill={pFill} style={style} />
+            );
+          }
         }
       });
     } else {
@@ -462,10 +568,9 @@ function BarChartInner<D>({
       if (!s) return;
       const globalIdx = series.indexOf(s);
       const color = getSeriesColor(globalIdx, s.color);
-      const lookup = seriesLookups[0];
-      const d = lookup?.map.get(cat);
+      const d = seriesLookups[0]?.map.get(cat);
       if (!d) return;
-      const val = yAccessor(d);
+      const val = yAccessor(d) * getWeight(s);
       const style = getBarStyle(catIdx, isCatHovered, s.id);
       const allCorners = roundBase;
 
@@ -474,27 +579,31 @@ function BarChartInner<D>({
         const bw = categoryScale.bandwidth();
         const barY = val >= 0 ? (valueScale(val) ?? 0) : zeroPos;
         const barH = Math.abs((valueScale(val) ?? 0) - zeroPos);
+        const pathD = roundedRectPath(x, barY, bw, barH, barRadius, { tl: true, tr: true, bl: allCorners, br: allCorners });
         bars.push(
-          <path
-            key={`${s.id}-${cat}`}
-            d={roundedRectPath(x, barY, bw, barH, barRadius, { tl: true, tr: true, bl: allCorners, br: allCorners })}
-            fill={color}
-            style={style}
-          />
+          <path key={`${s.id}-${cat}`} d={pathD} fill={color} style={style} />
         );
+        const pFill = getPatternFill(s.fillPattern, clipId);
+        if (pFill) {
+          bars.push(
+            <path key={`${s.id}-${cat}-pat`} d={pathD} fill={pFill} style={style} />
+          );
+        }
       } else {
         const y = categoryScale(cat) ?? 0;
         const bw = categoryScale.bandwidth();
         const barX = val >= 0 ? zeroPos : (valueScale(val) ?? 0);
         const barW = Math.abs((valueScale(val) ?? 0) - zeroPos);
+        const pathD = roundedRectPath(barX, y, barW, bw, barRadius, { tr: true, br: true, tl: allCorners, bl: allCorners });
         bars.push(
-          <path
-            key={`${s.id}-${cat}`}
-            d={roundedRectPath(barX, y, barW, bw, barRadius, { tr: true, br: true, tl: allCorners, bl: allCorners })}
-            fill={color}
-            style={style}
-          />
+          <path key={`${s.id}-${cat}`} d={pathD} fill={color} style={style} />
         );
+        const pFill = getPatternFill(s.fillPattern, clipId);
+        if (pFill) {
+          bars.push(
+            <path key={`${s.id}-${cat}-pat`} d={pathD} fill={pFill} style={style} />
+          );
+        }
       }
     }
   });
@@ -544,6 +653,7 @@ function BarChartInner<D>({
               <clipPath id={clipId}>
                 <rect x={0} y={0} width={innerWidth} height={innerHeight} />
               </clipPath>
+              <FillPatternDefs prefix={clipId} />
             </defs>
 
             <g clipPath={`url(#${clipId})`}>

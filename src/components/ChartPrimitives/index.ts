@@ -11,7 +11,7 @@ export { ChartBrush } from "./ChartBrush";
 export type { ChartBrushProps } from "./ChartBrush";
 
 export { ChartLegend } from "./ChartLegend";
-export type { ChartLegendProps } from "./ChartLegend";
+export type { ChartLegendProps, LegendLayout } from "./ChartLegend";
 
 export { ChartZoomControls } from "./ChartZoom";
 export type { ChartZoomControlsProps } from "./ChartZoom";
@@ -39,7 +39,7 @@ export {
   DEFAULT_MARGIN,
   CATEGORICAL_TOKENS,
 } from "./chartUtils";
-export type { Series, Margin, ConfidenceBand } from "./chartUtils";
+export type { Series, Margin, ConfidenceBand, LineDash, BarFillPattern } from "./chartUtils";
 
 export {
   getCategoricalPalette,

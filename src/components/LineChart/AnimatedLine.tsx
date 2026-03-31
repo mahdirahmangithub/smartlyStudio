@@ -1,7 +1,8 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useId } from "react";
 import { LinePath } from "@visx/shape";
 import { useSpring, animated } from "@react-spring/web";
 import type { CurveFactory } from "d3-shape";
+import type { LineDash } from "../ChartPrimitives/chartUtils";
 
 /** Matches --motion-easing-enter: cubic-bezier(0, 0, 0.2, 1) */
 const EASING_ENTER = cubicBezier(0, 0, 0.2, 1);
@@ -28,6 +29,12 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
   };
 }
 
+export const DASH_PATTERNS: Record<LineDash, string> = {
+  dotted: "0 6",
+  dashed: "8 8",
+  "dash-dot": "12 6 0.5 6",
+};
+
 export interface AnimatedLineProps<D> {
   data: D[];
   xAccessor: (d: D) => number;
@@ -38,6 +45,7 @@ export interface AnimatedLineProps<D> {
   curve?: CurveFactory;
   animate?: boolean;
   delay?: number;
+  dashStyle?: LineDash;
 }
 
 export function AnimatedLine<D>({
@@ -50,10 +58,12 @@ export function AnimatedLine<D>({
   curve,
   animate = true,
   delay = 0,
+  dashStyle,
 }: AnimatedLineProps<D>) {
   const pathRef = useRef<SVGPathElement>(null);
   const [length, setLength] = useState(0);
   const [ready, setReady] = useState(false);
+  const maskId = useId();
 
   useEffect(() => {
     if (pathRef.current) {
@@ -71,30 +81,64 @@ export function AnimatedLine<D>({
     immediate: !animate || !ready,
   });
 
+  const dashPattern = dashStyle ? DASH_PATTERNS[dashStyle] : undefined;
+  const useDrawAnimation = animate && length > 0;
+  const useMask = useDrawAnimation && !!dashPattern;
+
+  const transitionStyle = {
+    transition:
+      "stroke 200ms var(--animation-state-change-easing), opacity 200ms var(--animation-state-change-easing), stroke-width 200ms var(--animation-state-change-easing)",
+  };
+
   return (
     <LinePath data={data} x={xAccessor} y={yAccessor} curve={curve}>
       {({ path }) => {
         const d = path(data) ?? "";
         return (
-          <animated.path
-            ref={pathRef}
-            d={d}
-            fill="none"
-            stroke={color}
-            strokeWidth={strokeWidth}
-            opacity={opacity}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            style={{
-              transition: "stroke 200ms var(--animation-state-change-easing), opacity 200ms var(--animation-state-change-easing), stroke-width 200ms var(--animation-state-change-easing)",
-            }}
-            strokeDasharray={animate && length > 0 ? length : undefined}
-            strokeDashoffset={
-              animate && length > 0
-                ? spring.progress.to((p) => length * (1 - p))
-                : undefined
-            }
-          />
+          <>
+            {useMask && (
+              <defs>
+                <mask id={maskId}>
+                  <animated.path
+                    d={d}
+                    fill="none"
+                    stroke="white"
+                    strokeWidth={strokeWidth + 8}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeDasharray={length}
+                    strokeDashoffset={spring.progress.to(
+                      (p) => length * (1 - p),
+                    )}
+                  />
+                </mask>
+              </defs>
+            )}
+            <animated.path
+              ref={pathRef}
+              d={d}
+              fill="none"
+              stroke={color}
+              strokeWidth={strokeWidth}
+              opacity={opacity}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              style={transitionStyle}
+              strokeDasharray={
+                useMask
+                  ? dashPattern
+                  : useDrawAnimation
+                    ? length
+                    : dashPattern
+              }
+              strokeDashoffset={
+                useDrawAnimation && !useMask
+                  ? spring.progress.to((p) => length * (1 - p))
+                  : undefined
+              }
+              mask={useMask ? `url(#${maskId})` : undefined}
+            />
+          </>
         );
       }}
     </LinePath>

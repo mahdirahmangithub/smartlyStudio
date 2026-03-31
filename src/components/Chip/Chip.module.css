@@ -29,20 +29,20 @@
 
 .sm {
   min-height: var(--spacing-xl);
-  padding: 0 var(--spacing-xs);
+  padding: 0 calc(var(--spacing-xs) - var(--spacing-px));
   gap: var(--spacing-none);
   --focus-ring: inset 0 0 0 2px var(--element-outline-neutral-default);
 }
 
 .md {
   min-height: var(--spacing-2xl);
-  padding: 0 var(--spacing-sm);
+  padding: 0 calc(var(--spacing-sm) - var(--spacing-px));
   gap: var(--spacing-xs);
 }
 
 .lg {
   min-height: var(--spacing-4xl);
-  padding: 0 var(--spacing-sm-plus);
+  padding: 0 calc(var(--spacing-sm-plus) - var(--spacing-px));
   gap: var(--spacing-2xs);
 }
 

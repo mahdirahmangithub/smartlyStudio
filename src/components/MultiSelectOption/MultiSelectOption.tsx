@@ -13,6 +13,7 @@ import { cx } from "../../utils/cx";
 export interface MultiSelectOptionProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
   checked?: boolean;
+  indeterminate?: boolean;
   disabled?: boolean;
   labelText?: string;
   description?: boolean;
@@ -27,6 +28,7 @@ export interface MultiSelectOptionProps
 
 export function MultiSelectOption({
   checked = false,
+  indeterminate = false,
   disabled = false,
   labelText = "Label",
   description = true,
@@ -68,6 +70,7 @@ export function MultiSelectOption({
       >
         <Checkbox
           checked={checked}
+          indeterminate={indeterminate}
           disabled={disabled}
           size="sm"
           aria-label={labelText}

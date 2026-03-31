@@ -51,6 +51,7 @@ function LineChartContent<D>({
     yAccessor,
     visibleSeries,
     allSeries,
+    getWeight,
     tooltipData,
     clipId,
     animate,
@@ -113,17 +114,19 @@ function LineChartContent<D>({
             const idx = getIdx(s);
             const gradientId = `${clipId}-grad-${idx}`;
             const scale = s.yAxis === "right" && yRightScale ? yRightScale : yScale;
+            const w = getWeight(s);
             return (
-              <AreaClosed
-                key={`area-${s.id}`}
-                data={s.data}
-                x={(d) => xScale(xAccessor(d)) ?? 0}
-                y={(d) => scale(yAccessor(d)) ?? 0}
-                yScale={scale}
-                curve={curve}
-                fill={`url(#${gradientId})`}
-                strokeWidth={0}
-              />
+              <g key={`area-${s.id}`} style={{ opacity: w }}>
+                <AreaClosed
+                  data={s.data}
+                  x={(d) => xScale(xAccessor(d)) ?? 0}
+                  y={(d) => scale(yAccessor(d)) ?? 0}
+                  yScale={scale}
+                  curve={curve}
+                  fill={`url(#${gradientId})`}
+                  strokeWidth={0}
+                />
+              </g>
             );
           })}
         </g>
@@ -135,17 +138,19 @@ function LineChartContent<D>({
         const idx = getIdx(s);
         const color = getSeriesColor(idx, s.color);
         const scale = s.yAxis === "right" && yRightScale ? yRightScale : yScale;
+        const w = getWeight(s);
         return (
-          <ConfidenceBandArea
-            key={`band-${s.id}`}
-            data={s.data}
-            xAccessor={(d) => xScale(xAccessor(d)) ?? 0}
-            y0Accessor={(d) => scale(band.lower(d)) ?? 0}
-            y1Accessor={(d) => scale(band.upper(d)) ?? 0}
-            color={color}
-            curve={curve}
-            yScale={scale}
-          />
+          <g key={`band-${s.id}`} style={{ opacity: w }}>
+            <ConfidenceBandArea
+              data={s.data}
+              xAccessor={(d) => xScale(xAccessor(d)) ?? 0}
+              y0Accessor={(d) => scale(band.lower(d)) ?? 0}
+              y1Accessor={(d) => scale(band.upper(d)) ?? 0}
+              color={color}
+              curve={curve}
+              yScale={scale}
+            />
+          </g>
         );
       })}
 
@@ -158,7 +163,8 @@ function LineChartContent<D>({
           tooltipData.hoveredSeriesIndex >= 0;
         const isThisHovered =
           isHovering && tooltipData!.hoveredSeriesIndex === i;
-        const opacity = isHovering && !isThisHovered ? 0.24 : 1;
+        const hoverOpacity = isHovering && !isThisHovered ? 0.24 : 1;
+        const w = getWeight(s);
         const scale = s.yAxis === "right" && yRightScale ? yRightScale : yScale;
 
         return (
@@ -169,10 +175,11 @@ function LineChartContent<D>({
             yAccessor={(d) => scale(yAccessor(d)) ?? 0}
             color={baseColor}
             strokeWidth={isThisHovered ? 2.5 : 2}
-            opacity={opacity}
+            opacity={hoverOpacity * w}
             curve={curve}
             animate={animate && !isZoomed}
             delay={i * 150}
+            dashStyle={s.dash}
           />
         );
       })}

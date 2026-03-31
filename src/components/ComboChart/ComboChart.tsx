@@ -1,8 +1,8 @@
 import { useState, useCallback, useMemo, useId, useEffect } from "react";
 import { ParentSize } from "@visx/responsive";
 import { Group } from "@visx/group";
-import { scaleBand } from "@visx/scale";
 import { curveMonotoneX } from "@visx/curve";
+import { scaleLinear } from "@visx/scale";
 import type { CurveFactory } from "d3-shape";
 import { AnimatedLine } from "../LineChart/AnimatedLine";
 import { ChartAxes } from "../ChartPrimitives/ChartAxes";
@@ -13,14 +13,34 @@ import { ChartTooltipContent, type TooltipEntry } from "../ChartPrimitives/Chart
 import { Tooltip } from "../Tooltip";
 import {
   buildBandScale,
-  buildLinearScaleForBars,
   getSeriesColor,
   type Series,
   type Margin,
   DEFAULT_MARGIN,
 } from "../ChartPrimitives";
+import { useSeriesAnimation, type DomainTarget } from "../../hooks/useSeriesAnimation";
 import { cx } from "../../utils/cx";
 import styles from "../ChartPrimitives/ChartContainer.module.css";
+
+function computeGroupLayout(
+  bandStart: number,
+  bandWidth: number,
+  weights: number[],
+  padding: number,
+): { pos: number; size: number }[] {
+  const total = weights.reduce((a, b) => a + b, 0);
+  if (total === 0) return weights.map(() => ({ pos: bandStart, size: 0 }));
+  const result: { pos: number; size: number }[] = [];
+  let cursor = bandStart;
+  for (let i = 0; i < weights.length; i++) {
+    const slotWidth = (weights[i] / total) * bandWidth;
+    const barSize = slotWidth * (1 - padding);
+    const pad = slotWidth * padding / 2;
+    result.push({ pos: cursor + pad, size: barSize });
+    cursor += slotWidth;
+  }
+  return result;
+}
 
 function roundedRectPath(
   x: number, y: number, w: number, h: number, r: number,
@@ -146,20 +166,51 @@ function ComboChartInner<D>({
     });
   }, []);
 
-  const visibleSeries = useMemo(
-    () => series.filter((s) => !hiddenSeries.has(s.id)),
-    [series, hiddenSeries]
-  );
-
-  const barSeries = useMemo(() => visibleSeries.filter((s) => s.type === "bar"), [visibleSeries]);
-  const lineSeries = useMemo(() => visibleSeries.filter((s) => s.type === "line"), [visibleSeries]);
-
   const hasRightAxis = useMemo(() => series.some((s) => s.yAxis === "right"), [series]);
 
   const categories = useMemo(
     () => (series[0]?.data.map(categoryAccessor) ?? []),
     [series, categoryAccessor]
   );
+
+  const computeDomainValues = useCallback(
+    (targetVisible: ComboSeries<D>[], axis: "left" | "right"): DomainTarget | null => {
+      const filtered = targetVisible.filter((s) =>
+        axis === "right" ? s.yAxis === "right" : s.yAxis !== "right",
+      );
+      if (axis === "right" && !hasRightAxis) return null;
+      const bars = filtered.filter((s) => s.type === "bar");
+      const lines = filtered.filter((s) => s.type === "line");
+      const barVals: number[] = [];
+      if (barVariant === "stacked") {
+        const lookups = bars.map((s) => {
+          const m = new Map<string, D>();
+          s.data.forEach((d) => m.set(categoryAccessor(d), d));
+          return m;
+        });
+        categories.forEach((cat) => {
+          let sum = 0;
+          lookups.forEach((m) => { const d = m.get(cat); if (d) sum += yAccessor(d); });
+          barVals.push(sum);
+        });
+      } else {
+        bars.forEach((s) => s.data.forEach((d) => barVals.push(yAccessor(d))));
+      }
+      const lineVals = lines.flatMap((s) => s.data.map(yAccessor));
+      return { values: [...barVals, ...lineVals], includeZero: true };
+    },
+    [hasRightAxis, barVariant, categories, categoryAccessor, yAccessor],
+  );
+
+  const { getWeight, visibleSeries, renderTick, leftDomain, rightDomain } =
+    useSeriesAnimation<D, ComboSeries<D>>({
+      series,
+      hiddenSeries,
+      computeDomainValues,
+    });
+
+  const barSeries = useMemo(() => visibleSeries.filter((s) => s.type === "bar"), [visibleSeries]);
+  const lineSeries = useMemo(() => visibleSeries.filter((s) => s.type === "line"), [visibleSeries]);
 
   const barLookups = useMemo<CategoryLookup<D>[]>(
     () =>
@@ -194,54 +245,22 @@ function ComboChartInner<D>({
     [categories, effectiveInnerWidth, barPadding]
   );
 
-  const leftValues = useMemo(() => {
-    const leftBarSeries = barSeries.filter((s) => s.yAxis !== "right");
-    const leftLineSeries = lineSeries.filter((s) => s.yAxis !== "right");
-    const barVals: number[] = [];
+  const leftScale = useMemo(() => {
+    const [lo, hi] = leftDomain ?? [0, 1];
+    return scaleLinear<number>({ domain: [lo, hi], range: [innerHeight, 0] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [innerHeight, renderTick]);
 
-    if (barVariant === "stacked") {
-      categories.forEach((cat) => {
-        let sum = 0;
-        leftBarSeries.forEach((s) => {
-          const lookup = barLookups[barSeries.indexOf(s)];
-          const d = lookup?.map.get(cat);
-          if (d) sum += yAccessor(d);
-        });
-        barVals.push(sum);
-      });
-    } else {
-      leftBarSeries.forEach((s) => s.data.forEach((d) => barVals.push(yAccessor(d))));
-    }
+  const rightScale = useMemo(() => {
+    if (!hasRightAxis || !rightDomain) return null;
+    const [lo, hi] = rightDomain;
+    return scaleLinear<number>({ domain: [lo, hi], range: [innerHeight, 0] });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hasRightAxis, innerHeight, renderTick]);
 
-    const lineVals = leftLineSeries.flatMap((s) => s.data.map(yAccessor));
-    return [...barVals, ...lineVals];
-  }, [barSeries, lineSeries, categories, barLookups, barVariant, yAccessor]);
-
-  const rightValues = useMemo(() => {
-    const rightSeries = visibleSeries.filter((s) => s.yAxis === "right");
-    return rightSeries.flatMap((s) => s.data.map(yAccessor));
-  }, [visibleSeries, yAccessor]);
-
-  const leftScale = useMemo(
-    () => buildLinearScaleForBars(leftValues, innerHeight, true, true),
-    [leftValues, innerHeight]
-  );
-
-  const rightScale = useMemo(
-    () => hasRightAxis && rightValues.length > 0
-      ? buildLinearScaleForBars(rightValues, innerHeight, true, true)
-      : null,
-    [hasRightAxis, rightValues, innerHeight]
-  );
-
-  const groupScale = useMemo(() => {
-    if (barVariant !== "grouped" || barSeries.length <= 1) return null;
-    return scaleBand<string>({
-      domain: barSeries.map((s) => s.id),
-      range: [0, categoryScale.bandwidth()],
-      padding: groupPadding,
-    });
-  }, [barVariant, barSeries, categoryScale, groupPadding]);
+  const getGroupWeights = useCallback(() => {
+    return barSeries.map((s) => getWeight(s));
+  }, [barSeries, getWeight]);
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<SVGRectElement>) => {
@@ -261,17 +280,19 @@ function ComboChartInner<D>({
 
           let foundSeries: string | null = null;
 
-          if (barVariant === "grouped" && groupScale) {
-            for (const s of barSeries) {
-              const lookup = barLookups[barSeries.indexOf(s)];
+          if (barVariant === "grouped" && barSeries.length > 1) {
+            const layout = computeGroupLayout(bandStart, categoryScale.bandwidth(), getGroupWeights(), groupPadding);
+            for (let bi = 0; bi < barSeries.length; bi++) {
+              const s = barSeries[bi];
+              const lookup = barLookups[bi];
               const d = lookup?.map.get(cat);
               if (!d) continue;
               const val = yAccessor(d);
-              const barStart = bandStart + (groupScale(s.id) ?? 0);
-              const barEnd = barStart + groupScale.bandwidth();
+              const { pos: barStart2, size: barSize } = layout[bi];
+              const barEnd2 = barStart2 + barSize;
               const barTop = Math.min(leftScale(val) ?? 0, leftScale(0) ?? 0);
               const barBottom = Math.max(leftScale(val) ?? 0, leftScale(0) ?? 0);
-              if (mx >= barStart && mx <= barEnd && my >= barTop && my <= barBottom) {
+              if (mx >= barStart2 && mx <= barEnd2 && my >= barTop && my <= barBottom) {
                 foundSeries = s.id;
                 break;
               }
@@ -305,7 +326,7 @@ function ComboChartInner<D>({
         setHoverSeriesId(null);
       }
     },
-    [categoryScale, categories, barPadding, barVariant, groupScale, barSeries, barLookups, yAccessor, leftScale]
+    [categoryScale, categories, barPadding, barVariant, barSeries, barLookups, yAccessor, leftScale, getGroupWeights, groupPadding]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -393,7 +414,7 @@ function ComboChartInner<D>({
         const lookup = barLookups[si];
         const d = lookup.map.get(cat);
         if (!d) return;
-        const val = yAccessor(d);
+        const val = yAccessor(d) * getWeight(s);
         const y0 = cumValue;
         const y1 = cumValue + val;
         cumValue = y1;
@@ -414,23 +435,27 @@ function ComboChartInner<D>({
             key={`${s.id}-${cat}`}
             d={roundedRectPath(x, top, bw, h, barRadius, { tl: rEnd > 0, tr: rEnd > 0, bl: rBase > 0, br: rBase > 0 })}
             fill={color}
+            stroke="var(--element-surface-default)"
+            strokeWidth={4}
+            paintOrder="stroke"
             style={style}
           />
         );
       });
-    } else if (barVariant === "grouped" && groupScale) {
-      barSeries.forEach((s) => {
+    } else if (barVariant === "grouped" && barSeries.length > 1) {
+      const bandX = categoryScale(cat) ?? 0;
+      const layout = computeGroupLayout(bandX, categoryScale.bandwidth(), getGroupWeights(), groupPadding);
+      barSeries.forEach((s, bi) => {
         const globalIdx = series.indexOf(s);
         const color = getSeriesColor(globalIdx, s.color);
-        const lookup = barLookups[barSeries.indexOf(s)];
+        const lookup = barLookups[bi];
         const d = lookup.map.get(cat);
         if (!d) return;
-        const val = yAccessor(d);
+        const val = yAccessor(d) * getWeight(s);
         const style = getBarStyle(catIdx, isCatHovered, s.id);
         const allCorners = roundBase;
 
-        const x = (categoryScale(cat) ?? 0) + (groupScale(s.id) ?? 0);
-        const bw = groupScale.bandwidth();
+        const { pos: x, size: bw } = layout[bi];
         const barY = val >= 0 ? (leftScale(val) ?? 0) : zeroPos;
         const barH = Math.abs((leftScale(val) ?? 0) - zeroPos);
         bars.push(
@@ -450,7 +475,7 @@ function ComboChartInner<D>({
       const lookup = barLookups[0];
       const d = lookup?.map.get(cat);
       if (!d) return;
-      const val = yAccessor(d);
+      const val = yAccessor(d) * getWeight(s);
       const style = getBarStyle(catIdx, isCatHovered, s.id);
       const allCorners = roundBase;
 
@@ -578,12 +603,15 @@ function ComboChartInner<D>({
                   })
                   .filter((p): p is { x: number; y: number } => p !== null);
 
-                const lineOpacity = hoverCategory ? (hoverSeriesId && hoverSeriesId !== s.id ? 0.24 : 1) : 1;
+                const weight = getWeight(s);
+                const hoverOpacity = hoverCategory ? (hoverSeriesId && hoverSeriesId !== s.id ? 0.24 : 1) : 1;
+                const lineOpacity = hoverOpacity * weight;
 
                 return (
                   <g
                     key={`line-${s.id}`}
-                    filter="drop-shadow(0 1px 2px rgba(0,0,0,0.24))"
+                    filter="drop-shadow(0 0.5px 1px rgba(0,0,0,0.24))"
+                    style={{ transition: "opacity 200ms ease" }}
                   >
                     <AnimatedLine
                       data={lineData}
@@ -595,6 +623,7 @@ function ComboChartInner<D>({
                       curve={curve}
                       animate={animate}
                       delay={li * 150}
+                      dashStyle={s.dash}
                     />
                   </g>
                 );

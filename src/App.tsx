@@ -77,6 +77,7 @@ import FooterPlayground from "./pages/FooterPlayground";
 import TitleTextPlayground from "./pages/TitleTextPlayground";
 import BodyTextPlayground from "./pages/BodyTextPlayground";
 import BarChartPlayground from "./pages/BarChartPlayground";
+import ChartLegendPlayground from "./pages/ChartLegendPlayground";
 import LineChartPlayground from "./pages/LineChartPlayground";
 import PieChartPlayground from "./pages/PieChartPlayground";
 import LinkPlayground from "./pages/LinkPlayground";
@@ -124,6 +125,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "icon-container"
 | "illustration"
 | "bar-chart"
+| "chart-legend"
 | "line-chart"
 | "pie-chart"
 | "breadcrumb"
@@ -309,6 +311,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "button-group", label: "ButtonGroup" },
   { key: "callout", label: "Callout" },
   { key: "card", label: "Card" },
+  { key: "chart-legend", label: "ChartLegend" },
   { key: "code-block", label: "CodeBlock" },
   { key: "checkbox", label: "Checkbox" },
   { key: "chip", label: "Chip" },
@@ -585,6 +588,7 @@ export default function App() {
             {page === "title-text" && <TitleTextPlayground />}
             {page === "body-text" && <BodyTextPlayground />}
             {page === "bar-chart" && <BarChartPlayground />}
+            {page === "chart-legend" && <ChartLegendPlayground />}
             {page === "line-chart" && <LineChartPlayground />}
             {page === "pie-chart" && <PieChartPlayground />}
             {page === "link" && <LinkPlayground />}

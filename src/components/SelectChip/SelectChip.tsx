@@ -58,6 +58,7 @@ export const SelectChip = forwardRef<HTMLDivElement, SelectChipProps>(
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+      if (e.target !== e.currentTarget) return;
       if (onClick && (e.key === "Enter" || e.key === " ")) {
         e.preventDefault();
         onClick(e as unknown as MouseEvent<HTMLDivElement>);
