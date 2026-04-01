@@ -54,19 +54,19 @@
    ═══════════════════════════════════════════════════════════════════════ */
 
 .checked {
-  background: var(--element-fill-brand-tertiary-active-default);
+  background: var(--element-fill-brand-tertiary-default);
 }
 
 .checked:hover:not(.disabled) {
-  background: var(--element-fill-brand-tertiary-active-hover);
+  background: var(--element-fill-brand-tertiary-hover);
 }
 
 .checked:active:not(.disabled) {
-  background: var(--element-fill-brand-tertiary-active-press);
+  background: var(--element-fill-brand-tertiary-press);
 }
 
 .checked:focus-visible {
-  background: var(--element-fill-brand-tertiary-active-hover);
+  background: var(--element-fill-brand-tertiary-hover);
   box-shadow:
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
     0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
@@ -83,7 +83,7 @@
 }
 
 .checked.disabled {
-  background: var(--element-fill-brand-tertiary-active-disable);
+  background: var(--element-fill-brand-tertiary-disable);
 }
 
 /* ── text area ────────────────────────────────────────────────────────── */

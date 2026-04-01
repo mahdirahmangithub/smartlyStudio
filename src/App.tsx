@@ -86,6 +86,7 @@ import TextareaPlayground from "./pages/TextareaPlayground";
 import DataTablePlayground from "./pages/DataTablePlayground";
 import DataVizColorsPlayground from "./pages/DataVizColorsPlayground";
 import AnimatedIconsPlayground from "./pages/AnimatedIconsPlayground";
+import CheckboxAnimTestPlayground from "./pages/CheckboxAnimTestPlayground";
 import TypographyPlayground from "./pages/TypographyPlayground";
 import ShimmerPlayground from "./pages/ShimmerPlayground";
 import DataCellContentPlayground from "./pages/DataCellContentPlayground";
@@ -161,6 +162,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "container"
 | "stepper"
 | "video-player"
+| "checkbox-anim-test"
 
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
@@ -314,6 +316,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "chart-legend", label: "ChartLegend" },
   { key: "code-block", label: "CodeBlock" },
   { key: "checkbox", label: "Checkbox" },
+  { key: "checkbox-anim-test", label: "CheckboxAnimTest" },
   { key: "chip", label: "Chip" },
   { key: "combobox", label: "Combobox" },
   { key: "container", label: "Container" },
@@ -535,6 +538,7 @@ export default function App() {
             {page === "hint" && <HintPlayground />}
             {page === "label" && <LabelPlayground />}
             {page === "checkbox" && <CheckboxPlayground />}
+            {page === "checkbox-anim-test" && <CheckboxAnimTestPlayground />}
             {page === "radio" && <RadioPlayground />}
             {page === "toggle" && <TogglePlayground />}
             {page === "tag" && <TagPlayground />}

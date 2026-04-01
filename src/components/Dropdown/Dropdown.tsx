@@ -156,20 +156,6 @@ function calcPosition(
   return { x, y, side };
 }
 
-function getScrollAncestors(el: HTMLElement) {
-  const list: (HTMLElement | Window)[] = [];
-  let cur = el.parentElement;
-  while (cur) {
-    const s = getComputedStyle(cur);
-    if (/(auto|scroll|overlay)/.test(s.overflow + s.overflowX + s.overflowY)) {
-      list.push(cur);
-    }
-    cur = cur.parentElement;
-  }
-  list.push(window);
-  return list;
-}
-
 const EXIT_MS = 200;
 const DEFAULT_WIDTH = 320;
 const DEFAULT_MAX_HEIGHT = 400;
@@ -212,6 +198,11 @@ export function Dropdown({
   const headerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(undefined);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
+  type DismissReason = "escape" | "click-outside" | "programmatic";
+  const dismissReasonRef = useRef<DismissReason>("programmatic");
 
   /* ── mount / unmount animation ────────────────── */
 
@@ -234,19 +225,25 @@ export function Dropdown({
         () => setIsMounted(false),
         EXIT_MS + 50
       );
-      anchorRef.current?.focus();
+      if (dismissReasonRef.current === "escape") {
+        anchorRef.current?.focus({ preventScroll: true });
+      }
+      dismissReasonRef.current = "programmatic";
     }
     return () => clearTimeout(exitTimerRef.current);
   }, [open]);
 
+  const animRef = useRef(anim);
+  animRef.current = anim;
+
   const onAnimEnd = useCallback(() => {
-    if (anim === "enter") setAnim("idle");
-    else if (anim === "exit") {
+    if (animRef.current === "enter") setAnim("idle");
+    else if (animRef.current === "exit") {
       clearTimeout(exitTimerRef.current);
       setIsMounted(false);
       setAnim("idle");
     }
-  }, [anim]);
+  }, []);
 
   /* ── scroll area max-height (measured) ────────── */
 
@@ -256,12 +253,13 @@ export function Dropdown({
     if (!isMounted) return;
     const hH = headerRef.current?.offsetHeight ?? 0;
     const fH = footerRef.current?.offsetHeight ?? 0;
-    setScrollMaxH(maxHeight - hH - fH);
-  }, [isMounted, maxHeight, header, footer]);
+    const next = maxHeight - hH - fH;
+    setScrollMaxH((prev) => (prev === next ? prev : next));
+  }, [isMounted, maxHeight]);
 
   /* ── positioning ──────────────────────────────── */
 
-  const [pos, setPos] = useState({ x: 0, y: 0, side: "bottom" as Side });
+  const [pos, setPos] = useState({ x: 0, y: 0, side: "bottom" as Side, resolvedW: width });
 
   const updatePos = useCallback(() => {
     const anchor = anchorRef.current;
@@ -272,7 +270,8 @@ export function Dropdown({
     const panelW = matchAnchorWidth ? anchorRect.width : width;
     const panelH = panel.offsetHeight;
 
-    setPos(calcPosition(anchorRect, panelW, panelH, placement, offset));
+    const vp = calcPosition(anchorRect, panelW, panelH, placement, offset);
+    setPos({ x: vp.x + window.scrollX, y: vp.y + window.scrollY, side: vp.side, resolvedW: panelW });
   }, [anchorRef, placement, offset, width, matchAnchorWidth]);
 
   const updatePosRef = useRef(updatePos);
@@ -292,17 +291,12 @@ export function Dropdown({
       rafRef.current = requestAnimationFrame(() => updatePosRef.current());
     };
 
-    const ancestors = getScrollAncestors(anchor);
-    for (const a of ancestors)
-      a.addEventListener("scroll", tick, { passive: true });
     window.addEventListener("resize", tick);
 
     const ro = new ResizeObserver(tick);
-    ro.observe(anchor);
     if (panelRef.current) ro.observe(panelRef.current);
 
     return () => {
-      for (const a of ancestors) a.removeEventListener("scroll", tick);
       window.removeEventListener("resize", tick);
       ro.disconnect();
       cancelAnimationFrame(rafRef.current!);
@@ -331,12 +325,13 @@ export function Dropdown({
       const anchor = anchorRef.current;
       const target = e.target as Node;
       if (panel?.contains(target) || anchor?.contains(target)) return;
-      onClose();
+      dismissReasonRef.current = "click-outside";
+      onCloseRef.current();
     };
 
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [isMounted, closeOnClickOutside, onClose, anchorRef]);
+  }, [isMounted, closeOnClickOutside, anchorRef]);
 
   /* ── escape key ───────────────────────────────── */
 
@@ -344,12 +339,15 @@ export function Dropdown({
     if (!isMounted || !closeOnEscape) return;
 
     const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        dismissReasonRef.current = "escape";
+        onCloseRef.current();
+      }
     };
 
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
-  }, [isMounted, closeOnEscape, onClose]);
+  }, [isMounted, closeOnEscape]);
 
   /* ── keyboard navigation ────────────────────────
      Manages arrow-key roving focus between options,
@@ -402,6 +400,7 @@ export function Dropdown({
       const panel = panelRef.current;
       if (!panel) return;
       const { key, shiftKey } = e;
+      const active = document.activeElement as HTMLElement;
 
       /* ── Arrow Up / Down ── */
       if (key === "ArrowDown" || key === "ArrowUp") {
@@ -409,7 +408,6 @@ export function Dropdown({
         const opts = getOptions();
         if (opts.length === 0) return;
 
-        const active = document.activeElement as HTMLElement;
         const hInput = getHeaderInput();
         const inHeader = hInput && headerRef.current?.contains(active);
 
@@ -434,26 +432,24 @@ export function Dropdown({
           if (f && panel.contains(f))
             f.scrollIntoView?.({ block: "nearest" });
         });
+        return;
       }
 
       /* ── Home / End (skip when inside a text input) ── */
-      const isTextInput =
-        (document.activeElement as HTMLElement)?.tagName === "INPUT" &&
-        (document.activeElement as HTMLInputElement)?.type !== "checkbox" &&
-        (document.activeElement as HTMLInputElement)?.type !== "radio";
+      if (key === "Home" || key === "End") {
+        const isTextInput =
+          active?.tagName === "INPUT" &&
+          (active as HTMLInputElement).type !== "checkbox" &&
+          (active as HTMLInputElement).type !== "radio";
+        if (isTextInput) return;
 
-      if (key === "Home" && !isTextInput) {
         e.preventDefault();
         const opts = getOptions();
-        focusVisible(opts[0]);
-        opts[0]?.scrollIntoView?.({ block: "nearest" });
-      }
-      if (key === "End" && !isTextInput) {
-        e.preventDefault();
-        const opts = getOptions();
-        const last = opts[opts.length - 1];
-        focusVisible(last);
-        last?.scrollIntoView?.({ block: "nearest" });
+        if (opts.length === 0) return;
+        const target = key === "Home" ? opts[0] : opts[opts.length - 1];
+        focusVisible(target);
+        target?.scrollIntoView?.({ block: "nearest" });
+        return;
       }
 
       /* ── Focus trap (Tab / Shift-Tab) ── */
@@ -461,7 +457,6 @@ export function Dropdown({
         const focusables = getFocusables();
         if (focusables.length === 0) return;
 
-        const active = document.activeElement as HTMLElement;
         const first = focusables[0];
         const last = focusables[focusables.length - 1];
 
@@ -481,12 +476,6 @@ export function Dropdown({
     [getOptions, getHeaderInput, getFocusables, returnFocusRef]
   );
 
-  /* ── computed width ───────────────────────────── */
-
-  const resolvedWidth = matchAnchorWidth
-    ? anchorRef.current?.getBoundingClientRect().width ?? width
-    : width;
-
   /* ── render ───────────────────────────────────── */
 
   if (!isMounted) return null;
@@ -500,10 +489,10 @@ export function Dropdown({
         : "";
 
   const panelStyle: CSSProperties = {
-    position: "fixed",
+    position: "absolute",
     top: Math.round(pos.y),
     left: Math.round(pos.x),
-    width: resolvedWidth,
+    width: pos.resolvedW,
     zIndex: 9999,
   };
 

@@ -39,6 +39,7 @@ export function Checkbox({
 
   const inputRef = useRef<HTMLInputElement>(null);
   const prevStateRef = useRef({ checked: false, indeterminate: false });
+  const animRef = useRef<{ check?: string; dash?: string }>({});
 
   useEffect(() => {
     if (inputRef.current) {
@@ -49,27 +50,32 @@ export function Checkbox({
   const isActive = checked || indeterminate;
 
   const prev = prevStateRef.current;
-  const wasCheckedOnly = prev.checked && !prev.indeterminate;
-  const wasIndeterminate = prev.indeterminate;
+  const changed = prev.checked !== checked || prev.indeterminate !== indeterminate;
 
-  let checkAnim: string | undefined;
-  let dashAnim: string | undefined;
+  if (changed) {
+    const wasCheckedOnly = prev.checked && !prev.indeterminate;
+    const wasIndeterminate = prev.indeterminate;
 
-  if (wasCheckedOnly && indeterminate) {
-    checkAnim = styles.checkPathRotateOut;
-    dashAnim = styles.dashPathRotateIn;
-  } else if (wasIndeterminate && checked && !indeterminate) {
-    checkAnim = styles.checkPathRotateIn;
-    dashAnim = styles.dashPathRotateOut;
-  } else if (checked && !indeterminate) {
-    checkAnim = styles.checkPathDrawIn;
-  } else if (indeterminate) {
-    dashAnim = styles.dashPathDrawIn;
+    let checkAnim: string | undefined;
+    let dashAnim: string | undefined;
+
+    if (wasCheckedOnly && indeterminate) {
+      checkAnim = styles.checkPathRotateOut;
+      dashAnim = styles.dashPathRotateIn;
+    } else if (wasIndeterminate && checked && !indeterminate) {
+      checkAnim = styles.checkPathRotateIn;
+      dashAnim = styles.dashPathRotateOut;
+    } else if (checked && !indeterminate) {
+      checkAnim = styles.checkPathDrawIn;
+    } else if (indeterminate) {
+      dashAnim = styles.dashPathDrawIn;
+    }
+
+    animRef.current = { check: checkAnim, dash: dashAnim };
+    prevStateRef.current = { checked, indeterminate };
   }
 
-  useEffect(() => {
-    prevStateRef.current = { checked, indeterminate };
-  }, [checked, indeterminate]);
+  const { check: checkAnim, dash: dashAnim } = animRef.current;
 
   return (
     <span
