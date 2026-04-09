@@ -1,8 +1,10 @@
-import { type CSSProperties, useMemo, useState } from "react";
+import { type CSSProperties, useMemo, useState, useCallback } from "react";
 import { LineChart } from "../components/LineChart";
 import { BarChart } from "../components/BarChart";
+import { PieChart, type PieSlice } from "../components/PieChart";
 import type { Series } from "../components/LineChart";
 import type { LegendLayout } from "../components/ChartPrimitives";
+import { setOklchEnhancement, isOklchEnhanced, getCategoricalColor } from "../components/ChartPrimitives";
 import { curveMonotoneX } from "@visx/curve";
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
@@ -37,7 +39,8 @@ const xAccessor = (d: DataPoint) => d.date;
 const yAccessor = (d: DataPoint) => d.value;
 
 function DashStylesDemo() {
-  const sharedColor = "var(--data-viz-categorical-1-default)";
+  const oklchOn = isOklchEnhanced();
+  const sharedColor = getCategoricalColor(0);
   const series = useMemo<Series<DataPoint>[]>(
     () => [
       { id: "solid", label: "Solid", data: generateData(30, 70, 8), color: sharedColor },
@@ -45,7 +48,7 @@ function DashStylesDemo() {
       { id: "dashed", label: "Dashed", data: generateData(30, 85, 7), color: sharedColor, dash: "dashed" },
       { id: "dash-dot", label: "Dash-Dot", data: generateData(30, 40, 10), color: sharedColor, dash: "dash-dot" },
     ],
-    [],
+    [oklchOn],
   );
 
   return (
@@ -76,7 +79,8 @@ const barCategoryAccessor = (d: BarDataPoint) => d.category;
 const barYAccessor = (d: BarDataPoint) => d.value;
 
 function GroupedFillPatternsDemo() {
-  const sharedColor = "var(--data-viz-categorical-2-default)";
+  const oklchOn = isOklchEnhanced();
+  const sharedColor = getCategoricalColor(1);
   const series = useMemo<Series<BarDataPoint>[]>(
     () => [
       { id: "solid", label: "Solid", data: generateBarData(), color: sharedColor },
@@ -84,7 +88,7 @@ function GroupedFillPatternsDemo() {
       { id: "hatch-right", label: "Hatch /", data: generateBarData(), color: sharedColor, fillPattern: "hatch-right" },
       { id: "hatch-left", label: "Hatch \\", data: generateBarData(), color: sharedColor, fillPattern: "hatch-left" },
     ],
-    [],
+    [oklchOn],
   );
 
   return (
@@ -100,7 +104,8 @@ function GroupedFillPatternsDemo() {
 }
 
 function StackedFillPatternsDemo() {
-  const sharedColor = "var(--data-viz-categorical-3-default)";
+  const oklchOn = isOklchEnhanced();
+  const sharedColor = getCategoricalColor(6);
   const series = useMemo<Series<BarDataPoint>[]>(
     () => [
       { id: "solid", label: "Solid", data: generateBarData(), color: sharedColor },
@@ -108,7 +113,7 @@ function StackedFillPatternsDemo() {
       { id: "hatch-right", label: "Hatch /", data: generateBarData(), color: sharedColor, fillPattern: "hatch-right" },
       { id: "hatch-left", label: "Hatch \\", data: generateBarData(), color: sharedColor, fillPattern: "hatch-left" },
     ],
-    [],
+    [oklchOn],
   );
 
   return (
@@ -120,6 +125,34 @@ function StackedFillPatternsDemo() {
       height={350}
       showGrid
     />
+  );
+}
+
+function PieFillPatternsDemo() {
+  const oklchOn = isOklchEnhanced();
+  const sharedColor = getCategoricalColor(4);
+  const data = useMemo<PieSlice[]>(
+    () => [
+      { id: "solid", label: "Solid", value: 3500, color: sharedColor },
+      { id: "dotted", label: "Dotted", value: 2400, color: sharedColor, fillPattern: "dotted" },
+      { id: "hatch-right", label: "Hatch /", value: 1800, color: sharedColor, fillPattern: "hatch-right" },
+      { id: "hatch-left", label: "Hatch \\", value: 1200, color: sharedColor, fillPattern: "hatch-left" },
+    ],
+    [oklchOn],
+  );
+
+  return (
+    <div style={{ maxWidth: 340 }}>
+      <PieChart
+        data={data}
+        thickness={40}
+        height={340}
+        centerValue="8.9k"
+        centerLabel="Total"
+        showSliceLabels={false}
+        tooltipValueFormat={(v) => v.toLocaleString()}
+      />
+    </div>
   );
 }
 
@@ -153,12 +186,24 @@ function LegendLayoutDemo({ layout }: { layout: LegendLayout }) {
 
 export default function ChartLegendPlayground() {
   const [layout, setLayout] = useState<LegendLayout>("wrap");
+  const [oklch, setOklch] = useState(isOklchEnhanced);
+  const [, rerender] = useState(0);
+  const toggleOklch = useCallback(() => {
+    const next = !oklch;
+    setOklchEnhancement(next);
+    setOklch(next);
+    rerender((n) => n + 1);
+  }, [oklch]);
 
   return (
     <>
       <h1>Chart Legend</h1>
 
       <div style={{ display: "flex", gap: 16, marginBottom: 16, fontSize: 13 }}>
+        <label style={{ fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6, background: oklch ? "rgba(80,180,80,0.1)" : "rgba(0,0,0,0.04)" }}>
+          <input type="checkbox" checked={oklch} onChange={toggleOklch} style={{ width: 16, height: 16 }} />
+          OKLCH Enhanced Colors
+        </label>
         <label style={{ display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}>
           <input
             type="checkbox"
@@ -197,6 +242,16 @@ export default function ChartLegendPlayground() {
         </p>
         <div style={cardStyle}>
           <StackedFillPatternsDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Fill Patterns — Pie Chart</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Four pie slices with the same color but different fill patterns — solid, dotted, hatch /, and hatch \.
+        </p>
+        <div style={cardStyle}>
+          <PieFillPatternsDemo />
         </div>
       </section>
 

@@ -743,29 +743,45 @@ const STICKY_DATA: Employee[] = [
 ];
 
 function StickyDemo({ density }: { density: TableDensity }) {
+  const fmt = (v: number) => `$${v.toLocaleString()}`;
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name (sticky left)", dataIndex: "name", width: 180, fixed: "left",
       render: (v: string) => <DataCellContent title={v} />,
     },
-    { key: "age", title: "Age", dataIndex: "age", width: 120,
-      render: (v: number) => <DataCellContent title={String(v)} />,
+    { key: "age", title: "Age", dataIndex: "age", width: 100, align: "right",
+      render: (v: number) => <DataCellContent title={String(v)} textAlignment="right" />,
     },
-    { key: "email", title: "Email", dataIndex: "email", width: 280,
+    { key: "email", title: "Email (sticky left)", dataIndex: "email", width: 260, fixed: "left",
       render: (v: string) => <DataCellContent title={v} />,
     },
-    { key: "department", title: "Dept", dataIndex: "department", width: 200,
+    { key: "department", title: "Dept", dataIndex: "department", width: 160,
       render: (v: string) => <DataCellContent title={v} />,
     },
-    { key: "salary", title: "Salary", dataIndex: "salary", width: 200,
-      render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} />,
+    { key: "salary", title: "Salary", dataIndex: "salary", width: 140, align: "right",
+      render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
     },
-    { key: "id", title: "ID (sticky right)", dataIndex: "id", width: 120, fixed: "right",
-      render: (v: number) => <DataCellContent title={String(v)} />,
+    { key: "bonus", title: "Bonus (sticky left)", dataIndex: "salary", width: 140, fixed: "left", align: "right",
+      render: (v: number) => <DataCellContent title={fmt(Math.round(v * 0.15))} textAlignment="right" />,
+    },
+    { key: "total", title: "Total Comp", dataIndex: "salary", width: 150, align: "right",
+      render: (v: number) => <DataCellContent title={fmt(Math.round(v * 1.15))} textAlignment="right" />,
+    },
+    { key: "startYear", title: "Start Year", dataIndex: "id", width: 120,
+      render: (v: number) => <DataCellContent title={String(2018 + (v % 7))} />,
+    },
+    { key: "level", title: "Level", dataIndex: "age", width: 100,
+      render: (v: number) => <DataCellContent title={v < 30 ? "Junior" : v < 40 ? "Mid" : "Senior"} />,
+    },
+    { key: "location", title: "Location", dataIndex: "department", width: 160,
+      render: (v: string) => <DataCellContent title={v === "Engineering" ? "San Francisco" : v === "Design" ? "New York" : v === "Marketing" ? "London" : "Berlin"} />,
+    },
+    { key: "id", title: "ID (sticky right)", dataIndex: "id", width: 100, fixed: "right", align: "right",
+      render: (v: number) => <DataCellContent title={String(v)} textAlignment="right" />,
     },
   ];
 
   return (
-    <div style={{ maxWidth: 600 }}>
+    <div>
       <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
         Scroll horizontally &amp; vertically — Name sticks left, ID sticks right, header sticks top
       </p>
@@ -974,6 +990,87 @@ function CombinedDemo({ density }: { density: TableDensity }) {
   );
 }
 
+/* ── Deep header groups demo ── */
+
+interface CompRow {
+  id: number;
+  name: string;
+  title: string;
+  department: string;
+  baseSalary: number;
+  bonus: number;
+  rsus: number;
+  options: number;
+}
+
+const COMP_DATA: CompRow[] = [
+  { id: 1, name: "Alice Johnson", title: "Staff Engineer", department: "Engineering", baseSalary: 185000, bonus: 28000, rsus: 60000, options: 12000 },
+  { id: 2, name: "Bob Smith", title: "Director", department: "Marketing", baseSalary: 165000, bonus: 33000, rsus: 45000, options: 8000 },
+  { id: 3, name: "Charlie Brown", title: "Senior Engineer", department: "Engineering", baseSalary: 155000, bonus: 18000, rsus: 40000, options: 10000 },
+  { id: 4, name: "Diana Prince", title: "Lead Designer", department: "Design", baseSalary: 145000, bonus: 15000, rsus: 30000, options: 5000 },
+  { id: 5, name: "Eve Martinez", title: "Engineer", department: "Engineering", baseSalary: 130000, bonus: 12000, rsus: 25000, options: 6000 },
+  { id: 6, name: "Frank Lee", title: "VP Marketing", department: "Marketing", baseSalary: 210000, bonus: 50000, rsus: 80000, options: 20000 },
+];
+
+function DeepHeaderGroupDemo({ density }: { density: TableDensity }) {
+  const fmt = (v: number) => `$${v.toLocaleString()}`;
+
+  const columns: ColumnDef<CompRow>[] = [
+    {
+      key: "employee",
+      title: "Employee",
+      children: [
+        { key: "name", title: "Name", dataIndex: "name", width: 170, minWidth: 100,
+          render: (v: string, r) => <DataCellContent title={v} description={r.title} />,
+        },
+        { key: "department", title: "Dept", dataIndex: "department", width: 130, minWidth: 80,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
+      ],
+    },
+    {
+      key: "compensation",
+      title: "Compensation",
+      children: [
+        {
+          key: "base",
+          title: "Base",
+          children: [
+            { key: "baseSalary", title: "Salary", dataIndex: "baseSalary", width: 120, minWidth: 80, align: "right",
+              render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+            },
+            { key: "bonus", title: "Bonus", dataIndex: "bonus", width: 110, minWidth: 70, align: "right",
+              render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+            },
+          ],
+        },
+        {
+          key: "equity",
+          title: "Equity",
+          children: [
+            { key: "rsus", title: "RSUs", dataIndex: "rsus", width: 110, minWidth: 70, align: "right",
+              render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+            },
+            { key: "options", title: "Options", dataIndex: "options", width: 110, minWidth: 70, align: "right",
+              render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  return (
+    <DataTable<CompRow>
+      columns={columns}
+      dataSource={COMP_DATA}
+      rowKey="id"
+      density={density}
+      columnResize={{ mode: "fixed" }}
+    />
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Playground Page
    ═══════════════════════════════════════════════════════════════ */
@@ -1103,6 +1200,15 @@ export default function DataTablePlayground() {
       <section style={sectionStyle}>
         <h2>Combined Features</h2>
         <div style={cardStyle}><CombinedDemo density={density} /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Header Groups (Deep Nesting)</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Three-level header groups: top-level "Employee" and "Compensation" groups,
+          with "Compensation" further split into "Base" and "Equity" sub-groups.
+        </p>
+        <div style={cardStyle}><DeepHeaderGroupDemo density={density} /></div>
       </section>
       </div>
     </div>

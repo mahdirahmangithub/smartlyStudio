@@ -1,5 +1,5 @@
-import { type CSSProperties } from "react";
-import { Toast, Toaster, toast } from "../components/Toast";
+import { useState, type CSSProperties } from "react";
+import { Toast, toast } from "../components/Toast";
 import type { ToastType, ToastLayout } from "../components/Toast";
 import { Button } from "../components/Button";
 
@@ -260,11 +260,100 @@ function DurationDemo() {
   );
 }
 
+function TruncationDemo() {
+  const [title, setTitle] = useState("12 files have been deleted.");
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <label style={{ fontSize: 13, fontWeight: 500 }}>Title text</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          style={{
+            padding: "6px 10px",
+            border: "1px solid #ccc",
+            borderRadius: 6,
+            fontSize: 14,
+            maxWidth: 480,
+          }}
+        />
+      </div>
+
+      <p style={{ fontSize: 12, opacity: 0.5, margin: 0 }}>
+        Static previews (horizontal with actions):
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <Toast
+          title={title}
+          type="alert"
+          layout="horizontal"
+          undoAction={{ label: "Undo", onClick: () => {} }}
+          onClose={() => {}}
+        />
+        <Toast
+          title={title}
+          type="neutral"
+          layout="horizontal"
+          ctaAction={{ label: "Details", onClick: () => {} }}
+          undoAction={{ label: "Undo", onClick: () => {} }}
+          onClose={() => {}}
+        />
+        <Toast
+          title={title}
+          type="success"
+          layout="horizontal"
+          onClose={() => {}}
+        />
+      </div>
+
+      <div style={rowStyle}>
+        <Button
+          variant="alert"
+          emphasis="medium"
+          size="md"
+          onClick={() =>
+            toast.alert(title, {
+              layout: "horizontal",
+              undoAction: { label: "Undo", onClick: () => {} },
+              duration: Infinity,
+            })
+          }
+        >
+          Fire as alert + undo
+        </Button>
+        <Button
+          variant="neutral"
+          emphasis="medium"
+          size="md"
+          onClick={() =>
+            toast(title, {
+              layout: "horizontal",
+              ctaAction: { label: "Details", onClick: () => {} },
+              undoAction: { label: "Undo", onClick: () => {} },
+              duration: Infinity,
+            })
+          }
+        >
+          Fire with both actions
+        </Button>
+        <Button
+          variant="neutral"
+          emphasis="low"
+          size="md"
+          onClick={() => toast.dismiss()}
+        >
+          Dismiss all
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function ToastPlayground() {
   return (
     <>
-      <Toaster position="bottom-left" />
-
       <h1>Toast</h1>
 
       <section style={sectionStyle}>
@@ -294,6 +383,17 @@ export default function ToastPlayground() {
         </p>
         <div style={cardStyle}>
           <StackingDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Title Truncation</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Edit the title text to test how horizontal toasts handle long titles.
+          Static previews update live; buttons fire real toasts.
+        </p>
+        <div style={cardStyle}>
+          <TruncationDemo />
         </div>
       </section>
 

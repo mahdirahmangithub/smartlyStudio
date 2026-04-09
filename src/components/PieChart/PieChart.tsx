@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef, useId } from "react";
 import { Pie } from "@visx/shape";
 import { Group } from "@visx/group";
 import { ParentSize } from "@visx/responsive";
@@ -12,7 +12,7 @@ import {
 import { Tooltip } from "../Tooltip";
 import { IconContainer, type IconContainerSize } from "../IconContainer";
 import type { IconName } from "../Icon";
-import { getSeriesColor, isOklchEnhanced, type Series } from "../ChartPrimitives";
+import { getSeriesColor, isOklchEnhanced, FillPatternDefs, getPatternFill, type Series, type BarFillPattern } from "../ChartPrimitives";
 import { cx } from "../../utils/cx";
 import styles from "./PieChart.module.css";
 import chartStyles from "../ChartPrimitives/ChartContainer.module.css";
@@ -25,6 +25,7 @@ export interface PieSlice {
   label: string;
   value: number;
   color?: string;
+  fillPattern?: BarFillPattern;
 }
 
 export interface PieChartProps {
@@ -105,6 +106,7 @@ function PieChartInner({
 }: PieChartProps & { width: number }) {
   const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set());
   const [hoverSliceId, setHoverSliceId] = useState<string | null>(null);
+  const patternId = useId().replace(/:/g, "");
 
   const [sweepProgress, setSweepProgress] = useState(animate ? 0 : 1);
 
@@ -192,6 +194,7 @@ function PieChartInner({
         label: d.label,
         data: [d],
         color: d.color ?? getSeriesColor(i),
+        fillPattern: d.fillPattern,
       })),
     [data, oklchOn]
   );
@@ -236,6 +239,7 @@ function PieChartInner({
         label: realDatum.label,
         value: `${fmtVal} (${pct})`,
         color: colorScale(realDatum.id),
+        fillPattern: realDatum.fillPattern,
       },
     ];
     return { header: realDatum.label, entries };
@@ -276,6 +280,9 @@ function PieChartInner({
             role="img"
             aria-label="Pie chart"
           >
+            <defs>
+              <FillPatternDefs prefix={patternId} />
+            </defs>
             <Group top={radius} left={radius}>
               {isEmpty ? (
                 <circle
@@ -289,8 +296,8 @@ function PieChartInner({
                   pieValue={(d) => d.value}
                   outerRadius={radius}
                   innerRadius={innerRadius}
-                padAngle={effectivePadAngle}
-                cornerRadius={effectiveCornerRadius}
+                  padAngle={effectivePadAngle}
+                  cornerRadius={effectiveCornerRadius}
                   startAngle={startAngle}
                   endAngle={animatedEnd}
                   pieSortValues={pieSortValues}
@@ -304,11 +311,13 @@ function PieChartInner({
                       const dataIdx = data.findIndex((d) => d.id === sliceId);
                       const weight = dataIdx >= 0 ? (weightsRef.current[dataIdx] ?? 1) : 1;
                       const isSettled = Math.abs(weight - targetWeights[dataIdx]) < 0.01;
+                      const pFill = getPatternFill(arc.data.fillPattern, patternId);
+                      const arcD = path(arc) || "";
 
                       return (
                         <g key={sliceId}>
                           <path
-                            d={path(arc) || ""}
+                            d={arcD}
                             fill={colorScale(sliceId)}
                             className={cx(
                               styles.slice,
@@ -333,6 +342,17 @@ function PieChartInner({
                               }
                             }}
                           />
+                          {pFill && (
+                            <path
+                              d={arcD}
+                              fill={pFill}
+                              className={cx(
+                                styles.slice,
+                                isDimmed && styles.sliceDimmed
+                              )}
+                              pointerEvents="none"
+                            />
+                          )}
                           {showSliceLabels &&
                             angleSpan >= sliceLabelMinAngle &&
                             sweepDone &&

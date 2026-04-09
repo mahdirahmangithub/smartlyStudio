@@ -186,10 +186,10 @@ function ZoomDemo() {
 function IconIndicatorDemo() {
   const series = useMemo<Series<DataPoint>[]>(
     () => [
-      { id: "meta", label: "Meta", data: generateData(30, 80, 8), icon: <Icon name="Meta_color" size={8} /> },
-      { id: "reddit", label: "Reddit", data: generateData(30, 60, 10), icon: <Icon name="Reddit_color" size={8} /> },
-      { id: "tiktok", label: "TikTok", data: generateData(30, 45, 6), icon: <Icon name="TikTok_color" size={8} /> },
-      { id: "snapchat", label: "Snapchat", data: generateData(30, 70, 9), icon: <Icon name="Snapchat_color" size={8} /> },
+      { id: "meta", label: "Meta", data: generateData(30, 80, 8), icon: <Icon name="Meta_color" size={16} /> },
+      { id: "reddit", label: "Reddit", data: generateData(30, 60, 10), icon: <Icon name="Reddit_color" size={16} /> },
+      { id: "tiktok", label: "TikTok", data: generateData(30, 45, 6), icon: <Icon name="TikTok_color" size={16} /> },
+      { id: "snapchat", label: "Snapchat", data: generateData(30, 70, 9), icon: <Icon name="Snapchat_color" size={16} /> },
     ],
     []
   );

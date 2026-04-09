@@ -4,4 +4,5 @@ export type {
   DrawerDensity,
   DrawerMode,
   DrawerPlacement,
+  DrawerSide,
 } from "./Drawer";

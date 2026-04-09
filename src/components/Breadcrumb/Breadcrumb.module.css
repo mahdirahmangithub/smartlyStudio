@@ -2,6 +2,7 @@
 
 .root {
   display: block;
+  min-width: 0;
 }
 
 /* ── ordered list ── */
@@ -18,6 +19,28 @@
 
 .list.basicList {
   gap: var(--spacing-sm);
+}
+
+/* ── no-wrap mode ── */
+
+.list.noWrap {
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.noWrap > .listItem {
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+}
+
+.noWrap > .iconOnlyItem {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.noWrap > .collapsedItem {
+  flex-shrink: 0;
 }
 
 /* ── list item wrappers ── */
@@ -60,19 +83,33 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 16px;
-  height: 16px;
-  color: var(--text-neutral-tertiary-default);
+  width: var(--spacing-lg);
+  height: var(--spacing-lg);
+  color: var(--text-neutral-placeholder);
   transition: transform var(--animation-state-micro-duration) var(--animation-state-micro-easing);
 }
 
+.listItem:has([aria-disabled="true"]) .chevron {
+  color: var(--text-neutral-disable);
+}
+
 /* Hovering an item rotates its own chevron AND all subsequent items' chevrons */
-.listItem:hover .chevron,
-.listItem:hover ~ .listItem .chevron,
-.listItem:hover ~ .collapsedItem .chevron,
+.listItem:hover:not(:has([aria-disabled="true"])) .chevron,
+.listItem:hover:not(:has([aria-disabled="true"])) ~ .listItem .chevron,
+.listItem:hover:not(:has([aria-disabled="true"])) ~ .collapsedItem .chevron,
 .collapsedItem:hover .chevron,
 .collapsedItem:hover ~ .listItem .chevron {
   transform: rotate(180deg);
+}
+
+/* ── select item wrapper ── */
+
+.selectItem {
+  overflow: visible;
+}
+
+.selectItem.pill {
+  gap: 0;
 }
 
 /* ── collapsed button wrapper ── */

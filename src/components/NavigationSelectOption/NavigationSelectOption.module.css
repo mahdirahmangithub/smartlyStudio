@@ -50,6 +50,22 @@
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
+   SELECTED
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.selected {
+  background: var(--element-fill-brand-tertiary-hover);
+}
+
+.selected .label {
+  color: var(--text-brand-default);
+}
+
+.selected:hover:not(.disabled) .label {
+  color: var(--text-brand-hover);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
    DISABLED
    ═══════════════════════════════════════════════════════════════════════ */
 
@@ -98,5 +114,13 @@
 
 .disabled .label {
   color: var(--text-neutral-disable);
+}
+
+/* ── check icon (selected indicator) ─────────────────────────────────── */
+
+.checkIcon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--text-brand-default);
 }
 

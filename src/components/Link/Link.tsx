@@ -1,4 +1,4 @@
-import type { AnchorHTMLAttributes, ReactNode } from "react";
+import { forwardRef, type AnchorHTMLAttributes, type ReactNode } from "react";
 import { Icon } from "../Icon";
 import styles from "./Link.module.css";
 
@@ -32,51 +32,59 @@ export interface LinkProps
   children?: ReactNode;
 }
 
-export function Link({
-  size = "lg",
-  type = "neutral",
-  strong = false,
-  icon,
-  external = false,
-  disabled = false,
-  inline = false,
-  underline = false,
-  className,
-  children,
-  ...rest
-}: LinkProps) {
-  const showIcon = icon ?? external;
+export const Link = forwardRef<HTMLAnchorElement, LinkProps>(
+  function Link(
+    {
+      size = "lg",
+      type = "neutral",
+      strong = false,
+      icon,
+      external = false,
+      disabled = false,
+      inline = false,
+      underline = false,
+      className,
+      children,
+      ...rest
+    },
+    ref,
+  ) {
+    const showIcon = icon ?? external;
 
-  const cls = [
-    styles.link,
-    !inline && styles[size],
-    inline && styles.inline,
-    styles[type],
-    strong && styles.strong,
-    underline && styles.underline,
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+    const cls = [
+      styles.link,
+      !inline && styles[size],
+      inline && styles.inline,
+      styles[type],
+      strong && styles.strong,
+      underline && styles.underline,
+      className,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
-  return (
-    <a
-      className={cls}
-      aria-disabled={disabled || undefined}
-      tabIndex={disabled ? -1 : undefined}
-      {...(external && !disabled
-        ? { target: "_blank", rel: "noopener noreferrer" }
-        : undefined)}
-      {...rest}
-    >
-      {children}
-      {showIcon && (
-        <Icon
-          name="open_in_new"
-          size={inline ? ICON_SIZE.md : ICON_SIZE[size]}
-          className={styles.icon}
-        />
-      )}
-    </a>
-  );
-}
+    return (
+      <a
+        ref={ref}
+        className={cls}
+        aria-disabled={disabled || undefined}
+        tabIndex={disabled ? -1 : undefined}
+        {...(external && !disabled
+          ? { target: "_blank", rel: "noopener noreferrer" }
+          : undefined)}
+        {...rest}
+      >
+        {children}
+        {showIcon && (
+          <Icon
+            name="open_in_new"
+            size={inline ? ICON_SIZE.md : ICON_SIZE[size]}
+            className={styles.icon}
+          />
+        )}
+      </a>
+    );
+  },
+);
+
+Link.displayName = "Link";

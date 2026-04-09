@@ -17,12 +17,32 @@
   visibility: hidden;
 }
 
+/* ── Bottom side — viewport ── */
+
+.panel[data-side="bottom"] {
+  top: auto;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 50vh;
+  max-height: 80vh;
+  transform: translateY(100%);
+}
+
 /* ── Resizing — disable transitions during drag ── */
 
 .panel.resizing {
   transition: none !important;
-  will-change: width;
   user-select: none;
+}
+
+.panel.resizing[data-side="bottom"] {
+  will-change: height;
+}
+
+.panel.resizing:not([data-side="bottom"]) {
+  will-change: width;
 }
 
 /* ── Contained overlay — wrapper approach ── */
@@ -36,13 +56,11 @@
   overflow: hidden;
   pointer-events: none;
   z-index: var(--z-index-dialog);
+  contain: layout paint style;
 }
 
 .containedSlot .panel {
   position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
   display: flex;
   flex-direction: column;
   background: var(--element-surface-over);
@@ -50,10 +68,27 @@
   outline: none;
   visibility: visible;
   pointer-events: none;
-  transform: translateX(100%);
   transition:
-    transform var(--animation-drawer-enter-duration) var(--animation-drawer-enter-easing),
-    box-shadow 0s var(--animation-drawer-enter-duration);
+    transform var(--animation-drawer-exit-duration) var(--animation-drawer-exit-easing),
+    box-shadow 0s var(--animation-drawer-exit-duration);
+}
+
+.containedSlot .panel[data-side="right"] {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  transform: translateX(100%);
+}
+
+.containedSlot .panel[data-side="bottom"] {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 50%;
+  max-height: 80%;
+  transform: translateY(100%);
 }
 
 .containedSlot .panel[data-open] {
@@ -157,5 +192,43 @@
 }
 
 .resizing .resizeHandle::after {
+  opacity: var(--opacity-100);
+}
+
+/* ── Resize handle (top edge — bottom drawer) ── */
+
+.resizeHandleTop {
+  position: absolute;
+  top: calc(((var(--space-sm-plus) / 2) + var(--space-hair-line)) * -1);
+  left: 0;
+  right: 0;
+  height: var(--space-sm-plus);
+  cursor: ns-resize;
+  z-index: var(--z-index-above);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+.resizeHandleTop::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  width: calc(100% - 8px);
+  height: var(--space-2xs);
+  background-color: var(--element-fill-brand-primary-default);
+  opacity: var(--opacity-0);
+  border-radius: var(--radius-full);
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+  pointer-events: none;
+}
+
+.resizeHandleTop:hover::after,
+.resizeHandleTop:active::after {
+  opacity: var(--opacity-100);
+}
+
+.resizing .resizeHandleTop::after {
   opacity: var(--opacity-100);
 }

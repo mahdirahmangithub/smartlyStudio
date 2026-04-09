@@ -1,4 +1,5 @@
 import { type HTMLAttributes, type ReactNode } from "react";
+import { Icon } from "../Icon";
 import { OptionItemLeading } from "../OptionItemLeading";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
@@ -11,6 +12,8 @@ export interface NavigationSelectOptionProps
   labelText?: string;
   /** Content for the leading slot (e.g. an Icon) */
   leading?: ReactNode;
+  /** Marks this option as currently selected */
+  selected?: boolean;
   onClick?: () => void;
 }
 
@@ -19,6 +22,7 @@ export function NavigationSelectOption({
   disabled = false,
   labelText = "Label",
   leading,
+  selected = false,
   onClick,
   className,
   ...rest
@@ -41,9 +45,10 @@ export function NavigationSelectOption({
     <div className={cx(styles.option, className)} {...rest}>
       <div
         role="option"
+        aria-selected={selected}
         aria-disabled={disabled || undefined}
         tabIndex={disabled ? -1 : 0}
-        className={cx(styles.content, disabled && styles.disabled)}
+        className={cx(styles.content, selected && styles.selected, disabled && styles.disabled)}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
       >
@@ -62,6 +67,12 @@ export function NavigationSelectOption({
             <span ref={labelRef} className={styles.label}>{labelText}</span>
           </Tooltip>
         </div>
+
+        {selected && (
+          <span className={styles.checkIcon} aria-hidden="true">
+            <Icon name="check" size={20} />
+          </span>
+        )}
       </div>
     </div>
   );

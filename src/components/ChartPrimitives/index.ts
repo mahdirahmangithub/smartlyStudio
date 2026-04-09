@@ -36,10 +36,14 @@ export {
   isCategoricalColor,
   createBisector,
   findNearestDatum,
+  getPatternFill,
+  DASH_PATTERNS,
   DEFAULT_MARGIN,
   CATEGORICAL_TOKENS,
 } from "./chartUtils";
 export type { Series, Margin, ConfidenceBand, LineDash, BarFillPattern } from "./chartUtils";
+
+export { FillPatternDefs } from "./FillPatternDefs";
 
 export {
   getCategoricalPalette,

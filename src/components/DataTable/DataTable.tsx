@@ -193,6 +193,74 @@ function getLeafCount<T>(col: ColumnDef<T>): number {
   return col.children.reduce((s, c) => s + getLeafCount(c), 0);
 }
 
+function getDescendantLeafKeys<T>(col: ColumnDef<T>): string[] {
+  if (!col.children?.length) return [col.key];
+  const out: string[] = [];
+  for (const c of col.children) out.push(...getDescendantLeafKeys(c));
+  return out;
+}
+
+interface GroupResizeState {
+  leafKeys: string[];
+  initialWidths: Map<string, number>;
+  totalW0: number;
+  neighborLeafKeys: string[];
+  neighborInitialWidths: Map<string, number>;
+  neighborTotalW0: number;
+}
+
+/**
+ * Distribute `targetTotal` across leaves proportionally to their initial widths
+ * while respecting per-leaf min/max. Iteratively locks clamped leaves and
+ * redistributes the remaining budget so the sum always equals `targetTotal`.
+ */
+function distributeProportional(
+  keys: string[],
+  initialWidths: Map<string, number>,
+  initialTotal: number,
+  targetTotal: number,
+  getMin: (k: string) => number,
+  getMax: (k: string) => number
+): Map<string, number> {
+  const result = new Map<string, number>();
+  const locked = new Set<string>();
+  let budget = targetTotal;
+  let pool = initialTotal;
+
+  for (let pass = 0; pass < keys.length; pass++) {
+    let changed = false;
+    for (const k of keys) {
+      if (locked.has(k)) continue;
+      const ratio = pool > 0 ? (initialWidths.get(k) ?? 0) / pool : 1 / (keys.length - locked.size);
+      const raw = ratio * budget;
+      const min = getMin(k);
+      const max = getMax(k);
+      if (raw < min) {
+        result.set(k, min);
+        locked.add(k);
+        budget -= min;
+        pool -= initialWidths.get(k) ?? 0;
+        changed = true;
+      } else if (raw > max) {
+        result.set(k, max);
+        locked.add(k);
+        budget -= max;
+        pool -= initialWidths.get(k) ?? 0;
+        changed = true;
+      }
+    }
+    if (!changed) break;
+  }
+
+  for (const k of keys) {
+    if (locked.has(k)) continue;
+    const ratio = pool > 0 ? (initialWidths.get(k) ?? 0) / pool : 1 / (keys.length - locked.size);
+    result.set(k, ratio * budget);
+  }
+
+  return result;
+}
+
 interface HeaderCell<T = any> {
   column: ColumnDef<T>;
   colSpan: number;
@@ -336,30 +404,9 @@ export function DataTable<T extends Record<string, any>>({
     top: false,
     left: false,
     right: false,
+    activeLeftEdge: null as string | null,
   });
-
-  useEffect(() => {
-    const el = wrapperRef.current;
-    if (!el) return;
-    const update = () => {
-      const t = el.scrollTop > 0;
-      const l = el.scrollLeft > 0;
-      const r = el.scrollWidth - el.scrollLeft - el.clientWidth > 1;
-      setScrollState((prev) =>
-        prev.top === t && prev.left === l && prev.right === r
-          ? prev
-          : { top: t, left: l, right: r }
-      );
-    };
-    el.addEventListener("scroll", update, { passive: true });
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => {
-      el.removeEventListener("scroll", update);
-      ro.disconnect();
-    };
-  }, []);
+  const leftFixedThresholdsRef = useRef<{ key: string; threshold: number }[]>([]);
 
   /* ── Visible container height (for resize handle indicator) ── */
   useEffect(() => {
@@ -489,15 +536,15 @@ export function DataTable<T extends Record<string, any>>({
   const [resizingCol, setResizingCol] = useState<string | null>(null);
   const frozenWidths = useRef<Map<string, number> | null>(null);
   const resizeNeighborKey = useRef<string | null>(null);
+  const resizeActiveKeys = useRef<Set<string>>(new Set());
+  const groupResizeRef = useRef<GroupResizeState | null>(null);
 
   const activeWidths = useMemo(() => {
     const result = new Map<string, number | string>();
-    const nKey = resizeNeighborKey.current;
     for (const col of leafCols) {
       if (
         frozenWidths.current &&
-        col.key !== resizingCol &&
-        col.key !== nKey
+        !resizeActiveKeys.current.has(col.key)
       ) {
         result.set(
           col.key,
@@ -661,7 +708,12 @@ export function DataTable<T extends Record<string, any>>({
   const resizeMode = columnResize?.mode ?? "fixed";
 
   const onResizeStart = useCallback(
-    (colKey: string, e: ReactMouseEvent) => {
+    (
+      colKey: string,
+      e: ReactMouseEvent,
+      groupLeafKeys?: string[],
+      neighborLeafKeys?: string[]
+    ) => {
       e.preventDefault();
       e.stopPropagation();
 
@@ -672,26 +724,68 @@ export function DataTable<T extends Record<string, any>>({
 
       setResizingCol(colKey);
       resizeX0.current = e.clientX;
-      resizeW0.current = frozen.get(colKey) ?? DEFAULT_COL_WIDTH;
 
-      const col = leafCols.find((c) => c.key === colKey);
-      resizeMinW.current = col?.minWidth ?? columnResize?.minWidth ?? 50;
-      resizeMaxW.current = col?.maxWidth ?? columnResize?.maxWidth ?? 9999;
+      resizeActiveKeys.current.clear();
 
-      if (resizeMode === "fixed") {
-        const idx = leafCols.findIndex((c) => c.key === colKey);
-        const neighbor =
-          idx < leafCols.length - 1 ? leafCols[idx + 1] : null;
-        resizeNeighborKey.current = neighbor?.key ?? null;
-        resizeNeighborW0.current = neighbor
-          ? (frozen.get(neighbor.key) ?? DEFAULT_COL_WIDTH)
-          : 0;
-        resizeNeighborMinW.current =
-          neighbor?.minWidth ?? columnResize?.minWidth ?? 50;
-        resizeNeighborMaxW.current =
-          neighbor?.maxWidth ?? columnResize?.maxWidth ?? 9999;
-      } else {
+      if (groupLeafKeys && groupLeafKeys.length > 0) {
+        const initWidths = new Map<string, number>();
+        let totalW0 = 0;
+        for (const k of groupLeafKeys) {
+          const w = frozen.get(k) ?? DEFAULT_COL_WIDTH;
+          initWidths.set(k, w);
+          totalW0 += w;
+          resizeActiveKeys.current.add(k);
+        }
+
+        let nInitWidths = new Map<string, number>();
+        let nTotalW0 = 0;
+        const nKeys = resizeMode === "fixed" ? (neighborLeafKeys ?? []) : [];
+        if (nKeys.length > 0) {
+          for (const k of nKeys) {
+            const w = frozen.get(k) ?? DEFAULT_COL_WIDTH;
+            nInitWidths.set(k, w);
+            nTotalW0 += w;
+            resizeActiveKeys.current.add(k);
+          }
+        }
+
+        groupResizeRef.current = {
+          leafKeys: groupLeafKeys,
+          initialWidths: initWidths,
+          totalW0,
+          neighborLeafKeys: nKeys,
+          neighborInitialWidths: nInitWidths,
+          neighborTotalW0: nTotalW0,
+        };
+
+        resizeW0.current = totalW0;
         resizeNeighborKey.current = null;
+      } else {
+        groupResizeRef.current = null;
+        resizeW0.current = frozen.get(colKey) ?? DEFAULT_COL_WIDTH;
+
+        const col = leafCols.find((c) => c.key === colKey);
+        resizeMinW.current = col?.minWidth ?? columnResize?.minWidth ?? 50;
+        resizeMaxW.current = col?.maxWidth ?? columnResize?.maxWidth ?? 9999;
+
+        resizeActiveKeys.current.add(colKey);
+
+        if (resizeMode === "fixed") {
+          const idx = leafCols.findIndex((c) => c.key === colKey);
+          const neighbor =
+            idx < leafCols.length - 1 ? leafCols[idx + 1] : null;
+          resizeNeighborKey.current = neighbor?.key ?? null;
+          resizeNeighborW0.current = neighbor
+            ? (frozen.get(neighbor.key) ?? DEFAULT_COL_WIDTH)
+            : 0;
+          resizeNeighborMinW.current =
+            neighbor?.minWidth ?? columnResize?.minWidth ?? 50;
+          resizeNeighborMaxW.current =
+            neighbor?.maxWidth ?? columnResize?.maxWidth ?? 9999;
+          if (neighbor) resizeActiveKeys.current.add(neighbor.key);
+        } else {
+          resizeNeighborKey.current = null;
+        }
       }
     },
     [leafCols, numericWidth, columnResize, resizeMode]
@@ -700,11 +794,67 @@ export function DataTable<T extends Record<string, any>>({
   useEffect(() => {
     if (!resizingCol) return;
     const neighborKey = resizeNeighborKey.current;
+    const grp = groupResizeRef.current;
 
     const onMove = (e: globalThis.MouseEvent) => {
       const delta = e.clientX - resizeX0.current;
 
-      if (neighborKey) {
+      if (grp) {
+        const { leafKeys, initialWidths, totalW0, neighborLeafKeys, neighborInitialWidths, neighborTotalW0 } = grp;
+        const defaultMin = columnResize?.minWidth ?? 50;
+        const defaultMax = columnResize?.maxWidth ?? 9999;
+
+        const leafMin = (k: string) => leafCols.find((c) => c.key === k)?.minWidth ?? defaultMin;
+        const leafMax = (k: string) => leafCols.find((c) => c.key === k)?.maxWidth ?? defaultMax;
+
+        const groupMinTotal = leafKeys.reduce((s, k) => s + leafMin(k), 0);
+        const groupMaxTotal = leafKeys.reduce((s, k) => s + leafMax(k), 0);
+
+        let newTotal = Math.max(groupMinTotal, Math.min(groupMaxTotal, totalW0 + delta));
+
+        if (neighborLeafKeys.length > 0) {
+          const nMinTotal = neighborLeafKeys.reduce((s, k) => s + leafMin(k), 0);
+          const nMaxTotal = neighborLeafKeys.reduce((s, k) => s + leafMax(k), 0);
+
+          let neighborNewTotal = neighborTotalW0 - (newTotal - totalW0);
+          if (neighborNewTotal < nMinTotal) {
+            neighborNewTotal = nMinTotal;
+            newTotal = totalW0 + neighborTotalW0 - neighborNewTotal;
+          } else if (neighborNewTotal > nMaxTotal) {
+            neighborNewTotal = nMaxTotal;
+            newTotal = totalW0 + neighborTotalW0 - neighborNewTotal;
+          }
+          newTotal = Math.max(groupMinTotal, Math.min(groupMaxTotal, newTotal));
+          neighborNewTotal = neighborTotalW0 - (newTotal - totalW0);
+
+          const grpWidths = distributeProportional(leafKeys, initialWidths, totalW0, newTotal, leafMin, leafMax);
+          const nbrWidths = distributeProportional(neighborLeafKeys, neighborInitialWidths, neighborTotalW0, neighborNewTotal, leafMin, leafMax);
+
+          setWidthOverrides((prev) => {
+            const m = new Map(prev);
+            for (const [k, w] of grpWidths) {
+              m.set(k, w);
+              columnResize?.onResize?.(k, w);
+            }
+            for (const [k, w] of nbrWidths) {
+              m.set(k, w);
+              columnResize?.onResize?.(k, w);
+            }
+            return m;
+          });
+        } else {
+          const grpWidths = distributeProportional(leafKeys, initialWidths, totalW0, newTotal, leafMin, leafMax);
+
+          setWidthOverrides((prev) => {
+            const m = new Map(prev);
+            for (const [k, w] of grpWidths) {
+              m.set(k, w);
+              columnResize?.onResize?.(k, w);
+            }
+            return m;
+          });
+        }
+      } else if (neighborKey) {
         let newW = Math.max(
           resizeMinW.current,
           Math.min(resizeMaxW.current, resizeW0.current + delta)
@@ -752,17 +902,21 @@ export function DataTable<T extends Record<string, any>>({
 
     const onUp = () => {
       const frozen = frozenWidths.current;
-      if (!neighborKey && frozen) {
+      const hasNeighbor = neighborKey || (grp && grp.neighborLeafKeys.length > 0);
+      if (!hasNeighbor && frozen) {
+        const activeSnapshot = new Set(resizeActiveKeys.current);
         setWidthOverrides((prev) => {
           const m = new Map(prev);
           for (const [key, val] of frozen) {
-            if (key !== resizingCol) m.set(key, val);
+            if (!activeSnapshot.has(key)) m.set(key, val);
           }
           return m;
         });
       }
       frozenWidths.current = null;
       resizeNeighborKey.current = null;
+      groupResizeRef.current = null;
+      resizeActiveKeys.current.clear();
       setResizingCol(null);
       requestAnimationFrame(() => { didResize.current = false; });
     };
@@ -772,7 +926,7 @@ export function DataTable<T extends Record<string, any>>({
       document.removeEventListener("mousemove", onMove);
       document.removeEventListener("mouseup", onUp);
     };
-  }, [resizingCol, columnResize]);
+  }, [resizingCol, columnResize, leafCols]);
 
   /* ══════════════════════════════════════════════════════════
      Row Drag & Drop
@@ -953,11 +1107,53 @@ export function DataTable<T extends Record<string, any>>({
     return calcStickyOffsets(leafCols, w, extraLeft);
   }, [leafCols, numericWidth, internalColCount]);
 
-  const lastLeftKey = useMemo(() => {
-    let last: string | null = null;
-    for (const c of leafCols) if (c.fixed === "left") last = c.key;
-    return last;
-  }, [leafCols]);
+  useEffect(() => {
+    const thresholds: { key: string; threshold: number }[] = [];
+    let naturalPos = internalColCount * internalColWidth;
+    let stickyOff = internalColCount * internalColWidth;
+    for (const c of leafCols) {
+      if (c.fixed === "left") {
+        thresholds.push({ key: c.key, threshold: naturalPos - stickyOff });
+        stickyOff += numericWidth(c);
+      }
+      naturalPos += numericWidth(c);
+    }
+    leftFixedThresholdsRef.current = thresholds;
+  }, [leafCols, numericWidth, internalColCount]);
+
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const update = () => {
+      const t = el.scrollTop > 0;
+      const l = el.scrollLeft > 0;
+      const r = el.scrollWidth - el.scrollLeft - el.clientWidth > 1;
+      const sx = el.scrollLeft;
+      const thresholds = leftFixedThresholdsRef.current;
+
+      let edge: string | null = null;
+      for (let i = thresholds.length - 1; i >= 0; i--) {
+        if (sx >= thresholds[i].threshold) {
+          edge = thresholds[i].key;
+          break;
+        }
+      }
+
+      setScrollState((prev) =>
+        prev.top === t && prev.left === l && prev.right === r && prev.activeLeftEdge === edge
+          ? prev
+          : { top: t, left: l, right: r, activeLeftEdge: edge }
+      );
+    };
+    el.addEventListener("scroll", update, { passive: true });
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, [leafCols, numericWidth, internalColCount]);
 
   const firstRightKey = useMemo(() => {
     for (const c of leafCols) if (c.fixed === "right") return c.key;
@@ -972,7 +1168,7 @@ export function DataTable<T extends Record<string, any>>({
       return {
         position: "sticky",
         [sticky.side]: sticky.offset,
-        zIndex: 1,
+        zIndex: sticky.side === "left" ? 2 : 1,
       };
     },
     [stickyMap]
@@ -981,11 +1177,11 @@ export function DataTable<T extends Record<string, any>>({
   const cellStickyClass = useCallback(
     (col: ColumnDef<T>): string | false => {
       if (!stickyMap.has(col.key)) return false;
-      if (col.key === lastLeftKey) return styles.stickyLeftEdge;
+      if (col.key === scrollState.activeLeftEdge) return styles.stickyLeftEdge;
       if (col.key === firstRightKey) return styles.stickyRightEdge;
       return styles.stickyCell;
     },
-    [stickyMap, lastLeftKey, firstRightKey]
+    [stickyMap, scrollState.activeLeftEdge, firstRightKey]
   );
 
   /* ══════════════════════════════════════════════════════════
@@ -1014,23 +1210,44 @@ export function DataTable<T extends Record<string, any>>({
             const isLastLeaf =
               cell.isLeaf &&
               leafCols[leafCols.length - 1]?.key === col.key;
-            const isResizable =
+            const isLastInRow = cellIdx === row.length - 1;
+            const isLeafResizable =
               cell.isLeaf &&
               col.resizable !== false &&
               !!columnResize &&
               !(resizeMode === "fixed" && isLastLeaf);
+            const isGroupResizable =
+              !cell.isLeaf &&
+              col.resizable !== false &&
+              !!columnResize &&
+              !(resizeMode === "fixed" && isLastInRow);
+
+            let groupLeafKeys: string[] | undefined;
+            let neighborLeafKeys: string[] | undefined;
+            if (isGroupResizable) {
+              groupLeafKeys = getDescendantLeafKeys(col);
+              const nextCell = row[cellIdx + 1];
+              if (nextCell) {
+                neighborLeafKeys = nextCell.isLeaf
+                  ? [nextCell.column.key]
+                  : getDescendantLeafKeys(nextCell.column);
+              }
+            }
+
+            const canResize = isLeafResizable || isGroupResizable;
             const sortDir =
               sortState?.columnKey === col.key
                 ? sortState.direction
                 : null;
 
-            const stickyS =
-              cell.isLeaf && stickyMap.has(col.key)
+            const stickyEntry = cell.isLeaf ? stickyMap.get(col.key) : undefined;
+            const stickyS = stickyEntry
                 ? {
                     position: "sticky" as const,
-                    [stickyMap.get(col.key)!.side]:
-                      stickyMap.get(col.key)!.offset,
-                    zIndex: stickyHeader ? 4 : 2,
+                    [stickyEntry.side]: stickyEntry.offset,
+                    zIndex: stickyHeader
+                      ? (stickyEntry.side === "left" ? 5 : 4)
+                      : (stickyEntry.side === "left" ? 3 : 2),
                   }
                 : undefined;
 
@@ -1087,10 +1304,12 @@ export function DataTable<T extends Record<string, any>>({
                     ) : undefined
                   }
                 />
-                {isResizable && (
+                {canResize && (
                   <span
                     className={styles.resizeHandle}
-                    onMouseDown={(e) => onResizeStart(col.key, e)}
+                    onMouseDown={(e) =>
+                      onResizeStart(col.key, e, groupLeafKeys, neighborLeafKeys)
+                    }
                     role="separator"
                     aria-orientation="vertical"
                   />

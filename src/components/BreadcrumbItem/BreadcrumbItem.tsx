@@ -2,6 +2,8 @@ import { forwardRef, type ReactNode } from "react";
 import { Icon } from "../Icon";
 import { Link } from "../Link";
 import type { LinkSize } from "../Link";
+import { Tooltip } from "../Tooltip";
+import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./BreadcrumbItem.module.css";
 import { cx } from "../../utils/cx";
 
@@ -25,6 +27,8 @@ export interface BreadcrumbItemProps {
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
   /** Accessible label — required for icon-only items */
   "aria-label"?: string;
+  /** Max width of the label before truncation (default "20rem") */
+  maxWidth?: string | number;
   children?: ReactNode;
   className?: string;
 }
@@ -35,14 +39,8 @@ const ICON_SIZE: Record<BreadcrumbItemSize, number> = {
   sm: 16,
 };
 
-const PILL_LINK_SIZE: Record<BreadcrumbItemSize, LinkSize> = {
+const LINK_SIZE: Record<BreadcrumbItemSize, LinkSize> = {
   lg: "md",
-  md: "md",
-  sm: "sm",
-};
-
-const BASIC_LINK_SIZE: Record<BreadcrumbItemSize, LinkSize> = {
-  lg: "lg",
   md: "md",
   sm: "sm",
 };
@@ -55,6 +53,7 @@ export const BreadcrumbItem = forwardRef<HTMLSpanElement, BreadcrumbItemProps>(
       current = false,
       disabled = false,
       basic = false,
+      maxWidth,
       children,
       className,
       href,
@@ -66,6 +65,9 @@ export const BreadcrumbItem = forwardRef<HTMLSpanElement, BreadcrumbItemProps>(
     const variant = basic ? styles.flat : styles.pill;
     const isIconOnly = !!icon && !children;
 
+    const childrenText = typeof children === "string" ? children : undefined;
+    const [linkRef, isTruncated] = useIsTruncated<HTMLAnchorElement>(childrenText);
+
     const cls = cx(
       styles.root,
       variant,
@@ -76,7 +78,7 @@ export const BreadcrumbItem = forwardRef<HTMLSpanElement, BreadcrumbItemProps>(
       className,
     );
 
-    const linkSize = basic ? BASIC_LINK_SIZE[size] : PILL_LINK_SIZE[size];
+    const linkSize = LINK_SIZE[size];
 
     const iconEl = icon && (
       <span className={styles.icon}>
@@ -88,13 +90,18 @@ export const BreadcrumbItem = forwardRef<HTMLSpanElement, BreadcrumbItemProps>(
       </span>
     );
 
+    const linkStyle = maxWidth
+      ? ({ "--breadcrumb-label-max-width": typeof maxWidth === "number" ? `${maxWidth}px` : maxWidth } as React.CSSProperties)
+      : undefined;
+
     const linkProps = {
       href: current ? undefined : href,
       onClick: current ? undefined : onClick,
       disabled,
       size: linkSize,
-      strong: !current && !basic,
+      strong: !current,
       className: styles.link,
+      style: linkStyle,
       "aria-current": current ? ("page" as const) : undefined,
     };
 
@@ -108,9 +115,17 @@ export const BreadcrumbItem = forwardRef<HTMLSpanElement, BreadcrumbItemProps>(
           <>
             {iconEl}
             {children && (
-              <Link {...linkProps} aria-label={ariaLabel}>
-                {children}
-              </Link>
+              <Tooltip
+                type="neutral"
+                label={childrenText ?? ""}
+                showTail={false}
+                placement="top"
+                disabled={!isTruncated}
+              >
+                <Link ref={linkRef} {...linkProps} aria-label={ariaLabel}>
+                  {children}
+                </Link>
+              </Tooltip>
             )}
           </>
         )}

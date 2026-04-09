@@ -445,6 +445,45 @@ function ManySlices() {
   );
 }
 
+const PATTERN_DATA: PieSlice[] = [
+  { id: "organic", label: "Organic", value: 4200 },
+  { id: "paid", label: "Paid", value: 2800, fillPattern: "dotted" },
+  { id: "referral", label: "Referral", value: 1600, fillPattern: "hatch-right" },
+  { id: "direct", label: "Direct", value: 900, fillPattern: "hatch-left" },
+];
+
+function FillPatternDemo() {
+  return (
+    <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+      <div>
+        <p style={{ fontSize: 13, margin: "0 0 4px", opacity: 0.7 }}>Doughnut with patterns</p>
+        <div style={{ maxWidth: 340 }}>
+          <PieChart
+            data={PATTERN_DATA}
+            thickness={40}
+            height={340}
+            centerValue="9.5k"
+            centerLabel="Total traffic"
+            tooltipValueFormat={(v) => v.toLocaleString()}
+          />
+        </div>
+      </div>
+      <div>
+        <p style={{ fontSize: 13, margin: "0 0 4px", opacity: 0.7 }}>Solid pie with patterns</p>
+        <div style={{ maxWidth: 300 }}>
+          <PieChart
+            data={PATTERN_DATA}
+            thickness={0}
+            height={300}
+            showSliceLabels
+            tooltipValueFormat={(v) => v.toLocaleString()}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function PieChartPlayground() {
   const [oklch, setOklch] = useState(isOklchEnhanced);
   const [, rerender] = useState(0);
@@ -483,6 +522,16 @@ export default function PieChartPlayground() {
         </p>
         <div style={cardStyle}>
           <BasicDoughnut />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Fill Patterns</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Slices can have dotted, hatch-right, or hatch-left patterns for accessibility and distinction.
+        </p>
+        <div style={cardStyle}>
+          <FillPatternDemo />
         </div>
       </section>
 

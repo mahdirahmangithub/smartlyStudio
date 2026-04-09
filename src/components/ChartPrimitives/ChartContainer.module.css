@@ -92,8 +92,8 @@
 }
 
 .indicatorIcon {
-  width: var(--spacing-sm-plus);
-  height: var(--spacing-sm-plus);
+  width: var(--spacing-md);
+  height: var(--spacing-md);
   flex-shrink: 0;
   position: relative;
   display: flex;

@@ -4,6 +4,7 @@
   align-items: flex-start;
   gap: var(--spacing-sm);
   padding: var(--spacing-md);
+  width: max-content;
   min-width: 400px;
   max-width: 688px;
   border-radius: var(--radius-xl);
@@ -52,6 +53,8 @@
 
 .contentAction.horizontal {
   gap: 0;
+  flex-basis: auto;
+  flex-shrink: 1;
 }
 
 .contentAction.vertical {
@@ -77,6 +80,8 @@
 
 .text.horizontal {
   gap: 0;
+  flex-basis: auto;
+  flex-shrink: 1;
 }
 
 .text.vertical {
@@ -89,6 +94,10 @@
   align-items: center;
   width: 100%;
   padding: var(--spacing-sm-minus) 0;
+}
+
+.horizontal .title {
+  width: auto;
 }
 
 .titleText {
@@ -105,6 +114,11 @@
   font-size: var(--type-label-strong-md-size);
   line-height: var(--type-label-strong-md-line-height);
   letter-spacing: var(--type-label-strong-md-letter-spacing);
+}
+
+.horizontal .titleText {
+  flex-basis: auto;
+  flex-shrink: 1;
 }
 
 .neutral .titleText {

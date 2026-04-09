@@ -61,6 +61,9 @@ import SpinnerPlayground from "./pages/SpinnerPlayground";
 import CurrencyThumbnailPlayground from "./pages/CurrencyThumbnailPlayground";
 import FileTypeThumbnailPlayground from "./pages/FileTypeThumbnailPlayground";
 import FileAttachmentPlayground from "./pages/FileAttachmentPlayground";
+import FileUploadDropzonePlayground from "./pages/FileUploadDropzonePlayground";
+import FileUploadItemsPlayground from "./pages/FileUploadItemsPlayground";
+import FileUploadPlayground from "./pages/FileUploadPlayground";
 import SelectButtonPlayground from "./pages/SelectButtonPlayground";
 import SelectPlayground from "./pages/SelectPlayground";
 import SelectInputPlayground from "./pages/SelectInputPlayground";
@@ -112,12 +115,13 @@ import SpecialInputPlayground from "./pages/SpecialInputPlayground";
 import TestProgressiveBlurPlayground from "./pages/TestProgressiveBlurPlayground";
 import TabBarPlayground from "./pages/TabBarPlayground";
 import ToastPlayground from "./pages/ToastPlayground";
+import { Toaster } from "./components/Toast";
 import ToolbarButtonPlayground from "./pages/ToolbarButtonPlayground";
 import VideoPlayerPlayground from "./pages/VideoPlayerPlayground";
 import "./App.css";
 
 type Theme = "light" | "dark" | "dusk";
-type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
+type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divider" | "button-group" | "input-clear" | "input" | "chip" | "toggle-chip" | "select-chip" | "badge" | "icon-badge" | "notification-badge" | "expandable-badge" | "imagery" | "avatar" | "content-switcher-item" | "content-switcher" | "tooltip" | "keyboard-shortcut" | "hint" | "label" | "checkbox" | "radio" | "toggle" | "tag" | "row-container" | "option-leading" | "option-trailing" | "multi-select-option" | "single-select-option" | "generic-select-option" | "navigation-select-option" | "tag-multi-select-option" | "tag-single-select-option" | "add-item-option" | "option-separator" | "inline-input" | "search-input-attachment" | "search-input" | "select-option-header" | "dropdown" | "thumbnail" | "spinner" | "currency-thumbnail" | "file-type-thumbnail" | "file-attachment" | "file-upload-dropzone" | "file-upload-items" | "file-upload" | "select-button" | "select" | "select-input" | "multi-select-input" | "combobox" | "slider" | "inline-message" | "fieldset" | "title-text" | "body-text" | "link" | "text-showcase" | "textarea" | "data-table" | "animated-icons" | "typography" | "shimmer" | "data-cell-content"
 | "data-viz-colors"
 | "card"
 | "code-block"
@@ -339,6 +343,9 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "feedback-boolean", label: "FeedbackBoolean" },
   { key: "fieldset", label: "Fieldset" },
   { key: "file-attachment", label: "FileAttachment" },
+  { key: "file-upload-dropzone", label: "FileUploadDropzone" },
+  { key: "file-upload-items", label: "FileUploadItems" },
+  { key: "file-upload", label: "FileUpload" },
   { key: "file-type-thumbnail", label: "FileTypeThumb" },
   { key: "footer", label: "Footer" },
   { key: "generic-select-option", label: "GenericOpt" },
@@ -580,6 +587,9 @@ export default function App() {
             {page === "currency-thumbnail" && <CurrencyThumbnailPlayground />}
             {page === "file-type-thumbnail" && <FileTypeThumbnailPlayground />}
             {page === "file-attachment" && <FileAttachmentPlayground />}
+            {page === "file-upload-dropzone" && <FileUploadDropzonePlayground />}
+            {page === "file-upload-items" && <FileUploadItemsPlayground />}
+            {page === "file-upload" && <FileUploadPlayground />}
             {page === "select-button" && <SelectButtonPlayground />}
             {page === "select" && <SelectPlayground />}
             {page === "select-input" && <SelectInputPlayground />}
@@ -622,6 +632,8 @@ export default function App() {
           </div>
         </main>
       </div>
+
+      <Toaster position="bottom-left" />
     </div>
   );
 }

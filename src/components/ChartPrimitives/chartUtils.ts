@@ -9,6 +9,12 @@ export interface ConfidenceBand<D = any> {
 export type LineDash = "dotted" | "dashed" | "dash-dot";
 export type BarFillPattern = "dotted" | "hatch-right" | "hatch-left";
 
+export const DASH_PATTERNS: Record<LineDash, string> = {
+  dotted: "0 6",
+  dashed: "8 8",
+  "dash-dot": "12 6 0.5 6",
+};
+
 export interface Series<D = any> {
   id: string;
   label: string;
@@ -147,4 +153,20 @@ export function findNearestDatum<D>(
   const t0 = v0 instanceof Date ? v0.getTime() : v0;
   const t1 = v1 instanceof Date ? v1.getTime() : v1;
   return v - t0 > t1 - v ? d1 : d0;
+}
+
+/* ── Shared fill-pattern helpers ── */
+
+const FILL_PATTERN_IDS: Record<BarFillPattern, string> = {
+  dotted: "pat-dotted",
+  "hatch-right": "pat-hatch-right",
+  "hatch-left": "pat-hatch-left",
+};
+
+export function getPatternFill(
+  pattern: BarFillPattern | undefined,
+  prefix: string,
+): string | undefined {
+  if (!pattern) return undefined;
+  return `url(#${prefix}-${FILL_PATTERN_IDS[pattern]})`;
 }

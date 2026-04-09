@@ -1,5 +1,5 @@
 import { type CSSProperties, useState } from "react";
-import { Drawer, type DrawerDensity } from "../components/Drawer";
+import { Drawer, type DrawerDensity, type DrawerSide } from "../components/Drawer";
 import { Button } from "../components/Button";
 import { BodyText } from "../components/BodyText";
 
@@ -20,6 +20,7 @@ function OverlayDemo() {
   const [longContent, setLongContent] = useState(false);
   const [backdrop, setBackdrop] = useState(true);
   const [resizable, setResizable] = useState(true);
+  const [side, setSide] = useState<DrawerSide>("right");
 
   return (
     <div>
@@ -36,6 +37,14 @@ function OverlayDemo() {
           <option value="sm">sm</option>
           <option value="lg">lg</option>
         </select>
+        <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
+          <input
+            type="checkbox"
+            checked={side === "bottom"}
+            onChange={(e) => setSide(e.target.checked ? "bottom" : "right")}
+          />
+          Bottom
+        </label>
         <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
           <input
             type="checkbox"
@@ -65,6 +74,7 @@ function OverlayDemo() {
       <Drawer
         open={open}
         onClose={() => setOpen(false)}
+        side={side}
         density={density}
         backdrop={backdrop}
         title="Drawer Title"
@@ -93,7 +103,7 @@ function OverlayDemo() {
   );
 }
 
-function ContainedDemo() {
+function ContainedRightDemo() {
   const [open, setOpen] = useState(false);
   const [backdrop, setBackdrop] = useState(true);
   const [longContent, setLongContent] = useState(false);
@@ -102,36 +112,19 @@ function ContainedDemo() {
   return (
     <div>
       <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
-        <Button
-          variant="brand"
-          emphasis="high"
-          size="md"
-          onClick={() => setOpen(!open)}
-        >
-          {open ? "Close" : "Open"} Contained Drawer
+        <Button variant="brand" emphasis="high" size="md" onClick={() => setOpen(!open)}>
+          {open ? "Close" : "Open"} Right
         </Button>
         <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
-          <input
-            type="checkbox"
-            checked={longContent}
-            onChange={(e) => setLongContent(e.target.checked)}
-          />
+          <input type="checkbox" checked={longContent} onChange={(e) => setLongContent(e.target.checked)} />
           Scrollable
         </label>
         <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
-          <input
-            type="checkbox"
-            checked={backdrop}
-            onChange={(e) => setBackdrop(e.target.checked)}
-          />
+          <input type="checkbox" checked={backdrop} onChange={(e) => setBackdrop(e.target.checked)} />
           Backdrop
         </label>
         <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
-          <input
-            type="checkbox"
-            checked={resizable}
-            onChange={(e) => setResizable(e.target.checked)}
-          />
+          <input type="checkbox" checked={resizable} onChange={(e) => setResizable(e.target.checked)} />
           Resizable
         </label>
       </div>
@@ -146,35 +139,11 @@ function ContainedDemo() {
           border: "1px solid var(--element-divider-neutral-default)",
         }}
       >
-        <div
-          style={{
-            padding: 24,
-            height: "100%",
-            boxSizing: "border-box",
-            overflow: "auto",
-          }}
-        >
-          <BodyText size="lg">
-            Container content. The drawer slides in from the right.
-          </BodyText>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-              marginTop: 16,
-            }}
-          >
+        <div style={{ padding: 24, height: "100%", boxSizing: "border-box", overflow: "auto" }}>
+          <BodyText size="lg">Container content. The drawer slides in from the right.</BodyText>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
             {Array.from({ length: 6 }, (_, i) => (
-              <div
-                key={i}
-                style={{
-                  height: 48,
-                  borderRadius: 8,
-                  background:
-                    "var(--element-fill-neutral-tertiary-default)",
-                }}
-              />
+              <div key={i} style={{ height: 48, borderRadius: 8, background: "var(--element-fill-neutral-tertiary-default)" }} />
             ))}
           </div>
         </div>
@@ -182,25 +151,93 @@ function ContainedDemo() {
         <Drawer
           open={open}
           onClose={() => setOpen(false)}
+          side="right"
           placement="container"
           backdrop={backdrop}
           density="sm"
-          title="Contained Drawer"
+          title="Contained Right"
           headerSize="md"
-          footerActions={
-            <Button variant="brand" emphasis="high" size="md">
-              Confirm
-            </Button>
-          }
+          footerActions={<Button variant="brand" emphasis="high" size="md">Confirm</Button>}
           footerFullWidth
           resizable={resizable}
         >
           {longContent ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {Array.from({ length: 20 }, (_, i) => (
-                <BodyText key={i} size="md">
-                  {i + 1}. {LOREM}
-                </BodyText>
+                <BodyText key={i} size="md">{i + 1}. {LOREM}</BodyText>
+              ))}
+            </div>
+          ) : (
+            <BodyText size="md">{LOREM}</BodyText>
+          )}
+        </Drawer>
+      </div>
+    </div>
+  );
+}
+
+function ContainedBottomDemo() {
+  const [open, setOpen] = useState(false);
+  const [backdrop, setBackdrop] = useState(true);
+  const [longContent, setLongContent] = useState(false);
+  const [resizable, setResizable] = useState(false);
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <Button variant="brand" emphasis="high" size="md" onClick={() => setOpen(!open)}>
+          {open ? "Close" : "Open"} Bottom
+        </Button>
+        <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
+          <input type="checkbox" checked={longContent} onChange={(e) => setLongContent(e.target.checked)} />
+          Scrollable
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
+          <input type="checkbox" checked={backdrop} onChange={(e) => setBackdrop(e.target.checked)} />
+          Backdrop
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13 }}>
+          <input type="checkbox" checked={resizable} onChange={(e) => setResizable(e.target.checked)} />
+          Resizable
+        </label>
+      </div>
+
+      <div
+        style={{
+          position: "relative",
+          height: 500,
+          marginTop: 12,
+          borderRadius: 8,
+          background: "var(--element-surface-default)",
+          border: "1px solid var(--element-divider-neutral-default)",
+        }}
+      >
+        <div style={{ padding: 24, height: "100%", boxSizing: "border-box", overflow: "auto" }}>
+          <BodyText size="lg">Container content. The drawer slides in from the bottom.</BodyText>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 16 }}>
+            {Array.from({ length: 6 }, (_, i) => (
+              <div key={i} style={{ height: 48, borderRadius: 8, background: "var(--element-fill-neutral-tertiary-default)" }} />
+            ))}
+          </div>
+        </div>
+
+        <Drawer
+          open={open}
+          onClose={() => setOpen(false)}
+          side="bottom"
+          placement="container"
+          backdrop={backdrop}
+          density="sm"
+          title="Contained Bottom"
+          headerSize="md"
+          footerActions={<Button variant="brand" emphasis="high" size="md">Confirm</Button>}
+          footerFullWidth
+          resizable={resizable}
+        >
+          {longContent ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {Array.from({ length: 20 }, (_, i) => (
+                <BodyText key={i} size="md">{i + 1}. {LOREM}</BodyText>
               ))}
             </div>
           ) : (
@@ -302,12 +339,22 @@ export default function DrawerPlayground() {
       </section>
 
       <section style={sectionStyle}>
-        <h2>Contained Overlay</h2>
+        <h2>Contained Overlay — Right</h2>
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
-          Drawer positioned within a container instead of the viewport.
+          Drawer positioned within a container, sliding from the right.
         </p>
         <div style={cardStyle}>
-          <ContainedDemo />
+          <ContainedRightDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Contained Overlay — Bottom</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Drawer positioned within a container, sliding from the bottom.
+        </p>
+        <div style={cardStyle}>
+          <ContainedBottomDemo />
         </div>
       </section>
 

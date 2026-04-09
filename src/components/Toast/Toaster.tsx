@@ -354,6 +354,10 @@ function ToastItem({
     transform = offscreen;
     height = undefined;
     overflow = undefined;
+  } else if (!isVisible) {
+    transform = offscreen;
+    height = undefined;
+    overflow = undefined;
   } else if (expanded) {
     transform = `translateY(${liftDir * expandedOffset}px)`;
     height = undefined;

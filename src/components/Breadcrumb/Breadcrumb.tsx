@@ -6,14 +6,11 @@ import {
   Children,
   isValidElement,
   cloneElement,
-  createContext,
-  useContext,
   type HTMLAttributes,
   type ReactNode,
   type ReactElement,
 } from "react";
 import { Icon } from "../Icon";
-import { IconButton } from "../IconButton";
 import { Dropdown } from "../Dropdown";
 import { NavigationSelectOption } from "../NavigationSelectOption";
 import type { BreadcrumbItemSize } from "../BreadcrumbItem";
@@ -21,22 +18,6 @@ import itemStyles from "../BreadcrumbItem/BreadcrumbItem.module.css";
 import styles from "./Breadcrumb.module.css";
 import { cx } from "../../utils/cx";
 
-
-/* ── Context ── */
-
-interface BreadcrumbContextValue {
-  size: BreadcrumbItemSize;
-  basic: boolean;
-}
-
-const BreadcrumbContext = createContext<BreadcrumbContextValue>({
-  size: "lg",
-  basic: false,
-});
-
-export function useBreadcrumbContext() {
-  return useContext(BreadcrumbContext);
-}
 
 /* ── Props ── */
 
@@ -55,6 +36,8 @@ export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
   itemsAfterCollapse?: number;
   /** Accessible label for the expand button */
   expandText?: string;
+  /** Prevent items from wrapping — truncate instead */
+  noWrap?: boolean;
   /** Custom separator (defaults to chevron_right icon) */
   separator?: ReactNode;
   children: ReactNode;
@@ -63,35 +46,16 @@ export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
 
 /* ── Collapsed button (internal) ── */
 
-const ICON_SIZE: Record<BreadcrumbItemSize, number> = { lg: 20, md: 16, sm: 16 };
 
 const CollapsedButton = forwardRef<
   HTMLButtonElement,
   {
     size: BreadcrumbItemSize;
-    basic: boolean;
     onClick: () => void;
     label: string;
     expanded?: boolean;
   }
->(function CollapsedButton({ size, basic, onClick, label, expanded }, ref) {
-  if (basic) {
-    return (
-      <IconButton
-        ref={ref}
-        variant="neutral"
-        emphasis="low"
-        size={size}
-        icon={<Icon name="more_horiz" size={ICON_SIZE[size]} />}
-        aria-label={label}
-        aria-expanded={expanded}
-        aria-haspopup="listbox"
-        onClick={onClick}
-        hideTooltip={expanded}
-      />
-    );
-  }
-
+>(function CollapsedButton({ size, onClick, label, expanded }, ref) {
   const cls = cx(itemStyles.collapsed, itemStyles[size]);
 
   return (
@@ -120,6 +84,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
       itemsBeforeCollapse = 1,
       itemsAfterCollapse = 1,
       expandText = "Show full path",
+      noWrap = false,
       separator,
       children,
       className,
@@ -180,6 +145,14 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
 
     const closeDropdown = useCallback(() => setDropdownOpen(false), []);
 
+    const isSelectItem = (el: ReactElement) =>
+      (el.type as any)?.displayName === "BreadcrumbSelectItem";
+
+    const isIconOnlyItem = (el: ReactElement) => {
+      const p = el.props as Record<string, unknown>;
+      return !!p.icon && !p.children;
+    };
+
     const renderItems = () => {
       const result: ReactNode[] = [];
       let insertedCollapsed = false;
@@ -200,7 +173,6 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
               <CollapsedButton
                 ref={collapsedBtnRef}
                 size={size}
-                basic={basic}
                 onClick={toggleDropdown}
                 label={expandText}
                 expanded={dropdownOpen}
@@ -212,13 +184,21 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
         }
 
         const child = injectProps(visibleItems[i], isLast);
+        const isSelect = isSelectItem(visibleItems[i]);
+        const isIconOnly = isIconOnlyItem(visibleItems[i]);
         result.push(
           <li
             key={(child as ReactElement).key ?? i}
-            className={cx(styles.listItem, variantCls, basic && styles[size])}
+            className={cx(
+              styles.listItem,
+              isSelect && styles.selectItem,
+              isIconOnly && styles.iconOnlyItem,
+              variantCls,
+              basic && styles[size],
+            )}
           >
             {child}
-            {!isLast && <span className={styles.chevron} aria-hidden="true">{chevron}</span>}
+            {!isLast && !isSelect && <span className={styles.chevron} aria-hidden="true">{chevron}</span>}
           </li>,
         );
       }
@@ -227,14 +207,14 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
     };
 
     return (
-      <BreadcrumbContext.Provider value={{ size, basic }}>
+      <>
         <nav
           ref={ref}
           aria-label="Breadcrumb"
           className={cx(styles.root, className)}
           {...rest}
         >
-          <ol role="list" className={cx(styles.list, basic && styles.basicList)}>{renderItems()}</ol>
+          <ol role="list" className={cx(styles.list, basic && styles.basicList, noWrap && styles.noWrap)}>{renderItems()}</ol>
         </nav>
 
         {shouldCollapse && (
@@ -253,6 +233,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                   : String(p.children ?? "");
               const icon = p.icon as ReactNode | undefined;
               const href = p.href as string | undefined;
+              const onItemClick = p.onClick as ((e: unknown) => void) | undefined;
               const disabled = (p.disabled as boolean) ?? false;
 
               const iconNode =
@@ -270,14 +251,15 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                   disabled={disabled}
                   onClick={() => {
                     closeDropdown();
-                    if (href) window.location.href = href;
+                    if (onItemClick) onItemClick({ preventDefault() {} } as any);
+                    else if (href) window.location.href = href;
                   }}
                 />
               );
             })}
           </Dropdown>
         )}
-      </BreadcrumbContext.Provider>
+      </>
     );
   },
 );

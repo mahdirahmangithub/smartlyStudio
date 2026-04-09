@@ -46,7 +46,7 @@ export function CrosshairDots({ points, offsetLeft, offsetTop }: CrosshairDotsPr
           <div className={styles.indicatorBase}>
             <div
               className={styles.indicatorBg}
-              style={pt.icon ? { borderColor: pt.color, opacity: "var(--opacity-88)" } : undefined}
+              style={pt.icon ? { background: "var(--color-white-white)", borderColor: pt.color, opacity: "var(--opacity-88)" } : undefined}
             />
             {pt.icon ? (
               <div className={styles.indicatorIcon}>

@@ -11,6 +11,7 @@ import {
 import { Icon } from "../Icon";
 import styles from "./ScrollFade.module.css";
 import { cx } from "../../utils/cx";
+import { easedGradient } from "../../utils/easedGradient";
 
 export type ScrollFadeDirection = "horizontal" | "vertical";
 export type ScrollFadeSurface = "default" | "over" | "under" | "auto";
@@ -185,12 +186,18 @@ export const ScrollFade = forwardRef<HTMLDivElement, ScrollFadeProps>(
     }, [surface]);
 
     const isH = direction === "horizontal";
-    const startGrad = isH
-      ? `linear-gradient(to right, ${fadeColor}, transparent)`
-      : `linear-gradient(to bottom, ${fadeColor}, transparent)`;
-    const endGrad = isH
-      ? `linear-gradient(to left, ${fadeColor}, transparent)`
-      : `linear-gradient(to top, ${fadeColor}, transparent)`;
+    const startGrad = easedGradient(
+      isH ? "to right" : "to bottom",
+      fadeColor,
+      "transparent",
+      "ease-out",
+    );
+    const endGrad = easedGradient(
+      isH ? "to left" : "to top",
+      fadeColor,
+      "transparent",
+      "ease-out",
+    );
 
     const fadeDimStyle: CSSProperties = isH
       ? { width: fadeSize }

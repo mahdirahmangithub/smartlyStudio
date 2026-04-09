@@ -2,7 +2,7 @@ import { useRef, useEffect, useState, useId } from "react";
 import { LinePath } from "@visx/shape";
 import { useSpring, animated } from "@react-spring/web";
 import type { CurveFactory } from "d3-shape";
-import type { LineDash } from "../ChartPrimitives/chartUtils";
+import { DASH_PATTERNS, type LineDash } from "../ChartPrimitives/chartUtils";
 
 /** Matches --motion-easing-enter: cubic-bezier(0, 0, 0.2, 1) */
 const EASING_ENTER = cubicBezier(0, 0, 0.2, 1);
@@ -29,11 +29,6 @@ function cubicBezier(x1: number, y1: number, x2: number, y2: number) {
   };
 }
 
-export const DASH_PATTERNS: Record<LineDash, string> = {
-  dotted: "0 6",
-  dashed: "8 8",
-  "dash-dot": "12 6 0.5 6",
-};
 
 export interface AnimatedLineProps<D> {
   data: D[];

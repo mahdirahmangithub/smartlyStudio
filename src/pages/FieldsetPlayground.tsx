@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Fieldset, FieldGroup } from "../components/Fieldset";
 import { Input } from "../components/Input";
 import { ToggleField } from "../components/Toggle";
 import { CheckboxField } from "../components/Checkbox";
 import { Slider } from "../components/Slider";
+import { FileUpload, type FileUploadItem, type DroppedEntry } from "../components/FileUpload";
 
 const sectionStyle = {
   display: "flex",
@@ -38,6 +39,58 @@ export default function FieldsetPlayground() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [marketingAccepted, setMarketingAccepted] = useState(false);
   const maxBio = 200;
+
+  const [uploadItems, setUploadItems] = useState<FileUploadItem[]>([]);
+
+  const handleUploadFiles = useCallback((files: File[]) => {
+    const newItems: FileUploadItem[] = files.map((f) => ({
+      id: `file-${Date.now()}-${f.name}`,
+      name: f.name,
+      type: "file" as const,
+      status: "normal" as const,
+      fileSize: f.size < 1024 * 1024
+        ? `${(f.size / 1024).toFixed(0)} KB`
+        : `${(f.size / (1024 * 1024)).toFixed(1)} MB`,
+    }));
+    setUploadItems((prev) => [...prev, ...newItems]);
+  }, []);
+
+  const handleDropEntries = useCallback((entries: DroppedEntry[]) => {
+    function toItems(list: DroppedEntry[]): FileUploadItem[] {
+      return list.map((e) =>
+        e.type === "file"
+          ? {
+              id: `file-${Date.now()}-${e.name}`,
+              name: e.name,
+              type: "file" as const,
+              status: "normal" as const,
+              fileSize: e.file.size < 1024 * 1024
+                ? `${(e.file.size / 1024).toFixed(0)} KB`
+                : `${(e.file.size / (1024 * 1024)).toFixed(1)} MB`,
+            }
+          : {
+              id: `folder-${Date.now()}-${e.name}`,
+              name: e.name,
+              type: "folder" as const,
+              children: toItems(e.children),
+            }
+      );
+    }
+    setUploadItems((prev) => [...prev, ...toItems(entries)]);
+  }, []);
+
+  const removeFromTree = (
+    items: FileUploadItem[],
+    id: string,
+    path: string[]
+  ): FileUploadItem[] => {
+    if (path.length === 0) return items.filter((i) => i.id !== id);
+    return items.map((item) =>
+      item.id === path[0] && item.children
+        ? { ...item, children: removeFromTree(item.children, id, path.slice(1)) }
+        : item
+    );
+  };
 
   const emailError =
     email.length > 0 && !email.includes("@")
@@ -167,6 +220,30 @@ export default function FieldsetPlayground() {
               min={0}
               max={100}
               step={1}
+            />
+          </Fieldset>
+        </div>
+      </div>
+
+      {/* ── With FileUpload ─────────────────────── */}
+      <div style={sectionStyle}>
+        <h3 style={{ margin: 0 }}>With FileUpload</h3>
+        <div style={cardStyle}>
+          <Fieldset
+            label="Attachments"
+            description="Upload supporting documents"
+            optional
+          >
+            <FileUpload
+              items={uploadItems}
+              onFiles={handleUploadFiles}
+              onDropEntries={handleDropEntries}
+              hintText="PDF, PNG, JPG up to 100 MB"
+              onItemRemove={(id, path) =>
+                setUploadItems((prev) => removeFromTree(prev, id, path))
+              }
+              onItemRetry={(id) => alert(`Retry: ${id}`)}
+              onDeleteAll={() => setUploadItems([])}
             />
           </Fieldset>
         </div>

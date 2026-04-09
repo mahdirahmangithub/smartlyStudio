@@ -10,9 +10,10 @@ import { Tooltip } from "../Tooltip";
 import {
   buildBandScale,
   getSeriesColor,
+  FillPatternDefs,
+  getPatternFill,
   type Series,
   type Margin,
-  type BarFillPattern,
   DEFAULT_MARGIN,
 } from "../ChartPrimitives";
 import { useSeriesAnimation, type DomainTarget } from "../../hooks/useSeriesAnimation";
@@ -62,55 +63,6 @@ function computeGroupLayout(
   return result;
 }
 
-const FILL_PATTERN_DEFS: Record<BarFillPattern, string> = {
-  dotted: "bar-pat-dotted",
-  "hatch-right": "bar-pat-hatch-right",
-  "hatch-left": "bar-pat-hatch-left",
-};
-
-function FillPatternDefs({ prefix }: { prefix: string }) {
-  return (
-    <>
-      <pattern
-        id={`${prefix}-bar-pat-dotted`}
-        x={0}
-        y={0}
-        width={4}
-        height={4}
-        patternUnits="userSpaceOnUse"
-        patternContentUnits="userSpaceOnUse"
-      >
-        <circle cx={2} cy={2} r={0.9} fill="var(--util-subtle-inverse-strongest)" />
-      </pattern>
-      <pattern
-        id={`${prefix}-bar-pat-hatch-right`}
-        patternUnits="userSpaceOnUse"
-        width={2}
-        height={6}
-        patternTransform="rotate(-45 2 2)"
-      >
-        <path d="M -1,2 l 6,0" stroke="var(--util-subtle-inverse-strongest)" strokeWidth={1} />
-      </pattern>
-      <pattern
-        id={`${prefix}-bar-pat-hatch-left`}
-        patternUnits="userSpaceOnUse"
-        width={2}
-        height={6}
-        patternTransform="rotate(45 2 2)"
-      >
-        <path d="M -1,2 l 6,0" stroke="var(--util-subtle-inverse-strongest)" strokeWidth={1} />
-      </pattern>
-    </>
-  );
-}
-
-function getPatternFill(
-  pattern: BarFillPattern | undefined,
-  prefix: string,
-): string | undefined {
-  if (!pattern) return undefined;
-  return `url(#${prefix}-${FILL_PATTERN_DEFS[pattern]})`;
-}
 
 export type BarVariant = "simple" | "grouped" | "stacked";
 export type BarOrientation = "vertical" | "horizontal";

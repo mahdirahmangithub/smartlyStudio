@@ -22,7 +22,7 @@ export function useFocusTrap(
     if (!el) return;
 
     requestAnimationFrame(() => {
-      el.focus();
+      el.focus({ preventScroll: true });
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -54,7 +54,7 @@ export function useFocusTrap(
 
     return () => {
       el.removeEventListener("keydown", handleKeyDown);
-      previousFocusRef.current?.focus();
+      previousFocusRef.current?.focus({ preventScroll: true });
     };
   }, [active, containerRef]);
 }

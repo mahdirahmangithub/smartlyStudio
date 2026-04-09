@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useMemo,
   useRef,
   useState,
   type HTMLAttributes,
@@ -20,6 +21,7 @@ import { cx } from "../../utils/cx";
 export type DrawerDensity = "none" | "sm" | "lg";
 export type DrawerMode = "overlay" | "push";
 export type DrawerPlacement = "viewport" | "container";
+export type DrawerSide = "right" | "bottom";
 
 type SlidePhase = "idle" | "entering" | "open" | "exiting";
 
@@ -44,6 +46,8 @@ export interface DrawerProps
   children?: ReactNode;
   scrollFade?: boolean;
 
+  /** Which edge the drawer slides in from. `"bottom"` only supports overlay mode. */
+  side?: DrawerSide;
   mode?: DrawerMode;
   placement?: DrawerPlacement;
 
@@ -51,10 +55,14 @@ export interface DrawerProps
   ariaLabel?: string;
 
   width?: number | string;
+  height?: number | string;
   resizable?: boolean;
   minWidth?: number;
   maxWidth?: number;
   onWidthChange?: (width: number) => void;
+  minHeight?: number;
+  maxHeight?: number;
+  onHeightChange?: (height: number) => void;
   backdrop?: boolean;
 }
 
@@ -76,13 +84,18 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       footerFullWidth,
       children,
       ariaLabel,
+      side = "right",
       mode = "overlay",
       placement = "viewport",
       width,
+      height,
       resizable = false,
       minWidth = 280,
       maxWidth = 960,
       onWidthChange,
+      minHeight = 200,
+      maxHeight = 800,
+      onHeightChange,
       backdrop: showBackdrop = true,
       className,
       style,
@@ -95,20 +108,26 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
     const panelRef = useRef<HTMLElement>(null);
     const portalAnchorRef = useRef<HTMLSpanElement>(null);
     const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null);
-    const [resizedWidth, setResizedWidth] = useState<number | null>(null);
+    const [resizedSize, setResizedSize] = useState<number | null>(null);
     const [isResizing, setIsResizing] = useState(false);
+    const onCloseRef = useRef(onClose);
+    onCloseRef.current = onClose;
 
-    const isOverlay = mode === "overlay";
+    const isBottom = side === "bottom";
+    const resolvedMode = isBottom ? "overlay" : mode;
+    const isOverlay = resolvedMode === "overlay";
     const isContained = placement === "container";
     const isContainedOverlay = isContained && isOverlay;
     const headerFooterDensity = density === "lg" ? "lg" : "sm";
     const hasHeader = title != null;
     const hasFooter = footerActions != null || footerExtraAction != null;
+    const offScreen = isBottom ? "translateY(100%)" : "translateX(100%)";
 
     /* ────────────────────────────────────────────
      * Phase state machine (JS-controlled transitions)
      * Only used for viewport overlay + push modes.
-     * Contained overlay uses a wrapper + pure CSS transitions.
+     * Contained overlay uses pure CSS transitions
+     * via the .containedSlot wrapper + data-open.
      * ──────────────────────────────────────────── */
 
     const [phase, setPhase] = useState<SlidePhase>("idle");
@@ -141,10 +160,10 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
 
         if (isHidden) {
           panel.style.transition = "none";
-          panel.style.transform = "translateX(100%)";
+          panel.style.transform = offScreen;
           panel.style.visibility = "visible";
           // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-          panel.scrollTop; // forced reflow — commit off-screen position before transition
+          panel.scrollTop;
         }
 
         panel.style.transition =
@@ -153,15 +172,15 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
       } else if (phase === "exiting") {
         panel.style.transition =
           "transform var(--animation-drawer-exit-duration) var(--animation-drawer-exit-easing)";
-        panel.style.transform = "translateX(100%)";
+        panel.style.transform = offScreen;
       } else if (phase === "idle") {
         panel.style.transition = "none";
-        panel.style.transform = "translateX(100%)";
+        panel.style.transform = offScreen;
         panel.style.visibility = "hidden";
       } else if (phase === "open") {
         panel.style.transition = "";
       }
-    }, [phase, isContainedOverlay]);
+    }, [phase, isContainedOverlay, offScreen]);
 
     const handlePanelTransitionEnd = useCallback(
       (e: React.TransitionEvent) => {
@@ -179,6 +198,7 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
     const isActive = isContainedOverlay
       ? open
       : phase === "entering" || phase === "open";
+    const isPhaseVisible = phase !== "idle";
 
     /* ──────────────── Portal target ──────────────── */
 
@@ -202,7 +222,7 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
     const [containedFocusReady, setContainedFocusReady] = useState(false);
 
     useEffect(() => {
-      if (!isContainedOverlay) {
+      if (!isContainedOverlay || !showBackdrop) {
         setContainedFocusReady(false);
         return;
       }
@@ -221,7 +241,7 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
         cancelAnimationFrame(id1);
         cancelAnimationFrame(id2);
       };
-    }, [open, isContainedOverlay]);
+    }, [open, isContainedOverlay, showBackdrop]);
 
     const shouldTrapFocus =
       isOverlay &&
@@ -234,33 +254,33 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
     /* ──────────────── Escape to close ──────────────── */
 
     useEffect(() => {
-      if (!isActive || !onClose) return;
+      if (!isActive) return;
       const handleKey = (e: KeyboardEvent) => {
         if (e.key === "Escape") {
           e.stopPropagation();
-          onClose();
+          onCloseRef.current?.();
         }
       };
       document.addEventListener("keydown", handleKey);
       return () => document.removeEventListener("keydown", handleKey);
-    }, [isActive, onClose]);
+    }, [isActive]);
 
     /* ──────────────── Body scroll lock ──────────────── */
 
     useEffect(() => {
-      if (!isOverlay || isContained || phase === "idle") return;
+      if (!isOverlay || isContained || !isPhaseVisible) return;
       const prev = document.body.style.overflow;
       document.body.style.overflow = "hidden";
       return () => {
         document.body.style.overflow = prev;
       };
-    }, [isOverlay, isContained, phase]);
+    }, [isOverlay, isContained, isPhaseVisible]);
 
     /* ──────────────── Resize ──────────────── */
 
     useEffect(() => {
-      setResizedWidth(null);
-    }, [width]);
+      setResizedSize(null);
+    }, [isBottom ? height : width]);
 
     const rafId = useRef(0);
 
@@ -271,30 +291,32 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
         const handle = e.currentTarget;
         if (!panel) return;
 
-        const startX = e.clientX;
-        const startWidth = panel.getBoundingClientRect().width;
-
+        const rect = panel.getBoundingClientRect();
         setIsResizing(true);
         handle.setPointerCapture(e.pointerId);
+
+        const startPos = isBottom ? e.clientY : e.clientX;
+        const startSize = isBottom ? rect.height : rect.width;
+        const min = isBottom ? minHeight : minWidth;
+        const max = isBottom ? maxHeight : maxWidth;
+        const prop = isBottom ? "height" : "width";
+        const onSizeChange = isBottom ? onHeightChange : onWidthChange;
 
         const onMove = (ev: PointerEvent) => {
           cancelAnimationFrame(rafId.current);
           rafId.current = requestAnimationFrame(() => {
-            const delta = startX - ev.clientX;
-            const clamped = Math.min(
-              maxWidth,
-              Math.max(minWidth, startWidth + delta),
-            );
-            panel.style.width = `${clamped}px`;
+            const delta = startPos - (isBottom ? ev.clientY : ev.clientX);
+            const clamped = Math.min(max, Math.max(min, startSize + delta));
+            panel.style[prop] = `${clamped}px`;
           });
         };
 
         const onUp = () => {
           cancelAnimationFrame(rafId.current);
           setIsResizing(false);
-          const finalWidth = panel.getBoundingClientRect().width;
-          setResizedWidth(finalWidth);
-          onWidthChange?.(finalWidth);
+          const finalSize = panel.getBoundingClientRect()[prop];
+          setResizedSize(finalSize);
+          onSizeChange?.(finalSize);
           handle.removeEventListener("pointermove", onMove);
           handle.removeEventListener("pointerup", onUp);
           handle.removeEventListener("lostpointercapture", onUp);
@@ -304,25 +326,30 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
         handle.addEventListener("pointerup", onUp);
         handle.addEventListener("lostpointercapture", onUp);
       },
-      [minWidth, maxWidth, onWidthChange],
+      [isBottom, minWidth, maxWidth, onWidthChange, minHeight, maxHeight, onHeightChange],
     );
 
     /* ──────────────── Render ──────────────── */
 
     const anchor = <span ref={portalAnchorRef} style={{ display: "none" }} />;
 
-    const resolvedWidth = resizedWidth ?? width;
-    const panelStyle = {
-      ...style,
-      ...(resolvedWidth != null
-        ? {
-            width:
-              typeof resolvedWidth === "number"
-                ? `${resolvedWidth}px`
-                : resolvedWidth,
-          }
-        : undefined),
-    };
+    const panelStyle = useMemo(() => {
+      const sizeOverride: React.CSSProperties = {};
+      if (isBottom) {
+        const resolvedHeight = resizedSize ?? height;
+        if (resolvedHeight != null) {
+          sizeOverride.height =
+            typeof resolvedHeight === "number" ? `${resolvedHeight}px` : resolvedHeight;
+        }
+      } else {
+        const resolvedWidth = resizedSize ?? width;
+        if (resolvedWidth != null) {
+          sizeOverride.width =
+            typeof resolvedWidth === "number" ? `${resolvedWidth}px` : resolvedWidth;
+        }
+      }
+      return { ...style, ...sizeOverride };
+    }, [style, isBottom, resizedSize, height, width]);
 
     const contentClass = cx(
       styles.content,
@@ -351,17 +378,18 @@ export const Drawer = forwardRef<HTMLElement, DrawerProps>(
         className={cx(
           styles.panel,
           isResizing && styles.resizing,
-          mode === "push" && styles.push,
+          resolvedMode === "push" && styles.push,
           className,
         )}
         style={panelStyle}
+        data-side={side}
         data-open={isContainedOverlay && open ? "" : undefined}
         onTransitionEnd={isContainedOverlay ? undefined : handlePanelTransitionEnd}
         {...rest}
       >
         {resizable && (
           <div
-            className={styles.resizeHandle}
+            className={isBottom ? styles.resizeHandleTop : styles.resizeHandle}
             aria-hidden="true"
             onPointerDown={handleResizePointerDown}
           />
