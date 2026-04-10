@@ -13,10 +13,14 @@ export interface CalloutProps {
   type?: CalloutType;
   size?: CalloutSize;
   layout?: CalloutLayout;
-  title: string;
+  title: React.ReactNode;
   description?: string;
   onClose?: () => void;
   actions?: ReactNode;
+  /** Whether to show the status icon. @default true */
+  showIcon?: boolean;
+  /** Custom icon to replace the default type icon. */
+  customIcon?: ReactNode;
   className?: string;
 }
 
@@ -40,6 +44,8 @@ export function Callout({
   description,
   onClose,
   actions,
+  showIcon = true,
+  customIcon,
   className,
 }: CalloutProps) {
   const isHorizontal = layout === "horizontal";
@@ -51,14 +57,16 @@ export function Callout({
         styles[type],
         styles[size],
         isHorizontal && styles.horizontal,
+        !showIcon && styles.noIcon,
         className
       )}
       role="status"
     >
-      {/* status icon — grid col 1, row 1, vertically centered */}
-      <div className={cx(styles.iconWrap, styles.statusIcon)}>
-        <Icon name={TYPE_ICON[type]} size={ICON_SIZE[size]} />
-      </div>
+      {showIcon && (
+        <div className={cx(styles.iconWrap, styles.statusIcon)}>
+          {customIcon ?? <Icon name={TYPE_ICON[type]} size={ICON_SIZE[size]} />}
+        </div>
+      )}
 
       {/* header — grid col 2, row 1: title + close, all center-aligned */}
       <div className={styles.header}>

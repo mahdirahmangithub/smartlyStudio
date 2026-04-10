@@ -83,6 +83,8 @@ import BarChartPlayground from "./pages/BarChartPlayground";
 import ChartLegendPlayground from "./pages/ChartLegendPlayground";
 import LineChartPlayground from "./pages/LineChartPlayground";
 import PieChartPlayground from "./pages/PieChartPlayground";
+import PopoverPlayground from "./pages/PopoverPlayground";
+import ProgressBarPlayground from "./pages/ProgressBarPlayground";
 import LinkPlayground from "./pages/LinkPlayground";
 import TextShowcase from "./pages/TextShowcase";
 import TextareaPlayground from "./pages/TextareaPlayground";
@@ -91,6 +93,7 @@ import DataVizColorsPlayground from "./pages/DataVizColorsPlayground";
 import AnimatedIconsPlayground from "./pages/AnimatedIconsPlayground";
 import CheckboxAnimTestPlayground from "./pages/CheckboxAnimTestPlayground";
 import TypographyPlayground from "./pages/TypographyPlayground";
+import SelectTilePlayground from "./pages/SelectTilePlayground";
 import ShimmerPlayground from "./pages/ShimmerPlayground";
 import DataCellContentPlayground from "./pages/DataCellContentPlayground";
 import AccordionPlayground from "./pages/AccordionPlayground";
@@ -99,10 +102,11 @@ import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import GlobalNavigationBarPlayground from "./pages/GlobalNavigationBarPlayground";
 import HeaderPlayground from "./pages/HeaderPlayground";
 import IconContainerPlayground from "./pages/IconContainerPlayground";
+import IconThumbnailRowPlayground from "./pages/IconThumbnailRowPlayground";
+import EditorPopoverPlayground from "./pages/EditorPopoverPlayground";
 import NavigationBrandItemPlayground from "./pages/NavigationBrandItemPlayground";
 import NavigationCategoryItemPlayground from "./pages/NavigationCategoryItemPlayground";
 import NavigationItemPlayground from "./pages/NavigationItemPlayground";
-import NavigationItemTest2Playground from "./pages/NavigationItemTest2Playground";
 import NavBarContentPlayground from "./pages/NavBarContentPlayground";
 import NavbarPlayground from "./pages/NavbarPlayground";
 import NavigationProfileItemPlayground from "./pages/NavigationProfileItemPlayground";
@@ -112,6 +116,7 @@ import SidebarPlayground from "./pages/SidebarPlayground";
 import SortableListPlayground from "./pages/SortableListPlayground";
 import StepperPlayground from "./pages/StepperPlayground";
 import SpecialInputPlayground from "./pages/SpecialInputPlayground";
+import TestPlayground from "./pages/TestPlayground";
 import TestProgressiveBlurPlayground from "./pages/TestProgressiveBlurPlayground";
 import TabBarPlayground from "./pages/TabBarPlayground";
 import ToastPlayground from "./pages/ToastPlayground";
@@ -133,6 +138,8 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "chart-legend"
 | "line-chart"
 | "pie-chart"
+| "popover"
+| "progress-bar"
 | "breadcrumb"
 | "dimmer"
 | "drag-handle"
@@ -146,7 +153,6 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "navigation-brand-item"
 | "navigation-category-item"
 | "navigation-item"
-| "navigation-item-test2"
 | "navbar"
 | "navbar-content"
 | "navigation-sub-item"
@@ -159,6 +165,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "sortable-list"
 | "special-input"
 | "tab-bar"
+| "test"
 | "test-progressive-blur"
 | "toast"
 | "toolbar-button"
@@ -166,7 +173,10 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "container"
 | "stepper"
 | "video-player"
+| "select-tile"
 | "checkbox-anim-test"
+| "editor-popover"
+| "icon-thumbnail-row"
 
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
@@ -336,6 +346,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "drag-handle", label: "DragHandle" },
   { key: "drawer", label: "Drawer" },
   { key: "dropdown", label: "Dropdown" },
+  { key: "editor-popover", label: "EditorPopover" },
   { key: "empty-state", label: "EmptyState" },
   { key: "entity", label: "Entity" },
   { key: "expandable-badge", label: "ExpandableBadge" },
@@ -355,6 +366,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "hint", label: "Hint" },
   { key: "icon-badge", label: "IconBadge" },
   { key: "icon-container", label: "IconContainer" },
+  { key: "icon-thumbnail-row", label: "IconThumbRow" },
   { key: "icons", label: "Icons" },
   { key: "illustration", label: "Illustration" },
   { key: "imagery", label: "Imagery" },
@@ -375,7 +387,6 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "navigation-brand-item", label: "NavBrandItem" },
   { key: "navigation-category-item", label: "NavCategoryItem" },
   { key: "navigation-item", label: "NavItem" },
-  { key: "navigation-item-test2", label: "NavItemTest2" },
   { key: "navigation-profile-item", label: "NavProfileItem" },
   { key: "navigation-sub-item", label: "NavSubItem" },
   { key: "navigation-select-option", label: "NavOpt" },
@@ -384,6 +395,8 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "option-separator", label: "OptionSeparator" },
   { key: "option-trailing", label: "OptionTrailing" },
   { key: "pie-chart", label: "PieChart" },
+  { key: "popover", label: "Popover" },
+  { key: "progress-bar", label: "ProgressBar" },
   { key: "radio", label: "Radio" },
   { key: "row-container", label: "RowContainer" },
   { key: "scroll-fade", label: "ScrollFade" },
@@ -392,6 +405,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "select", label: "Select" },
   { key: "select-button", label: "SelectButton" },
   { key: "select-chip", label: "SelectChip" },
+  { key: "select-tile", label: "SelectTile" },
   { key: "select-input", label: "SelectInput" },
   { key: "select-option-header", label: "SelectOptHeader" },
   { key: "shimmer", label: "Shimmer" },
@@ -407,6 +421,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "tag", label: "Tag" },
   { key: "tag-multi-select-option", label: "TagMultiOpt" },
   { key: "tag-single-select-option", label: "TagSingleOpt" },
+  { key: "test", label: "Test" },
   { key: "test-progressive-blur", label: "TestProgBlur" },
   { key: "textarea", label: "Textarea" },
   { key: "text-showcase", label: "TextShowcase" },
@@ -516,6 +531,7 @@ export default function App() {
           <div className="app-content" style={page === "navbar-content" ? { maxWidth: "none" } : undefined}>
             {page === "button" && <ButtonPlayground />}
             {page === "icon-container" && <IconContainerPlayground />}
+            {page === "icon-thumbnail-row" && <IconThumbnailRowPlayground />}
             {page === "icons" && <IconsPage />}
             {page === "scroll-fade" && <ScrollFadePage />}
             {page === "expander" && <ExpanderPlayground />}
@@ -531,6 +547,7 @@ export default function App() {
             {page === "chip" && <ChipPlayground />}
             {page === "toggle-chip" && <ToggleChipPlayground />}
             {page === "select-chip" && <SelectChipPlayground />}
+            {page === "select-tile" && <SelectTilePlayground />}
             {page === "badge" && <BadgePlayground />}
             {page === "icon-badge" && <IconBadgePlayground />}
             {page === "notification-badge" && <NotificationBadgePlayground />}
@@ -564,7 +581,6 @@ export default function App() {
             {page === "navigation-brand-item" && <NavigationBrandItemPlayground />}
             {page === "navigation-category-item" && <NavigationCategoryItemPlayground />}
             {page === "navigation-item" && <NavigationItemPlayground />}
-            {page === "navigation-item-test2" && <NavigationItemTest2Playground />}
             {page === "navigation-profile-item" && <NavigationProfileItemPlayground />}
             {page === "navigation-sub-item" && <NavigationSubItemPlayground />}
             {page === "navigation-select-option" && <NavigationSelectOptionPlayground />}
@@ -579,6 +595,7 @@ export default function App() {
             {page === "select-option-header" && <SelectOptionHeaderPlayground />}
             {page === "drag-handle" && <DragHandlePlayground />}
             {page === "dropdown" && <DropdownPlayground />}
+            {page === "editor-popover" && <EditorPopoverPlayground />}
             {page === "empty-state" && <EmptyStatePlayground />}
             {page === "entity" && <EntityPlayground />}
             {page === "feedback-boolean" && <FeedbackBooleanPlayground />}
@@ -605,6 +622,8 @@ export default function App() {
             {page === "chart-legend" && <ChartLegendPlayground />}
             {page === "line-chart" && <LineChartPlayground />}
             {page === "pie-chart" && <PieChartPlayground />}
+            {page === "popover" && <PopoverPlayground />}
+            {page === "progress-bar" && <ProgressBarPlayground />}
             {page === "link" && <LinkPlayground />}
             {page === "text-showcase" && <TextShowcase />}
             {page === "textarea" && <TextareaPlayground />}
@@ -617,6 +636,7 @@ export default function App() {
             {page === "navbar" && <NavbarPlayground />}
             {page === "navbar-content" && <NavBarContentPlayground />}
             {page === "shortcut-tooltip" && <ShortcutTooltipPlayground />}
+            {page === "test" && <TestPlayground />}
             {page === "test-progressive-blur" && <TestProgressiveBlurPlayground />}
             {page === "toast" && <ToastPlayground />}
             {page === "toolbar-button" && <ToolbarButtonPlayground />}

@@ -13,11 +13,13 @@ export interface ActionCardProps
   icon?: ReactNode;
   title: string;
   description?: string;
+  /** Extra class applied to the inner content (CardBody), useful for shimmer etc. */
+  contentClassName?: string;
 }
 
 export const ActionCard = forwardRef<HTMLElement, ActionCardProps>(
   function ActionCard(
-    { variant = "outline-hairline", disabled, icon, title, description, className, ...rest },
+    { variant = "outline-hairline", disabled, icon, title, description, contentClassName, className, ...rest },
     ref,
   ) {
     return (
@@ -31,7 +33,7 @@ export const ActionCard = forwardRef<HTMLElement, ActionCardProps>(
         {...rest}
       >
         <CardContent className={styles.content}>
-          <CardBody className={styles.body}>
+          <CardBody className={cx(styles.body, contentClassName)}>
             {icon && <Thumbnail size="sm" type="icon" icon={icon} className={styles.thumbnail} />}
             <div className={styles.text}>
               <span className={styles.title}>{title}</span>

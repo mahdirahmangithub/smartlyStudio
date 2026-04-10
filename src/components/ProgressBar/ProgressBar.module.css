@@ -1,0 +1,105 @@
+/* ── Root ── */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  width: 100%;
+}
+
+/* ── Text row ── */
+.textRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.label,
+.value {
+  font-family: var(--type-label-xs-family);
+  font-weight: var(--type-label-xs-weight);
+  font-size: var(--type-label-xs-size);
+  line-height: var(--type-label-xs-line-height);
+  letter-spacing: var(--type-label-xs-letter-spacing);
+  color: var(--text-neutral-secondary-default);
+}
+
+.value {
+  margin-left: auto;
+}
+
+/* ── Track ── */
+.track {
+  position: relative;
+  width: 100%;
+  height: var(--spacing-sm-minus);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  background: var(--element-fill-neutral-secondary-default);
+}
+
+/* ── Indicator ── */
+.indicator {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-xs);
+  transform-origin: left;
+  transition: transform var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* ── Type: brand ── */
+.brand .indicator { background: var(--element-fill-brand-primary-default); }
+
+/* ── Type: neutral ── */
+.neutral .indicator { background: var(--element-fill-neutral-primary-default); }
+
+/* ── Type: info ── */
+.info .indicator { background: var(--element-fill-info-primary-default); }
+
+/* ── Type: error ── */
+.error .indicator { background: var(--element-fill-alert-primary-default); }
+
+/* ── Indeterminate ── */
+.indeterminate::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 40%;
+  border-radius: var(--radius-xs);
+  animation: slide 1.5s ease-in-out infinite;
+}
+
+.brand .indeterminate::after {
+  background: var(--element-fill-brand-primary-default);
+}
+.neutral .indeterminate::after {
+  background: var(--element-fill-neutral-primary-default);
+}
+.info .indeterminate::after {
+  background: var(--element-fill-info-primary-default);
+}
+.error .indeterminate::after {
+  background: var(--element-fill-alert-primary-default);
+}
+
+@keyframes slide {
+  0% {
+    left: -40%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .indicator {
+    transition: none !important;
+  }
+  .indeterminate::after {
+    animation: none;
+    width: 100%;
+    opacity: 0.5;
+  }
+}

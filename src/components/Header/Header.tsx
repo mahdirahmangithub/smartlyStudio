@@ -115,6 +115,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
                 icon={<Icon name="chevron_left" size={16} />}
                 aria-label="Back"
                 onClick={onBack}
+                hideTooltip
               />
             )}
 
@@ -142,6 +143,7 @@ export const Header = forwardRef<HTMLElement, HeaderProps>(
                     icon={<Icon name="close" size={16} />}
                     aria-label="Close"
                     onClick={onClose}
+                    hideTooltip
                   />
                 )}
               </span>

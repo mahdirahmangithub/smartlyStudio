@@ -9,6 +9,18 @@
   width: 100%;
 }
 
+/* ── no icon — single column ───────────────────────────────────────────── */
+
+.noIcon {
+  grid-template-columns: 1fr;
+}
+
+.noIcon .header,
+.noIcon .description,
+.noIcon .actions {
+  grid-column: 1;
+}
+
 /* ── type  →  background, border, title/icon color ────────────────────── */
 
 .brand   { background: var(--element-fill-brand-secondary-default);   border-color: var(--element-outline-brand-active);   }

@@ -5,8 +5,8 @@
   flex-direction: column;
   width: 100%;
   overflow: clip;
-  padding: 4px;
-  margin: -4px;
+  padding: var(--spacing-xs);
+  margin: var(--spacing-negative-xs);
 }
 
 /* ── header bar ─────────────────────────────────────────────────────── */

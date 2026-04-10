@@ -2,8 +2,11 @@ import { useState } from "react";
 import { Fieldset } from "../components/Fieldset";
 import { Input } from "../components/Input";
 import { Toggle } from "../components/Toggle";
-import { useShimmer } from "../components/Shimmer";
+import { useShimmer, Shimmer } from "../components/Shimmer";
 import { BodyText } from "../components/BodyText";
+import { Callout } from "../components/Callout";
+import { ActionCard } from "../components/ActionCard";
+import { Icon } from "../components/Icon";
 
 const sectionStyle = { marginBottom: 40 } as const;
 const cardStyle = {
@@ -83,6 +86,38 @@ export default function ShimmerPlayground() {
               />
             </Fieldset>
           </div>
+        </div>
+      </section>
+
+      {/* ── Callout with Shimmer title ──────────────────────── */}
+      <section style={sectionStyle}>
+        <div style={cardStyle}>
+          <h3 style={{ margin: "0 0 16px" }}>Callout with Shimmer title</h3>
+          <Callout
+            type="info"
+            size="md"
+            layout="vertical"
+            title={
+              <Shimmer active={loading} inverse={inverse} pulse={pulse}>
+                Publishing campaigns in progress...
+              </Shimmer>
+            }
+            description="Your campaigns are being published to all selected channels."
+          />
+        </div>
+      </section>
+
+      {/* ── ActionCard with Shimmer ─────────────────────────── */}
+      <section style={sectionStyle}>
+        <div style={cardStyle}>
+          <h3 style={{ margin: "0 0 16px" }}>ActionCard with Shimmer</h3>
+          <ActionCard
+            icon={<Icon name="campaign" size={20} />}
+            title="Create a new campaign"
+            description="Set up targeting, budget, and creatives in one place."
+            isStatic
+            contentClassName={shimmer}
+          />
         </div>
       </section>
 

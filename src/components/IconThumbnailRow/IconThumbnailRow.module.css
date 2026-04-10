@@ -1,0 +1,74 @@
+/* ── Root ── */
+
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* ── Icons container ── */
+
+.icons {
+  display: flex;
+  align-items: center;
+}
+
+.lg .icons { padding-right: 10px; }
+.md .icons { padding-right: 8px; }
+.sm .icons { padding-right: 6px; }
+
+/* ── Individual chip ── */
+
+.chip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs);
+  background: var(--element-surface-over);
+  border: var(--spacing-hair-line) solid var(--element-outline-neutral-disable);
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.chip::before {
+  content: "";
+  position: absolute;
+  inset: calc(-1 * var(--spacing-hair-line));
+  border: var(--spacing-2xs) solid var(--element-surface-over);
+  border-radius: var(--radius-full);
+  pointer-events: none;
+}
+
+.lg .chip { margin-right: var(--spacing-negative-sm-plus); }
+.md .chip { margin-right: var(--spacing-negative-sm); }
+.sm .chip { margin-right: var(--spacing-negative-sm-minus); }
+
+.chip:last-child {
+  margin-right: 0;
+}
+
+/* ── Overflow text ── */
+
+.overflow {
+  flex-shrink: 0;
+  color: var(--text-neutral-tertiary-default);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.lg .overflow,
+.md .overflow {
+  font-family: var(--type-caption-strong-md-family);
+  font-size: var(--type-caption-strong-md-size);
+  font-weight: var(--type-caption-strong-md-weight);
+  line-height: var(--type-caption-strong-md-line-height);
+  letter-spacing: var(--type-caption-strong-md-letter-spacing);
+}
+
+.sm .overflow {
+  font-family: var(--type-caption-strong-sm-family);
+  font-size: var(--type-caption-strong-sm-size);
+  font-weight: var(--type-caption-strong-sm-weight);
+  line-height: var(--type-caption-strong-sm-line-height);
+  letter-spacing: var(--type-caption-strong-sm-letter-spacing);
+}
