@@ -7,6 +7,7 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from "react";
+import { detectSurface, SURFACE_TOKENS, type SurfaceType } from "../../utils/detectSurface";
 import styles from "./NotificationBadge.module.css";
 import { cx } from "../../utils/cx";
 
@@ -19,7 +20,7 @@ export type NotificationBadgeType =
   | "warning"
   | "alert";
 export type NotificationBadgeEmphasis = "medium" | "high";
-export type NotificationBadgeSurface = "auto" | "default" | "over" | "under";
+export type NotificationBadgeSurface = SurfaceType;
 
 export interface NotificationBadgeProps
   extends HTMLAttributes<HTMLSpanElement> {
@@ -34,54 +35,6 @@ export interface NotificationBadgeProps
   icon?: ReactNode;
 }
 
-
-const SURFACE_TOKENS: Record<string, string> = {
-  default: "--element-surface-default",
-  over: "--element-surface-over",
-  under: "--element-surface-under",
-};
-
-function detectSurface(element: HTMLElement): string {
-  let el: HTMLElement | null = element.parentElement;
-  while (el) {
-    const rawBg = el.style.background || el.style.backgroundColor;
-    if (rawBg) {
-      for (const [key, token] of Object.entries(SURFACE_TOKENS)) {
-        if (rawBg.includes(`var(${token})`)) return key;
-      }
-    }
-    el = el.parentElement;
-  }
-
-  const tokenColors: [string, string][] = [];
-  for (const [key, token] of Object.entries(SURFACE_TOKENS)) {
-    const temp = document.createElement("div");
-    temp.style.backgroundColor = `var(${token})`;
-    element.appendChild(temp);
-    const resolved = getComputedStyle(temp).backgroundColor;
-    element.removeChild(temp);
-    if (
-      resolved &&
-      resolved !== "rgba(0, 0, 0, 0)" &&
-      resolved !== "transparent"
-    ) {
-      tokenColors.push([key, resolved]);
-    }
-  }
-
-  el = element.parentElement;
-  while (el) {
-    const bg = getComputedStyle(el).backgroundColor;
-    if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
-      for (let i = tokenColors.length - 1; i >= 0; i--) {
-        if (bg === tokenColors[i][1]) return tokenColors[i][0];
-      }
-      break;
-    }
-    el = el.parentElement;
-  }
-  return "default";
-}
 
 export const NotificationBadge = forwardRef<
   HTMLSpanElement,

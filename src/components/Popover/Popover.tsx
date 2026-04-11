@@ -54,7 +54,7 @@ export interface PopoverProps
   anchorRef: PopoverAnchorRef;
   placement?: PopoverPlacement;
   density?: PopoverDensity;
-  width?: number;
+  width?: number | "auto";
   maxHeight?: number;
   offset?: number;
 
@@ -346,7 +346,7 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
 
       const anchorRect = anchor.getBoundingClientRect();
       const panelH = panel.offsetHeight;
-      const panelW = width ?? panel.offsetWidth;
+      const panelW = typeof width === "number" ? width : panel.offsetWidth;
 
       const vp = calcPosition(anchorRect, panelW, panelH, placement, offset);
       setPos({
@@ -385,17 +385,21 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
 
     /* ── theme inheritance ────────────────────────── */
 
+    const themeAnchorRef = useRef<HTMLSpanElement>(null);
     const [theme, setTheme] = useState<string | null>(null);
 
     useEffect(() => {
-      const el = anchorRef.current;
-      if (!isElement(el)) return;
-      setTheme(
-        el
-          .closest<HTMLElement>("[data-theme]")
-          ?.getAttribute("data-theme") ?? null,
+      const node = themeAnchorRef.current;
+      if (!node) return;
+      const themed = node.closest<HTMLElement>("[data-theme]");
+      setTheme(themed?.getAttribute("data-theme") ?? null);
+      if (!themed) return;
+      const obs = new MutationObserver(() =>
+        setTheme(themed.getAttribute("data-theme")),
       );
-    }, [anchorRef, isMounted]);
+      obs.observe(themed, { attributes: true, attributeFilter: ["data-theme"] });
+      return () => obs.disconnect();
+    }, [isMounted]);
 
     /* ── click outside ────────────────────────────── */
 
@@ -478,7 +482,9 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
 
     /* ── render ───────────────────────────────────── */
 
-    if (!isMounted) return null;
+    const themeSpan = <span ref={themeAnchorRef} hidden />;
+
+    if (!isMounted) return themeSpan;
 
     const capSide =
       pos.side.charAt(0).toUpperCase() + pos.side.slice(1);
@@ -505,60 +511,65 @@ export const Popover = forwardRef<HTMLDivElement, PopoverProps>(
       zIndex: 9999,
     };
 
-    return createPortal(
-      <div
-        ref={setRefs}
-        id={id}
-        role={panelRole}
-        aria-modal={panelRole === "dialog" ? false : undefined}
-        aria-labelledby={hasHeader ? titleId : undefined}
-        aria-describedby={hasHeader && description ? descId : undefined}
-        tabIndex={-1}
-        className={cx(styles.panel, animClass, className)}
-        style={panelStyle}
-        data-theme={theme || undefined}
-        onAnimationEnd={onAnimEnd}
-        {...rest}
-      >
-        {hasHeader && (
-          <Header
-            ref={headerMeasureRef}
-            id={titleId}
-            size={headerSize}
-            density={headerFooterDensity}
-            title={title!}
-            description={description}
-            descriptionId={description ? descId : undefined}
-            divider
-            slot={headerSlot}
-            actions={headerActions}
-            onBack={onBack}
-            onClose={onClose}
-          />
-        )}
+    return (
+      <>
+        {themeSpan}
+        {createPortal(
+          <div
+            ref={setRefs}
+            id={id}
+            role={panelRole}
+            aria-modal={panelRole === "dialog" ? false : undefined}
+            aria-labelledby={hasHeader ? titleId : undefined}
+            aria-describedby={hasHeader && description ? descId : undefined}
+            tabIndex={-1}
+            className={cx(styles.panel, animClass, className)}
+            style={panelStyle}
+            data-theme={theme || undefined}
+            onAnimationEnd={onAnimEnd}
+            {...rest}
+          >
+            {hasHeader && (
+              <Header
+                ref={headerMeasureRef}
+                id={titleId}
+                size={headerSize}
+                density={headerFooterDensity}
+                title={title!}
+                description={description}
+                descriptionId={description ? descId : undefined}
+                divider
+                slot={headerSlot}
+                actions={headerActions}
+                onBack={onBack}
+                onClose={onClose}
+              />
+            )}
 
-        <div
-          className={cx(styles.content, contentDensityClass)}
-          style={
-            contentMaxH != null ? { maxHeight: contentMaxH } : undefined
-          }
-        >
-          <div className={styles.contentInner}>{children}</div>
-        </div>
+            <div
+              className={cx(styles.content, contentDensityClass)}
+              style={
+                contentMaxH != null ? { maxHeight: contentMaxH } : undefined
+              }
+            >
+              <div className={styles.contentInner}>{children}</div>
+            </div>
 
-        {hasFooter && (
-          <Footer
-            ref={footerMeasureRef}
-            density={headerFooterDensity}
-            divider
-            actions={footerActions}
-            extraAction={footerExtraAction}
-            slot={footerSlot}
-            fullWidth={footerFullWidth}
-          />
+            {hasFooter && (
+              <Footer
+                ref={footerMeasureRef}
+                density={headerFooterDensity}
+                divider
+                actions={footerActions}
+                extraAction={footerExtraAction}
+                slot={footerSlot}
+                fullWidth={footerFullWidth}
+              />
+            )}
+          </div>,
+          document.body,
         )}
-      </div>,
-      document.body,
+      </>
     );
   },
 );

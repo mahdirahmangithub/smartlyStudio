@@ -10,6 +10,7 @@ import {
   type CSSProperties,
   type AnimationEvent,
 } from "react";
+import { detectSurface, SURFACE_TOKENS, type SurfaceType } from "../../utils/detectSurface";
 import styles from "./ExpandableBadge.module.css";
 import { cx } from "../../utils/cx";
 
@@ -20,7 +21,7 @@ export type ExpandableBadgeType =
   | "success"
   | "warning"
   | "alert";
-export type ExpandableBadgeSurface = "auto" | "default" | "over" | "under";
+export type ExpandableBadgeSurface = SurfaceType;
 
 export interface ExpandableBadgeProps
   extends Omit<HTMLAttributes<HTMLSpanElement>, "children"> {
@@ -33,56 +34,8 @@ export interface ExpandableBadgeProps
 }
 
 
-const SURFACE_TOKENS: Record<string, string> = {
-  default: "--element-surface-default",
-  over: "--element-surface-over",
-  under: "--element-surface-under",
-};
-
 const BADGE_PX: Record<ExpandableBadgeSize, number> = { sm: 2, md: 4, lg: 4 };
 const BADGE_H: Record<ExpandableBadgeSize, number> = { sm: 16, md: 20, lg: 24 };
-
-function detectSurface(element: HTMLElement): string {
-  let el: HTMLElement | null = element.parentElement;
-  while (el) {
-    const rawBg = el.style.background || el.style.backgroundColor;
-    if (rawBg) {
-      for (const [key, token] of Object.entries(SURFACE_TOKENS)) {
-        if (rawBg.includes(`var(${token})`)) return key;
-      }
-    }
-    el = el.parentElement;
-  }
-
-  const tokenColors: [string, string][] = [];
-  for (const [key, token] of Object.entries(SURFACE_TOKENS)) {
-    const temp = document.createElement("div");
-    temp.style.backgroundColor = `var(${token})`;
-    element.appendChild(temp);
-    const resolved = getComputedStyle(temp).backgroundColor;
-    element.removeChild(temp);
-    if (
-      resolved &&
-      resolved !== "rgba(0, 0, 0, 0)" &&
-      resolved !== "transparent"
-    ) {
-      tokenColors.push([key, resolved]);
-    }
-  }
-
-  el = element.parentElement;
-  while (el) {
-    const bg = getComputedStyle(el).backgroundColor;
-    if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
-      for (let i = tokenColors.length - 1; i >= 0; i--) {
-        if (bg === tokenColors[i][1]) return tokenColors[i][0];
-      }
-      break;
-    }
-    el = el.parentElement;
-  }
-  return "default";
-}
 
 type AnimState = "idle" | "expanding" | "collapsing";
 

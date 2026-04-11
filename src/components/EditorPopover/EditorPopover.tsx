@@ -14,8 +14,8 @@ import {
   type PopoverAnchorRef,
 } from "../Popover";
 import { IconButton } from "../IconButton";
-import { Icon, type IconName } from "../Icon";
-import { IconThumbnailRow, type IconThumbnailRowSize } from "../IconThumbnailRow";
+import { Icon } from "../Icon";
+import { ScrollFade } from "../ScrollFade";
 import { Divider } from "../Divider";
 import { DragHandle } from "../DragHandle";
 import styles from "./EditorPopover.module.css";
@@ -30,6 +30,7 @@ export type EditorPopoverSize = "sm" | "lg";
 export interface EditorPopoverProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "title" | "content"> {
   open: boolean;
+  /** Dismiss callback — fired by click-outside, escape, and the close button */
   onClose?: () => void;
   anchorRef: PopoverAnchorRef;
   placement?: PopoverPlacement;
@@ -42,16 +43,8 @@ export interface EditorPopoverProps
   /** Show drag handle and allow repositioning */
   draggable?: boolean;
 
-  /** Selection label shown on the left */
-  selectionLabel?: string;
-  /** Secondary description below the selection label */
-  selectionDescription?: string;
-  /** Icons rendered as overlapping chips before the selection label */
-  selectionIcons?: IconName[];
-  /** Max visible selection icons; surplus shows as "+N" */
-  selectionIconsMax?: number;
-  /** Makes the selection zone clickable */
-  onSelectionClick?: () => void;
+  /** Optional selection slot rendered on the left, before the divider */
+  selection?: ReactNode;
 
   /** Consumer-provided toolbar items */
   children?: ReactNode;
@@ -60,10 +53,16 @@ export interface EditorPopoverProps
   cta?: ReactNode;
   /** Show a "more" icon button — fires callback on click */
   onMore?: () => void;
+  /** Show a close (X) button that calls onClose */
+  showCloseButton?: boolean;
 
+  /** Fixed width in px. When omitted the toolbar auto-sizes to its content. */
+  width?: number;
   /** Popover passthrough */
   offset?: number;
+  /** Fire onClose when clicking outside the popover (default: true) */
   closeOnClickOutside?: boolean;
+  /** Fire onClose when pressing Escape (default: true) */
   closeOnEscape?: boolean;
 }
 
@@ -71,71 +70,9 @@ export interface EditorPopoverProps
    Constants
    ═══════════════════════════════════════════════════════════════════════ */
 
-const BUTTON_SIZE: Record<EditorPopoverSize, "xs" | "sm"> = {
-  lg: "sm",
-  sm: "xs",
-};
-
-const ICON_SIZE: Record<EditorPopoverSize, number> = {
-  lg: 16,
-  sm: 16,
-};
-
-const THUMB_SIZE: Record<EditorPopoverSize, IconThumbnailRowSize> = {
-  lg: "sm",
-  sm: "sm",
-};
-
+const ICON_SIZE = 16;
 const DRAG_THRESHOLD = 4;
-
-/* ═══════════════════════════════════════════════════════════════════════
-   Internal: ActionBarSelection
-   ═══════════════════════════════════════════════════════════════════════ */
-
-interface ActionBarSelectionProps {
-  label: string;
-  description?: string;
-  icons?: IconName[];
-  iconsMax?: number;
-  interactive?: boolean;
-  onClick?: () => void;
-  size: EditorPopoverSize;
-}
-
-function ActionBarSelection({
-  label,
-  description,
-  icons,
-  iconsMax,
-  interactive = false,
-  onClick,
-  size,
-}: ActionBarSelectionProps) {
-  const thumbSize = THUMB_SIZE[size];
-  const Tag = interactive ? "button" : "div";
-
-  return (
-    <Tag
-      className={cx(
-        styles.selection,
-        interactive && styles.selectionInteractive,
-      )}
-      onClick={interactive ? onClick : undefined}
-      type={interactive ? "button" : undefined}
-      aria-label={interactive ? label : undefined}
-    >
-      {icons && icons.length > 0 && (
-        <IconThumbnailRow icons={icons} size={thumbSize} max={iconsMax} />
-      )}
-      <div className={styles.selectionText}>
-        <span className={styles.selectionLabel}>{label}</span>
-        {description && (
-          <span className={styles.selectionDescription}>{description}</span>
-        )}
-      </div>
-    </Tag>
-  );
-}
+const GLIDE_FACTOR = 0.25;
 
 /* ═══════════════════════════════════════════════════════════════════════
    Component
@@ -153,16 +90,14 @@ export const EditorPopover = forwardRef<HTMLDivElement, EditorPopoverProps>(
       fixed = false,
       draggable = false,
 
-      selectionLabel,
-      selectionDescription,
-      selectionIcons,
-      selectionIconsMax,
-      onSelectionClick,
+      selection,
 
       children,
       cta,
       onMore,
+      showCloseButton = false,
 
+      width,
       offset = 4,
       closeOnClickOutside = true,
       closeOnEscape = true,
@@ -170,57 +105,157 @@ export const EditorPopover = forwardRef<HTMLDivElement, EditorPopoverProps>(
       ...rest
     } = props;
 
-    const btnSize = BUTTON_SIZE[size];
-    const iconSize = ICON_SIZE[size];
-    const hasSelection = selectionLabel != null;
-    const hasRightActions = cta != null || onMore != null || onClose != null;
+    const hasSelection = selection != null;
+    const hasRightActions = cta != null || onMore != null || showCloseButton;
 
     /* ── Drag state ── */
 
-    const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+    const toolbarRef = useRef<HTMLDivElement>(null);
+
+    const [dragTarget, setDragTarget] = useState({ x: 0, y: 0 });
+    const dragTargetRef = useRef(dragTarget);
+    dragTargetRef.current = dragTarget;
+
+    const [smoothOffset, setSmoothOffset] = useState({ x: 0, y: 0 });
+    const smoothRef = useRef(smoothOffset);
+    smoothRef.current = smoothOffset;
+
+    const pendingDrag = useRef<{
+      pointerId: number;
+      startX: number;
+      startY: number;
+      ox: number;
+      oy: number;
+      baseX: number;
+      baseY: number;
+      panelW: number;
+      panelH: number;
+    } | null>(null);
     const draggingRef = useRef(false);
-    const startRef = useRef({ px: 0, py: 0, ox: 0, oy: 0 });
+    const didDragRef = useRef(false);
 
-    useEffect(() => {
-      if (!open) setDragOffset({ x: 0, y: 0 });
-    }, [open]);
-
-    const onPointerDown = useCallback(
+    const handleToolbarPointerDown = useCallback(
       (e: ReactPointerEvent) => {
-        (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-        startRef.current = {
-          px: e.clientX,
-          py: e.clientY,
-          ox: dragOffset.x,
-          oy: dragOffset.y,
+        if (!draggable) return;
+        didDragRef.current = false;
+
+        const el = toolbarRef.current;
+        const rect = el?.getBoundingClientRect();
+        const sx = smoothRef.current.x;
+        const sy = smoothRef.current.y;
+
+        pendingDrag.current = {
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          ox: dragTargetRef.current.x,
+          oy: dragTargetRef.current.y,
+          baseX: rect ? rect.left - sx : 0,
+          baseY: rect ? rect.top - sy : 0,
+          panelW: rect?.width ?? 0,
+          panelH: rect?.height ?? 0,
         };
         draggingRef.current = false;
       },
-      [dragOffset],
+      [draggable],
     );
 
-    const onPointerMove = useCallback((e: ReactPointerEvent) => {
-      const dx = e.clientX - startRef.current.px;
-      const dy = e.clientY - startRef.current.py;
+    /* ── Window pointer listeners ── */
 
-      if (!draggingRef.current) {
-        if (Math.abs(dx) + Math.abs(dy) < DRAG_THRESHOLD) return;
-        draggingRef.current = true;
-      }
+    useEffect(() => {
+      if (!draggable || !open) return;
 
-      setDragOffset({
-        x: startRef.current.ox + dx,
-        y: startRef.current.oy + dy,
-      });
-    }, []);
+      const handleMove = (e: PointerEvent) => {
+        const p = pendingDrag.current;
+        if (!p) return;
 
-    const onPointerUp = useCallback((e: ReactPointerEvent) => {
-      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-      draggingRef.current = false;
-    }, []);
+        const dx = e.clientX - p.startX;
+        const dy = e.clientY - p.startY;
+
+        if (!draggingRef.current) {
+          if (Math.abs(dx) + Math.abs(dy) < DRAG_THRESHOLD) return;
+          draggingRef.current = true;
+          didDragRef.current = true;
+          toolbarRef.current?.setPointerCapture(p.pointerId);
+        }
+
+        let nextX = p.ox + dx;
+        let nextY = p.oy + dy;
+
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+        const minX = -p.baseX;
+        const minY = -p.baseY;
+        const maxX = vw - p.panelW - p.baseX;
+        const maxY = vh - p.panelH - p.baseY;
+
+        nextX = Math.max(minX, Math.min(maxX, nextX));
+        nextY = Math.max(minY, Math.min(maxY, nextY));
+
+        setDragTarget({ x: nextX, y: nextY });
+      };
+
+      const handleUp = () => {
+        if (draggingRef.current && toolbarRef.current && pendingDrag.current) {
+          toolbarRef.current.releasePointerCapture(
+            pendingDrag.current.pointerId,
+          );
+        }
+        pendingDrag.current = null;
+        draggingRef.current = false;
+      };
+
+      window.addEventListener("pointermove", handleMove);
+      window.addEventListener("pointerup", handleUp);
+      return () => {
+        window.removeEventListener("pointermove", handleMove);
+        window.removeEventListener("pointerup", handleUp);
+      };
+    }, [draggable, open]);
+
+    /* ── Smooth glide (rAF lerp toward dragTarget) ── */
+
+    useEffect(() => {
+      if (!draggable) return;
+
+      const s = smoothRef.current;
+      const t = dragTargetRef.current;
+      if (s.x === t.x && s.y === t.y) return;
+
+      let running = true;
+      const tick = () => {
+        if (!running) return;
+        const cur = smoothRef.current;
+        const tgt = dragTargetRef.current;
+        const nx = cur.x + (tgt.x - cur.x) * GLIDE_FACTOR;
+        const ny = cur.y + (tgt.y - cur.y) * GLIDE_FACTOR;
+        const settled =
+          Math.abs(tgt.x - nx) < 0.5 && Math.abs(tgt.y - ny) < 0.5;
+        const next = settled ? { x: tgt.x, y: tgt.y } : { x: nx, y: ny };
+        smoothRef.current = next;
+        setSmoothOffset(next);
+        if (!settled) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+
+      return () => { running = false; };
+    }, [draggable, dragTarget]);
+
+    const handleToolbarClick = useCallback(
+      (e: React.MouseEvent) => {
+        if (didDragRef.current) {
+          e.stopPropagation();
+          e.preventDefault();
+          didDragRef.current = false;
+        }
+      },
+      [],
+    );
 
     const positionOffset =
-      dragOffset.x !== 0 || dragOffset.y !== 0 ? dragOffset : undefined;
+      smoothOffset.x !== 0 || smoothOffset.y !== 0 ? smoothOffset : undefined;
+
+    const canDismiss = onClose != null;
 
     return (
       <Popover
@@ -229,12 +264,13 @@ export const EditorPopover = forwardRef<HTMLDivElement, EditorPopoverProps>(
         onClose={onClose ?? (() => {})}
         anchorRef={anchorRef}
         placement={placement}
+        width={width ?? "auto"}
         density="none"
         role="toolbar"
         fixed={fixed}
         offset={offset}
-        closeOnClickOutside={closeOnClickOutside}
-        closeOnEscape={closeOnEscape}
+        closeOnClickOutside={canDismiss && closeOnClickOutside}
+        closeOnEscape={canDismiss && closeOnEscape}
         trapFocus={false}
         autoFocus={false}
         positionOffset={positionOffset}
@@ -242,43 +278,42 @@ export const EditorPopover = forwardRef<HTMLDivElement, EditorPopoverProps>(
         {...rest}
       >
         <div
+          ref={toolbarRef}
           className={cx(
             styles.toolbar,
             styles[size],
             !expanded && styles.collapsed,
           )}
+          onPointerDown={draggable ? handleToolbarPointerDown : undefined}
+          onClickCapture={draggable ? handleToolbarClick : undefined}
+          style={draggable ? { touchAction: "none" } : undefined}
         >
-          {/* Drag handle */}
+          {/* Drag handle (visual indicator) */}
           {draggable && (
             <DragHandle
               size="sm"
               type="dot"
               className={styles.dragHandle}
-              onPointerDown={onPointerDown}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerUp}
             />
           )}
 
-          {/* Selection zone */}
+          {/* Selection slot */}
           {hasSelection && (
             <div className={styles.selectionGroup}>
-              <ActionBarSelection
-                label={selectionLabel!}
-                description={selectionDescription}
-                icons={selectionIcons}
-                iconsMax={selectionIconsMax}
-                interactive={onSelectionClick != null}
-                onClick={onSelectionClick}
-                size={size}
-              />
+              {selection}
               {expanded && <Divider orientation="vertical" />}
             </div>
           )}
 
           {/* Items zone */}
           {expanded && children && (
-            <div className={styles.items}>{children}</div>
+            width != null ? (
+              <ScrollFade direction="horizontal" className={styles.items}>
+                <div className={styles.itemsInner}>{children}</div>
+              </ScrollFade>
+            ) : (
+              <div className={styles.itemsInner}>{children}</div>
+            )
           )}
 
           {/* Right actions */}
@@ -287,21 +322,21 @@ export const EditorPopover = forwardRef<HTMLDivElement, EditorPopoverProps>(
               {cta}
               {onMore && (
                 <IconButton
-                  size={btnSize}
+                  size="md"
                   variant="neutral"
                   emphasis="low"
-                  icon={<Icon name="more_vert" size={iconSize} />}
+                  icon={<Icon name="more_vert" size={ICON_SIZE} />}
                   aria-label="More actions"
                   onClick={onMore}
                   hideTooltip
                 />
               )}
-              {onClose && (
+              {showCloseButton && onClose && (
                 <IconButton
-                  size={btnSize}
+                  size="md"
                   variant="neutral"
                   emphasis="low"
-                  icon={<Icon name="close" size={iconSize} />}
+                  icon={<Icon name="close" size={ICON_SIZE} />}
                   aria-label="Close"
                   onClick={onClose}
                   hideTooltip

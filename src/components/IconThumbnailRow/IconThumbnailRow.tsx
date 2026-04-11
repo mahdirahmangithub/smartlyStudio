@@ -1,8 +1,10 @@
-import { Icon, type IconName } from "../Icon";
+import { type IconName } from "../Icon";
+import { IconThumbnail, type IconThumbnailSize } from "../IconThumbnail";
+import type { SurfaceType } from "../../utils/detectSurface";
 import styles from "./IconThumbnailRow.module.css";
 import { cx } from "../../utils/cx";
 
-export type IconThumbnailRowSize = "sm" | "md" | "lg";
+export type IconThumbnailRowSize = IconThumbnailSize;
 
 export interface IconThumbnailRowProps {
   /** Icon names to display as overlapping circular chips */
@@ -11,24 +13,23 @@ export interface IconThumbnailRowProps {
   size?: IconThumbnailRowSize;
   /** Max visible icons — surplus auto-shows as "+N" */
   max?: number;
+  /** Show an outline ring on each chip that adapts to the parent surface */
+  outline?: boolean;
+  /** Which surface background the outline should match */
+  surface?: SurfaceType;
   className?: string;
 }
-
-const ICON_SIZE: Record<IconThumbnailRowSize, number> = {
-  lg: 20,
-  md: 16,
-  sm: 12,
-};
 
 export function IconThumbnailRow({
   icons,
   size = "lg",
   max,
+  outline = true,
+  surface = "auto",
   className,
 }: IconThumbnailRowProps) {
   const visible = max != null && max < icons.length ? icons.slice(0, max) : icons;
   const overflow = max != null ? Math.max(0, icons.length - max) : 0;
-  const iconSize = ICON_SIZE[size];
 
   if (visible.length === 0) return null;
 
@@ -39,9 +40,15 @@ export function IconThumbnailRow({
     >
       <div className={styles.icons}>
         {visible.map((name, i) => (
-          <span key={`${name}-${i}`} className={styles.chip} style={{ zIndex: i + 1 }}>
-            <Icon name={name} size={iconSize} />
-          </span>
+          <IconThumbnail
+            key={`${name}-${i}`}
+            icon={name}
+            size={size}
+            outline={outline}
+            surface={surface}
+            className={styles.chip}
+            style={{ zIndex: i + 1 }}
+          />
         ))}
       </div>
 

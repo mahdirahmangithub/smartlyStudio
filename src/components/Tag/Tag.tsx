@@ -12,6 +12,7 @@ import {
 import { InputClear, type InputClearSize, type InputClearType } from "../InputClear";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
+import { detectSurface, SURFACE_TOKENS, type SurfaceType } from "../../utils/detectSurface";
 import styles from "./Tag.module.css";
 import { cx } from "../../utils/cx";
 
@@ -34,7 +35,7 @@ export type TagType =
   | "cat-8";
 
 export type TagEmphasis = "high" | "low";
-export type TagSurface = "auto" | "default" | "over" | "under";
+export type TagSurface = SurfaceType;
 
 export interface TagProps extends Omit<HTMLAttributes<HTMLSpanElement>, "children"> {
   size?: TagSize;
@@ -70,54 +71,6 @@ const INPUT_CLEAR_SIZE: Record<TagSize, InputClearSize> = {
   md: "2xs",
   lg: "xs",
 };
-
-const SURFACE_TOKENS: Record<string, string> = {
-  default: "--element-surface-default",
-  over: "--element-surface-over",
-  under: "--element-surface-under",
-};
-
-function detectSurface(element: HTMLElement): string {
-  let el: HTMLElement | null = element.parentElement;
-  while (el) {
-    const rawBg = el.style.background || el.style.backgroundColor;
-    if (rawBg) {
-      for (const [key, token] of Object.entries(SURFACE_TOKENS)) {
-        if (rawBg.includes(`var(${token})`)) return key;
-      }
-    }
-    el = el.parentElement;
-  }
-
-  const tokenColors: [string, string][] = [];
-  for (const [key, token] of Object.entries(SURFACE_TOKENS)) {
-    const temp = document.createElement("div");
-    temp.style.backgroundColor = `var(${token})`;
-    element.appendChild(temp);
-    const resolved = getComputedStyle(temp).backgroundColor;
-    element.removeChild(temp);
-    if (
-      resolved &&
-      resolved !== "rgba(0, 0, 0, 0)" &&
-      resolved !== "transparent"
-    ) {
-      tokenColors.push([key, resolved]);
-    }
-  }
-
-  el = element.parentElement;
-  while (el) {
-    const bg = getComputedStyle(el).backgroundColor;
-    if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
-      for (let i = tokenColors.length - 1; i >= 0; i--) {
-        if (bg === tokenColors[i][1]) return tokenColors[i][0];
-      }
-      break;
-    }
-    el = el.parentElement;
-  }
-  return "default";
-}
 
 function getClearVariant(variant: TagType, emphasis: TagEmphasis): InputClearType {
   if (variant === "cat-7" || variant === "cat-8") return "inverse";

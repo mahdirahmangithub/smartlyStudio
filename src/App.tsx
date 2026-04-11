@@ -102,6 +102,7 @@ import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import GlobalNavigationBarPlayground from "./pages/GlobalNavigationBarPlayground";
 import HeaderPlayground from "./pages/HeaderPlayground";
 import IconContainerPlayground from "./pages/IconContainerPlayground";
+import IconThumbnailPlayground from "./pages/IconThumbnailPlayground";
 import IconThumbnailRowPlayground from "./pages/IconThumbnailRowPlayground";
 import EditorPopoverPlayground from "./pages/EditorPopoverPlayground";
 import NavigationBrandItemPlayground from "./pages/NavigationBrandItemPlayground";
@@ -176,6 +177,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "select-tile"
 | "checkbox-anim-test"
 | "editor-popover"
+| "icon-thumbnail"
 | "icon-thumbnail-row"
 
 
@@ -366,6 +368,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "hint", label: "Hint" },
   { key: "icon-badge", label: "IconBadge" },
   { key: "icon-container", label: "IconContainer" },
+  { key: "icon-thumbnail", label: "IconThumbnail" },
   { key: "icon-thumbnail-row", label: "IconThumbRow" },
   { key: "icons", label: "Icons" },
   { key: "illustration", label: "Illustration" },
@@ -531,6 +534,7 @@ export default function App() {
           <div className="app-content" style={page === "navbar-content" ? { maxWidth: "none" } : undefined}>
             {page === "button" && <ButtonPlayground />}
             {page === "icon-container" && <IconContainerPlayground />}
+            {page === "icon-thumbnail" && <IconThumbnailPlayground />}
             {page === "icon-thumbnail-row" && <IconThumbnailRowPlayground />}
             {page === "icons" && <IconsPage />}
             {page === "scroll-fade" && <ScrollFadePage />}

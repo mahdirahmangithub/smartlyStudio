@@ -1,109 +1,33 @@
 /* ── Toolbar root ── */
 
 .toolbar {
+  position: relative;
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   white-space: nowrap;
 }
 
 /* ── Size variants ── */
 
 .lg {
-  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) var(--spacing-md);
 }
 
 .sm {
-  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-sm) var(--spacing-sm) var(--spacing-sm);
 }
 
 /* collapsed: tighter inline padding */
 .collapsed.lg {
-  padding: var(--spacing-md) var(--spacing-xl);
+  padding: var(--spacing-md) var(--spacing-md);
 }
 
 .collapsed.sm {
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: var(--spacing-sm) var(--spacing-sm);
 }
 
-/* ── Selection zone ── */
-
-.selection {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  flex-shrink: 0;
-  border-radius: var(--radius-sm);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  user-select: none;
-}
-
-.selectionInteractive {
-  cursor: pointer;
-}
-
-.selectionInteractive:hover {
-  background: var(--element-fill-neutral-tertiary-hover);
-}
-
-.selectionInteractive:active {
-  background: var(--element-fill-neutral-tertiary-active-default);
-}
-
-.selectionText {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-2xs);
-  min-width: 0;
-}
-
-.selectionLabel {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--text-neutral-primary);
-}
-
-.lg .selectionLabel {
-  font-family: var(--type-label-strong-sm-family);
-  font-size: var(--type-label-strong-sm-size);
-  font-weight: var(--type-label-strong-sm-weight);
-  line-height: var(--type-label-strong-sm-line-height);
-  letter-spacing: var(--type-label-strong-sm-letter-spacing);
-}
-
-.sm .selectionLabel {
-  font-family: var(--type-label-strong-xs-family);
-  font-size: var(--type-label-strong-xs-size);
-  font-weight: var(--type-label-strong-xs-weight);
-  line-height: var(--type-label-strong-xs-line-height);
-  letter-spacing: var(--type-label-strong-xs-letter-spacing);
-}
-
-.selectionDescription {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--text-neutral-tertiary-default);
-}
-
-.lg .selectionDescription {
-  font-family: var(--type-body-sm-family);
-  font-size: var(--type-body-sm-size);
-  font-weight: var(--type-body-sm-weight);
-  line-height: var(--type-body-sm-line-height);
-  letter-spacing: var(--type-body-sm-letter-spacing);
-}
-
-.sm .selectionDescription {
-  font-family: var(--type-caption-md-family);
-  font-size: var(--type-caption-md-size);
-  font-weight: var(--type-caption-md-weight);
-  line-height: var(--type-caption-md-line-height);
-  letter-spacing: var(--type-caption-md-letter-spacing);
-}
-
-/* ── Selection + divider group ── */
+/* ── Selection slot + divider group ── */
 
 .selectionGroup {
   display: flex;
@@ -117,7 +41,12 @@
 .items {
   flex: 1;
   min-width: 0;
-  overflow: hidden;
+}
+
+.itemsInner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
 }
 
 /* ── Right actions ── */
@@ -125,7 +54,7 @@
 .rightActions {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-xs);
   flex-shrink: 0;
 }
 
@@ -137,9 +66,5 @@
   top: 50%;
   transform: translateY(-50%);
   touch-action: none;
-  opacity: var(--opacity-100);
-}
-
-.dragHandle:hover {
-  opacity: var(--opacity-100);
+  cursor: default;
 }
