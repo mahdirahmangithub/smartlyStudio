@@ -1,7 +1,0 @@
-.folder [class*="content"] {
-  background: transparent;
-}
-
-.folder [class*="iconSlot"] {
-  color: var(--text-neutral-primary);
-}
