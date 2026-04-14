@@ -1,0 +1,194 @@
+/* ── Root ── */
+
+.root {
+  --_cap-height: 36px;
+  --_tab-width: 32px;
+
+  position: fixed;
+  right: 0;
+  bottom: var(--spacing-2xl);
+  z-index: var(--z-index-stack-floating-action);
+  width: var(--_tab-width);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  transition:
+    transform var(--animation-state-change-duration) var(--animation-state-change-easing),
+    opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.root:focus-visible .tab {
+  outline: 2px solid var(--element-outline-brand-active);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Panel-open: slide out to the right ── */
+
+.panelOpen {
+  transform: translateX(100%);
+  opacity: var(--opacity-0);
+  pointer-events: none;
+}
+
+/* ── Disabled ── */
+
+.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ── Glow (brand-colored blur behind the tab) ── */
+
+.glow {
+  position: absolute;
+  top: var(--_cap-height);
+  bottom: var(--_cap-height);
+  left: 0;
+  right: 0;
+  background: var(--element-fill-brand-primary-default);
+  filter: blur(var(--blur-xl));
+  border-radius: var(--radius-full);
+  opacity: var(--opacity-0);
+  transform: translateX(var(--spacing-md));
+  transition:
+    opacity var(--animation-state-micro-duration) var(--animation-state-micro-easing),
+    transform var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+  pointer-events: none;
+}
+
+.root:hover:not(.disabled) .glow {
+  opacity: var(--opacity-24);
+  transform: translateX(var(--spacing-xs));
+}
+
+.root:active:not(.disabled) .glow {
+  opacity: var(--opacity-24);
+  transform: translateX(0);
+}
+
+/* ── Tab shape wrapper (caps + content column) ── */
+
+.tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  filter:
+    drop-shadow(-1px 0 2px var(--shadow-ambient))
+    drop-shadow(-2px 0 4px var(--shadow-halo))
+    drop-shadow(-1px 0 2px var(--shadow-ambient));
+}
+
+.disabled .tab {
+  filter: none;
+}
+
+/* ── SVG end-caps ── */
+
+.cap {
+  display: block;
+  width: var(--_tab-width);
+  height: var(--_cap-height);
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.capPath {
+  fill: var(--element-surface-over);
+}
+
+.capBorderPath {
+  fill: none;
+  stroke: var(--element-divider-neutral-default);
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+}
+
+.disabled .capBorderPath {
+  stroke: var(--element-divider-neutral-weak);
+}
+
+/* ── Middle (content area) ── */
+
+.content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  background: var(--element-surface-over);
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.content::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: -0.5px;
+  width: 1px;
+  background: var(--element-divider-neutral-default);
+}
+
+.disabled .content::after {
+  background: var(--element-divider-neutral-weak);
+}
+
+/* ── Icon ── */
+
+.icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-neutral-secondary-default);
+  transform: rotate(90deg);
+  transition: color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.root:hover:not(.disabled) .icon {
+  color: var(--text-neutral-secondary-hover);
+}
+
+.root:active:not(.disabled) .icon {
+  color: var(--text-neutral-secondary-press);
+}
+
+.disabled .icon {
+  color: var(--text-neutral-disable);
+}
+
+/* ── Label ── */
+
+.label {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+  color: var(--text-neutral-secondary-default);
+  white-space: nowrap;
+  padding: var(--spacing-xs) 0;
+  transition: color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.root:hover:not(.disabled) .label {
+  color: var(--text-neutral-secondary-hover);
+}
+
+.root:active:not(.disabled) .label {
+  color: var(--text-neutral-secondary-press);
+}
+
+.disabled .label {
+  color: var(--text-neutral-disable);
+}

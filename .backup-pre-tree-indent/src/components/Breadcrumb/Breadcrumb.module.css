@@ -1,0 +1,128 @@
+/* ── nav root ── */
+
+.root {
+  display: block;
+  min-width: 0;
+}
+
+/* ── ordered list ── */
+
+.list {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.list.basicList {
+  gap: var(--spacing-sm);
+}
+
+/* ── no-wrap mode ── */
+
+.list.noWrap {
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+
+.noWrap > .listItem {
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+}
+
+.noWrap > .iconOnlyItem {
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.noWrap > .collapsedItem {
+  flex-shrink: 0;
+}
+
+/* ── list item wrappers ── */
+
+.listItem {
+  display: flex;
+  align-items: center;
+}
+
+/* ── gap between items (pill vs flat) ── */
+
+.listItem.pill {
+  gap: var(--spacing-2xs);
+}
+
+.listItem.flat.lg {
+  padding-block: var(--spacing-sm-plus);
+  gap: var(--spacing-sm);
+}
+
+.listItem.flat.md {
+  padding-block: var(--spacing-sm);
+  gap: var(--spacing-sm);
+}
+
+.listItem.flat.sm {
+  padding-block: var(--spacing-xs);
+  gap: var(--spacing-sm);
+}
+
+/* last item has no gap for separator */
+.listItem:last-child {
+  gap: 0;
+}
+
+/* ── separator (chevron) ── */
+
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: var(--spacing-lg);
+  height: var(--spacing-lg);
+  color: var(--text-neutral-placeholder);
+  transition: transform var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+}
+
+.listItem:has([aria-disabled="true"]) .chevron {
+  color: var(--text-neutral-disable);
+}
+
+/* Hovering an item rotates its own chevron AND all subsequent items' chevrons */
+.listItem:hover:not(:has([aria-disabled="true"])) .chevron,
+.listItem:hover:not(:has([aria-disabled="true"])) ~ .listItem .chevron,
+.listItem:hover:not(:has([aria-disabled="true"])) ~ .collapsedItem .chevron,
+.collapsedItem:hover .chevron,
+.collapsedItem:hover ~ .listItem .chevron {
+  transform: rotate(180deg);
+}
+
+/* ── select item wrapper ── */
+
+.selectItem {
+  overflow: visible;
+}
+
+.selectItem.pill {
+  gap: 0;
+}
+
+/* ── collapsed button wrapper ── */
+
+.collapsedItem {
+  display: flex;
+  align-items: center;
+}
+
+.collapsedItem.pill {
+  gap: var(--spacing-2xs);
+}
+
+.collapsedItem.flat {
+  gap: var(--spacing-sm);
+}

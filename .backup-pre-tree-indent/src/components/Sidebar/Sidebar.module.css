@@ -1,0 +1,171 @@
+@property --_header-fade {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+/* ── Root (flex spacer — controls how much page content is pushed) ── */
+
+.root {
+  position: relative;
+  flex-shrink: 0;
+  height: 100%;
+  overflow: visible;
+  transition: width var(--animation-state-expand-duration) var(--animation-state-expand-easing);
+}
+
+.root.collapsing {
+  transition: width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing);
+}
+
+.root.resizing {
+  transition: none !important;
+}
+
+/* ── Panel (visual sidebar surface) ── */
+
+.panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: calc(var(--z-index-navigation) + var(--z-index-below));
+  display: flex;
+  flex-direction: column;
+  background: var(--element-surface-over);
+  overflow: visible;
+  transition: width var(--animation-state-expand-duration) var(--animation-state-expand-easing);
+}
+
+.panelInner {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--spacing-md) var(--spacing-md) 0;
+}
+
+.panel.collapsing {
+  transition: width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing);
+}
+
+/* ── Resizing — disable transitions during drag ── */
+
+.panel.resizing {
+  transition: none !important;
+  will-change: width;
+  user-select: none;
+}
+
+/* ── Header ── */
+
+.header {
+  display: flex;
+  align-items: center;
+   flex-shrink: 0;
+}
+
+.headerContent {
+  flex: 1 1 0%;
+  min-width: 0;
+  overflow: hidden;
+  --_header-fade: 48px;
+  -webkit-mask-image: linear-gradient(to right, var(--color-black-black) calc(100% - var(--_header-fade)), var(--color-black-opacity-0) 100%);
+  mask-image: linear-gradient(to right, var(--color-black-black) calc(100% - var(--_header-fade)), var(--color-black-opacity-0) 100%);
+  transition: --_header-fade var(--animation-state-collapse-duration) var(--animation-state-collapse-easing);
+}
+
+.headerContent.expanded {
+  --_header-fade: 0px;
+  transition: --_header-fade var(--animation-state-expand-duration) var(--animation-state-expand-easing);
+}
+
+.headerContentInner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+   width: calc(var(--nav-expanded-width, 100%) - 40px - var(--spacing-xs));
+}
+
+.titleArea {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.actionsArea {
+  flex-shrink: 0;
+}
+
+.trigger {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.trigger button {
+  cursor: inherit;
+}
+
+/* ── Content area ── */
+
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  margin-inline: calc(-1 * var(--spacing-xs));
+  padding-inline: var(--spacing-xs);
+}
+
+/* ── Right-edge divider ── */
+
+.edgeDivider {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  pointer-events: none;
+}
+
+/* ── Resize handle (right edge) ── */
+
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  right: calc(((var(--space-sm-plus) / 2) - var(--space-hair-line)) * -1);
+  bottom: 0;
+  width: var(--space-sm-plus);
+  cursor: ew-resize;
+  z-index: var(--z-index-above);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+
+.resizeHandle::after {
+  content: "";
+  position: absolute;
+  top: var(--spacing-xs);
+  height: calc(100% - var(--spacing-sm));
+  width: var(--space-2xs);
+  background-color: var(--element-fill-brand-primary-default);
+  opacity: var(--opacity-0);
+  border-radius: var(--radius-full);
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+  pointer-events: none;
+}
+
+.resizeHandle:hover::after,
+.resizeHandle:active::after {
+  opacity: var(--opacity-100);
+}
+
+.resizing .resizeHandle::after {
+  opacity: var(--opacity-100);
+}

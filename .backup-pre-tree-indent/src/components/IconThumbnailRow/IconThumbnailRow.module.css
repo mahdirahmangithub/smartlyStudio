@@ -1,0 +1,50 @@
+/* ── Root ── */
+
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+/* ── Icons container ── */
+
+.icons {
+  display: flex;
+  align-items: center;
+}
+
+/* ── Overlap per size ── */
+
+.lg .chip { margin-right: var(--spacing-negative-sm-plus); }
+.md .chip { margin-right: var(--spacing-negative-sm); }
+.sm .chip { margin-right: var(--spacing-negative-sm-minus); }
+
+.chip:last-child {
+  margin-right: 0;
+}
+
+/* ── Overflow text ── */
+
+.overflow {
+  flex-shrink: 0;
+  color: var(--text-neutral-tertiary-default);
+  white-space: nowrap;
+  text-align: center;
+}
+
+.lg .overflow,
+.md .overflow {
+  font-family: var(--type-caption-strong-md-family);
+  font-size: var(--type-caption-strong-md-size);
+  font-weight: var(--type-caption-strong-md-weight);
+  line-height: var(--type-caption-strong-md-line-height);
+  letter-spacing: var(--type-caption-strong-md-letter-spacing);
+}
+
+.sm .overflow {
+  font-family: var(--type-caption-strong-sm-family);
+  font-size: var(--type-caption-strong-sm-size);
+  font-weight: var(--type-caption-strong-sm-weight);
+  line-height: var(--type-caption-strong-sm-line-height);
+  letter-spacing: var(--type-caption-strong-sm-letter-spacing);
+}

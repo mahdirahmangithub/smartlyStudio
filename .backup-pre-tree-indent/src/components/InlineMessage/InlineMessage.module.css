@@ -1,0 +1,146 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   InlineMessage
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.root {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* ── high emphasis (background pill) ───────────────────────────────────── */
+
+.high {
+  padding: var(--spacing-sm-minus);
+  border-radius: var(--radius-xl);
+}
+
+.high .text {
+  padding: 0 var(--spacing-xs);
+  font-family: var(--type-label-strong-xs-family);
+  font-size: var(--type-label-strong-xs-size);
+  font-weight: var(--type-label-strong-xs-weight);
+  line-height: var(--type-label-strong-xs-line-height);
+  letter-spacing: var(--type-label-strong-xs-letter-spacing);
+}
+
+/* ── low emphasis (no background) ──────────────────────────────────────── */
+
+.low {
+  justify-content: space-between;
+}
+
+.low .content {
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xs);
+}
+
+.low .text {
+  font-family: var(--type-label-sm-family);
+  font-size: var(--type-label-sm-size);
+  font-weight: var(--type-label-sm-weight);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+}
+
+/* ── shared inner layout ───────────────────────────────────────────────── */
+
+.content {
+  display: flex;
+  align-items: flex-start;
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.high .content {
+  align-items: center;
+}
+
+.icon {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.text {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── character counter ─────────────────────────────────────────────────── */
+
+.counter {
+  flex-shrink: 0;
+  padding: var(--spacing-2xs) var(--spacing-2xs) var(--spacing-2xs) var(--spacing-sm);
+  font-family: var(--type-caption-sm-family);
+  font-size: var(--type-caption-sm-size);
+  font-weight: var(--type-caption-sm-weight);
+  line-height: var(--type-caption-sm-line-height);
+  letter-spacing: var(--type-caption-sm-letter-spacing);
+  color: var(--text-neutral-tertiary-default);
+  white-space: nowrap;
+}
+
+/* ── range layout ──────────────────────────────────────────────────────── */
+
+.range {
+  gap: var(--spacing-sm);
+}
+
+.rangeLabel {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--type-caption-sm-family);
+  font-size: var(--type-caption-sm-size);
+  font-weight: var(--type-caption-sm-weight);
+  line-height: var(--type-caption-sm-line-height);
+  letter-spacing: var(--type-caption-sm-letter-spacing);
+  color: var(--text-neutral-tertiary-default);
+}
+
+.rangeLabelEnd {
+  text-align: right;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   Type colours
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── none (low emphasis only) ──────────────────────────────────────────── */
+
+.none.low .icon  { color: var(--text-neutral-placeholder); }
+.none.low .text  { color: var(--text-neutral-placeholder); }
+
+/* ── neutral ───────────────────────────────────────────────────────────── */
+
+.neutral.high { background: var(--element-fill-neutral-secondary-default); }
+.neutral .icon { color: var(--text-neutral-secondary-default); }
+.neutral .text { color: var(--text-neutral-secondary-default); }
+
+/* ── info ──────────────────────────────────────────────────────────────── */
+
+.info.high { background: var(--element-fill-info-secondary-default); }
+.info .icon { color: var(--text-info-default); }
+.info .text { color: var(--text-info-default); }
+
+/* ── success ───────────────────────────────────────────────────────────── */
+
+.success.high { background: var(--element-fill-success-secondary-default); }
+.success .icon { color: var(--text-success-default); }
+.success .text { color: var(--text-success-default); }
+
+/* ── warning ───────────────────────────────────────────────────────────── */
+
+.warning.high { background: var(--element-fill-warning-secondary-default); }
+.warning .icon { color: var(--text-warning-default); }
+.warning .text { color: var(--text-warning-default); }
+
+/* ── alert ─────────────────────────────────────────────────────────────── */
+
+.alert.high { background: var(--element-fill-alert-secondary-default); }
+.alert .icon { color: var(--text-alert-default); }
+.alert .text { color: var(--text-alert-default); }

@@ -1,0 +1,22 @@
+/* ── base ──────────────────────────────────────────────────────────────── */
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-neutral-tertiary-default);
+  cursor: pointer;
+  transition: color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.hint:hover:not(.disabled) {
+  color: var(--text-neutral-tertiary-hover);
+}
+
+/* ── disabled ─────────────────────────────────────────────────────────── */
+
+.disabled {
+  color: var(--text-neutral-disable);
+  pointer-events: none;
+  cursor: default;
+}

@@ -1,0 +1,141 @@
+/* ── base ──────────────────────────────────────────────────────────────── */
+
+.inputClear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 0;
+  margin: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--animation-state-change-duration) var(--animation-state-change-easing),
+    color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.inputClear:focus-visible {
+  box-shadow: var(--focus-ring,
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
+  outline: none;
+}
+
+.inputClear:disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* ── shape ─────────────────────────────────────────────────────────────── */
+
+.round  { border-radius: var(--radius-full); }
+.square { border-radius: 0; }
+
+/* ── sizes ─────────────────────────────────────────────────────────────── */
+
+.size2xs { padding: var(--spacing-2xs); }
+.sizeXs  { padding: var(--spacing-xs);  }
+.sizeSm  { padding: var(--spacing-xs);  }
+.sizeMd  { padding: var(--spacing-sm);  }
+.sizeLg  { padding: var(--spacing-sm-plus); }
+
+/* ── icon sizing ───────────────────────────────────────────────────────── */
+
+.size2xs .icon,
+.sizeXs .icon  { width: 12px; height: 12px; }
+
+.sizeSm .icon,
+.sizeMd .icon  { width: 16px; height: 16px; }
+
+.sizeLg .icon  { width: 20px; height: 20px; }
+
+/* ── type: neutral ─────────────────────────────────────────────────────── */
+
+.neutral {
+  background: var(--element-fill-neutral-tertiary-default);
+  color: var(--text-neutral-secondary-default);
+}
+.neutral:hover { background: var(--element-fill-neutral-tertiary-active-hover); }
+.neutral:active { background: var(--element-fill-neutral-tertiary-active-press); }
+.neutral:disabled {
+  background: var(--element-fill-neutral-tertiary-disable);
+  color: var(--text-neutral-disable);
+}
+
+/* ── type: brand ───────────────────────────────────────────────────────── */
+
+.brand {
+  background: var(--element-fill-brand-tertiary-default);
+  color: var(--text-brand-default);
+}
+.brand:hover { background: var(--element-fill-brand-tertiary-active-hover); }
+.brand:active { background: var(--element-fill-brand-tertiary-active-press); }
+.brand:disabled {
+  background: var(--element-fill-brand-tertiary-disable);
+  color: var(--text-brand-disable);
+}
+
+/* ── type: info ────────────────────────────────────────────────────────── */
+
+.info {
+  background: var(--element-fill-info-tertiary-default);
+  color: var(--text-info-default);
+}
+.info:hover { background: var(--element-fill-info-tertiary-active-hover); }
+.info:active { background: var(--element-fill-info-tertiary-active-press); }
+.info:disabled {
+  background: var(--element-fill-info-tertiary-disable);
+  color: var(--text-info-disable);
+}
+
+/* ── type: success ─────────────────────────────────────────────────────── */
+
+.success {
+  background: var(--element-fill-success-tertiary-default);
+  color: var(--text-success-default);
+}
+.success:hover { background: var(--element-fill-success-tertiary-active-hover); }
+.success:active { background: var(--element-fill-success-tertiary-active-press); }
+.success:disabled {
+  background: var(--element-fill-success-tertiary-disable);
+  color: var(--text-success-disable);
+}
+
+/* ── type: warning ─────────────────────────────────────────────────────── */
+
+.warning {
+  background: var(--element-fill-warning-tertiary-default);
+  color: var(--text-warning-default);
+}
+.warning:hover { background: var(--element-fill-warning-tertiary-active-hover); }
+.warning:active { background: var(--element-fill-warning-tertiary-active-press); }
+.warning:disabled {
+  background: var(--element-fill-warning-tertiary-disable);
+  color: var(--text-warning-disable);
+}
+
+/* ── type: alert ───────────────────────────────────────────────────────── */
+
+.alert {
+  background: var(--element-fill-alert-tertiary-default);
+  color: var(--text-alert-default);
+}
+.alert:hover { background: var(--element-fill-alert-tertiary-active-hover); }
+.alert:active { background: var(--element-fill-alert-tertiary-active-press); }
+.alert:disabled {
+  background: var(--element-fill-alert-tertiary-disable);
+  color: var(--text-alert-disable);
+}
+
+/* ── type: inverse ─────────────────────────────────────────────────────── */
+
+.inverse {
+  background: var(--element-fill-neutral-tertiary-inverse-default);
+  color: var(--text-neutral-inverse-primary);
+}
+.inverse:hover { background: var(--element-fill-neutral-tertiary-inverse-hover); }
+.inverse:active { background: var(--element-fill-neutral-tertiary-inverse-press); }
+.inverse:disabled {
+  background: var(--element-fill-neutral-tertiary-inverse-disable);
+  color: var(--text-neutral-inverse-disable);
+}

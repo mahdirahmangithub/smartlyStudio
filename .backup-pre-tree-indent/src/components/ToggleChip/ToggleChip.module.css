@@ -1,0 +1,213 @@
+/* ── base ──────────────────────────────────────────────────────────────── */
+
+.toggleChip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  overflow: clip;
+  border: var(--spacing-px) solid transparent;
+  border-radius: var(--radius-full);
+  cursor: default;
+  user-select: none;
+  white-space: nowrap;
+  transition:
+    background var(--animation-state-change-duration) var(--animation-state-change-easing),
+    color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.toggleChip:focus-visible {
+  box-shadow: var(--focus-ring,
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
+  outline: none;
+}
+
+/* ── sizes ─────────────────────────────────────────────────────────────── */
+
+.sm {
+  min-height: var(--spacing-xl);
+  padding: 0 calc(var(--spacing-xs) - var(--spacing-px));
+  gap: var(--spacing-none);
+  --focus-ring: inset 0 0 0 2px var(--element-outline-neutral-default);
+}
+
+.md {
+  min-height: var(--spacing-2xl);
+  padding: 0 calc(var(--spacing-sm) - var(--spacing-px));
+  gap: var(--spacing-xs);
+}
+
+.lg {
+  min-height: var(--spacing-4xl);
+  padding: 0 calc(var(--spacing-sm-plus) - var(--spacing-px));
+  gap: var(--spacing-2xs);
+}
+
+/* ── leading icon ──────────────────────────────────────────────────────── */
+
+.leadingIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sm .leadingIcon,
+.md .leadingIcon { width: 16px; height: 16px; }
+.lg .leadingIcon { width: 20px; height: 20px; }
+
+/* ── label ─────────────────────────────────────────────────────────────── */
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.sm .label {
+  padding-left: var(--spacing-sm-minus);
+  padding-right: var(--spacing-sm-minus);
+  font-family: var(--type-label-strong-xs-family);
+  font-weight: var(--type-label-strong-xs-weight);
+  font-size: var(--type-label-strong-xs-size);
+  line-height: var(--type-label-strong-xs-line-height);
+  letter-spacing: var(--type-label-strong-xs-letter-spacing);
+}
+
+.md .label,
+.lg .label {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+}
+
+.md .label {
+  padding-left: var(--spacing-xs);
+  padding-right: var(--spacing-xs);
+}
+
+.lg .label {
+  padding-left: var(--spacing-sm-minus);
+  padding-right: var(--spacing-sm-minus);
+}
+
+/* ── clear slot (InputClear container) ─────────────────────────────────── */
+
+.clearSlot {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sm .clearSlot,
+.md .clearSlot { width: 16px; height: 16px; }
+.lg .clearSlot { width: 20px; height: 20px; }
+
+.clearSlot > * {
+  position: absolute;
+}
+
+/* ── disabled ──────────────────────────────────────────────────────────── */
+
+.toggleChip.disabled {
+  pointer-events: none;
+}
+
+/* ====================================================================== */
+/* MEDIUM EMPHASIS — tertiary fill + visible border                       */
+/* ====================================================================== */
+
+/* ── medium unchecked ─────────────────────────────────────────────────── */
+
+.medium {
+  background: var(--element-fill-neutral-tertiary-default);
+  border-color: var(--element-outline-neutral-default);
+  color: var(--text-neutral-secondary-default);
+}
+.medium:hover {
+  background: var(--element-fill-neutral-tertiary-hover);
+  border-color: var(--element-outline-neutral-hover);
+  color: var(--text-neutral-secondary-hover);
+}
+.medium:active:not(:has(button:active)) {
+  background: var(--element-fill-neutral-tertiary-press);
+  border-color: var(--element-outline-neutral-press);
+  color: var(--text-neutral-secondary-press);
+}
+.medium.disabled {
+  background: var(--element-fill-neutral-tertiary-disable);
+  border-color: var(--element-outline-neutral-disable);
+  color: var(--text-neutral-disable);
+}
+
+/* ── medium checked ───────────────────────────────────────────────────── */
+
+.medium.checked {
+  background: var(--element-fill-brand-tertiary-active-default);
+  border-color: var(--element-outline-brand-active);
+  color: var(--text-brand-default);
+}
+.medium.checked:hover {
+  background: var(--element-fill-brand-tertiary-active-hover);
+  border-color: var(--element-outline-brand-active);
+  color: var(--text-brand-hover);
+}
+.medium.checked:active:not(:has(button:active)) {
+  background: var(--element-fill-brand-tertiary-active-press);
+  border-color: var(--element-outline-brand-active);
+  color: var(--text-brand-press);
+}
+.medium.checked.disabled {
+  background: var(--element-fill-brand-tertiary-active-disable);
+  border-color: var(--element-outline-brand-disable);
+  color: var(--text-brand-disable);
+}
+
+/* ====================================================================== */
+/* LOW EMPHASIS — tertiary-active fill, no border                         */
+/* ====================================================================== */
+
+/* ── low unchecked ────────────────────────────────────────────────────── */
+
+.low {
+  background: var(--element-fill-neutral-tertiary-active-default);
+  color: var(--text-neutral-secondary-default);
+}
+.low:hover {
+  background: var(--element-fill-neutral-tertiary-active-hover);
+  color: var(--text-neutral-secondary-hover);
+}
+.low:active:not(:has(button:active)) {
+  background: var(--element-fill-neutral-tertiary-active-press);
+  color: var(--text-neutral-secondary-press);
+}
+.low.disabled {
+  background: var(--element-fill-neutral-tertiary-active-disable);
+  color: var(--text-neutral-disable);
+}
+
+/* ── low checked ──────────────────────────────────────────────────────── */
+
+.low.checked {
+  background: var(--element-fill-brand-tertiary-active-default);
+  color: var(--text-brand-default);
+}
+.low.checked:hover {
+  background: var(--element-fill-brand-tertiary-active-hover);
+  color: var(--text-brand-hover);
+}
+.low.checked:active:not(:has(button:active)) {
+  background: var(--element-fill-brand-tertiary-active-press);
+  color: var(--text-brand-press);
+}
+.low.checked.disabled {
+  background: var(--element-fill-brand-tertiary-active-disable);
+  color: var(--text-brand-disable);
+}

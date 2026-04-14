@@ -1,0 +1,54 @@
+/* ── Icon swap container ─────────────────────────────────────────── */
+
+.iconSwap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Shared layer base ──────────────────────────────────────────── */
+
+.copyIcon,
+.checkIcon {
+  transition:
+    opacity var(--animation-state-micro-duration) var(--animation-state-micro-easing),
+    transform var(--animation-state-micro-duration) var(--animation-state-micro-easing),
+    filter var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+}
+
+.checkIcon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Default state: copy visible, check hidden ──────────────────── */
+
+.copyIcon {
+  opacity: var(--opacity-100);
+  transform: scale(1);
+  filter: blur(var(--blur-none));
+}
+
+.checkIcon {
+  opacity: var(--opacity-0);
+  transform: scale(0.6);
+  filter: blur(var(--blur-xs));
+}
+
+/* ── Copied state: copy hidden, check visible ───────────────────── */
+
+.copied .copyIcon {
+  opacity: var(--opacity-0);
+  transform: scale(0.6);
+  filter: blur(var(--blur-xs));
+}
+
+.copied .checkIcon {
+  opacity: var(--opacity-100);
+  transform: scale(1);
+  filter: blur(var(--blur-none));
+}

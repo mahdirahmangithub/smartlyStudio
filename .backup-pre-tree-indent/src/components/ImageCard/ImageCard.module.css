@@ -1,0 +1,39 @@
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border-radius: inherit;
+}
+
+.textContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-2xl) var(--spacing-md) var(--spacing-md) var(--spacing-md);
+  color: var(--text-neutral-inverse-primary);
+  text-shadow:
+    0 var(--space-px) var(--blur-2xs) var(--shadow-ambient),
+    0 var(--space-2xs) var(--blur-xs) var(--shadow-halo),
+    0 var(--space-negative-px) var(--blur-2xs) var(--shadow-ambient);
+}
+
+.title {
+  font-family: var(--type-label-strong-md-family);
+  font-weight: var(--type-label-strong-md-weight);
+  font-size: var(--type-label-strong-md-size);
+  line-height: var(--type-label-strong-md-line-height);
+  letter-spacing: var(--type-label-strong-md-letter-spacing);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.description {
+  font-family: var(--type-body-sm-family);
+  font-weight: var(--type-body-sm-weight);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line-height);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+}

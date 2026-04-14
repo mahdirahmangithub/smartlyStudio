@@ -1,0 +1,729 @@
+/* ── calendar/date-cell — Figma SDS Φ (930:4090, matrix 6663:86611) ── */
+
+.cell {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: var(--spacing-4xl);
+  padding: 0;
+}
+
+/* Full-cell range tint behind the 40×40 day (matches Figma range_start / range_end masks) */
+.rangeLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Period-1 lavender under neutral P2 preview/endpoint bridges (transparent halves show through).
+   Inherits z-index: 0 from .rangeLayer — no override needed. */
+
+.rangeLayerStripForeground {
+  z-index: 1;
+}
+
+.rangeLayerBrand.rangeLayerMiddle {
+  background: var(--element-fill-brand-tertiary-active-default);
+}
+
+/* Figma type=neutral + checked: strip uses tertiary *active* (6666:280290) */
+.rangeLayerNeutral.rangeLayerMiddle {
+  background: var(--element-fill-neutral-tertiary-active-default);
+}
+
+.rangeLayerBoth.rangeLayerMiddle {
+  background: var(--element-fill-brand-tertiary-active-default);
+}
+
+/* Draft range uses same strip fill as committed selection (not separate “hover” fill) */
+.rangeLayerPreview.rangeLayerMiddle {
+  background: var(--element-fill-brand-tertiary-active-default);
+}
+
+.rangeLayerPreviewNeutralStrip.rangeLayerNeutral.rangeLayerMiddle {
+  background: var(--element-fill-neutral-tertiary-active-default);
+}
+
+/*
+ * Range start/end: tint from cell center toward the strip (transparent on the outer half).
+ * Adjacent end + start of the same tint would both be transparent at the shared column
+ * edge (white seam). `.rangeLayerSeamJoinPrev` / `Next` nudge the stop by `--spacing-px`
+ * only when Calendar detects that neighbor pairing. Month-edge fades override below.
+ */
+.rangeLayerBrand.rangeLayerStart {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 50%,
+    var(--element-fill-brand-tertiary-active-default) 50%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerStart.rangeLayerSeamJoinPrev {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent calc(50% - var(--spacing-px)),
+    var(--element-fill-brand-tertiary-active-default) calc(50% - var(--spacing-px)),
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerEnd {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    var(--element-fill-brand-tertiary-active-default) 50%,
+    transparent 50%,
+    transparent 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerEnd.rangeLayerSeamJoinNext {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    var(--element-fill-brand-tertiary-active-default) calc(50% + var(--spacing-px)),
+    transparent calc(50% + var(--spacing-px)),
+    transparent 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerStart {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 50%,
+    var(--element-fill-neutral-tertiary-active-default) 50%,
+    var(--element-fill-neutral-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerStart.rangeLayerSeamJoinPrev {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent calc(50% - var(--spacing-px)),
+    var(--element-fill-neutral-tertiary-active-default) calc(50% - var(--spacing-px)),
+    var(--element-fill-neutral-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerEnd {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-neutral-tertiary-active-default) 0%,
+    var(--element-fill-neutral-tertiary-active-default) 50%,
+    transparent 50%,
+    transparent 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerEnd.rangeLayerSeamJoinNext {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-neutral-tertiary-active-default) 0%,
+    var(--element-fill-neutral-tertiary-active-default) calc(50% + var(--spacing-px)),
+    transparent calc(50% + var(--spacing-px)),
+    transparent 100%
+  );
+}
+
+/*
+ * Dual-range overlap — same lavender strip token as single-period selection; halftone (::after)
+ * marks overlap only (Figma-style: solid strip vs dotted overlap, one purple family).
+ */
+/* Stacking for mix ::after on middle, start, or end (overlap boundary days). */
+.rangeLayerMix {
+  isolation: isolate;
+}
+
+.rangeLayerMix.rangeLayerMiddle::after,
+.rangeLayerMix.rangeLayerStart::after,
+.rangeLayerMix.rangeLayerEnd::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  pointer-events: none;
+  background-color: transparent;
+  background-image: radial-gradient(
+    circle closest-side at center,
+    var(--text-neutral-primary) 32%,
+    transparent 33%
+  );
+  background-size: var(--spacing-sm) var(--spacing-sm);
+  opacity: var(--opacity-12);
+}
+
+/* Overlap boundary: dots only on the “overlap” half (Figma transition day). */
+.rangeLayerMix.rangeLayerOverlapSplitLeading.rangeLayerMiddle::after,
+.rangeLayerMix.rangeLayerOverlapSplitLeading.rangeLayerStart::after,
+.rangeLayerMix.rangeLayerOverlapSplitLeading.rangeLayerEnd::after {
+  inset: 0 0 0 50%;
+}
+
+.rangeLayerMix.rangeLayerOverlapSplitTrailing.rangeLayerMiddle::after,
+.rangeLayerMix.rangeLayerOverlapSplitTrailing.rangeLayerStart::after,
+.rangeLayerMix.rangeLayerOverlapSplitTrailing.rangeLayerEnd::after {
+  inset: 0 50% 0 0;
+}
+
+/*
+ * Split transition days: same strip fill family as Figma — overlap half = lavender + dots,
+ * non-overlap half = solid strip (no dots). Purple uses brand tertiary active throughout.
+ */
+/* Tint class must match the cell (brand vs neutral); split gradients use both tokens either way. */
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftBrand.rangeLayerMiddle,
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftBrand.rangeLayerStart,
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftBrand.rangeLayerEnd,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftBrand.rangeLayerMiddle,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftBrand.rangeLayerStart,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftBrand.rangeLayerEnd {
+  background: var(--element-fill-brand-tertiary-active-default);
+}
+
+/* Leading: left = period 2 solid strip, right = same lavender + halftone (overlap) */
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftNeutral.rangeLayerMiddle,
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftNeutral.rangeLayerStart,
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftNeutral.rangeLayerEnd,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftNeutral.rangeLayerMiddle,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftNeutral.rangeLayerStart,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitLeadingLeftNeutral.rangeLayerEnd {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-neutral-tertiary-active-default) 0%,
+    var(--element-fill-neutral-tertiary-active-default) 50%,
+    var(--element-fill-brand-tertiary-active-default) 50%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+/* Trailing: left = lavender + halftone, right = period 1 solid strip */
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightBrand.rangeLayerMiddle,
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightBrand.rangeLayerStart,
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightBrand.rangeLayerEnd,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightBrand.rangeLayerMiddle,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightBrand.rangeLayerStart,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightBrand.rangeLayerEnd {
+  background: var(--element-fill-brand-tertiary-active-default);
+}
+
+/* Trailing: left = overlap (lavender + dots), right = period 2 solid strip */
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightNeutral.rangeLayerMiddle,
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightNeutral.rangeLayerStart,
+.rangeLayerBrand.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightNeutral.rangeLayerEnd,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightNeutral.rangeLayerMiddle,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightNeutral.rangeLayerStart,
+.rangeLayerNeutral.rangeLayerBoth.rangeLayerOverlapSplitTrailingRightNeutral.rangeLayerEnd {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    var(--element-fill-brand-tertiary-active-default) 50%,
+    var(--element-fill-neutral-tertiary-active-default) 50%,
+    var(--element-fill-neutral-tertiary-active-default) 100%
+  );
+}
+
+/*
+ * Month boundary fade only on calendar day 1 / last day of the month when range crosses
+ * (Figma 953:151417). Markers: rangeLayerMonthFadeLeading / Trailing + tone + preview.
+ */
+
+/* ── committed brand / middle ── */
+.rangeLayerBrand.rangeLayerMiddle.rangeLayerMonthFadeCommittedBrand.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerMiddle.rangeLayerMonthFadeCommittedBrand.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerMiddle.rangeLayerMonthFadeCommittedBrand.rangeLayerMonthFadeLeading.rangeLayerMonthFadeTrailing {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 40%,
+    var(--element-fill-brand-tertiary-active-default) 60%,
+    transparent 100%
+  );
+}
+
+/* ── committed brand / start & end bridges ── */
+.rangeLayerBrand.rangeLayerStart.rangeLayerMonthFadeCommittedBrand.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerEnd.rangeLayerMonthFadeCommittedBrand.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+/* ── committed neutral / middle ── */
+.rangeLayerNeutral.rangeLayerMiddle.rangeLayerMonthFadeCommittedNeutral.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-neutral-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerMiddle.rangeLayerMonthFadeCommittedNeutral.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-neutral-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerMiddle.rangeLayerMonthFadeCommittedNeutral.rangeLayerMonthFadeLeading.rangeLayerMonthFadeTrailing {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-neutral-tertiary-active-default) 40%,
+    var(--element-fill-neutral-tertiary-active-default) 60%,
+    transparent 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerStart.rangeLayerMonthFadeCommittedNeutral.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-neutral-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerEnd.rangeLayerMonthFadeCommittedNeutral.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-neutral-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+/* ── committed dual “both” (brand strip; overlap read by dot mix, no inset frame) ── */
+.rangeLayerBrand.rangeLayerBoth.rangeLayerMiddle.rangeLayerMonthFadeCommittedBoth.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerBoth.rangeLayerMiddle.rangeLayerMonthFadeCommittedBoth.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerBoth.rangeLayerMiddle.rangeLayerMonthFadeCommittedBoth.rangeLayerMonthFadeLeading.rangeLayerMonthFadeTrailing {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 40%,
+    var(--element-fill-brand-tertiary-active-default) 60%,
+    transparent 100%
+  );
+}
+
+/* ── preview (draft) brand — same fill tokens as committed month-edge fades ── */
+.rangeLayerBrand.rangeLayerPreview.rangeLayerMiddle.rangeLayerMonthFadePreviewBrand.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerPreview.rangeLayerMiddle.rangeLayerMonthFadePreviewBrand.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerPreview.rangeLayerMiddle.rangeLayerMonthFadePreviewBrand.rangeLayerMonthFadeLeading.rangeLayerMonthFadeTrailing {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 40%,
+    var(--element-fill-brand-tertiary-active-default) 60%,
+    transparent 100%
+  );
+}
+
+/* ── preview dual both ── */
+.rangeLayerBrand.rangeLayerBoth.rangeLayerPreview.rangeLayerMiddle.rangeLayerMonthFadePreviewBoth.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerBoth.rangeLayerPreview.rangeLayerMiddle.rangeLayerMonthFadePreviewBoth.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerBoth.rangeLayerPreview.rangeLayerMiddle.rangeLayerMonthFadePreviewBoth.rangeLayerMonthFadeLeading.rangeLayerMonthFadeTrailing {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 40%,
+    var(--element-fill-brand-tertiary-active-default) 60%,
+    transparent 100%
+  );
+}
+
+/* ── preview neutral (period 2) ── */
+.rangeLayerNeutral.rangeLayerPreview.rangeLayerMiddle.rangeLayerMonthFadePreviewNeutral.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-neutral-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerPreview.rangeLayerMiddle.rangeLayerMonthFadePreviewNeutral.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-neutral-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerPreview.rangeLayerMiddle.rangeLayerMonthFadePreviewNeutral.rangeLayerMonthFadeLeading.rangeLayerMonthFadeTrailing {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-neutral-tertiary-active-default) 40%,
+    var(--element-fill-neutral-tertiary-active-default) 60%,
+    transparent 100%
+  );
+}
+
+/* ── preview (draft) brand / start & end bridges at month edge ── */
+.rangeLayerBrand.rangeLayerPreview.rangeLayerStart.rangeLayerMonthFadePreviewBrand.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerPreview.rangeLayerEnd.rangeLayerMonthFadePreviewBrand.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+/* ── preview (draft) neutral / start & end bridges at month edge ── */
+.rangeLayerNeutral.rangeLayerPreview.rangeLayerStart.rangeLayerMonthFadePreviewNeutral.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-neutral-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerNeutral.rangeLayerPreview.rangeLayerEnd.rangeLayerMonthFadePreviewNeutral.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-neutral-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+/* ── preview dual both / start & end bridges at month edge ── */
+.rangeLayerBrand.rangeLayerBoth.rangeLayerPreview.rangeLayerStart.rangeLayerMonthFadePreviewBoth.rangeLayerMonthFadeLeading:not(
+  .rangeLayerMonthFadeTrailing
+) {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.rangeLayerBrand.rangeLayerBoth.rangeLayerPreview.rangeLayerEnd.rangeLayerMonthFadePreviewBoth.rangeLayerMonthFadeTrailing:not(
+  .rangeLayerMonthFadeLeading
+) {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+/*
+ * Overlap halftone (::after) — mask so dots fade with month edge like the strip fill
+ * (953:151417). Same geometry as committed/preview middle fades (0→100%, 100%→0, 40–60%).
+ */
+.rangeLayerMix.rangeLayerMonthFadeLeading:not(.rangeLayerMonthFadeTrailing).rangeLayerMiddle::after,
+.rangeLayerMix.rangeLayerMonthFadeLeading:not(.rangeLayerMonthFadeTrailing).rangeLayerStart::after,
+.rangeLayerMix.rangeLayerMonthFadeLeading:not(.rangeLayerMonthFadeTrailing).rangeLayerEnd::after {
+  mask-image: linear-gradient(90deg, transparent 0%, #000 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 100%);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.rangeLayerMix.rangeLayerMonthFadeTrailing:not(.rangeLayerMonthFadeLeading).rangeLayerMiddle::after,
+.rangeLayerMix.rangeLayerMonthFadeTrailing:not(.rangeLayerMonthFadeLeading).rangeLayerStart::after,
+.rangeLayerMix.rangeLayerMonthFadeTrailing:not(.rangeLayerMonthFadeLeading).rangeLayerEnd::after {
+  mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.rangeLayerMix.rangeLayerMonthFadeLeading.rangeLayerMonthFadeTrailing.rangeLayerMiddle::after,
+.rangeLayerMix.rangeLayerMonthFadeLeading.rangeLayerMonthFadeTrailing.rangeLayerStart::after,
+.rangeLayerMix.rangeLayerMonthFadeLeading.rangeLayerMonthFadeTrailing.rangeLayerEnd::after {
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 40%,
+    #000 60%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 40%,
+    #000 60%,
+    transparent 100%
+  );
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+/* 40×40 day control — Figma “base” (fixed circle; do not use aspect-ratio + min-width hacks — they skew to ovals) */
+.dayButton {
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--spacing-4xl);
+  height: var(--spacing-4xl);
+  flex-shrink: 0;
+  margin: 0;
+  padding: var(--spacing-sm);
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--element-fill-neutral-tertiary-default);
+  color: var(--text-neutral-secondary);
+  font-family: var(--type-number-md-family);
+  font-weight: var(--type-number-md-weight);
+  font-size: var(--type-number-md-size);
+  line-height: var(--type-number-md-line-height);
+  letter-spacing: var(--type-number-md-letter-spacing);
+  cursor: pointer;
+  transition:
+    background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing),
+    outline-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.dayButton:hover:not(:disabled):not(.outside):not(.endpoint):not(.endpointNeutral):not(.todayRing):not(.onTint) {
+  background: var(--element-fill-neutral-tertiary-hover);
+}
+
+.dayButton:active:not(:disabled):not(.outside):not(.endpoint):not(.endpointNeutral):not(.todayRing):not(.onTint) {
+  background: var(--element-fill-neutral-tertiary-press);
+}
+
+.dayButton:focus {
+  outline: none;
+}
+
+.dayButton:focus-visible {
+  outline: 2px solid var(--element-outline-brand-active);
+  outline-offset: 2px;
+}
+
+/* Interior / preview strip: number sits on tint */
+.onTint {
+  background: transparent;
+  color: var(--text-neutral-secondary);
+}
+
+.onTint:hover:not(:disabled) {
+  background: var(--element-fill-brand-tertiary-active-hover);
+}
+
+.onTintNeutral {
+  background: transparent;
+  color: var(--text-neutral-secondary);
+}
+
+.onTintNeutral:hover:not(:disabled) {
+  background: var(--element-fill-neutral-tertiary-active-hover);
+}
+
+.onTintPreview:hover:not(:disabled) {
+  background: var(--element-fill-brand-tertiary-active-hover);
+}
+
+.outside {
+  background: transparent;
+  color: var(--text-neutral-disable);
+  cursor: default;
+}
+
+.todayRing {
+  background: transparent;
+  color: var(--text-brand-default);
+  box-shadow: inset 0 0 0 var(--spacing-px) var(--element-outline-brand-active);
+}
+
+.todayRing:hover:not(:disabled) {
+  background: var(--element-fill-brand-tertiary-hover);
+  color: var(--text-brand-hover);
+}
+
+/* Today on neutral period-2 strip: hover fill follows neutral tint, ring/text stay brand */
+.todayRing.onTintNeutral:hover:not(:disabled) {
+  background: var(--element-fill-neutral-tertiary-active-hover);
+  color: var(--text-brand-hover);
+}
+
+.disabled,
+.dayButton:disabled {
+  color: var(--text-neutral-disable);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.todayRing:disabled {
+  color: var(--text-brand-disable);
+  box-shadow: inset 0 0 0 var(--spacing-px) var(--element-outline-neutral-default);
+}
+
+.endpoint {
+  background: var(--element-fill-brand-primary-default);
+  color: var(--text-neutral-inverse-primary);
+}
+
+.endpoint:hover:not(:disabled) {
+  background: var(--element-fill-brand-primary-hover);
+  color: var(--text-neutral-inverse-primary);
+}
+
+.endpoint:active:not(:disabled) {
+  background: var(--element-fill-brand-primary-press);
+}
+
+.disabled.endpoint,
+.endpoint:disabled {
+  background: var(--element-fill-brand-primary-disable);
+  color: var(--text-neutral-inverse-disable);
+}
+
+/* Figma type=neutral + emphasis=high + checked: primary fill + inverse label (6666:280290) */
+.endpointNeutral {
+  background: var(--element-fill-neutral-primary-default);
+  color: var(--text-neutral-inverse-primary);
+}
+
+.endpointNeutral:hover:not(:disabled) {
+  background: var(--element-fill-neutral-primary-hover);
+  color: var(--text-neutral-inverse-primary);
+}
+
+.endpointNeutral:active:not(:disabled) {
+  background: var(--element-fill-neutral-primary-press);
+  color: var(--text-neutral-inverse-primary);
+}
+
+.disabled.endpointNeutral,
+.endpointNeutral:disabled {
+  background: var(--element-fill-neutral-primary-disable);
+  color: var(--text-neutral-inverse-disable);
+}
+
+.inner {
+  pointer-events: none;
+}

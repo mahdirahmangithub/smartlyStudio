@@ -1,0 +1,101 @@
+/* ── SF Pro Display (Mac headings/titles) ──────────────────────────── */
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SF-Pro-Display-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Display";
+  src: url("/fonts/SF-Pro-Display-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── SF Pro Text (Mac body/labels) ─────────────────────────────────── */
+
+@font-face {
+  font-family: "SF Pro Text";
+  src: url("/fonts/SF-Pro-Text-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SF Pro Text";
+  src: url("/fonts/SF-Pro-Text-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Menlo (Mac & Marketing code) ──────────────────────────────────── */
+
+@font-face {
+  font-family: "Menlo";
+  src: url("/fonts/Menlo.ttc") format("collection");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Segoe UI (Windows) ────────────────────────────────────────────── */
+
+@font-face {
+  font-family: "Segoe UI";
+  src: url("/fonts/Segoe UI.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Segoe UI";
+  src: url("/fonts/Segoe UI Semibold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Roc Grotesk (Marketing) ───────────────────────────────────────── */
+
+@font-face {
+  font-family: "Roc Grotesk";
+  src: url("/fonts/RocGrotesk-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Roc Grotesk";
+  src: url("/fonts/RocGrotesk-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Inter (Inter theme — variable font) ───────────────────────────── */
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/Inter-VariableFont_opsz,wght.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Geist Mono (Inter code — variable font) ───────────────────────── */
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-VariableFont_wght.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}

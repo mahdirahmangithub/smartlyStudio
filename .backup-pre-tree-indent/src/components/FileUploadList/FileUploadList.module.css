@@ -1,0 +1,113 @@
+/* ── root ────────────────────────────────────────────────────────────── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: clip;
+  padding: var(--spacing-xs);
+  margin: var(--spacing-negative-xs);
+}
+
+/* ── header bar ─────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--spacing-xl);
+  gap: var(--spacing-sm);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.summary {
+  margin: 0;
+  font-family: var(--type-label-strong-xs-family);
+  font-weight: var(--type-label-strong-xs-weight);
+  font-size: var(--type-label-strong-xs-size);
+  line-height: var(--type-label-strong-xs-line-height);
+  letter-spacing: var(--type-label-strong-xs-letter-spacing);
+  color: var(--text-neutral-tertiary-default);
+  white-space: nowrap;
+}
+
+/* ── scrollable list area ───────────────────────────────────────────── */
+
+.listArea {
+  position: relative;
+}
+
+.scrollContent {
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.scrollContent::-webkit-scrollbar {
+  display: none;
+}
+
+.listContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding-top: var(--spacing-md);
+
+}
+
+/* ── fade overlays ─────────────────────────────────────────────────── */
+
+.fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 16px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+  z-index: 1;
+}
+
+.fadeVisible {
+  opacity: 1;
+}
+
+.fadeTop {
+  top: 0;
+  background: linear-gradient(to bottom, var(--element-surface-default), transparent);
+}
+
+.fadeBottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--element-surface-default), transparent);
+}
+
+/* ── screen reader only ─────────────────────────────────────────────── */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── empty state ────────────────────────────────────────────────────── */
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: var(--spacing-xl);
+}

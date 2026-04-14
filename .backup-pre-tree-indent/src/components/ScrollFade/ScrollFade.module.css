@@ -1,0 +1,96 @@
+/* ====== WRAPPER ====== */
+.wrapper {
+  position: relative;
+  overflow: hidden;
+  --focus-ring: inset 0 0 0 2px var(--element-outline-neutral-default);
+}
+
+.wrapper.horizontal {
+  width: 100%;
+}
+
+.wrapper.vertical {
+  height: 100%;
+}
+
+/* ====== SCROLL AREA ====== */
+.scrollArea {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.scrollArea::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollArea.horizontal {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.scrollArea.vertical {
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+}
+
+/* ====== FADE OVERLAYS ====== */
+.fade {
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.fade.visible {
+  opacity: 1;
+}
+
+.fade.horizontal {
+  top: 0;
+  bottom: 0;
+}
+
+.fade.vertical {
+  left: 0;
+  right: 0;
+}
+
+.fadeStart.horizontal { left: 0; }
+.fadeEnd.horizontal   { right: 0; }
+.fadeStart.vertical   { top: 0; }
+.fadeEnd.vertical      { bottom: 0; }
+
+/* ====== CHEVRON INDICATORS ====== */
+.chevron {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--text-neutral-secondary-default);
+  opacity: 0;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.chevron.visible {
+  opacity: 1;
+}
+
+.chevron.horizontal {
+  top: 0;
+  bottom: 0;
+}
+
+.chevron.vertical {
+  left: 0;
+  right: 0;
+}
+
+.chevronStart.horizontal { left: 0; }
+.chevronEnd.horizontal   { right: 0; }
+.chevronStart.vertical   { top: 0; }
+.chevronEnd.vertical      { bottom: 0; }

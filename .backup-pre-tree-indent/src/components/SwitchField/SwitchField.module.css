@@ -1,0 +1,19 @@
+/* ── field wrapper ───────────────────────────────────────────────────── */
+
+.field {
+  display: flex;
+  align-items: center;
+}
+
+.sm {
+  gap: var(--spacing-sm);
+}
+
+.lg {
+  gap: var(--spacing-sm-extra);
+}
+
+.control {
+  display: flex;
+  flex-shrink: 0;
+}

@@ -1,0 +1,240 @@
+/* ── outer wrapper ─────────────────────────────────────────────────────── */
+
+.wrapper {
+  box-sizing: border-box;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-default);
+  pointer-events: auto;
+  z-index: var(--z-index-tooltip, 10000);
+  position: relative;
+}
+
+/* ── content box ──────────────────────────────────────────────────────── */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm-plus) var(--spacing-sm-extra);
+  box-sizing: border-box;
+}
+
+/* ── type: inverse ────────────────────────────────────────────────────── */
+
+.inverse {
+  background: var(--element-fill-neutral-primary-default);
+}
+
+.inverse .headerText,
+.inverse .iconSlot {
+  color: var(--text-neutral-inverse-secondary-default);
+}
+
+.inverse .description {
+  color: var(--text-neutral-inverse-tertiary-default);
+}
+
+/* ── type: neutral ────────────────────────────────────────────────────── */
+
+.neutral {
+  background: var(--element-surface-over);
+  outline: var(--spacing-hair-line) solid var(--util-border-weak);
+  outline-offset: calc(-1 * var(--spacing-hair-line));
+}
+
+.neutral .headerText,
+.neutral .iconSlot {
+  color: var(--text-neutral-secondary-default);
+}
+
+.neutral .description {
+  color: var(--text-neutral-tertiary-default);
+}
+
+/* ── type: brand ──────────────────────────────────────────────────────── */
+
+.brand {
+  background: var(--element-fill-brand-secondary-default);
+}
+
+.brand .headerText,
+.brand .iconSlot,
+.brand .description {
+  color: var(--text-brand-default);
+}
+
+/* ── type: info ───────────────────────────────────────────────────────── */
+
+.info {
+  background: var(--element-fill-info-secondary-default);
+}
+
+.info .headerText,
+.info .iconSlot,
+.info .description {
+  color: var(--text-info-default);
+}
+
+/* ── type: success ────────────────────────────────────────────────────── */
+
+.success {
+  background: var(--element-fill-success-secondary-default);
+}
+
+.success .headerText,
+.success .iconSlot,
+.success .description {
+  color: var(--text-success-default);
+}
+
+/* ── type: warning ────────────────────────────────────────────────────── */
+
+.warning {
+  background: var(--element-fill-warning-secondary-default);
+}
+
+.warning .headerText,
+.warning .iconSlot,
+.warning .description {
+  color: var(--text-warning-default);
+}
+
+/* ── type: alert ──────────────────────────────────────────────────────── */
+
+.alert {
+  background: var(--element-fill-alert-secondary-default);
+}
+
+.alert .headerText,
+.alert .iconSlot,
+.alert .description {
+  color: var(--text-alert-default);
+}
+
+/* ── header ────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.headerText {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── icon slot ─────────────────────────────────────────────────────────── */
+
+.iconSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+}
+
+/* ── description ───────────────────────────────────────────────────────── */
+
+.description {
+  font-family: var(--type-body-sm-family);
+  font-weight: var(--type-body-sm-weight);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line-height);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  white-space: pre-wrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 100%;
+  width: min-content;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════ */
+/* Enter / exit animations                                               */
+/* ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── keyframes ─────────────────────────────────────────────────────────── */
+
+@keyframes tooltip-enter-top {
+  from { opacity: var(--opacity-0); transform: scale(0.94) translateY(var(--spacing-xs)); }
+  to   { opacity: var(--opacity-100); transform: scale(1) translateY(0); }
+}
+@keyframes tooltip-exit-top {
+  from { opacity: var(--opacity-100); transform: scale(1) translateY(0); }
+  to   { opacity: var(--opacity-0); transform: scale(0.94) translateY(var(--spacing-xs)); }
+}
+
+@keyframes tooltip-enter-bottom {
+  from { opacity: var(--opacity-0); transform: scale(0.94) translateY(var(--spacing-negative-xs)); }
+  to   { opacity: var(--opacity-100); transform: scale(1) translateY(0); }
+}
+@keyframes tooltip-exit-bottom {
+  from { opacity: var(--opacity-100); transform: scale(1) translateY(0); }
+  to   { opacity: var(--opacity-0); transform: scale(0.94) translateY(var(--spacing-negative-xs)); }
+}
+
+@keyframes tooltip-enter-left {
+  from { opacity: var(--opacity-0); transform: scale(0.94) translateX(var(--spacing-xs)); }
+  to   { opacity: var(--opacity-100); transform: scale(1) translateX(0); }
+}
+@keyframes tooltip-exit-left {
+  from { opacity: var(--opacity-100); transform: scale(1) translateX(0); }
+  to   { opacity: var(--opacity-0); transform: scale(0.94) translateX(var(--spacing-xs)); }
+}
+
+@keyframes tooltip-enter-right {
+  from { opacity: var(--opacity-0); transform: scale(0.94) translateX(var(--spacing-negative-xs)); }
+  to   { opacity: var(--opacity-100); transform: scale(1) translateX(0); }
+}
+@keyframes tooltip-exit-right {
+  from { opacity: var(--opacity-100); transform: scale(1) translateX(0); }
+  to   { opacity: var(--opacity-0); transform: scale(0.94) translateX(var(--spacing-negative-xs)); }
+}
+
+/* ── enter classes ─────────────────────────────────────────────────────── */
+
+.enterTop {
+  animation: tooltip-enter-top var(--animation-tooltip-enter-duration) var(--animation-tooltip-enter-easing) both;
+  transform-origin: center bottom;
+}
+.enterBottom {
+  animation: tooltip-enter-bottom var(--animation-tooltip-enter-duration) var(--animation-tooltip-enter-easing) both;
+  transform-origin: center top;
+}
+.enterLeft {
+  animation: tooltip-enter-left var(--animation-tooltip-enter-duration) var(--animation-tooltip-enter-easing) both;
+  transform-origin: right center;
+}
+.enterRight {
+  animation: tooltip-enter-right var(--animation-tooltip-enter-duration) var(--animation-tooltip-enter-easing) both;
+  transform-origin: left center;
+}
+
+/* ── exit classes ──────────────────────────────────────────────────────── */
+
+.exitTop {
+  animation: tooltip-exit-top var(--animation-tooltip-exit-duration) var(--animation-tooltip-exit-easing) both;
+  transform-origin: center bottom;
+}
+.exitBottom {
+  animation: tooltip-exit-bottom var(--animation-tooltip-exit-duration) var(--animation-tooltip-exit-easing) both;
+  transform-origin: center top;
+}
+.exitLeft {
+  animation: tooltip-exit-left var(--animation-tooltip-exit-duration) var(--animation-tooltip-exit-easing) both;
+  transform-origin: right center;
+}
+.exitRight {
+  animation: tooltip-exit-right var(--animation-tooltip-exit-duration) var(--animation-tooltip-exit-easing) both;
+  transform-origin: left center;
+}
+

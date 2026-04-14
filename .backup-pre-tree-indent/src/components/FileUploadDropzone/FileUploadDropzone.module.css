@@ -1,0 +1,180 @@
+/* ── root wrapper ────────────────────────────────────────────────────── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: stretch;
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+/* ── dashed border box ──────────────────────────────────────────────── */
+
+.input {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  border: var(--spacing-px) dashed var(--element-outline-neutral-default);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: border-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.input:hover:not(.disabled .input) {
+  border-color: var(--element-outline-neutral-hover);
+}
+
+/* ── icon + text group ──────────────────────────────────────────────── */
+
+.iconText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.uploadIcon {
+  color: var(--text-neutral-disable);
+}
+
+.textGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  width: 100%;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+  color: var(--text-neutral-secondary-default);
+  width: 100%;
+}
+
+.description {
+  margin: 0;
+  font-family: var(--type-body-sm-family);
+  font-weight: var(--type-body-sm-weight);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line-height);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-neutral-tertiary-default);
+  width: 100%;
+}
+
+/* ── drop overlay ───────────────────────────────────────────────────── */
+
+@keyframes dropFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes dropTextSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(var(--spacing-2xl));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes dropIconSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(var(--spacing-md));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropOverlay {
+  position: absolute;
+  inset: calc(-1 * var(--spacing-px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-xl);
+  background: var(--element-fill-brand-secondary-default);
+  border: var(--spacing-px) dashed var(--element-outline-brand-active);
+  border-radius: var(--radius-lg);
+  z-index: 1;
+  pointer-events: none;
+  animation: dropFadeIn var(--animation-state-change-duration) var(--animation-state-change-easing) both;
+}
+
+.dropIcon {
+  color: var(--text-brand-default);
+  animation: dropIconSlideUp var(--animation-state-micro-duration) var(--animation-state-micro-easing) both;
+}
+
+.dropText {
+  margin: 0;
+  animation: dropTextSlideUp var(--animation-state-micro-duration) var(--animation-state-micro-easing) both;
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+  color: var(--text-brand-default);
+  text-align: center;
+  width: 100%;
+}
+
+/* ── error state ────────────────────────────────────────────────────── */
+
+.error .input {
+  border-color: var(--element-outline-alert-active);
+}
+
+/* ── disabled state ─────────────────────────────────────────────────── */
+
+.disabled .input {
+  border-color: var(--element-outline-neutral-disable);
+  cursor: not-allowed;
+}
+
+.disabled .uploadIcon,
+.disabled .title,
+.disabled .description {
+  color: var(--text-neutral-disable);
+}
+
+/* ── focus-visible (removed from .input — Button handles its own ring) */
+
+/* ── hidden file input ──────────────────────────────────────────────── */
+
+.hiddenInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  padding: 0;
+  margin: -1px;
+}

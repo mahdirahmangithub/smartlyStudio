@@ -1,0 +1,147 @@
+/* ── base card ─────────────────────────────────────────────────────────── */
+
+.card {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  overflow: clip;
+  border-radius: var(--radius-lg);
+  border: var(--spacing-hair-line) solid var(--util-border-default);
+  background: var(--element-surface-over);
+  box-sizing: border-box;
+}
+
+/* ── compact layout (thumbnail-only) ──────────────────────────────────── */
+
+.compact {
+  width: var(--spacing-4xl-extra);
+  height: var(--spacing-4xl-extra);
+  max-width: var(--spacing-4xl-extra);
+  max-height: var(--spacing-4xl-extra);
+}
+
+.compact .thumbnailSlot {
+  width: var(--spacing-4xl-extra);
+  height: var(--spacing-4xl-extra);
+}
+
+/* ── expanded layout (with text) ──────────────────────────────────────── */
+
+.expanded {
+  gap: var(--spacing-sm);
+  padding: calc(var(--spacing-xs) - var(--spacing-hair-line));
+  padding-right: var(--spacing-sm);
+  min-width: 160px;
+  max-width: 320px;
+  width: 180px;
+}
+
+/* ── text area ────────────────────────────────────────────────────────── */
+
+.textArea {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.title {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-neutral-primary);
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+}
+
+.description {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-neutral-tertiary-default);
+  font-family: var(--type-label-xs-family);
+  font-weight: var(--type-label-xs-weight);
+  font-size: var(--type-label-xs-size);
+  line-height: var(--type-label-xs-line-height);
+  letter-spacing: var(--type-label-xs-letter-spacing);
+}
+
+/* ── state: loading text ──────────────────────────────────────────────── */
+
+.loading .title {
+  color: var(--text-neutral-disable);
+}
+
+/* ── state: error text ────────────────────────────────────────────────── */
+
+.error .description {
+  color: var(--text-alert-default);
+}
+
+/* ── remove button container ──────────────────────────────────────────── */
+
+.removeWrap {
+  position: absolute;
+  top: 1.5px;
+  right: 1.5px;
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-full);
+  background: var(--util-subtle-strongest);
+  backdrop-filter: blur(var(--blur-xs));
+  z-index: 2;
+  opacity: var(--opacity-0);
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.card:hover .removeWrap {
+  opacity: var(--opacity-100);
+}
+
+/* ── thumbnail slot ────────────────────────────────────────────────────── */
+
+.thumbnailSlot {
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* ── error retry overlay ──────────────────────────────────────────────── */
+
+.retryOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--element-surface-over);
+  color: var(--text-neutral-secondary-default);
+  z-index: 1;
+  border-radius: inherit;
+  opacity: var(--opacity-0);
+  cursor: pointer;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.card:hover .retryOverlay {
+  opacity: var(--opacity-100);
+}
+
+/* ── refresh icon rotate animation on hover ───────────────────────────── */
+
+.retryOverlay .refreshIcon {
+  display: flex;
+  transform: rotate(-90deg);
+  transition: transform var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+}
+
+.card:hover .retryOverlay .refreshIcon {
+  transform: rotate(0deg);
+}

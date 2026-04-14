@@ -1,0 +1,121 @@
+/* ═══════════════════════════════════════════════════════════════
+   AI Loading Shimmer
+   Two simultaneous animations:
+   1) Opacity pulse  – fades between 12 % and 48 %
+   2) Mask sweep     – a bright "glint" band sweeps left → right
+                       over dimmed content (ChatGPT-style highlight)
+
+   The mask is 300 % wide so it always covers the element fully.
+   Content at rest is dimmed; the bright band reveals full
+   brightness as it passes through.
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes shimmerPulse {
+  0%,
+  100% {
+    opacity: var(--opacity-32);
+  }
+  50% {
+    opacity: var(--opacity-64);
+  }
+}
+
+@keyframes shimmerPulseInverse {
+  0%,
+  100% {
+    opacity: var(--opacity-48);
+  }
+  50% {
+    opacity: var(--opacity-88);
+  }
+}
+
+@keyframes shimmerMask {
+  0% {
+    mask-position: 100% 0%;
+    -webkit-mask-position: 100% 0%;
+  }
+  100% {
+    mask-position: 0% 0%;
+    -webkit-mask-position: 0% 0%;
+  }
+}
+
+.shimmer,
+.shimmerInverse {
+  mask-size: 300% 100%;
+  -webkit-mask-size: 300% 100%;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+}
+
+.shimmer {
+  mask-image: linear-gradient(
+    90deg,
+    var(--color-black-opacity-48) 0%,
+    var(--color-black-opacity-48) 36%,
+    var(--color-black-opacity-32) 41%,
+    var(--color-black-opacity-16) 45%,
+    var(--color-black-opacity-8) 50%,
+    var(--color-black-opacity-16) 55%,
+    var(--color-black-opacity-32) 59%,
+    var(--color-black-opacity-48) 64%,
+    var(--color-black-opacity-48) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    var(--color-black-opacity-48) 0%,
+    var(--color-black-opacity-48) 36%,
+    var(--color-black-opacity-32) 41%,
+    var(--color-black-opacity-16) 45%,
+    var(--color-black-opacity-8) 50%,
+    var(--color-black-opacity-16) 55%,
+    var(--color-black-opacity-32) 59%,
+    var(--color-black-opacity-48) 64%,
+    var(--color-black-opacity-48) 100%
+  );
+
+  animation:
+    shimmerPulse 1800ms ease-in-out infinite,
+    shimmerMask 1800ms ease-in-out infinite;
+}
+
+.shimmerInverse {
+  mask-image: linear-gradient(
+    90deg,
+    var(--color-black-opacity-32) 0%,
+    var(--color-black-opacity-32) 36%,
+    var(--color-black-opacity-32) 41%,
+    var(--color-black-opacity-56) 45%,
+    var(--color-black-opacity-88) 50%,
+    var(--color-black-opacity-56) 55%,
+    var(--color-black-opacity-32) 59%,
+    var(--color-black-opacity-32) 64%,
+    var(--color-black-opacity-32) 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    var(--color-black-opacity-32) 0%,
+    var(--color-black-opacity-32) 36%,
+    var(--color-black-opacity-32) 41%,
+    var(--color-black-opacity-56) 45%,
+    var(--color-black-opacity-88) 50%,
+    var(--color-black-opacity-56) 55%,
+    var(--color-black-opacity-32) 59%,
+    var(--color-black-opacity-32) 64%,
+    var(--color-black-opacity-32) 100%
+  );
+
+  animation:
+    shimmerPulseInverse 1800ms ease-in-out infinite,
+    shimmerMask 1800ms ease-in-out infinite;
+}
+
+/* ── Disable opacity pulse, keep mask sweep only ── */
+
+.noPulse {
+  animation-name: shimmerMask;
+  animation-duration: 1800ms;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}

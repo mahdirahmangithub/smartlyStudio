@@ -1,0 +1,183 @@
+/* ── root ──────────────────────────────────────────────────────────── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+}
+
+/* ── base row ─────────────────────────────────────────────────────── */
+
+.base {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  width: 100%;
+}
+
+/* ── leading + text ───────────────────────────────────────────────── */
+
+.leadingText {
+  display: flex;
+  flex: 1 0 0;
+  gap: var(--spacing-sm);
+  align-items: center;
+  min-width: 0;
+}
+
+.leading {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ── text column ──────────────────────────────────────────────────── */
+
+.text {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  align-items: flex-start;
+  min-width: 0;
+}
+
+/* ── title row ────────────────────────────────────────────────────── */
+
+.titleRow {
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+}
+
+.title {
+  font-family: var(--type-label-strong-sm-family);
+  font-size: var(--type-label-strong-sm-size);
+  font-weight: var(--type-label-strong-sm-weight);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+  color: var(--text-neutral-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+/* ── description ──────────────────────────────────────────────────── */
+
+.description {
+  font-family: var(--type-body-sm-family);
+  font-size: var(--type-body-sm-size);
+  font-weight: var(--type-body-sm-weight);
+  line-height: var(--type-body-sm-line-height);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-neutral-tertiary-default);
+  width: 100%;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+}
+
+/* ── vertical layout ──────────────────────────────────────────────── */
+
+.vertical .base {
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.vertical .leadingText {
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+}
+
+/* ── error state ──────────────────────────────────────────────────── */
+
+.error .title {
+  color: var(--text-alert-default);
+}
+
+.error .leading {
+  color: var(--text-alert-default);
+}
+
+.error .description {
+  color: var(--text-alert-default);
+}
+
+/* ── disabled state ───────────────────────────────────────────────── */
+
+.disabled {
+  opacity: var(--opacity-40);
+  pointer-events: none;
+}
+
+/* ── interactive (onClick) ────────────────────────────────────────── */
+
+.interactive {
+  cursor: pointer;
+}
+
+.interactive:focus-visible {
+  outline: 2px solid var(--element-outline-brand-active);
+  outline-offset: var(--spacing-2xs);
+  border-radius: var(--radius-sm);
+}
+
+/* ── actions ──────────────────────────────────────────────────────── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+/* ── hidden actions ───────────────────────────────────────────────── */
+
+.hiddenActions {
+  display: flex;
+  gap: var(--spacing-2xs);
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: var(--spacing-2xs);
+  max-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition:
+    opacity var(--animation-state-micro-duration) var(--animation-state-micro-easing),
+    max-width 0s var(--animation-state-micro-duration);
+}
+
+.root:hover:not(.disabled) .hiddenActions {
+  max-width: 300px;
+  opacity: 1;
+  transition:
+    max-width var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+  animation: revealEdge var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+}
+
+@keyframes revealEdge {
+  from {
+    mask-image: linear-gradient(to right, transparent, var(--color-black-black) 16px, var(--color-black-black));
+  }
+  to {
+    mask-image: none;
+  }
+}
+
+.hiddenActions > * {
+  flex-shrink: 0;
+}
+
+/* ── persistent actions ───────────────────────────────────────────── */
+
+.persistentActions {
+  display: flex;
+  gap: var(--spacing-2xs);
+  align-items: center;
+}

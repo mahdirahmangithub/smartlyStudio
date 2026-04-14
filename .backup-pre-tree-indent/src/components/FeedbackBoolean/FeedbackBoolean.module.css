@@ -1,0 +1,56 @@
+/* ── Thumb icon: cross-fade outline/fill ── */
+
+.morphWrap {
+  display: inline-flex;
+  position: relative;
+}
+
+.morphWrap .outlinePath {
+  opacity: 1;
+  transition: opacity 100ms ease;
+}
+
+.morphWrap .fillPath {
+  opacity: 0;
+  position: absolute;
+  inset: 0;
+  transition: opacity 100ms ease;
+}
+
+.morphWrap.active .outlinePath {
+  opacity: 0;
+}
+
+.morphWrap.active .fillPath {
+  opacity: 1;
+}
+
+/* ── Thumbs up: rotate down → spring up → settle ── */
+
+@keyframes thumbUpRotate {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(12deg); }
+  65% { transform: rotate(-8deg); }
+  85% { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+/* ── Thumbs down: rotate up → spring down → settle (mirror of up) ── */
+
+@keyframes thumbDownRotate {
+  0% { transform: rotate(0deg); }
+  35% { transform: rotate(12deg); }
+  65% { transform: rotate(-8deg); }
+  85% { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.animateUpWrap {
+  animation: thumbUpRotate 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: 40% 80%;
+}
+
+.animateDownWrap {
+  animation: thumbDownRotate 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: 60% 20%;
+}

@@ -1,0 +1,165 @@
+/* ── Toaster Container ── */
+.toaster {
+  position: fixed;
+  z-index: 999999;
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  outline: none;
+  pointer-events: none;
+}
+
+/* ── Position variants ── */
+.toaster.bottomRight {
+  bottom: var(--spacing-4xl);
+  right: var(--spacing-4xl);
+}
+
+.toaster.bottomLeft {
+  bottom: var(--spacing-4xl);
+  left: var(--spacing-4xl);
+}
+
+.toaster.topRight {
+  top: var(--spacing-4xl);
+  right: var(--spacing-4xl);
+}
+
+.toaster.topLeft {
+  top: var(--spacing-4xl);
+  left: var(--spacing-4xl);
+}
+
+.toaster.bottomCenter {
+  bottom: var(--spacing-4xl);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.toaster.topCenter {
+  top: var(--spacing-4xl);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ── Toast Item Wrapper ── */
+.toastWrapper {
+  position: absolute;
+  pointer-events: auto;
+  transform-origin: center bottom;
+  transition:
+    transform var(--animation-message-enter-duration) var(--animation-message-enter-easing),
+    opacity var(--animation-message-enter-duration) var(--animation-message-enter-easing),
+    height var(--animation-message-enter-duration) var(--animation-message-enter-easing),
+    overflow 0s var(--animation-message-enter-duration);
+}
+
+/* ── Bottom positions ── */
+.toaster.bottomRight .toastWrapper,
+.toaster.bottomLeft .toastWrapper,
+.toaster.bottomCenter .toastWrapper {
+  bottom: 0;
+}
+
+/* ── Top positions ── */
+.toaster.topRight .toastWrapper,
+.toaster.topLeft .toastWrapper,
+.toaster.topCenter .toastWrapper {
+  top: 0;
+  transform-origin: center top;
+}
+
+/* ── Right aligned toasts ── */
+.toaster.bottomRight .toastWrapper,
+.toaster.topRight .toastWrapper {
+  right: 0;
+}
+
+/* ── Left aligned toasts ── */
+.toaster.bottomLeft .toastWrapper,
+.toaster.topLeft .toastWrapper {
+  left: 0;
+}
+
+/* ── Center aligned toasts ── */
+.toaster.bottomCenter .toastWrapper,
+.toaster.topCenter .toastWrapper {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ── Enter: slide up from below ── */
+.toastWrapper.unmounted {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+.toastWrapper.mounted {
+  opacity: 1;
+}
+
+/* ── Exit: slide down and fade ── */
+.toastWrapper.removed {
+  opacity: 0;
+  transform: translateY(100%);
+  transition:
+    transform var(--animation-message-exit-duration) var(--animation-message-exit-easing),
+    opacity var(--animation-message-exit-duration) var(--animation-message-exit-easing);
+  pointer-events: none;
+}
+
+.toastWrapper.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Stacking: collapse transition ── */
+.toastWrapper.stackedBack,
+.toastWrapper.stackedFront {
+  transition:
+    transform var(--animation-state-collapse-duration) var(--animation-state-collapse-easing),
+    opacity var(--animation-state-collapse-duration) var(--animation-state-collapse-easing),
+    height var(--animation-state-collapse-duration) var(--animation-state-collapse-easing),
+    overflow 0s var(--animation-state-collapse-duration);
+}
+
+/* ── Expanded: expand transition ── */
+.toastWrapper.expanded {
+  transition:
+    transform var(--animation-state-expand-duration) var(--animation-state-expand-easing),
+    opacity var(--animation-state-expand-duration) var(--animation-state-expand-easing),
+    height var(--animation-state-expand-duration) var(--animation-state-expand-easing),
+    overflow 0s var(--animation-state-expand-duration);
+}
+
+/* ── Hover bridge: fills the gap between expanded toasts so hover is maintained ── */
+.toaster.bottomRight .toastWrapper.gapBridge::before,
+.toaster.bottomLeft .toastWrapper.gapBridge::before,
+.toaster.bottomCenter .toastWrapper.gapBridge::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  top: 100%;
+  height: var(--toast-gap, 16px);
+}
+
+.toaster.topRight .toastWrapper.gapBridge::before,
+.toaster.topLeft .toastWrapper.gapBridge::before,
+.toaster.topCenter .toastWrapper.gapBridge::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  bottom: 100%;
+  height: var(--toast-gap, 16px);
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion) {
+  .toastWrapper,
+  .toastWrapper.removed {
+    transition: none !important;
+  }
+}

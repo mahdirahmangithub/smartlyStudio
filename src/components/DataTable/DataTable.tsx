@@ -24,7 +24,7 @@ import { Expander } from "../Expander";
 import { DataCellContent } from "../DataCellContent";
 import { Checkbox } from "../Checkbox";
 import { Radio } from "../Radio";
-import { TreeIndent } from "../TreeIndent";
+import { TreeIndent, type TreeIndentLineStyle } from "../TreeIndent";
 import { computeConnectorGuides } from "../../utils/treeConnectors";
 import { cx } from "../../utils/cx";
 
@@ -138,6 +138,8 @@ export interface DataTableProps<T = any> {
   treeIndentWidth?: number;
   /** Show tree connector lines (default true). Set false for plain spacing. */
   treeConnectorLines?: boolean;
+  /** End connector style: "slope" (diagonal curve) or "square" (L-shape). Default "slope". */
+  treeLineStyle?: TreeIndentLineStyle;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -429,6 +431,7 @@ export function DataTable<T extends Record<string, any>>({
   density = "md",
   treeIndentWidth,
   treeConnectorLines,
+  treeLineStyle,
 }: DataTableProps<T>) {
   const tableRef = useRef<HTMLTableElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -1666,6 +1669,7 @@ export function DataTable<T extends Record<string, any>>({
                                 guide={guide}
                                 cellWidth={treeIndentWidth ?? indentSize}
                                 showLines={treeConnectorLines}
+                                lineStyle={treeLineStyle}
                               />
                               {cellContent}
                             </div>

@@ -1,0 +1,44 @@
+:root {
+
+  /* state */
+  --animation-state-change-easing: var(--motion-easing-snappy);
+  --animation-state-change-duration: var(--motion-duration-fast-md);
+  --animation-state-micro-easing: var(--motion-easing-standard);
+  --animation-state-micro-duration: var(--motion-duration-fast-md);
+  --animation-state-expand-easing: var(--motion-easing-enter);
+  --animation-state-expand-duration: var(--motion-duration-normal-md);
+  --animation-state-collapse-easing: var(--motion-easing-exit);
+  --animation-state-collapse-duration: var(--motion-duration-normal-sm);
+
+  /* message */
+  --animation-message-enter-easing: var(--motion-easing-enter);
+  --animation-message-enter-duration: var(--motion-duration-normal-sm);
+  --animation-message-exit-easing: var(--motion-easing-exit);
+  --animation-message-exit-duration: var(--motion-duration-fast-lg);
+
+  /* drawer */
+  --animation-drawer-enter-easing: var(--motion-easing-emphasized);
+  --animation-drawer-enter-duration: var(--motion-duration-normal-lg);
+  --animation-drawer-exit-easing: var(--motion-easing-exit);
+  --animation-drawer-exit-duration: var(--motion-duration-normal-md);
+
+  /* modal */
+  --animation-modal-enter-easing: var(--motion-easing-enter);
+  --animation-modal-enter-duration: var(--motion-duration-normal-md);
+  --animation-modal-exit-easing: var(--motion-easing-exit);
+  --animation-modal-exit-duration: var(--motion-duration-fast-xl);
+  --animation-modal-scrim-easing: var(--motion-easing-linear);
+  --animation-modal-scrim-duration: var(--motion-duration-normal-sm);
+
+  /* dropdown */
+  --animation-dropdown-enter-easing: var(--motion-easing-enter);
+  --animation-dropdown-enter-duration: var(--motion-duration-fast-xl);
+  --animation-dropdown-exit-easing: var(--motion-easing-exit);
+  --animation-dropdown-exit-duration: var(--motion-duration-fast-md);
+
+  /* tooltip */
+  --animation-tooltip-enter-easing: var(--motion-easing-enter);
+  --animation-tooltip-enter-duration: var(--motion-duration-fast-xl);
+  --animation-tooltip-exit-easing: var(--motion-easing-exit);
+  --animation-tooltip-exit-duration: var(--motion-duration-fast-md);
+}

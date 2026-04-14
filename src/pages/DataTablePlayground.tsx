@@ -5,7 +5,7 @@ import { RowContainer } from "../components/RowContainer";
 import { Badge } from "../components/Badge";
 import { Icon } from "../components/Icon";
 import { IconButton } from "../components/IconButton";
-import { TreeIndent } from "../components/TreeIndent";
+import { TreeIndent, type TreeIndentLineStyle } from "../components/TreeIndent";
 import { computeConnectorGuides, type ConnectorType } from "../utils/treeConnectors";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -65,8 +65,17 @@ const TREE_DATA: TreeRow[] = [
         name: "Frontend",
         role: "Team",
         children: [
-          { id: 111, name: "Alice", role: "Lead" },
+          {
+            id: 111,
+            name: "Alice",
+            role: "Lead",
+            children: [
+              { id: 1111, name: "Alice Jr.", role: "Intern" },
+              { id: 1112, name: "Alex", role: "Intern" },
+            ],
+          },
           { id: 112, name: "Bob", role: "Developer" },
+          { id: 113, name: "Carol", role: "Developer" },
         ],
       },
       {
@@ -76,6 +85,33 @@ const TREE_DATA: TreeRow[] = [
         children: [
           { id: 121, name: "Charlie", role: "Lead" },
           { id: 122, name: "Diana", role: "Developer" },
+          {
+            id: 123,
+            name: "Platform",
+            role: "Sub-team",
+            children: [
+              { id: 1231, name: "Eli", role: "SRE" },
+              {
+                id: 1232,
+                name: "Faye",
+                role: "SRE",
+                children: [
+                  { id: 12321, name: "Nora", role: "Junior SRE" },
+                  { id: 12322, name: "Oscar", role: "Junior SRE" },
+                ],
+              },
+              { id: 1233, name: "Greg", role: "SRE" },
+            ],
+          },
+        ],
+      },
+      {
+        id: 13,
+        name: "QA",
+        role: "Team",
+        children: [
+          { id: 131, name: "Heidi", role: "Lead" },
+          { id: 132, name: "Ivan", role: "Tester" },
         ],
       },
     ],
@@ -85,8 +121,25 @@ const TREE_DATA: TreeRow[] = [
     name: "Design",
     role: "Department",
     children: [
-      { id: 21, name: "Eve", role: "Lead" },
-      { id: 22, name: "Frank", role: "Designer" },
+      {
+        id: 21,
+        name: "Product Design",
+        role: "Team",
+        children: [
+          { id: 211, name: "Eve", role: "Lead" },
+          { id: 212, name: "Frank", role: "Designer" },
+        ],
+      },
+      { id: 22, name: "Brand", role: "Team" },
+    ],
+  },
+  {
+    id: 3,
+    name: "Marketing",
+    role: "Department",
+    children: [
+      { id: 31, name: "Grace", role: "Lead" },
+      { id: 32, name: "Hank", role: "Analyst" },
     ],
   },
 ];
@@ -598,6 +651,7 @@ function ExpandableDemo({ density }: { density: TableDensity }) {
 function TreeDemo({ density }: { density: TableDensity }) {
   const [showConnectors, setShowConnectors] = useState(true);
   const [indentWidth, setIndentWidth] = useState(32);
+  const [lineStyle, setLineStyle] = useState<TreeIndentLineStyle>("slope");
 
   const columns: ColumnDef<TreeRow>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 250,
@@ -610,10 +664,21 @@ function TreeDemo({ density }: { density: TableDensity }) {
 
   return (
     <>
-      <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 8 }}>
+      <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 8, flexWrap: "wrap" }}>
         <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13 }}>
           <input type="checkbox" checked={showConnectors} onChange={(e) => setShowConnectors(e.target.checked)} />
           Show connector lines
+        </label>
+        <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+          Style:
+          <select
+            value={lineStyle}
+            onChange={(e) => setLineStyle(e.target.value as TreeIndentLineStyle)}
+            style={{ padding: "2px 6px", borderRadius: 4, fontSize: 13 }}
+          >
+            <option value="slope">Slope</option>
+            <option value="square">Square (L-shape)</option>
+          </select>
         </label>
         <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13 }}>
           Indent width:
@@ -633,9 +698,10 @@ function TreeDemo({ density }: { density: TableDensity }) {
         dataSource={TREE_DATA}
         rowKey="id"
         density={density}
-        expandable={{ defaultExpandedRowKeys: [1, 2, 11, 12, 21, 22] }}
+        expandable={{ defaultExpandedRowKeys: [1, 2, 3, 11, 12, 13, 21, 111, 123, 1232] }}
         treeConnectorLines={showConnectors}
         treeIndentWidth={indentWidth}
+        treeLineStyle={lineStyle}
       />
     </>
   );

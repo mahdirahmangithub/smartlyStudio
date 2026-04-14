@@ -1,0 +1,74 @@
+/* ── base ──────────────────────────────────────────────────────────────── */
+
+.currencyThumbnail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--element-fill-neutral-secondary-default);
+}
+
+/* ── sizes ─────────────────────────────────────────────────────────────── */
+
+.sm {
+  width: var(--spacing-lg);
+  min-width: var(--spacing-lg);
+  max-width: var(--spacing-lg);
+  height: var(--spacing-lg);
+  min-height: var(--spacing-lg);
+  max-height: var(--spacing-lg);
+  border-radius: var(--radius-md);
+}
+
+.md {
+  width: var(--spacing-xl);
+  min-width: var(--spacing-xl);
+  max-width: var(--spacing-xl);
+  height: var(--spacing-xl);
+  min-height: var(--spacing-xl);
+  max-height: var(--spacing-xl);
+  border-radius: var(--radius-md);
+}
+
+.lg {
+  width: var(--spacing-2xl);
+  min-width: var(--spacing-2xl);
+  max-width: var(--spacing-2xl);
+  height: var(--spacing-2xl);
+  min-height: var(--spacing-2xl);
+  max-height: var(--spacing-2xl);
+  border-radius: var(--radius-lg);
+}
+
+/* ── symbol typography ─────────────────────────────────────────────────── */
+
+.symbol {
+  color: var(--text-neutral-secondary-default);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sm .symbol {
+  font-family: var(--type-label-strong-xs-family);
+  font-weight: var(--type-label-strong-xs-weight);
+  font-size: var(--type-label-strong-xs-size);
+  line-height: var(--type-label-strong-xs-line-height);
+  letter-spacing: var(--type-label-strong-xs-letter-spacing);
+}
+
+.md .symbol {
+  font-family: var(--type-label-strong-sm-family);
+  font-weight: var(--type-label-strong-sm-weight);
+  font-size: var(--type-label-strong-sm-size);
+  line-height: var(--type-label-strong-sm-line-height);
+  letter-spacing: var(--type-label-strong-sm-letter-spacing);
+}
+
+.lg .symbol {
+  font-family: var(--type-label-strong-md-family);
+  font-weight: var(--type-label-strong-md-weight);
+  font-size: var(--type-label-strong-md-size);
+  line-height: var(--type-label-strong-md-line-height);
+  letter-spacing: var(--type-label-strong-md-letter-spacing);
+}

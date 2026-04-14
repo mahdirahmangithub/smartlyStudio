@@ -1,0 +1,123 @@
+/* ====== BASE ====== */
+.iconToggleButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: clip;
+  box-sizing: border-box;
+  border: var(--spacing-px) solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  transition:
+    background var(--animation-state-change-duration) var(--animation-state-change-easing),
+    color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.iconToggleButton:focus-visible {
+  box-shadow: var(--focus-ring,
+    0 0 0 var(--spacing-2xs) var(--element-surface-over),
+    0 0 0 var(--spacing-xs) var(--element-outline-neutral-default));
+  outline: none;
+}
+
+/* Active indicator pseudo-element (visible only when checked) */
+.iconToggleButton::after {
+  content: '';
+  position: absolute;
+  border-radius: inherit;
+  pointer-events: none;
+  border-style: solid;
+  border-color: transparent;
+  border-width: 0;
+  transition:
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* ====== SIZES ====== */
+/* Horizontal padding accounts for the 1px border so the button stays square:
+   border + padding + icon + padding + border = min-height */
+.sm {
+  min-height: var(--spacing-xl);
+  padding: 0 calc(var(--spacing-xs) - var(--spacing-px));
+  gap: var(--spacing-2xs);
+  border-radius: var(--radius-md);
+}
+
+.md {
+  min-height: var(--spacing-2xl);
+  padding: 0 calc(var(--spacing-sm) - var(--spacing-px));
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-lg);
+}
+
+.lg {
+  min-height: var(--spacing-4xl);
+  padding: 0 calc(var(--spacing-sm-plus) - var(--spacing-px));
+  gap: var(--spacing-xs);
+  border-radius: var(--radius-lg);
+}
+
+/* ====== ICON CONTAINER ====== */
+.iconWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sm .iconWrap { width: 16px; height: 16px; }
+.md .iconWrap { width: 16px; height: 16px; }
+.lg .iconWrap { width: 20px; height: 20px; }
+
+/* ============================================================
+   MEDIUM EMPHASIS — UNCHECKED
+   ============================================================ */
+
+.medium                                      { background: var(--element-fill-neutral-tertiary-default); border-color: var(--element-outline-neutral-default); color: var(--text-neutral-secondary-default); }
+.medium:hover:not(:disabled)                 { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-secondary-hover); }
+.medium:active:not(:disabled)                { background: var(--element-fill-neutral-tertiary-press); border-color: var(--element-outline-neutral-press); color: var(--text-neutral-secondary-press); }
+.medium:focus-visible:not(:disabled)         { background: var(--element-fill-neutral-tertiary-hover); border-color: var(--element-outline-neutral-hover); color: var(--text-neutral-secondary-hover); }
+.medium:disabled                             { background: var(--element-fill-neutral-tertiary-disable); border-color: var(--element-outline-neutral-disable); color: var(--text-neutral-disable); cursor: not-allowed; }
+
+/* ============================================================
+   MEDIUM EMPHASIS — CHECKED
+   ============================================================ */
+.medium.checked                              { background: var(--element-fill-brand-tertiary-default); border-color: var(--element-outline-brand-active); color: var(--text-brand-default); }
+.medium.checked::after                       { inset: -1px; border-width: 3px; border-color: var(--element-outline-brand-default); }
+.medium.checked:hover:not(:disabled)         { background: var(--element-fill-brand-tertiary-hover); border-color: var(--element-outline-brand-active); color: var(--text-brand-hover); }
+.medium.checked:hover:not(:disabled)::after  { border-color: var(--element-outline-brand-hover); }
+.medium.checked:active:not(:disabled)        { background: var(--element-fill-brand-tertiary-press); border-color: var(--element-outline-brand-active); color: var(--text-brand-press); }
+.medium.checked:active:not(:disabled)::after { border-color: var(--element-outline-brand-press); }
+.medium.checked:focus-visible:not(:disabled) { background: var(--element-fill-brand-tertiary-hover); border-color: var(--element-outline-brand-active); color: var(--text-brand-hover); }
+.medium.checked:focus-visible:not(:disabled)::after { border-color: var(--element-outline-brand-hover); }
+.medium.checked:disabled                     { background: var(--element-fill-brand-tertiary-disable); border-color: var(--element-outline-brand-disable); color: var(--text-brand-disable); cursor: not-allowed; }
+.medium.checked:disabled::after              { border-color: var(--element-outline-brand-default); }
+
+/* ============================================================
+   LOW EMPHASIS — UNCHECKED
+   ============================================================ */
+.low                                      { background: var(--element-fill-neutral-tertiary-default); color: var(--text-neutral-secondary-default); }
+.low:hover:not(:disabled)                 { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-secondary-hover); }
+.low:active:not(:disabled)                { background: var(--element-fill-neutral-tertiary-press); color: var(--text-neutral-secondary-press); }
+.low:focus-visible:not(:disabled)         { background: var(--element-fill-neutral-tertiary-hover); color: var(--text-neutral-secondary-hover); }
+.low:disabled                             { background: var(--element-fill-neutral-tertiary-disable); color: var(--text-neutral-disable); cursor: not-allowed; }
+
+/* ============================================================
+   LOW EMPHASIS — CHECKED
+   ============================================================ */
+.low.checked                              { background: var(--element-fill-brand-tertiary-default); color: var(--text-brand-default); }
+.low.checked::after                       { inset: 0; border-width: var(--spacing-2xs); border-color: var(--element-outline-brand-default); }
+.low.checked:hover:not(:disabled)         { background: var(--element-fill-brand-tertiary-hover); color: var(--text-brand-hover); }
+.low.checked:hover:not(:disabled)::after  { border-color: var(--element-outline-brand-hover); }
+.low.checked:active:not(:disabled)        { background: var(--element-fill-brand-tertiary-press); color: var(--text-brand-press); }
+.low.checked:active:not(:disabled)::after { border-color: var(--element-outline-brand-press); }
+.low.checked:focus-visible:not(:disabled) { background: var(--element-fill-brand-tertiary-hover); color: var(--text-brand-hover); }
+.low.checked:focus-visible:not(:disabled)::after { border-color: var(--element-outline-brand-hover); }
+.low.checked:disabled                     { background: var(--element-fill-brand-tertiary-disable); color: var(--text-brand-disable); cursor: not-allowed; }
+.low.checked:disabled::after              { border-color: var(--element-outline-brand-default); }
