@@ -39,11 +39,6 @@ export interface CalendarDateCellProps
   mix?: boolean;
   /** Explicit selection state for range endpoints (overrides `selected` for aria-selected). */
   ariaSelected?: boolean;
-  /** Selection crosses month edge: fade only on day 1 / last day of month (953:151417). */
-  monthFadeLeading?: boolean;
-  monthFadeTrailing?: boolean;
-  monthFadeTone?: "brand" | "neutral" | "both";
-  monthFadePreview?: boolean;
   /** Dual-range: preview endpoints use neutral fill when editing period 2. */
   previewEndpointsNeutral?: boolean;
   calendarMode: "single" | "range" | "dual-range";
@@ -81,10 +76,6 @@ export const CalendarDateCell = forwardRef<HTMLDivElement, CalendarDateCellProps
   previewEnd,
   mix,
   ariaSelected,
-  monthFadeLeading,
-  monthFadeTrailing,
-  monthFadeTone,
-  monthFadePreview,
   previewEndpointsNeutral = false,
   calendarMode,
   stripSeamJoinPrev = false,
@@ -139,10 +130,7 @@ export const CalendarDateCell = forwardRef<HTMLDivElement, CalendarDateCellProps
     (startBridge && !brandEndpoint && !neutralEndpoint) ||
     (endBridge && !brandEndpoint && !neutralEndpoint);
 
-  const monthFade = !!(monthFadeLeading || monthFadeTrailing);
-
-  const overlapVisualSplit =
-    (overlapSplitLeading || overlapSplitTrailing) && !monthFade;
+  const overlapVisualSplit = overlapSplitLeading || overlapSplitTrailing;
 
   /* Dual-range endpoints sit in overlap too: need both+mix + split gradients (not plain bridge). */
   const showBothOverlapLayer =
@@ -156,7 +144,7 @@ export const CalendarDateCell = forwardRef<HTMLDivElement, CalendarDateCellProps
   const stripUnderlayTone: "brand" | "neutral" | null = (() => {
     if (calendarMode !== "dual-range") return null;
     if (!(brandEndpoint || neutralEndpoint)) return null;
-    if (monthFade || showBothOverlapLayer) return null;
+    if (showBothOverlapLayer) return null;
     if (inRange0) return "brand";
     if (inRange1) return "neutral";
     return null;
@@ -225,32 +213,6 @@ export const CalendarDateCell = forwardRef<HTMLDivElement, CalendarDateCellProps
               (isStripInterior || startBridge || endBridge) &&
               previewEndpointsNeutral &&
               styles.rangeLayerPreviewNeutralStrip,
-            monthFade && monthFadeLeading && styles.rangeLayerMonthFadeLeading,
-            monthFade && monthFadeTrailing && styles.rangeLayerMonthFadeTrailing,
-            monthFade &&
-              monthFadePreview &&
-              monthFadeTone === "brand" &&
-              styles.rangeLayerMonthFadePreviewBrand,
-            monthFade &&
-              monthFadePreview &&
-              monthFadeTone === "both" &&
-              styles.rangeLayerMonthFadePreviewBoth,
-            monthFade &&
-              monthFadePreview &&
-              monthFadeTone === "neutral" &&
-              styles.rangeLayerMonthFadePreviewNeutral,
-            monthFade &&
-              !monthFadePreview &&
-              monthFadeTone === "brand" &&
-              styles.rangeLayerMonthFadeCommittedBrand,
-            monthFade &&
-              !monthFadePreview &&
-              monthFadeTone === "neutral" &&
-              styles.rangeLayerMonthFadeCommittedNeutral,
-            monthFade &&
-              !monthFadePreview &&
-              monthFadeTone === "both" &&
-              styles.rangeLayerMonthFadeCommittedBoth,
             stripSeamJoinPrev && styles.rangeLayerSeamJoinPrev,
             stripSeamJoinNext && styles.rangeLayerSeamJoinNext,
           )}
@@ -259,6 +221,7 @@ export const CalendarDateCell = forwardRef<HTMLDivElement, CalendarDateCellProps
       )}
       <button
         type="button"
+        data-date={iso}
         className={cx(
           styles.dayButton,
           outside && styles.outside,

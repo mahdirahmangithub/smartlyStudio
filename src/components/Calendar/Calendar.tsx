@@ -1,4 +1,4 @@
-import { useCallback, useId, useMemo, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { Icon } from "../Icon";
 import { IconButton } from "../IconButton";
 import { Tooltip } from "../Tooltip";
@@ -8,6 +8,7 @@ import {
   addMonths,
   buildMonthMatrix,
   compareDate,
+  dateToIsoDateString,
   daysInMonth,
   formatDateForAria,
   formatMonthYearShort,
@@ -169,74 +170,48 @@ function inferActiveRangeIndexForDualDraft(
   return currentIndex;
 }
 
-/** Fade only on calendar day 1 / last day of month when range crosses month edge — not every week row. */
-type MonthBoundaryFade = {
-  leading: boolean;
-  trailing: boolean;
-  tone: "brand" | "neutral" | "both";
-  preview: boolean;
-};
+/**
+ * Month-edge fade on the ONE adjacent empty cell when a range crosses a month
+ * boundary. Returns the tone for the gradient, or null if no fade is needed.
+ */
+type EmptyCellFadeTone = "brand" | "neutral" | "both";
 
-function monthBoundaryFadeForRange(
-  date: CompleteDateValue,
-  range: CalendarRange,
-): Pick<MonthBoundaryFade, "leading" | "trailing"> | null {
-  if (!isInClosedRange(date, range.start, range.end)) return null;
-  const lastDay = daysInMonth(date.year, date.month);
-  const atMonthStart = date.day === 1;
-  const atMonthEnd = date.day === lastDay;
-  if (!atMonthStart && !atMonthEnd) return null;
-  const leading = atMonthStart && compareDate(range.start, date) < 0;
-  const trailing = atMonthEnd && compareDate(range.end, date) > 0;
-  if (!leading && !trailing) return null;
-  return { leading, trailing };
-}
-
-function resolveMonthBoundaryFade(
-  date: CompleteDateValue,
+function getMonthEdgeFade(
+  direction: "leading" | "trailing",
+  ym: YearMonth,
   props: CalendarProps,
   previewRange: CalendarRange | null,
   draftAnchor: CompleteDateValue | null,
   activeRangeIndex: 0 | 1,
-): MonthBoundaryFade | null {
+): EmptyCellFadeTone | null {
+  const lastDay = daysInMonth(ym.year, ym.month);
+  const edgeDate: CompleteDateValue =
+    direction === "trailing"
+      ? { year: ym.year, month: ym.month, day: lastDay }
+      : { year: ym.year, month: ym.month, day: 1 };
+
+  function crosses(range: CalendarRange): boolean {
+    if (!isInClosedRange(edgeDate, range.start, range.end)) return false;
+    return direction === "trailing"
+      ? compareDate(range.end, edgeDate) > 0
+      : compareDate(range.start, edgeDate) < 0;
+  }
+
+  if (props.mode === "single") return null;
+
   if (props.mode === "range") {
-    if (previewRange && draftAnchor) {
-      const p = monthBoundaryFadeForRange(date, previewRange);
-      if (p && (p.leading || p.trailing)) {
-        return { leading: p.leading, trailing: p.trailing, tone: "brand", preview: true };
-      }
-    }
-    if (props.value && !draftAnchor) {
-      const v = monthBoundaryFadeForRange(date, props.value);
-      if (v && (v.leading || v.trailing)) {
-        return { leading: v.leading, trailing: v.trailing, tone: "brand", preview: false };
-      }
-    }
+    if (previewRange && draftAnchor && crosses(previewRange)) return "brand";
+    if (props.value && !draftAnchor && crosses(props.value)) return "brand";
     return null;
   }
 
-  if (props.mode === "dual-range") {
-    const [r0, r1] = props.value.ranges;
-    const src0 =
-      draftAnchor && activeRangeIndex === 0 && previewRange ? previewRange : r0;
-    const src1 =
-      draftAnchor && activeRangeIndex === 1 && previewRange ? previewRange : r1;
-
-    const b0 = src0 ? monthBoundaryFadeForRange(date, src0) : null;
-    const b1 = src1 ? monthBoundaryFadeForRange(date, src1) : null;
-    if (!b0 && !b1) return null;
-    const leading = !!(b0?.leading || b1?.leading);
-    const trailing = !!(b0?.trailing || b1?.trailing);
-    if (!leading && !trailing) return null;
-    const r0hit = !!(b0?.leading || b0?.trailing);
-    const r1hit = !!(b1?.leading || b1?.trailing);
-    const tone: "brand" | "neutral" | "both" =
-      r0hit && r1hit ? "both" : r0hit ? "brand" : "neutral";
-    const preview = !!(draftAnchor && previewRange);
-    return { leading, trailing, tone, preview };
-  }
-
-  return null;
+  const [r0, r1] = props.value.ranges;
+  const src0 = draftAnchor && activeRangeIndex === 0 && previewRange ? previewRange : r0;
+  const src1 = draftAnchor && activeRangeIndex === 1 && previewRange ? previewRange : r1;
+  const hit0 = src0 ? crosses(src0) : false;
+  const hit1 = src1 ? crosses(src1) : false;
+  if (!hit0 && !hit1) return null;
+  return hit0 && hit1 ? "both" : hit0 ? "brand" : "neutral";
 }
 
 function buildDayAriaLabel(
@@ -278,6 +253,9 @@ export function Calendar(props: CalendarProps) {
   /** While choosing range end, mouse target for live preview (keyboard uses focusedDate). */
   const [rangePreviewHoverDate, setRangePreviewHoverDate] = useState<CompleteDateValue | null>(null);
   const [slideDir, setSlideDir] = useState<"next" | "prev" | null>(null);
+
+  const containerRef = useRef<HTMLElement>(null);
+  const pendingKeyboardFocusRef = useRef(false);
 
   const [internalActiveRange, setInternalActiveRange] = useState<0 | 1>(() =>
     props.mode === "dual-range" ? (props.defaultActiveRangeIndex ?? 0) : 0,
@@ -364,77 +342,102 @@ export function Calendar(props: CalendarProps) {
 
   const moveFocus = useCallback(
     (next: CompleteDateValue) => {
+      pendingKeyboardFocusRef.current = true;
       setFocusedDate(next);
       ensureVisible(next);
     },
     [ensureVisible],
   );
 
+  useEffect(() => {
+    if (!pendingKeyboardFocusRef.current) return;
+    pendingKeyboardFocusRef.current = false;
+    const iso = dateToIsoDateString(focusedDate);
+    const btn = containerRef.current?.querySelector<HTMLButtonElement>(
+      `button[data-date="${iso}"]`,
+    );
+    btn?.focus();
+  }, [focusedDate]);
+
   const clearRangeHoverForKeyboard = useCallback(() => {
     if (draftAnchor) setRangePreviewHoverDate(null);
   }, [draftAnchor]);
 
+  const skipDisabled = useCallback(
+    (from: CompleteDateValue, step: number): CompleteDateValue => {
+      let d = addDays(from, step);
+      let tries = 0;
+      while (isDateDisabled(d) && tries < 60) {
+        d = addDays(d, step > 0 ? 1 : -1);
+        tries++;
+      }
+      return d;
+    },
+    [isDateDisabled],
+  );
+
   const onKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
       const { key } = e;
-      if (key === "ArrowRight") {
+      const target = e.target as HTMLElement;
+      const isGridCell = target.hasAttribute("data-date");
+
+      if (key === "ArrowRight" && isGridCell) {
         e.preventDefault();
         clearRangeHoverForKeyboard();
-        moveFocus(addDays(focusedDate, 1));
+        moveFocus(skipDisabled(focusedDate, 1));
         return;
       }
-      if (key === "ArrowLeft") {
+      if (key === "ArrowLeft" && isGridCell) {
         e.preventDefault();
         clearRangeHoverForKeyboard();
-        moveFocus(addDays(focusedDate, -1));
+        moveFocus(skipDisabled(focusedDate, -1));
         return;
       }
-      if (key === "ArrowDown") {
+      if (key === "ArrowDown" && isGridCell) {
         e.preventDefault();
         clearRangeHoverForKeyboard();
-        moveFocus(addDays(focusedDate, 7));
+        moveFocus(skipDisabled(focusedDate, 7));
         return;
       }
-      if (key === "ArrowUp") {
+      if (key === "ArrowUp" && isGridCell) {
         e.preventDefault();
         clearRangeHoverForKeyboard();
-        moveFocus(addDays(focusedDate, -7));
+        moveFocus(skipDisabled(focusedDate, -7));
         return;
       }
-      if (key === "Home") {
+      if (key === "Home" && isGridCell) {
         e.preventDefault();
         clearRangeHoverForKeyboard();
         moveFocus(startOfWeek(focusedDate, weekStartsOn));
         return;
       }
-      if (key === "End") {
+      if (key === "End" && isGridCell) {
         e.preventDefault();
         clearRangeHoverForKeyboard();
         moveFocus(endOfWeek(focusedDate, weekStartsOn));
         return;
       }
-      if (key === "PageDown") {
+      if (key === "PageDown" && isGridCell) {
         e.preventDefault();
         clearRangeHoverForKeyboard();
         bumpMonth(1);
         return;
       }
-      if (key === "PageUp") {
+      if (key === "PageUp" && isGridCell) {
         e.preventDefault();
         clearRangeHoverForKeyboard();
         bumpMonth(-1);
         return;
       }
 
-      if (key === "Escape") {
-        if (props.mode !== "single" && draftAnchor) {
-          e.preventDefault();
-          endDraftAnchor();
-        }
+      if (key === "Escape" && draftAnchor && props.mode !== "single") {
+        e.preventDefault();
+        endDraftAnchor();
         return;
       }
 
-      if (key === "Enter" || key === " ") {
+      if ((key === "Enter" || key === " ") && isGridCell) {
         if (isDateDisabled(focusedDate)) return;
         e.preventDefault();
         const d = focusedDate;
@@ -476,6 +479,7 @@ export function Calendar(props: CalendarProps) {
     [
       focusedDate,
       moveFocus,
+      skipDisabled,
       weekStartsOn,
       bumpMonth,
       draftAnchor,
@@ -765,6 +769,9 @@ export function Calendar(props: CalendarProps) {
       metaByDay.set(c.date.day, getStripLayerMeta(f, stripLayerOptions));
     }
 
+    const trailingFadeTone = getMonthEdgeFade("trailing", ym, props, previewRange, draftAnchor, activeRangeIndex);
+    const leadingFadeTone = getMonthEdgeFade("leading", ym, props, previewRange, draftAnchor, activeRangeIndex);
+
     return (
       <div
         key={`${ym.year}-${ym.month}-${matrixIndex}`}
@@ -781,134 +788,169 @@ export function Calendar(props: CalendarProps) {
             role="rowgroup"
             onAnimationEnd={slideMonths ? onMonthBodyAnimationEnd : undefined}
           >
-            {weeks.map((week, wi) => (
-              <div key={wi} className={styles.dayRow} role="row">
-                {week.map((cell) => {
-                  const { date } = cell;
-                  if (!cell.inCurrentMonth) {
-                    return (
-                      <div
-                        key={`empty-${date.year}-${date.month}-${date.day}`}
-                        className={styles.emptyDayCell}
-                        role="gridcell"
+            {weeks.map((week, wi) => {
+              let firstInMonth = -1;
+              let lastInMonth = -1;
+              for (let i = 0; i < week.length; i++) {
+                if (week[i].inCurrentMonth) {
+                  if (firstInMonth === -1) firstInMonth = i;
+                  lastInMonth = i;
+                }
+              }
+
+              const trailingIdx = trailingFadeTone != null && lastInMonth >= 0 && lastInMonth < 6
+                ? lastInMonth + 1 : -1;
+              const leadingIdx = leadingFadeTone != null && firstInMonth > 0
+                ? firstInMonth - 1 : -1;
+
+              return (
+                <div key={wi} className={styles.dayRow} role="row">
+                  {week.map((cell, ci) => {
+                    const { date } = cell;
+                    if (!cell.inCurrentMonth) {
+                      if (ci === trailingIdx) {
+                        return (
+                          <div
+                            key={`empty-${date.year}-${date.month}-${date.day}`}
+                            className={cx(
+                              styles.emptyDayCell,
+                              styles.emptyDayCellFade,
+                              trailingFadeTone === "brand" && styles.emptyFadeTrailingBrand,
+                              trailingFadeTone === "neutral" && styles.emptyFadeTrailingNeutral,
+                              trailingFadeTone === "both" && styles.emptyFadeBoth,
+                              trailingFadeTone === "both" && styles.emptyFadeTrailingBoth,
+                            )}
+                            role="gridcell"
+                          />
+                        );
+                      }
+                      if (ci === leadingIdx) {
+                        return (
+                          <div
+                            key={`empty-${date.year}-${date.month}-${date.day}`}
+                            className={cx(
+                              styles.emptyDayCell,
+                              styles.emptyDayCellFade,
+                              leadingFadeTone === "brand" && styles.emptyFadeLeadingBrand,
+                              leadingFadeTone === "neutral" && styles.emptyFadeLeadingNeutral,
+                              leadingFadeTone === "both" && styles.emptyFadeBoth,
+                              leadingFadeTone === "both" && styles.emptyFadeLeadingBoth,
+                            )}
+                            role="gridcell"
+                          />
+                        );
+                      }
+                      return (
+                        <div
+                          key={`empty-${date.year}-${date.month}-${date.day}`}
+                          className={styles.emptyDayCell}
+                          role="gridcell"
+                        />
+                      );
+                    }
+
+                    const disabled = isDateDisabled(date);
+                    const focused = sameDate(date, focusedDate);
+                    const extra = getDateAttributes?.(date);
+                    const flags = flagsByDay.get(date.day)!;
+                    const extras = buildExtras(date);
+                    const label = buildDayAriaLabel(localeForIntl, date, extras);
+
+                    const meta = metaByDay.get(date.day)!;
+                    const prevMeta =
+                      metaByDay.get(date.day - 1) ??
+                      getStripLayerMeta(getCellFlags(addDays(date, -1)), stripLayerOptions);
+                    const nextMeta =
+                      metaByDay.get(date.day + 1) ??
+                      getStripLayerMeta(getCellFlags(addDays(date, 1)), stripLayerOptions);
+
+                    const stripSeamJoinPrev =
+                      props.mode !== "single" &&
+                      meta.startBridge &&
+                      prevMeta.endBridge &&
+                      meta.tintNeutral === prevMeta.tintNeutral &&
+                      (meta.tintBrand || meta.tintNeutral) &&
+                      (prevMeta.tintBrand || prevMeta.tintNeutral) &&
+                      !flags.overlapSplitLeading;
+
+                    const stripSeamJoinNext =
+                      props.mode !== "single" &&
+                      meta.endBridge &&
+                      nextMeta.startBridge &&
+                      meta.tintNeutral === nextMeta.tintNeutral &&
+                      (meta.tintBrand || meta.tintNeutral) &&
+                      (nextMeta.tintBrand || nextMeta.tintNeutral) &&
+                      !flags.overlapSplitTrailing;
+
+                    const dateCell = (
+                      <CalendarDateCell
+                        key={`${date.year}-${date.month}-${date.day}`}
+                        date={date}
+                        label={label}
+                        dayNumber={date.day}
+                        outside={false}
+                        today={sameDate(date, today)}
+                        disabled={disabled}
+                        tabIndex={focused ? 0 : -1}
+                        className={extra?.className}
+                        title={extra?.title}
+                        onClick={() => handleDayClick(date)}
+                        onFocus={() => {
+                          setFocusedDate(date);
+                          setRangePreviewHoverDate(null);
+                        }}
+                        onMouseEnter={() => {
+                          if (
+                            draftAnchor &&
+                            (props.mode === "range" || props.mode === "dual-range") &&
+                            !isDateDisabled(date)
+                          ) {
+                            setRangePreviewHoverDate(date);
+                          }
+                        }}
+                        selected={flags.selected}
+                        inRange={flags.inRange}
+                        rangeStart={flags.rangeStart}
+                        rangeEnd={flags.rangeEnd}
+                        inRange0={flags.inRange0}
+                        range0Start={flags.range0Start}
+                        range0End={flags.range0End}
+                        inRange1={flags.inRange1}
+                        range1Start={flags.range1Start}
+                        range1End={flags.range1End}
+                        bothRanges={flags.bothRanges}
+                        overlapSplitLeading={flags.overlapSplitLeading}
+                        overlapSplitTrailing={flags.overlapSplitTrailing}
+                        overlapSplitLeftTone={flags.overlapSplitLeftTone ?? undefined}
+                        overlapSplitRightTone={flags.overlapSplitRightTone ?? undefined}
+                        inPreview={flags.inPreview}
+                        previewStart={flags.previewStart}
+                        previewEnd={flags.previewEnd}
+                        mix={!!flags.bothRanges}
+                        ariaSelected={flags.ariaSelected}
+                        previewEndpointsNeutral={previewEndpointsNeutral}
+                        calendarMode={props.mode}
+                        stripSeamJoinPrev={stripSeamJoinPrev}
+                        stripSeamJoinNext={stripSeamJoinNext}
                       />
                     );
-                  }
 
-                  const disabled = isDateDisabled(date);
-                  const focused = sameDate(date, focusedDate);
-                  const extra = getDateAttributes?.(date);
-                  const flags = flagsByDay.get(date.day)!;
-                  const extras = buildExtras(date);
-                  const label = buildDayAriaLabel(localeForIntl, date, extras);
-                  const monthFade = resolveMonthBoundaryFade(
-                    date,
-                    props,
-                    previewRange,
-                    draftAnchor,
-                    activeRangeIndex,
-                  );
+                    if (extra?.tooltip) {
+                      return (
+                        <Tooltip
+                          key={`${date.year}-${date.month}-${date.day}`}
+                          label={extra.tooltip}
+                        >
+                          {dateCell}
+                        </Tooltip>
+                      );
+                    }
 
-                  const meta = metaByDay.get(date.day)!;
-                  const prevMeta =
-                    metaByDay.get(date.day - 1) ??
-                    getStripLayerMeta(getCellFlags(addDays(date, -1)), stripLayerOptions);
-                  const nextMeta =
-                    metaByDay.get(date.day + 1) ??
-                    getStripLayerMeta(getCellFlags(addDays(date, 1)), stripLayerOptions);
-
-                  const stripSeamJoinPrev =
-                    props.mode !== "single" &&
-                    meta.startBridge &&
-                    prevMeta.endBridge &&
-                    meta.tintNeutral === prevMeta.tintNeutral &&
-                    (meta.tintBrand || meta.tintNeutral) &&
-                    (prevMeta.tintBrand || prevMeta.tintNeutral) &&
-                    !flags.overlapSplitLeading &&
-                    !monthFade?.leading;
-
-                  const stripSeamJoinNext =
-                    props.mode !== "single" &&
-                    meta.endBridge &&
-                    nextMeta.startBridge &&
-                    meta.tintNeutral === nextMeta.tintNeutral &&
-                    (meta.tintBrand || meta.tintNeutral) &&
-                    (nextMeta.tintBrand || nextMeta.tintNeutral) &&
-                    !flags.overlapSplitTrailing &&
-                    !monthFade?.trailing;
-
-                  const dateCell = (
-                    <CalendarDateCell
-                      key={`${date.year}-${date.month}-${date.day}`}
-                      date={date}
-                      label={label}
-                      dayNumber={date.day}
-                      outside={false}
-                      today={sameDate(date, today)}
-                      disabled={disabled}
-                      tabIndex={focused ? 0 : -1}
-                      className={extra?.className}
-                      title={extra?.title}
-                      onClick={() => handleDayClick(date)}
-                      onFocus={() => {
-                        setFocusedDate(date);
-                        setRangePreviewHoverDate(null);
-                      }}
-                      onMouseEnter={() => {
-                        if (
-                          draftAnchor &&
-                          (props.mode === "range" || props.mode === "dual-range") &&
-                          !isDateDisabled(date)
-                        ) {
-                          setRangePreviewHoverDate(date);
-                        }
-                      }}
-                      selected={flags.selected}
-                      inRange={flags.inRange}
-                      rangeStart={flags.rangeStart}
-                      rangeEnd={flags.rangeEnd}
-                      inRange0={flags.inRange0}
-                      range0Start={flags.range0Start}
-                      range0End={flags.range0End}
-                      inRange1={flags.inRange1}
-                      range1Start={flags.range1Start}
-                      range1End={flags.range1End}
-                      bothRanges={flags.bothRanges}
-                      overlapSplitLeading={flags.overlapSplitLeading}
-                      overlapSplitTrailing={flags.overlapSplitTrailing}
-                      overlapSplitLeftTone={flags.overlapSplitLeftTone ?? undefined}
-                      overlapSplitRightTone={flags.overlapSplitRightTone ?? undefined}
-                      inPreview={flags.inPreview}
-                      previewStart={flags.previewStart}
-                      previewEnd={flags.previewEnd}
-                      mix={!!flags.bothRanges}
-                      ariaSelected={flags.ariaSelected}
-                      monthFadeLeading={monthFade?.leading}
-                      monthFadeTrailing={monthFade?.trailing}
-                      monthFadeTone={monthFade?.tone}
-                      monthFadePreview={monthFade?.preview}
-                      previewEndpointsNeutral={previewEndpointsNeutral}
-                      calendarMode={props.mode}
-                      stripSeamJoinPrev={stripSeamJoinPrev}
-                      stripSeamJoinNext={stripSeamJoinNext}
-                    />
-                  );
-
-                  if (extra?.tooltip) {
-                    return (
-                      <Tooltip
-                        key={`${date.year}-${date.month}-${date.day}`}
-                        label={extra.tooltip}
-                      >
-                        {dateCell}
-                      </Tooltip>
-                    );
-                  }
-
-                  return dateCell;
-                })}
-              </div>
-            ))}
+                    return dateCell;
+                  })}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -917,6 +959,7 @@ export function Calendar(props: CalendarProps) {
 
   return (
     <section
+      ref={containerRef}
       className={cx(styles.root, numberOfMonths === 2 && styles.rootDual, className)}
       aria-label={ariaLabel}
       onKeyDownCapture={onKeyDown}

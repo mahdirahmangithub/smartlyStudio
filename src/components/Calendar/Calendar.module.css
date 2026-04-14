@@ -213,6 +213,89 @@
   min-height: var(--spacing-4xl);
 }
 
+.emptyDayCellFade {
+  position: relative;
+}
+
+.emptyFadeTrailingBrand {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+.emptyFadeLeadingBrand {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.emptyFadeTrailingNeutral {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-neutral-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+.emptyFadeLeadingNeutral {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-neutral-tertiary-active-default) 100%
+  );
+}
+
+/* Dual-range overlap on empty fade cells: brand gradient + halftone dots with matching mask */
+.emptyFadeBoth {
+  isolation: isolate;
+}
+
+.emptyFadeBoth::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-color: transparent;
+  background-image: radial-gradient(
+    circle closest-side at center,
+    var(--text-neutral-primary) 32%,
+    transparent 33%
+  );
+  background-size: var(--spacing-sm) var(--spacing-sm);
+  opacity: var(--opacity-12);
+}
+
+.emptyFadeTrailingBoth {
+  background: linear-gradient(
+    90deg,
+    var(--element-fill-brand-tertiary-active-default) 0%,
+    transparent 100%
+  );
+}
+
+.emptyFadeTrailingBoth::after {
+  mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, transparent 100%);
+}
+
+.emptyFadeLeadingBoth {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--element-fill-brand-tertiary-active-default) 100%
+  );
+}
+
+.emptyFadeLeadingBoth::after {
+  mask-image: linear-gradient(90deg, transparent 0%, #000 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 100%);
+}
+
 .gridSurface {
   width: 100%;
 }
