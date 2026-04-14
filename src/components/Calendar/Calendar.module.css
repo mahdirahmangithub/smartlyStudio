@@ -1,0 +1,273 @@
+/* ── Calendar — SDS Φ Basic Components (Figma 952:99947, 938:22162) ── */
+
+.root {
+  box-sizing: border-box;
+  width: 100%;
+  /* Single month frame width 352px */
+  max-width: 22rem;
+  padding: 0 var(--spacing-sm);
+  color: var(--text-neutral-primary);
+  /* Never narrower than 7 day hit targets + horizontal insets (matches .calendarShell band) */
+  min-width: calc(
+    7 * var(--spacing-4xl) + 2 * var(--spacing-3xl) + 4 * var(--spacing-sm)
+  );
+}
+
+.rootDual {
+  /* Two months 704px */
+  max-width: 44rem;
+  /* Two 7-column grids + gap-sm + same insets as single */
+  min-width: calc(
+    14 * var(--spacing-4xl) + var(--spacing-sm) + 2 * var(--spacing-3xl) + 5 * var(--spacing-sm)
+  );
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Nav + month title: absolute chevrons; title strip matches .monthsRow track widths (953:151417) ── */
+
+.calendarShell {
+  /* Clears md nav; + spacing-sm matches Figma 8px view gutter (titles + grids + nav share this band) */
+  --calendar-content-inset: var(--spacing-3xl);
+  --calendar-band-inset: calc(var(--calendar-content-inset) + var(--spacing-sm));
+
+  display: grid;
+  grid-template-rows: auto auto;
+  row-gap: var(--spacing-xs);
+  width: 100%;
+  padding: var(--spacing-xs) 0;
+  box-sizing: border-box;
+}
+
+.titleRow {
+  position: relative;
+  grid-row: 1;
+  width: 100%;
+  min-height: var(--spacing-2xl);
+}
+
+.navPrev,
+.navNext {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.navPrev {
+  left: var(--calendar-band-inset);
+}
+
+.navNext {
+  right: var(--calendar-band-inset);
+}
+
+.titleRowInner {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  gap: var(--spacing-sm);
+  align-items: center;
+  min-height: var(--spacing-2xl);
+  padding-inline: var(--calendar-band-inset);
+}
+
+.shellTitleSlot {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.monthsHost {
+  grid-row: 2;
+  min-width: 0;
+  width: 100%;
+  padding-inline: var(--calendar-band-inset);
+  box-sizing: border-box;
+}
+
+/* Month name centered over each column (Figma 953:151417) */
+.monthTitle {
+  margin: 0;
+  width: 100%;
+  min-width: 0;
+  text-align: center;
+  font-family: var(--type-label-strong-md-family);
+  font-weight: var(--type-label-strong-md-weight);
+  font-size: var(--type-label-strong-md-size);
+  line-height: var(--type-label-strong-md-line-height);
+  letter-spacing: var(--type-label-strong-md-letter-spacing);
+  /* Figma month title — text/neutral/secondary/default */
+  color: var(--text-neutral-secondary-default);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.slideViewport {
+  overflow: hidden;
+  width: 100%;
+}
+
+.slideTrack {
+  display: flex;
+  width: 100%;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .slideTrackAnimated {
+    transition: transform var(--animation-state-expand-duration) var(--animation-state-expand-easing);
+  }
+}
+
+.slidePanel {
+  flex: 0 0 100%;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .monthBodyEnterNext {
+    animation: calendarEnterNext var(--animation-state-expand-duration) var(--animation-state-expand-easing);
+  }
+
+  .monthBodyEnterPrev {
+    animation: calendarEnterPrev var(--animation-state-expand-duration) var(--animation-state-expand-easing);
+  }
+}
+
+@keyframes calendarEnterNext {
+  from {
+    transform: translateX(var(--spacing-lg));
+    opacity: 0.88;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes calendarEnterPrev {
+  from {
+    transform: translateX(calc(-1 * var(--spacing-lg)));
+    opacity: 0.88;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.monthsRow {
+  display: flex;
+  gap: var(--spacing-sm);
+  width: 100%;
+  align-items: flex-start;
+}
+
+.monthColumn {
+  flex: 1 1 0;
+  /* One week row = seven 40×40 columns; don’t compress below that */
+  min-width: calc(7 * var(--spacing-4xl));
+}
+
+/* Figma: day rows gap spacing-2xs, row radius-sm + clip (range row corners) */
+
+.dayBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+  width: 100%;
+  min-width: 0;
+}
+
+.dayRow {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: stretch;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+/* Leading/trailing week padding — no adjacent-month numbers (Figma 953:151417) */
+.emptyDayCell {
+  box-sizing: border-box;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: var(--spacing-4xl);
+}
+
+.gridSurface {
+  width: 100%;
+}
+
+.dualRangeToolbar {
+  display: flex;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.rangeTab {
+  font: inherit;
+  font-size: var(--type-body-sm-size);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--element-outline-neutral-default);
+  background: var(--element-fill-neutral-primary-default);
+  color: var(--text-neutral-primary);
+  cursor: pointer;
+  transition:
+    background-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.rangeTab:hover {
+  background: var(--element-fill-neutral-tertiary-hover);
+}
+
+.rangeTabActive {
+  border-color: var(--element-outline-brand-active);
+  background: var(--element-fill-brand-tertiary-active-default);
+}
+
+.rangeTab:focus {
+  outline: none;
+}
+
+.rangeTab:focus-visible {
+  outline: 2px solid var(--element-outline-brand-active);
+  outline-offset: 2px;
+}
+
+/* Optional caption (Figma 952:99941) */
+
+.caption {
+  margin: 0;
+  padding: var(--spacing-sm);
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  font-family: var(--type-caption-md-family);
+  font-weight: var(--type-caption-md-weight);
+  font-size: var(--type-caption-md-size);
+  line-height: var(--type-caption-md-line-height);
+  letter-spacing: var(--type-caption-md-letter-spacing);
+  color: var(--text-neutral-tertiary-default);
+}

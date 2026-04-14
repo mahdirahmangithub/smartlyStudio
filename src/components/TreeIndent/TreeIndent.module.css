@@ -1,0 +1,53 @@
+/* ── TreeIndent (SVG-based) ─────────────────────────────────── */
+
+.root {
+  display: inline-flex;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+
+/* ── Each depth-level cell ── */
+
+.cell {
+  position: relative;
+  width: var(--tree-indent-cell-width, 32px);
+  flex-shrink: 0;
+  align-self: stretch;
+}
+
+/* ── SVG elements ── */
+
+.svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Vertical segment of end connector: covers top half */
+.svgTop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  pointer-events: none;
+}
+
+/* L-corner + horizontal: anchored at vertical center */
+.svgBottom {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  pointer-events: none;
+}
+
+/* ── Stroke style (shared by all lines) ── */
+
+.stroke {
+  stroke: var(--tree-indent-line-color, var(--element-divider-neutral-default));
+  stroke-width: var(--tree-indent-line-width, 1px);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

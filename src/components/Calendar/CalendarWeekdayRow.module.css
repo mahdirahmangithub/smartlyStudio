@@ -1,0 +1,42 @@
+/* ── Weekday row — Figma 938:22135 (caption/md, py-sm) ── */
+
+.row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: flex-start;
+}
+
+.headerCell {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Match CalendarDateCell .cell — per-column min-width: 4xl made narrow single-month
+     rows overflow while date rows shrank, misaligning headers vs dates */
+  min-width: 0;
+  margin: 0;
+  padding: var(--spacing-sm) var(--spacing-2xs);
+  text-align: center;
+  font-family: var(--type-caption-md-family);
+  font-weight: var(--type-caption-md-weight);
+  font-size: var(--type-caption-md-size);
+  line-height: var(--type-caption-md-line-height);
+  letter-spacing: var(--type-caption-md-letter-spacing);
+  /* Figma 938:22135 — text/neutral/tertiary/default */
+  color: var(--text-neutral-tertiary-default);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -24,6 +24,8 @@ import { Expander } from "../Expander";
 import { DataCellContent } from "../DataCellContent";
 import { Checkbox } from "../Checkbox";
 import { Radio } from "../Radio";
+import { TreeIndent } from "../TreeIndent";
+import { computeConnectorGuides } from "../../utils/treeConnectors";
 import { cx } from "../../utils/cx";
 
 /* ═══════════════════════════════════════════════════════════════
@@ -132,6 +134,10 @@ export interface DataTableProps<T = any> {
   rowDisabled?: (record: T, index: number) => boolean;
   /** Controls cell padding. Columns can override via their own `density` prop. */
   density?: TableDensity;
+  /** Width per tree indent level in px (default 24). Forwarded to TreeIndent. */
+  treeIndentWidth?: number;
+  /** Show tree connector lines (default true). Set false for plain spacing. */
+  treeConnectorLines?: boolean;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -198,6 +204,42 @@ function getDescendantLeafKeys<T>(col: ColumnDef<T>): string[] {
   const out: string[] = [];
   for (const c of col.children) out.push(...getDescendantLeafKeys(c));
   return out;
+}
+
+function findParentGroup<T>(
+  columns: ColumnDef<T>[],
+  leafKey: string,
+  parent: ColumnDef<T> | null = null
+): ColumnDef<T> | null {
+  for (const col of columns) {
+    if (col.key === leafKey) return parent;
+    if (col.children?.length) {
+      const found = findParentGroup(col.children, leafKey, col);
+      if (found !== null) return found;
+    }
+  }
+  return null;
+}
+
+function reorderWithinGroup<T>(
+  columns: ColumnDef<T>[],
+  fromKey: string,
+  toKey: string
+): ColumnDef<T>[] {
+  const fi = columns.findIndex((c) => c.key === fromKey);
+  const ti = columns.findIndex((c) => c.key === toKey);
+  if (fi !== -1 && ti !== -1) {
+    const next = [...columns];
+    const [moved] = next.splice(fi, 1);
+    next.splice(ti, 0, moved);
+    return next;
+  }
+  return columns.map((col) => {
+    if (!col.children?.length) return col;
+    const recursed = reorderWithinGroup(col.children, fromKey, toKey);
+    if (recursed !== col.children) return { ...col, children: recursed };
+    return col;
+  });
 }
 
 interface GroupResizeState {
@@ -306,6 +348,7 @@ interface FlatRow<T = any> {
   depth: number;
   hasChildren: boolean;
   parent: Key | null;
+  isLastChild: boolean;
 }
 
 function flattenTree<T>(
@@ -317,11 +360,13 @@ function flattenTree<T>(
   parent: Key | null = null
 ): FlatRow<T>[] {
   const out: FlatRow<T>[] = [];
-  for (const r of data) {
+  for (let i = 0; i < data.length; i++) {
+    const r = data[i];
     const k = getRowKey(r, rowKey);
     const ch = (r as Record<string, any>)[childField] as T[] | undefined;
     const hasKids = !!ch?.length;
-    out.push({ record: r, key: k, depth, hasChildren: hasKids, parent });
+    const isLast = i === data.length - 1;
+    out.push({ record: r, key: k, depth, hasChildren: hasKids, parent, isLastChild: isLast });
     if (hasKids && expanded.has(k))
       out.push(
         ...flattenTree(ch!, rowKey, childField, expanded, depth + 1, k)
@@ -382,6 +427,8 @@ export function DataTable<T extends Record<string, any>>({
   rowError,
   rowDisabled,
   density = "md",
+  treeIndentWidth,
+  treeConnectorLines,
 }: DataTableProps<T>) {
   const tableRef = useRef<HTMLTableElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -442,15 +489,20 @@ export function DataTable<T extends Record<string, any>>({
 
   /* ── Column order (for column DnD) ── */
   const [colOrder, setColOrder] = useState<string[] | null>(null);
+  const [groupedColOverride, setGroupedColOverride] = useState<ColumnDef<T>[] | null>(null);
+
+  const hasGroups = useMemo(
+    () => columns.some((c) => c.children?.length),
+    [columns]
+  );
 
   const orderedColumns = useMemo(() => {
+    if (hasGroups) return groupedColOverride ?? columns;
     if (!colOrder) return columns;
-    const hasGroups = columns.some((c) => c.children?.length);
-    if (hasGroups) return columns;
     const map = new Map<string, ColumnDef<T>>();
     for (const c of columns) map.set(c.key, c);
     return colOrder.map((k) => map.get(k)!).filter(Boolean);
-  }, [columns, colOrder]);
+  }, [columns, colOrder, hasGroups, groupedColOverride]);
 
   const leafCols = useMemo(
     () => flattenLeafColumns(orderedColumns),
@@ -665,14 +717,26 @@ export function DataTable<T extends Record<string, any>>({
   const flatRows = useMemo<FlatRow<T>[]>(() => {
     if (isTreeData)
       return flattenTree(dataSource, rowKey, childField, expKeys);
-    return dataSource.map((r) => ({
+    return dataSource.map((r, i) => ({
       record: r,
       key: getRowKey(r, rowKey),
       depth: 0,
       hasChildren: false,
       parent: null,
+      isLastChild: i === dataSource.length - 1,
     }));
   }, [dataSource, rowKey, childField, expKeys, isTreeData]);
+
+  /* ── Tree connector guides ── */
+  const connectorGuides = useMemo(
+    () =>
+      isTreeData
+        ? computeConnectorGuides(
+            flatRows.map((r) => ({ depth: r.depth, isLastChild: r.isLastChild }))
+          )
+        : [],
+    [flatRows, isTreeData]
+  );
 
   /* ══════════════════════════════════════════════════════════
      Sorting
@@ -979,14 +1043,43 @@ export function DataTable<T extends Record<string, any>>({
   const [overCol, setOverCol] = useState<string | null>(null);
   const [colDropPosition, setColDropPosition] = useState<"before" | "after">("before");
 
+  const dragColSiblingKeys = useRef<Set<string> | null>(null);
+  const dragIsGroupRef = useRef(false);
+  const dragGroupLeafKeysRef = useRef<Set<string> | null>(null);
+
   const colDragProps = useCallback(
-    (colKey: string) =>
-      columnDragAndDrop
-        ? {
+    (col: ColumnDef<T>) => {
+      const colKey = col.key;
+      const isGroupCol = !!col.children?.length;
+      if (!columnDragAndDrop) return {};
+      return {
             draggable: true,
             onDragStart: (e: ReactDragEvent<HTMLTableCellElement>) => {
               setDragCol(colKey);
               e.dataTransfer.effectAllowed = "move";
+              dragIsGroupRef.current = isGroupCol;
+
+              if (isGroupCol) {
+                dragGroupLeafKeysRef.current = new Set(
+                  getDescendantLeafKeys(col)
+                );
+                const parent = findParentGroup(orderedColumns, colKey);
+                const siblings = parent?.children ?? orderedColumns;
+                dragColSiblingKeys.current = new Set(
+                  siblings.map((c) => c.key)
+                );
+              } else if (hasGroups) {
+                dragGroupLeafKeysRef.current = null;
+                const parent = findParentGroup(orderedColumns, colKey);
+                const siblings = parent?.children ?? orderedColumns;
+                dragColSiblingKeys.current = new Set(
+                  flattenLeafColumns(siblings).map((c) => c.key)
+                );
+              } else {
+                dragGroupLeafKeysRef.current = null;
+                dragColSiblingKeys.current = null;
+              }
+
               const th = e.currentTarget;
               const clone = th.cloneNode(true) as HTMLElement;
               clone.classList.add(styles.colDragGhost);
@@ -1004,14 +1097,39 @@ export function DataTable<T extends Record<string, any>>({
               setTimeout(() => themeRoot.removeChild(clone));
             },
             onDragOver: (e: ReactDragEvent<HTMLTableCellElement>) => {
+              if (
+                dragColSiblingKeys.current &&
+                !dragColSiblingKeys.current.has(colKey)
+              ) {
+                e.dataTransfer.dropEffect = "none";
+                return;
+              }
               e.preventDefault();
-              const isLastCol = colKey === leafCols[leafCols.length - 1]?.key;
-              if (isLastCol) {
-                const rect = e.currentTarget.getBoundingClientRect();
-                const midX = rect.left + rect.width / 2;
-                setColDropPosition(e.clientX < midX ? "before" : "after");
+
+              if (dragIsGroupRef.current) {
+                const parent = findParentGroup(orderedColumns, colKey);
+                const siblings = parent?.children ?? orderedColumns;
+                const isLast = colKey === siblings[siblings.length - 1]?.key;
+                if (isLast) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const midX = rect.left + rect.width / 2;
+                  setColDropPosition(e.clientX < midX ? "before" : "after");
+                } else {
+                  setColDropPosition("before");
+                }
               } else {
-                setColDropPosition("before");
+                const siblingKeys = dragColSiblingKeys.current;
+                const pool = siblingKeys
+                  ? leafCols.filter((c) => siblingKeys.has(c.key))
+                  : leafCols;
+                const isLastInScope = colKey === pool[pool.length - 1]?.key;
+                if (isLastInScope) {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  const midX = rect.left + rect.width / 2;
+                  setColDropPosition(e.clientX < midX ? "before" : "after");
+                } else {
+                  setColDropPosition("before");
+                }
               }
               if (overCol !== colKey) setOverCol(colKey);
             },
@@ -1020,28 +1138,58 @@ export function DataTable<T extends Record<string, any>>({
             },
             onDrop: (e: ReactDragEvent<HTMLTableCellElement>) => {
               e.preventDefault();
+              if (
+                dragColSiblingKeys.current &&
+                !dragColSiblingKeys.current.has(colKey)
+              ) {
+                setDragCol(null);
+                setOverCol(null);
+                dragColSiblingKeys.current = null;
+                dragIsGroupRef.current = false;
+                dragGroupLeafKeysRef.current = null;
+                return;
+              }
               if (dragCol && dragCol !== colKey) {
-                const keys = leafCols.map((c) => c.key);
-                const fi = keys.indexOf(dragCol);
-                const ti = keys.indexOf(colKey);
-                if (fi !== -1 && ti !== -1) {
-                  const next = [...keys];
-                  next.splice(fi, 1);
-                  next.splice(ti, 0, dragCol);
-                  setColOrder(next);
-                  columnDragAndDrop.onReorder?.(fi, ti);
+                if (hasGroups) {
+                  const reordered = reorderWithinGroup(
+                    orderedColumns,
+                    dragCol,
+                    colKey
+                  );
+                  setGroupedColOverride(reordered);
+                  columnDragAndDrop.onReorder?.(
+                    orderedColumns.findIndex((c) => c.key === dragCol),
+                    orderedColumns.findIndex((c) => c.key === colKey)
+                  );
+                } else {
+                  const keys = leafCols.map((c) => c.key);
+                  const fi = keys.indexOf(dragCol);
+                  const ti = keys.indexOf(colKey);
+                  if (fi !== -1 && ti !== -1) {
+                    const next = [...keys];
+                    next.splice(fi, 1);
+                    next.splice(ti, 0, dragCol);
+                    setColOrder(next);
+                    columnDragAndDrop.onReorder?.(fi, ti);
+                  }
                 }
               }
               setDragCol(null);
               setOverCol(null);
+              dragColSiblingKeys.current = null;
+              dragIsGroupRef.current = false;
+              dragGroupLeafKeysRef.current = null;
             },
             onDragEnd: () => {
               setDragCol(null);
               setOverCol(null);
+              dragColSiblingKeys.current = null;
+              dragIsGroupRef.current = false;
+              dragGroupLeafKeysRef.current = null;
             },
-          }
-        : {},
-    [dragCol, overCol, columnDragAndDrop, leafCols]
+          };
+    },
+    [dragCol, overCol, columnDragAndDrop, leafCols, hasGroups, orderedColumns]
   );
 
   /* ══════════════════════════════════════════════════════════
@@ -1270,7 +1418,7 @@ export function DataTable<T extends Record<string, any>>({
                   styles.headerCell,
                   isSortable && styles.sortableHeader,
                   overCol === col.key && (colDropPosition === "before" ? styles.colDragOverBefore : styles.colDragOverAfter),
-                  dragCol === col.key && styles.colBeingDragged,
+                  (dragCol === col.key || (cell.isLeaf && dragGroupLeafKeysRef.current?.has(col.key))) && styles.colBeingDragged,
                   cell.isLeaf && cellStickyClass(col),
                   hasSelection && allSelected && styles.cellChecked,
                   cell.isLeaf && col.density && CELL_DENSITY_CLASS[col.density]
@@ -1282,7 +1430,7 @@ export function DataTable<T extends Record<string, any>>({
                 }}
                 onClick={isSortable ? () => { if (!didResize.current) cycleSort(col.key); } : undefined}
                 {...(cell.isLeaf ? col.onHeaderCell?.() : {})}
-                {...(cell.isLeaf ? colDragProps(col.key) : {})}
+                {...(columnDragAndDrop ? colDragProps(col) : {})}
               >
                 <DataCellContent
                   title={col.title}
@@ -1444,7 +1592,7 @@ export function DataTable<T extends Record<string, any>>({
                         isRowError && styles.cellError,
                         isRowDisabled && styles.cellDisabled,
                         col.density && CELL_DENSITY_CLASS[col.density],
-                        dragCol === col.key && styles.colBeingDragged
+                        (dragCol === col.key || dragGroupLeafKeysRef.current?.has(col.key)) && styles.colBeingDragged
                       )}
                       {...cellProps}
                     >
@@ -1472,11 +1620,10 @@ export function DataTable<T extends Record<string, any>>({
                           )
                         ) : undefined;
 
+                        const needsTreeIndent = isFirst && isTreeData;
+
                         let expandBtnSlot: ReactNode = undefined;
                         if (isTreeData || showExpandCol) {
-                          const indent = isTreeData && depth > 0 ? (
-                            <span className={styles.treeIndent} style={{ width: depth * indentSize }} />
-                          ) : null;
                           const btn = ((showExpandCol && canExpand) || treeCanExpand) ? (
                             <IconButton
                               size="md"
@@ -1491,26 +1638,40 @@ export function DataTable<T extends Record<string, any>>({
                           ) : ((showExpandCol || (isTreeData && !treeCanExpand)) ? (
                             <span className={styles.treeLeafSpacer} />
                           ) : null);
-                          if (indent && btn) {
-                            expandBtnSlot = <span style={{ display: 'inline-flex', alignItems: 'center' }}>{indent}{btn}</span>;
-                          } else {
-                            expandBtnSlot = indent || btn || undefined;
-                          }
+                          expandBtnSlot = btn || undefined;
                         }
 
+                        const guide = needsTreeIndent && depth > 0 ? connectorGuides[rowIdx] : null;
+
+                        let cellContent: ReactNode;
                         if (isValidElement(raw) && (raw as ReactElement).type === DataCellContent) {
-                          return cloneElement(raw as ReactElement<any>, {
+                          cellContent = cloneElement(raw as ReactElement<any>, {
                             switchSlot: switchSlot ?? (raw as ReactElement<any>).props.switchSlot,
                             expandButton: expandBtnSlot ?? (raw as ReactElement<any>).props.expandButton,
                           });
+                        } else {
+                          cellContent = (
+                            <DataCellContent
+                              switchSlot={switchSlot}
+                              expandButton={expandBtnSlot}
+                              title={raw}
+                            />
+                          );
                         }
-                        return (
-                          <DataCellContent
-                            switchSlot={switchSlot}
-                            expandButton={expandBtnSlot}
-                            title={raw}
-                          />
-                        );
+
+                        if (guide) {
+                          return (
+                            <div className={styles.treeCell}>
+                              <TreeIndent
+                                guide={guide}
+                                cellWidth={treeIndentWidth ?? indentSize}
+                                showLines={treeConnectorLines}
+                              />
+                              {cellContent}
+                            </div>
+                          );
+                        }
+                        return cellContent;
                       })()}
                     </td>
                   );

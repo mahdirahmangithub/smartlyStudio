@@ -1,10 +1,12 @@
-import { useState, useCallback, type CSSProperties } from "react";
+import { useState, useCallback, useMemo, type CSSProperties } from "react";
 import { DataTable, type ColumnDef, type SortState, type TableDensity } from "../components/DataTable";
 import { DataCellContent } from "../components/DataCellContent";
 import { RowContainer } from "../components/RowContainer";
 import { Badge } from "../components/Badge";
 import { Icon } from "../components/Icon";
 import { IconButton } from "../components/IconButton";
+import { TreeIndent } from "../components/TreeIndent";
+import { computeConnectorGuides, type ConnectorType } from "../utils/treeConnectors";
 
 /* ═══════════════════════════════════════════════════════════════
    Shared layout styles (mirrors other playground pages)
@@ -594,6 +596,9 @@ function ExpandableDemo({ density }: { density: TableDensity }) {
 }
 
 function TreeDemo({ density }: { density: TableDensity }) {
+  const [showConnectors, setShowConnectors] = useState(true);
+  const [indentWidth, setIndentWidth] = useState(32);
+
   const columns: ColumnDef<TreeRow>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 250,
       render: (v: string) => <DataCellContent title={v} />,
@@ -604,13 +609,35 @@ function TreeDemo({ density }: { density: TableDensity }) {
   ];
 
   return (
-    <DataTable<TreeRow>
-      columns={columns}
-      dataSource={TREE_DATA}
-      rowKey="id"
-      density={density}
-      expandable={{ defaultExpandedRowKeys: [1] }}
-    />
+    <>
+      <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 8 }}>
+        <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+          <input type="checkbox" checked={showConnectors} onChange={(e) => setShowConnectors(e.target.checked)} />
+          Show connector lines
+        </label>
+        <label style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+          Indent width:
+          <input
+            type="range"
+            min={12}
+            max={48}
+            value={indentWidth}
+            onChange={(e) => setIndentWidth(Number(e.target.value))}
+            style={{ width: 100 }}
+          />
+          <span style={{ minWidth: 30 }}>{indentWidth}px</span>
+        </label>
+      </div>
+      <DataTable<TreeRow>
+        columns={columns}
+        dataSource={TREE_DATA}
+        rowKey="id"
+        density={density}
+        expandable={{ defaultExpandedRowKeys: [1, 2, 11, 12, 21, 22] }}
+        treeConnectorLines={showConnectors}
+        treeIndentWidth={indentWidth}
+      />
+    </>
   );
 }
 
@@ -1071,6 +1098,205 @@ function DeepHeaderGroupDemo({ density }: { density: TableDensity }) {
   );
 }
 
+/* ── Grouped Header Column DnD demo ── */
+
+interface ProjectRow {
+  id: number;
+  project: string;
+  lead: string;
+  startDate: string;
+  endDate: string;
+  budget: number;
+  spent: number;
+  priority: string;
+  status: string;
+}
+
+const PROJECT_DATA: ProjectRow[] = [
+  { id: 1, project: "Website Redesign", lead: "Alice", startDate: "2025-01-15", endDate: "2025-06-30", budget: 120000, spent: 87000, priority: "High", status: "In Progress" },
+  { id: 2, project: "Mobile App v2", lead: "Bob", startDate: "2025-03-01", endDate: "2025-09-15", budget: 200000, spent: 45000, priority: "Critical", status: "In Progress" },
+  { id: 3, project: "Data Pipeline", lead: "Charlie", startDate: "2025-02-10", endDate: "2025-05-20", budget: 85000, spent: 82000, priority: "Medium", status: "Review" },
+  { id: 4, project: "Auth Service", lead: "Diana", startDate: "2025-04-01", endDate: "2025-07-31", budget: 60000, spent: 12000, priority: "High", status: "Planning" },
+  { id: 5, project: "Analytics Dashboard", lead: "Eve", startDate: "2025-01-20", endDate: "2025-04-30", budget: 95000, spent: 91000, priority: "Low", status: "Complete" },
+];
+
+function GroupedHeaderColDnDDemo({ density }: { density: TableDensity }) {
+  const fmt = (v: number) => `$${v.toLocaleString()}`;
+
+  const columns: ColumnDef<ProjectRow>[] = [
+    {
+      key: "overview",
+      title: "Overview",
+      children: [
+        { key: "project", title: "Project", dataIndex: "project", width: 170,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
+        { key: "lead", title: "Lead", dataIndex: "lead", width: 110,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
+        { key: "status", title: "Status", dataIndex: "status", width: 120,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
+      ],
+    },
+    {
+      key: "schedule",
+      title: "Schedule",
+      children: [
+        { key: "startDate", title: "Start", dataIndex: "startDate", width: 120,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
+        { key: "endDate", title: "End", dataIndex: "endDate", width: 120,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
+        { key: "priority", title: "Priority", dataIndex: "priority", width: 100,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
+      ],
+    },
+    {
+      key: "financials",
+      title: "Financials",
+      children: [
+        { key: "budget", title: "Budget", dataIndex: "budget", width: 120, align: "right",
+          render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+        },
+        { key: "spent", title: "Spent", dataIndex: "spent", width: 120, align: "right",
+          render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+        },
+      ],
+    },
+  ];
+
+  return (
+    <>
+      <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+        Drag sub-column headers to reorder them <strong>within their parent group</strong> — columns cannot cross group
+        boundaries. You can also drag <strong>parent group headers</strong> (Overview, Schedule, Financials) to reorder
+        entire groups. All descendant columns move with the group.
+      </p>
+      <DataTable<ProjectRow>
+        columns={columns}
+        dataSource={PROJECT_DATA}
+        rowKey="id"
+        density={density}
+        columnDragAndDrop={{ onReorder: (from, to) => console.log("grouped col move", from, to) }}
+      />
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Standalone TreeIndent Demo
+   ═══════════════════════════════════════════════════════════════ */
+
+interface FileNode {
+  name: string;
+  type: "folder" | "file";
+  children?: FileNode[];
+}
+
+const FILE_TREE: FileNode[] = [
+  {
+    name: "src", type: "folder", children: [
+      {
+        name: "components", type: "folder", children: [
+          { name: "Button.tsx", type: "file" },
+          { name: "Input.tsx", type: "file" },
+          { name: "Modal.tsx", type: "file" },
+        ],
+      },
+      {
+        name: "hooks", type: "folder", children: [
+          { name: "useAuth.ts", type: "file" },
+          { name: "useFetch.ts", type: "file" },
+        ],
+      },
+      { name: "App.tsx", type: "file" },
+      { name: "index.ts", type: "file" },
+    ],
+  },
+  {
+    name: "public", type: "folder", children: [
+      { name: "favicon.ico", type: "file" },
+    ],
+  },
+  { name: "package.json", type: "file" },
+  { name: "README.md", type: "file" },
+];
+
+interface FlatFile { name: string; type: "folder" | "file"; depth: number; isLastChild: boolean }
+
+function flattenFiles(nodes: FileNode[], depth = 0): FlatFile[] {
+  const out: FlatFile[] = [];
+  nodes.forEach((n, i) => {
+    const isLast = i === nodes.length - 1;
+    out.push({ name: n.name, type: n.type, depth, isLastChild: isLast });
+    if (n.children) out.push(...flattenFiles(n.children, depth + 1));
+  });
+  return out;
+}
+
+function StandaloneTreeIndentDemo() {
+  const flat = useMemo(() => flattenFiles(FILE_TREE), []);
+  const guides = useMemo(
+    () => computeConnectorGuides(flat.map((f) => ({ depth: f.depth, isLastChild: f.isLastChild }))),
+    [flat]
+  );
+
+  return (
+    <div style={{ display: "flex", gap: 32, flexWrap: "wrap" }}>
+      {/* With connector lines */}
+      <div>
+        <h4 style={{ margin: "0 0 8px" }}>With connector lines</h4>
+        <div style={{ fontFamily: "var(--type-body-md-family, monospace)", fontSize: 13 }}>
+          {flat.map((f, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "stretch", height: 28 }}>
+              <TreeIndent guide={guides[i]} cellWidth={20} />
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <Icon name={f.type === "folder" ? "folder" : "description"} size={16} />
+                {f.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Without lines (plain indent) */}
+      <div>
+        <h4 style={{ margin: "0 0 8px" }}>Without lines (plain indent)</h4>
+        <div style={{ fontFamily: "var(--type-body-md-family, monospace)", fontSize: 13 }}>
+          {flat.map((f, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "stretch", height: 28 }}>
+              <TreeIndent guide={guides[i]} cellWidth={20} showLines={false} />
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <Icon name={f.type === "folder" ? "folder" : "description"} size={16} />
+                {f.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Wider cells */}
+      <div>
+        <h4 style={{ margin: "0 0 8px" }}>Wider indent (cellWidth=32)</h4>
+        <div style={{ fontFamily: "var(--type-body-md-family, monospace)", fontSize: 13 }}>
+          {flat.map((f, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "stretch", height: 28 }}>
+              <TreeIndent guide={guides[i]} cellWidth={32} />
+              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <Icon name={f.type === "folder" ? "folder" : "description"} size={16} />
+                {f.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════
    Playground Page
    ═══════════════════════════════════════════════════════════════ */
@@ -1154,7 +1380,19 @@ export default function DataTablePlayground() {
 
       <section style={sectionStyle}>
         <h2>Tree / Hierarchical Data</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Tree rows with connector lines showing parent–child relationships. Uses the reusable <code>TreeIndent</code> component.
+        </p>
         <div style={cardStyle}><TreeDemo density={density} /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>TreeIndent (Standalone)</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          The <code>TreeIndent</code> component is reusable outside of DataTable.
+          File explorer example showing connector lines, plain indent, and custom cell width.
+        </p>
+        <div style={cardStyle}><StandaloneTreeIndentDemo /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1209,6 +1447,11 @@ export default function DataTablePlayground() {
           with "Compensation" further split into "Base" and "Equity" sub-groups.
         </p>
         <div style={cardStyle}><DeepHeaderGroupDemo density={density} /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Grouped Header Column Drag &amp; Drop</h2>
+        <div style={cardStyle}><GroupedHeaderColDnDDemo density={density} /></div>
       </section>
       </div>
     </div>
