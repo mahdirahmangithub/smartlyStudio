@@ -36,6 +36,8 @@ export interface ChartLegendProps<D> {
   onToggle?: (id: string) => void;
   onSeriesHover?: (id: string | null) => void;
   layout?: LegendLayout;
+  /** Start in collapsed state. */
+  defaultCollapsed?: boolean;
 }
 
 /* ── Expanded legend chips (individual series toggles) ────────────── */
@@ -223,8 +225,9 @@ export function ChartLegend<D>({
   onToggle,
   onSeriesHover,
   layout = "wrap",
+  defaultCollapsed = false,
 }: ChartLegendProps<D>) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(!defaultCollapsed);
 
   if (expanded) {
     return (

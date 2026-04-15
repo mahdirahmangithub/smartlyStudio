@@ -60,6 +60,8 @@ export interface PieChartProps {
   /** Custom value formatter for tooltip. */
   tooltipValueFormat?: (value: number) => string;
   showLegend?: boolean;
+  /** Start the legend in collapsed state. */
+  legendDefaultCollapsed?: boolean;
   /** Animate on mount. */
   animate?: boolean;
   /** Sort slices by value. */
@@ -95,6 +97,7 @@ function PieChartInner({
   showTooltip = true,
   tooltipValueFormat,
   showLegend = true,
+  legendDefaultCollapsed = false,
   animate = true,
   sortSlices = "none",
   activeSliceId,
@@ -408,6 +411,7 @@ function PieChartInner({
             hiddenSeries={hiddenSeries}
             onToggle={toggleSeries}
             onSeriesHover={setLegendHoveredId}
+            defaultCollapsed={legendDefaultCollapsed}
           />
         )}
       </div>

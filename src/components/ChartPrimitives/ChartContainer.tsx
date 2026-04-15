@@ -67,6 +67,8 @@ export interface ChartContainerProps<D = any> {
   edgeFade?: boolean;
   edgeFadeWidth?: number;
   showLegend?: boolean;
+  /** Start the legend in collapsed state. */
+  legendDefaultCollapsed?: boolean;
   legendLayout?: LegendLayout;
   showTooltip?: boolean;
   enableZoom?: boolean;
@@ -101,6 +103,7 @@ function ChartContainerInner<D>({
   edgeFade = false,
   edgeFadeWidth = 40,
   showLegend = true,
+  legendDefaultCollapsed = false,
   legendLayout,
   showTooltip = true,
   enableZoom = false,
@@ -584,6 +587,7 @@ function ChartContainerInner<D>({
             onToggle={toggleSeries}
             onSeriesHover={setLegendHoveredId}
             layout={legendLayout}
+            defaultCollapsed={legendDefaultCollapsed}
           />
         )}
       </div>

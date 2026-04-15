@@ -83,6 +83,7 @@ import BodyTextPlayground from "./pages/BodyTextPlayground";
 import BarChartPlayground from "./pages/BarChartPlayground";
 import ChartLegendPlayground from "./pages/ChartLegendPlayground";
 import LineChartPlayground from "./pages/LineChartPlayground";
+import MonochromeChartsPlayground from "./pages/MonochromeChartsPlayground";
 import PieChartPlayground from "./pages/PieChartPlayground";
 import PopoverPlayground from "./pages/PopoverPlayground";
 import ProgressBarPlayground from "./pages/ProgressBarPlayground";
@@ -388,6 +389,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "label", label: "Label" },
   { key: "line-chart", label: "LineChart" },
   { key: "link", label: "Link" },
+  { key: "mono-charts", label: "MonoCharts" },
   { key: "modal", label: "Modal" },
   { key: "multi-select-input", label: "MultiSelectInput" },
   { key: "multi-select-option", label: "MultiSelectOpt" },
@@ -632,6 +634,7 @@ export default function App() {
             {page === "bar-chart" && <BarChartPlayground />}
             {page === "chart-legend" && <ChartLegendPlayground />}
             {page === "line-chart" && <LineChartPlayground />}
+            {page === "mono-charts" && <MonochromeChartsPlayground />}
             {page === "pie-chart" && <PieChartPlayground />}
             {page === "popover" && <PopoverPlayground />}
             {page === "progress-bar" && <ProgressBarPlayground />}

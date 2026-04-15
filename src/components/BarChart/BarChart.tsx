@@ -87,6 +87,8 @@ export interface BarChartProps<D = any> {
   showXGrid?: boolean;
   showAxes?: boolean;
   showLegend?: boolean;
+  /** Start the legend in collapsed state. */
+  legendDefaultCollapsed?: boolean;
   showTooltip?: boolean;
   margin?: Margin;
   height?: number;
@@ -118,6 +120,7 @@ function BarChartInner<D>({
   showXGrid,
   showAxes = true,
   showLegend = true,
+  legendDefaultCollapsed = false,
   showTooltip = true,
   margin = DEFAULT_MARGIN,
   width,
@@ -657,6 +660,7 @@ function BarChartInner<D>({
             hiddenSeries={hiddenSeries}
             onToggle={toggleSeries}
             onSeriesHover={setLegendHoveredId}
+            defaultCollapsed={legendDefaultCollapsed}
           />
         )}
       </div>

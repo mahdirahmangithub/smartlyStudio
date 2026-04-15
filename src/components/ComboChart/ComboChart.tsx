@@ -90,6 +90,8 @@ export interface ComboChartProps<D = any> {
   showXGrid?: boolean;
   showAxes?: boolean;
   showLegend?: boolean;
+  /** Start the legend in collapsed state. */
+  legendDefaultCollapsed?: boolean;
   showTooltip?: boolean;
   margin?: Margin;
   height?: number;
@@ -129,6 +131,7 @@ function ComboChartInner<D>({
   showXGrid,
   showAxes = true,
   showLegend = true,
+  legendDefaultCollapsed = false,
   showTooltip = true,
   margin = DEFAULT_MARGIN,
   width,
@@ -676,6 +679,7 @@ function ComboChartInner<D>({
             hiddenSeries={hiddenSeries}
             onToggle={toggleSeries}
             onSeriesHover={setLegendHoveredId}
+            defaultCollapsed={legendDefaultCollapsed}
           />
         )}
       </div>
