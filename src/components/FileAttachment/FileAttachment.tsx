@@ -2,16 +2,33 @@ import { forwardRef, type ReactNode, type HTMLAttributes } from "react";
 import { InputClear } from "../InputClear";
 import { Icon } from "../Icon";
 import { Tooltip } from "../Tooltip";
+import { FileTypeThumbnail, type FileType } from "../FileTypeThumbnail";
+import type { ThumbnailSize } from "../Thumbnail";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
 import styles from "./FileAttachment.module.css";
 import { cx } from "../../utils/cx";
+import {
+  inferFileTypeFromFile,
+  inferFileTypeFromFileName,
+} from "../../utils/inferFileType";
 
 export type FileAttachmentState = "normal" | "loading" | "error";
 
 export interface FileAttachmentProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "title" | "children"> {
-  /** The thumbnail component (Thumbnail, FileTypeThumbnail, etc.) */
-  thumbnail: ReactNode;
+  /**
+   * Custom thumbnail (Thumbnail, FileTypeThumbnail, etc.).
+   * When omitted, pass `file` and/or `fileName` to render {@link FileTypeThumbnail} from shared inference.
+   */
+  thumbnail?: ReactNode;
+  /** When set without `thumbnail`, infers icon via MIME/name (see `inferFileTypeFromFile`). */
+  file?: File;
+  /** When set without `thumbnail`, infers icon from extension (see `inferFileTypeFromFileName`). */
+  fileName?: string;
+  /** Overrides inferred type for the auto {@link FileTypeThumbnail}. */
+  fileType?: FileType;
+  /** Size for the auto {@link FileTypeThumbnail} (default `md`). */
+  autoThumbnailSize?: ThumbnailSize;
   state?: FileAttachmentState;
   /** File name — always used for tooltip; visible text in expanded mode */
   title?: string;
@@ -28,6 +45,10 @@ export const FileAttachment = forwardRef<HTMLDivElement, FileAttachmentProps>(
   (
     {
       thumbnail,
+      file,
+      fileName,
+      fileType,
+      autoThumbnailSize = "md",
       state = "normal",
       title,
       description,
@@ -38,6 +59,25 @@ export const FileAttachment = forwardRef<HTMLDivElement, FileAttachmentProps>(
     },
     ref
   ) => {
+    const resolvedThumbnail: ReactNode =
+      thumbnail !== undefined
+        ? thumbnail
+        : file != null
+          ? (
+              <FileTypeThumbnail
+                size={autoThumbnailSize}
+                fileType={fileType ?? inferFileTypeFromFile(file)}
+              />
+            )
+          : fileName != null && fileName !== ""
+            ? (
+                <FileTypeThumbnail
+                  size={autoThumbnailSize}
+                  fileType={fileType ?? inferFileTypeFromFileName(fileName)}
+                />
+              )
+            : null;
+
     const isExpanded = !!description;
     const isError = state === "error";
 
@@ -62,7 +102,7 @@ export const FileAttachment = forwardRef<HTMLDivElement, FileAttachmentProps>(
       >
         {/* thumbnail + error retry overlay */}
         <div className={styles.thumbnailSlot}>
-          {thumbnail}
+          {resolvedThumbnail}
           {isError && (
             <div
               className={styles.retryOverlay}

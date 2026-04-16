@@ -1,0 +1,12 @@
+/* Full gap hit target when visual debug is on (token-based). */
+.hitRect {
+  background: color-mix(
+    in srgb,
+    var(--element-fill-neutral-secondary-default) 55%,
+    transparent
+  );
+}
+
+.debugSvg {
+  pointer-events: none;
+}

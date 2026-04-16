@@ -89,6 +89,8 @@ export interface ChartContainerProps<D = any> {
   className?: string;
   ariaLabel?: string;
   children: (ctx: ChartRenderContext<D>) => React.ReactNode;
+  /** Render HTML content positioned over the chart area (e.g. persistent annotations). */
+  htmlOverlay?: (ctx: ChartRenderContext<D>) => React.ReactNode;
 }
 
 function ChartContainerInner<D>({
@@ -125,6 +127,7 @@ function ChartContainerInner<D>({
   className,
   ariaLabel = "Chart",
   children,
+  htmlOverlay,
 }: ChartContainerProps<D> & { width: number; height: number }) {
   const [hiddenSeries, setHiddenSeries] = useState<Set<string>>(new Set());
   const [legendHoveredId, setLegendHoveredId] = useState<string | null>(null);
@@ -564,6 +567,8 @@ function ChartContainerInner<D>({
             offsetTop={effectiveMargin.top}
           />
         )}
+
+        {htmlOverlay?.(ctx)}
 
         {enableBrush && (
           <ChartBrush

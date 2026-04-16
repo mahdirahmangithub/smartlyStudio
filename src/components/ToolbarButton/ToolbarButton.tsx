@@ -143,6 +143,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         shortcut={tooltipShortcut}
         placement={tooltipPlacement}
         disabled={suppressTooltip}
+        disableInteractive
       >
         {button}
       </ShortcutTooltip>
@@ -152,6 +153,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         showTail={false}
         placement={tooltipPlacement}
         disabled={suppressTooltip}
+        disableInteractive
       >
         {button}
       </Tooltip>

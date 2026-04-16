@@ -46,7 +46,7 @@ export function IconBadge({
 
   if (ariaLabel) {
     return (
-      <Tooltip type="inverse" showTail={false} placement="top" label={ariaLabel}>
+      <Tooltip type="inverse" showTail={false} placement="top" label={ariaLabel} disableInteractive>
         {badge}
       </Tooltip>
     );

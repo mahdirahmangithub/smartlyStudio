@@ -49,6 +49,11 @@
   outline: none;
 }
 
+.content.noFocusRing:focus-visible {
+  box-shadow: none;
+  outline: none;
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    CHECKED interactive states
    ═══════════════════════════════════════════════════════════════════════ */
@@ -70,6 +75,11 @@
   box-shadow:
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
     0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
+}
+
+.content.noFocusRing.checked:focus-visible {
+  box-shadow: none;
   outline: none;
 }
 

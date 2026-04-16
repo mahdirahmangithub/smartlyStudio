@@ -12,6 +12,8 @@ export interface AddItemOptionProps
   itemText?: string;
   /** Adjusts left padding to align with multi-select option rows that have a checkbox */
   multiSelect?: boolean;
+  /** When true, omits the focus-visible ring (hover/press backgrounds unchanged). */
+  hideFocusRing?: boolean;
   onClick?: () => void;
 }
 
@@ -21,6 +23,7 @@ export function AddItemOption({
   labelText = "Add",
   itemText = "Item",
   multiSelect = false,
+  hideFocusRing = true,
   onClick,
   className,
   ...rest
@@ -46,7 +49,8 @@ export function AddItemOption({
         className={cx(
           styles.content,
           multiSelect && styles.multiSelect,
-          disabled && styles.disabled
+          disabled && styles.disabled,
+          hideFocusRing && styles.noFocusRing
         )}
         onClick={handleClick}
         onKeyDown={handleKeyDown}

@@ -37,6 +37,11 @@
   background: var(--element-fill-neutral-tertiary-hover);
 }
 
+/* Combobox / listbox active descendant (focus stays in field). */
+.content.active:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-hover);
+}
+
 .content:active:not(.disabled) {
   background: var(--element-fill-neutral-tertiary-press);
 }
@@ -46,6 +51,12 @@
   box-shadow:
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
     0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
+}
+
+/* Optional: menus that manage focus for roving keys but should not show a focus ring. */
+.content.noFocusRing:focus-visible {
+  box-shadow: none;
   outline: none;
 }
 
@@ -70,6 +81,11 @@
   box-shadow:
     0 0 0 var(--spacing-2xs) var(--element-surface-over),
     0 0 0 var(--spacing-xs) var(--element-outline-neutral-default);
+  outline: none;
+}
+
+.alert.noFocusRing:focus-visible {
+  box-shadow: none;
   outline: none;
 }
 

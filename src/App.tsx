@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { Icon, searchIcons, getCategories } from "./components/Icon";
 import type { IconCategory, IconEntry } from "./components/Icon";
 import { ContentSwitcher } from "./components/ContentSwitcher";
@@ -51,6 +51,7 @@ import TagSingleSelectOptionPlayground from "./pages/TagSingleSelectOptionPlaygr
 import AddItemOptionPlayground from "./pages/AddItemOptionPlayground";
 import OptionSeparatorPlayground from "./pages/OptionSeparatorPlayground";
 import InlineInputPlayground from "./pages/InlineInputPlayground";
+import InlineTextareaPlayground from "./pages/InlineTextareaPlayground";
 import SearchInputAttachmentPlayground from "./pages/SearchInputAttachmentPlayground";
 import SearchInputPlayground from "./pages/SearchInputPlayground";
 import SelectOptionHeaderPlayground from "./pages/SelectOptionHeaderPlayground";
@@ -87,6 +88,7 @@ import MonochromeChartsPlayground from "./pages/MonochromeChartsPlayground";
 import PieChartPlayground from "./pages/PieChartPlayground";
 import PopoverPlayground from "./pages/PopoverPlayground";
 import ProgressBarPlayground from "./pages/ProgressBarPlayground";
+import PromptInputPlayground from "./pages/PromptInputPlayground";
 import LinkPlayground from "./pages/LinkPlayground";
 import TextShowcase from "./pages/TextShowcase";
 import TextareaPlayground from "./pages/TextareaPlayground";
@@ -137,6 +139,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "code-block"
 | "copy-button"
 | "inline-code"
+| "inline-textarea"
 | "icon-container"
 | "illustration"
 | "bar-chart"
@@ -145,6 +148,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "pie-chart"
 | "popover"
 | "progress-bar"
+| "prompt-input"
 | "breadcrumb"
 | "dimmer"
 | "drag-handle"
@@ -383,6 +387,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "inline-code", label: "InlineCode" },
   { key: "inline-input", label: "InlineInput" },
   { key: "inline-message", label: "InlineMessage" },
+  { key: "inline-textarea", label: "InlineTextarea" },
   { key: "input", label: "Input" },
   { key: "input-clear", label: "InputClear" },
   { key: "keyboard-shortcut", label: "KbdShortcut" },
@@ -408,6 +413,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "pie-chart", label: "PieChart" },
   { key: "popover", label: "Popover" },
   { key: "progress-bar", label: "ProgressBar" },
+  { key: "prompt-input", label: "PromptInput" },
   { key: "radio", label: "Radio" },
   { key: "row-container", label: "RowContainer" },
   { key: "scroll-fade", label: "ScrollFade" },
@@ -473,13 +479,49 @@ export default function App() {
     return PAGES.filter((p) => p.label.toLowerCase().includes(q) || p.key.toLowerCase().includes(q));
   }, [navSearch]);
 
+  const searchRef = useRef<HTMLInputElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+
+  const handleSidebarKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const nav = navRef.current;
+      if (!nav) return;
+      const buttons = Array.from(nav.querySelectorAll<HTMLButtonElement>("button"));
+      if (!buttons.length) return;
+
+      const isSearch = e.target === searchRef.current;
+      const btnIdx = buttons.indexOf(e.target as HTMLButtonElement);
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        if (isSearch) {
+          buttons[0]?.focus();
+        } else if (btnIdx >= 0 && btnIdx < buttons.length - 1) {
+          buttons[btnIdx + 1].focus();
+        }
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        if (btnIdx === 0) {
+          searchRef.current?.focus();
+        } else if (btnIdx > 0) {
+          buttons[btnIdx - 1].focus();
+        }
+      } else if (e.key === "Enter" && isSearch && buttons.length > 0) {
+        e.preventDefault();
+        setPage(filteredPages[0].key);
+      }
+    },
+    [filteredPages, setPage],
+  );
+
   return (
     <div className="app" data-theme={theme} data-density={density} data-typeface={typeface}>
       <div className="app-shell">
         {sidebarOpen && <div className="sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
-        <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`}>
+        <aside className={`app-sidebar ${sidebarOpen ? "open" : ""}`} onKeyDown={handleSidebarKeyDown}>
           <div className="sidebar-search">
             <input
+              ref={searchRef}
               type="text"
               className="sidebar-search-input"
               placeholder="Search…"
@@ -487,12 +529,13 @@ export default function App() {
               onChange={(e) => setNavSearch(e.target.value)}
             />
           </div>
-          <nav className="sidebar-nav">
+          <nav className="sidebar-nav" ref={navRef}>
             {filteredPages.map((p) => (
               <button
                 key={p.key}
                 className={`sidebar-btn ${page === p.key ? "active" : ""}`}
                 onClick={() => setPage(p.key)}
+                tabIndex={-1}
               >
                 {p.label}
               </button>
@@ -627,6 +670,7 @@ export default function App() {
             {page === "combobox" && <ComboboxPlayground />}
             {page === "slider" && <SliderPlayground />}
             {page === "inline-message" && <InlineMessagePlayground />}
+            {page === "inline-textarea" && <InlineTextareaPlayground />}
             {page === "modal" && <ModalPlayground />}
             {page === "fieldset" && <FieldsetPlayground />}
             {page === "title-text" && <TitleTextPlayground />}
@@ -638,6 +682,7 @@ export default function App() {
             {page === "pie-chart" && <PieChartPlayground />}
             {page === "popover" && <PopoverPlayground />}
             {page === "progress-bar" && <ProgressBarPlayground />}
+            {page === "prompt-input" && <PromptInputPlayground />}
             {page === "link" && <LinkPlayground />}
             {page === "text-showcase" && <TextShowcase />}
             {page === "textarea" && <TextareaPlayground />}

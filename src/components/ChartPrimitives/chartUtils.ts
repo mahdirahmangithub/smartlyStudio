@@ -32,6 +32,23 @@ export interface Series<D = any> {
   fillPattern?: BarFillPattern;
 }
 
+export interface ChartAnnotation {
+  /** X value on the scale (e.g. a Date for time-series charts). */
+  x: Date | number;
+  /** Y value on the scale. */
+  y: number;
+  /** Primary label shown in the tooltip. */
+  label: string;
+  /** Optional secondary text. */
+  description?: string;
+  /** Dot color — defaults to the first series color. */
+  color?: string;
+  /** Tooltip placement relative to the dot. */
+  placement?: "top" | "bottom" | "left" | "right";
+  /** Series id to bind to (uses that series' y-axis and color). */
+  seriesId?: string;
+}
+
 export interface Margin {
   top: number;
   right: number;

@@ -14,6 +14,8 @@ export interface NavigationSelectOptionProps
   leading?: ReactNode;
   /** Marks this option as currently selected */
   selected?: boolean;
+  /** When true, omits the focus-visible ring (hover/press backgrounds unchanged). */
+  hideFocusRing?: boolean;
   onClick?: () => void;
 }
 
@@ -23,6 +25,7 @@ export function NavigationSelectOption({
   labelText = "Label",
   leading,
   selected = false,
+  hideFocusRing = true,
   onClick,
   className,
   ...rest
@@ -48,7 +51,7 @@ export function NavigationSelectOption({
         aria-selected={selected}
         aria-disabled={disabled || undefined}
         tabIndex={disabled ? -1 : 0}
-        className={cx(styles.content, selected && styles.selected, disabled && styles.disabled)}
+        className={cx(styles.content, selected && styles.selected, disabled && styles.disabled, hideFocusRing && styles.noFocusRing)}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
       >

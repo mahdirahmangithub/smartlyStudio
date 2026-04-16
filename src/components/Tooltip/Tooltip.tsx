@@ -56,6 +56,17 @@ export interface TooltipProps {
   showTail?: boolean;
   className?: string;
   disabled?: boolean;
+  /**
+   * When true, the floating tooltip does not receive pointer events (like MUI `disableInteractive`).
+   * Hover cannot “move onto” the tooltip to keep it open; dismiss follows trigger leave + hideDelay only.
+   * Ignored for `anchor="cursor"` (already non-interactive). Default false for backward compatibility.
+   */
+  disableInteractive?: boolean;
+  /**
+   * When true, pointer down outside the trigger and floating layer queues a close (same hide delay as leave).
+   * Default false so existing consumers (e.g. controlled chart tooltips) stay unchanged unless opted in.
+   */
+  closeOnPointerDownOutside?: boolean;
 }
 
 /* ═══════════════════════════════════════════════════════════════════ */
@@ -406,6 +417,8 @@ export function Tooltip({
   showTail = true,
   className,
   disabled = false,
+  disableInteractive = false,
+  closeOnPointerDownOutside = false,
 }: TooltipProps) {
   const tooltipId = useId();
   const config = useTooltipConfig();
@@ -613,6 +626,17 @@ export function Tooltip({
     }
   }, [isOpen, isControlled, effectiveHideDelay, setOpen]);
 
+  /** Close path that respects hideDelay for both controlled and uncontrolled (e.g. outside pointer). */
+  const queueHide = useCallback(() => {
+    clearTimeout(showTimerRef.current);
+    if (!isOpen || disabled) return;
+    if (effectiveHideDelay <= 0) {
+      setOpen(false);
+    } else {
+      hideTimerRef.current = window.setTimeout(() => setOpen(false), effectiveHideDelay);
+    }
+  }, [isOpen, disabled, effectiveHideDelay, setOpen]);
+
   useEffect(
     () => () => {
       clearTimeout(showTimerRef.current);
@@ -620,6 +644,19 @@ export function Tooltip({
     },
     [],
   );
+
+  useEffect(() => {
+    if (!closeOnPointerDownOutside || !isMounted || !isOpen) return;
+
+    const handler = (e: PointerEvent) => {
+      const t = e.target as Node;
+      if (triggerRef.current?.contains(t) || floatingRef.current?.contains(t)) return;
+      queueHide();
+    };
+
+    document.addEventListener("pointerdown", handler, true);
+    return () => document.removeEventListener("pointerdown", handler, true);
+  }, [closeOnPointerDownOutside, isMounted, isOpen, queueHide]);
 
   /* ── event handlers ─────────────────────────── */
 
@@ -666,12 +703,14 @@ export function Tooltip({
   );
 
   const onFloatEnter = useCallback(() => {
-    if (!isControlled) clearTimeout(hideTimerRef.current);
-  }, [isControlled]);
+    if (disableInteractive || isControlled) return;
+    clearTimeout(hideTimerRef.current);
+  }, [disableInteractive, isControlled]);
 
   const onFloatLeave = useCallback(() => {
+    if (disableInteractive) return;
     if (!isControlled) scheduleHide();
-  }, [isControlled, scheduleHide]);
+  }, [disableInteractive, isControlled, scheduleHide]);
 
   /* ── render ─────────────────────────────────── */
 
@@ -695,6 +734,8 @@ export function Tooltip({
         ? contentStyles[`exit${capSide}`] ?? ""
         : "";
 
+  const floatNonInteractive = isCursorMode || disableInteractive;
+
   const floatStyle: CSSProperties = isCursorMode
     ? {
         position: "fixed",
@@ -708,6 +749,7 @@ export function Tooltip({
         position: "fixed",
         top: Math.round(pos.y),
         left: Math.round(pos.x),
+        ...(disableInteractive ? { pointerEvents: "none" as const } : {}),
       };
 
   const tailStyle: CSSProperties = {
@@ -756,8 +798,8 @@ export function Tooltip({
             style={floatStyle}
             data-theme={theme || undefined}
             onAnimationEnd={onAnimEnd}
-            onMouseEnter={onFloatEnter}
-            onMouseLeave={onFloatLeave}
+            onMouseEnter={floatNonInteractive ? undefined : onFloatEnter}
+            onMouseLeave={floatNonInteractive ? undefined : onFloatLeave}
           >
             {customContent ?? (
               <TooltipContent

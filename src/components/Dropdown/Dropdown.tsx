@@ -4,6 +4,7 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useContext,
   type ReactNode,
   type CSSProperties,
   type RefObject,
@@ -12,6 +13,16 @@ import { createPortal } from "react-dom";
 import { ScrollFade } from "../ScrollFade";
 import styles from "./Dropdown.module.css";
 import { cx } from "../../utils/cx";
+import { DropdownMenuTreeContext, DropdownMenuTreeProvider } from "./DropdownMenuTreeContext";
+import {
+  MenuDebugContext,
+  MenuGraceContext,
+  MenuItemRoleContext,
+  SiblingSubmenuContext,
+  type GraceIntent,
+  type MenuGraceContextValue,
+  type SiblingSubmenuManager,
+} from "./MenuContext";
 
 /* ═══════════════════════════════════════════════════════════════════════
    Types
@@ -54,11 +65,60 @@ export interface DropdownProps {
   id?: string;
   /** ARIA role for the panel — "listbox" (default) for selection, "menu" for action menus */
   role?: DropdownRole;
+  /**
+   * When this value changes while open, panel position is recomputed (e.g. caret anchor moves).
+   */
+  layoutRevision?: number | string;
+  /**
+   * Extra roots that count as “inside” for click-outside dismissal (e.g. the textarea when the
+   * anchor is a 1px caret probe).
+   */
+  clickOutsideExtraRefs?: ReadonlyArray<RefObject<HTMLElement | null>>;
+  /**
+   * When false, the panel does not handle Arrow/Home/End/Tab roving (host owns keys, e.g. combobox in textarea).
+   * Default true.
+   */
+  panelKeyboardNav?: boolean;
+  /**
+   * When true, ArrowDown on the last option focuses the first, and ArrowUp on the first focuses the last
+   * (wraps within options; skips header input and returnFocusRef on ArrowUp from first). Default false.
+   */
+  keyboardWrap?: boolean;
+  /** Stacking order; default 9999. Nested submenus should use higher values. */
+  zIndex?: number;
+  /** Fires when the panel element mounts/unmounts (e.g. submenu pointer bridges). */
+  onPanelMount?: (el: HTMLDivElement | null) => void;
+  /**
+   * When true, every nested `HoverSubmenu` draws its pointer-bridge safety-triangle overlay.
+   * Only meaningful on the root menu `Dropdown` (`role="menu"`); propagates automatically via
+   * context — you do not need to pass this to child `HoverSubmenu` components.
+   */
+  debugSubmenuBridge?: boolean;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
    Helpers
    ═══════════════════════════════════════════════════════════════════════ */
+
+/**
+ * Ray-casting point-in-polygon test (works for any simple polygon).
+ * Cast a horizontal ray rightward from (x, y); count edge crossings — odd = inside.
+ */
+function isPointInPolygon(
+  point: { x: number; y: number },
+  polygon: Array<{ x: number; y: number }>,
+): boolean {
+  let inside = false;
+  const { x, y } = point;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const xi = polygon[i].x, yi = polygon[i].y;
+    const xj = polygon[j].x, yj = polygon[j].y;
+    const intersect =
+      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
 
 
 type Side = "top" | "bottom" | "left" | "right";
@@ -193,7 +253,77 @@ export function Dropdown({
   returnFocusRef,
   id,
   role: panelRole = "listbox",
+  layoutRevision,
+  clickOutsideExtraRefs,
+  panelKeyboardNav = true,
+  keyboardWrap = false,
+  zIndex = 9999,
+  onPanelMount,
+  debugSubmenuBridge = false,
 }: DropdownProps) {
+  const treeCtx = useContext(DropdownMenuTreeContext);
+  /**
+   * When this is the root of a menu tree (role="menu" with no ancestor tree provider),
+   * we auto-provide the DropdownMenuTreeContext so consumers don't need to add it manually.
+   */
+  const isMenuRoot = panelRole === "menu" && treeCtx === null;
+
+  /* ── Grace-area context (role="menu" panels only) ────────────────────────
+     Tracks the active grace polygon + pointer direction so HoverSubmenu rows
+     can skip opening when the cursor is traversing toward an open sibling panel.
+     ─────────────────────────────────────────────────────────────────────────── */
+  const graceIntentRef = useRef<GraceIntent | null>(null);
+  const pointerDirRef = useRef<"left" | "right">("right");
+  const lastPointerXRef = useRef<number>(0);
+
+  const graceCtxRef = useRef<MenuGraceContextValue | null>(null);
+  if (panelRole === "menu" && graceCtxRef.current === null) {
+    graceCtxRef.current = {
+      graceIntentRef,
+      pointerDirRef,
+      setGraceIntent(intent) { graceIntentRef.current = intent; },
+      isInGrace(x, y) {
+        const intent = graceIntentRef.current;
+        if (!intent) return false;
+        const movingToward =
+          intent.side === "right"
+            ? pointerDirRef.current === "right"
+            : pointerDirRef.current === "left";
+        return movingToward && isPointInPolygon({ x, y }, intent.area);
+      },
+    };
+  }
+  const graceCtx = graceCtxRef.current;
+
+  /* ── Sibling coordinator (role="menu" panels only) ───────────────────────
+     When one HoverSubmenu opens it calls notifyOpen; all registered siblings
+     close immediately — preventing two submenus being open at once.
+     ─────────────────────────────────────────────────────────────────────────── */
+  const siblingManagerRef = useRef<SiblingSubmenuManager | null>(null);
+  if (panelRole === "menu" && siblingManagerRef.current === null) {
+    const registry = new Map<symbol, () => void>();
+    siblingManagerRef.current = {
+      register(id, closeNow) {
+        registry.set(id, closeNow);
+        return () => registry.delete(id);
+      },
+      notifyOpen(id) {
+        for (const [sibId, sibClose] of registry) {
+          if (sibId !== id) sibClose();
+        }
+      },
+    };
+  }
+  const siblingManager = siblingManagerRef.current;
+
+  /** Track horizontal pointer direction across the panel for grace-area checks. */
+  const handlePanelPointerMove = useCallback((e: React.PointerEvent) => {
+    if (e.pointerType !== "mouse") return;
+    if (e.clientX !== lastPointerXRef.current) {
+      pointerDirRef.current = e.clientX > lastPointerXRef.current ? "right" : "left";
+      lastPointerXRef.current = e.clientX;
+    }
+  }, []);
   const panelRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
@@ -226,7 +356,8 @@ export function Dropdown({
         EXIT_MS + 50
       );
       if (dismissReasonRef.current === "escape") {
-        anchorRef.current?.focus({ preventScroll: true });
+        const el = returnFocusRef?.current ?? anchorRef.current;
+        el?.focus({ preventScroll: true });
       }
       dismissReasonRef.current = "programmatic";
     }
@@ -279,7 +410,7 @@ export function Dropdown({
 
   useLayoutEffect(() => {
     if (isMounted) updatePosRef.current();
-  }, [isMounted, placement, offset, width, matchAnchorWidth]);
+  }, [isMounted, placement, offset, width, matchAnchorWidth, layoutRevision]);
 
   useEffect(() => {
     if (!isMounted) return;
@@ -315,6 +446,17 @@ export function Dropdown({
     );
   }, [anchorRef, isMounted]);
 
+  useLayoutEffect(() => {
+    if (!isMounted) {
+      onPanelMount?.(null);
+      return;
+    }
+    const el = panelRef.current;
+    onPanelMount?.(el ?? null);
+    if (!treeCtx || !el) return;
+    return treeCtx.registerTreePanel(el);
+  }, [isMounted, treeCtx, onPanelMount]);
+
   /* ── click outside ────────────────────────────── */
 
   useEffect(() => {
@@ -325,13 +467,19 @@ export function Dropdown({
       const anchor = anchorRef.current;
       const target = e.target as Node;
       if (panel?.contains(target) || anchor?.contains(target)) return;
+      if (
+        clickOutsideExtraRefs?.some((r) => r.current && r.current.contains(target as Node))
+      ) {
+        return;
+      }
+      if (treeCtx?.isInsideTreePanels(target)) return;
       dismissReasonRef.current = "click-outside";
       onCloseRef.current();
     };
 
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [isMounted, closeOnClickOutside, anchorRef]);
+  }, [isMounted, closeOnClickOutside, anchorRef, clickOutsideExtraRefs, treeCtx]);
 
   /* ── escape key ───────────────────────────────── */
 
@@ -397,14 +545,25 @@ export function Dropdown({
 
   const handlePanelKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
+      if (!panelKeyboardNav) return;
       const panel = panelRef.current;
       if (!panel) return;
       const { key, shiftKey } = e;
       const active = document.activeElement as HTMLElement;
 
+      /* ── ArrowLeft: close submenu and return focus to trigger row ── */
+      if (key === "ArrowLeft" && panelRole === "menu") {
+        e.preventDefault();
+        e.stopPropagation();
+        dismissReasonRef.current = "escape"; // reuse escape path so returnFocusRef fires
+        onCloseRef.current();
+        return;
+      }
+
       /* ── Arrow Up / Down ── */
       if (key === "ArrowDown" || key === "ArrowUp") {
         e.preventDefault();
+        e.stopPropagation(); // prevent bubbling to an ancestor menu panel via React portal tree
         const opts = getOptions();
         if (opts.length === 0) return;
 
@@ -420,9 +579,11 @@ export function Dropdown({
         if (key === "ArrowDown") {
           if (inHeader || idx < 0) focusVisible(opts[0]);
           else if (idx < opts.length - 1) focusVisible(opts[idx + 1]);
+          else if (keyboardWrap) focusVisible(opts[0]);
         } else {
           if (idx === 0) {
-            if (hInput) focusVisible(hInput);
+            if (keyboardWrap) focusVisible(opts[opts.length - 1]);
+            else if (hInput) focusVisible(hInput);
             else if (returnFocusRef?.current) returnFocusRef.current.focus();
           } else if (idx > 0) focusVisible(opts[idx - 1]);
         }
@@ -444,6 +605,7 @@ export function Dropdown({
         if (isTextInput) return;
 
         e.preventDefault();
+        e.stopPropagation();
         const opts = getOptions();
         if (opts.length === 0) return;
         const target = key === "Home" ? opts[0] : opts[opts.length - 1];
@@ -452,28 +614,42 @@ export function Dropdown({
         return;
       }
 
-      /* ── Focus trap (Tab / Shift-Tab) ── */
+      /* ── Tab ── */
       if (key === "Tab") {
-        const focusables = getFocusables();
-        if (focusables.length === 0) return;
-
-        const first = focusables[0];
-        const last = focusables[focusables.length - 1];
-
-        if (shiftKey) {
-          if (active === first || !panel.contains(active)) {
-            e.preventDefault();
-            focusVisible(last);
-          }
+        if (panelRole === "menu") {
+          // Menus are not modal — Tab closes the menu and lets focus move naturally.
+          e.preventDefault();
+          e.stopPropagation();
+          dismissReasonRef.current = "programmatic";
+          onCloseRef.current();
         } else {
-          if (active === last || !panel.contains(active)) {
-            e.preventDefault();
-            focusVisible(first);
+          // Listbox / non-menu: trap focus within the panel.
+          const focusables = getFocusables();
+          if (focusables.length === 0) return;
+          const first = focusables[0];
+          const last  = focusables[focusables.length - 1];
+          if (shiftKey) {
+            if (active === first || !panel.contains(active)) {
+              e.preventDefault();
+              focusVisible(last);
+            }
+          } else {
+            if (active === last || !panel.contains(active)) {
+              e.preventDefault();
+              focusVisible(first);
+            }
           }
         }
       }
     },
-    [getOptions, getHeaderInput, getFocusables, returnFocusRef]
+    [
+      getOptions,
+      getHeaderInput,
+      getFocusables,
+      returnFocusRef,
+      panelKeyboardNav,
+      keyboardWrap,
+    ]
   );
 
   /* ── render ───────────────────────────────────── */
@@ -493,19 +669,21 @@ export function Dropdown({
     top: Math.round(pos.y),
     left: Math.round(pos.x),
     width: pos.resolvedW,
-    zIndex: 9999,
+    zIndex,
   };
 
-  return createPortal(
+  const panelNode = (
     <div
       ref={panelRef}
       id={id}
       role={panelRole}
+      data-dropdown-tree-panel=""
       className={cx(styles.panel, animClass, className)}
       style={panelStyle}
       data-theme={theme || undefined}
       onAnimationEnd={onAnimEnd}
-      onKeyDown={handlePanelKeyDown}
+      onKeyDown={panelKeyboardNav ? handlePanelKeyDown : undefined}
+      onPointerMove={panelRole === "menu" ? handlePanelPointerMove : undefined}
     >
       {header && (
         <div ref={headerRef} className={styles.header}>{header}</div>
@@ -523,7 +701,37 @@ export function Dropdown({
       {footer && (
         <div ref={footerRef} className={styles.footer}>{footer}</div>
       )}
-    </div>,
+    </div>
+  );
+
+  // Wrap with item-role context so every child item gets the correct ARIA role
+  // automatically, then with grace + sibling contexts for menu panels.
+  const itemRoleValue: "menuitem" | "option" =
+    panelRole === "menu" ? "menuitem" : "option";
+
+  const maybeWrappedPanel =
+    panelRole === "menu" && graceCtx && siblingManager ? (
+      <MenuItemRoleContext.Provider value={itemRoleValue}>
+        <MenuGraceContext.Provider value={graceCtx}>
+          <SiblingSubmenuContext.Provider value={siblingManager}>
+            {panelNode}
+          </SiblingSubmenuContext.Provider>
+        </MenuGraceContext.Provider>
+      </MenuItemRoleContext.Provider>
+    ) : (
+      <MenuItemRoleContext.Provider value={itemRoleValue}>
+        {panelNode}
+      </MenuItemRoleContext.Provider>
+    );
+
+  return createPortal(
+    isMenuRoot ? (
+      <DropdownMenuTreeProvider>
+        <MenuDebugContext.Provider value={debugSubmenuBridge}>
+          {maybeWrappedPanel}
+        </MenuDebugContext.Provider>
+      </DropdownMenuTreeProvider>
+    ) : maybeWrappedPanel,
     document.body
   );
 }

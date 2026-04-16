@@ -52,7 +52,14 @@ export const IconToggleButton = forwardRef<HTMLButtonElement, IconToggleButtonPr
     };
 
     return (
-      <Tooltip type="inverse" showTail={false} placement="top" label={ariaLabel} disabled={hideTooltip}>
+      <Tooltip
+        type="inverse"
+        showTail={false}
+        placement="top"
+        label={ariaLabel}
+        disabled={hideTooltip}
+        disableInteractive
+      >
         <button
           ref={ref}
           type={htmlType}

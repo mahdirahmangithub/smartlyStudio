@@ -31,6 +31,8 @@ export default function TooltipPlayground() {
   const [showLeading, setShowLeading] = useState(false);
   const [showTrailing, setShowTrailing] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const [disableInteractive, setDisableInteractive] = useState(false);
+  const [closeOnPointerDownOutside, setCloseOnPointerDownOutside] = useState(false);
 
   return (
     <TooltipProvider showDelay={300} hideDelay={150} skipDelay={300}>
@@ -84,6 +86,22 @@ export default function TooltipPlayground() {
             <input type="checkbox" checked={disabled} onChange={(e) => setDisabled(e.target.checked)} />
             Disabled
           </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <input
+              type="checkbox"
+              checked={disableInteractive}
+              onChange={(e) => setDisableInteractive(e.target.checked)}
+            />
+            disableInteractive
+          </label>
+          <label style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <input
+              type="checkbox"
+              checked={closeOnPointerDownOutside}
+              onChange={(e) => setCloseOnPointerDownOutside(e.target.checked)}
+            />
+            close on outside pointer
+          </label>
         </div>
 
         {/* ── Main demo ───────────────────────────────────── */}
@@ -99,6 +117,8 @@ export default function TooltipPlayground() {
             anchor={anchor}
             showTail={showTail}
             disabled={disabled}
+            disableInteractive={disableInteractive}
+            closeOnPointerDownOutside={closeOnPointerDownOutside}
             label={showLabel ? "Tooltip Label" : undefined}
             description={showDesc ? "This is a tooltip description providing additional context." : undefined}
             leadingIcon={showLeading ? <Icon name={TYPE_ICONS[type]} size={16} /> : undefined}

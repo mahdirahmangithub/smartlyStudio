@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { AreaClosed } from "@visx/shape";
 import { AnimatedLine } from "./AnimatedLine";
 import { ConfidenceBandArea } from "./ConfidenceBand";
@@ -8,19 +8,43 @@ import {
   type ChartRenderContext,
   getSeriesColor,
 } from "../ChartPrimitives";
+import type { ChartAnnotation } from "../ChartPrimitives/chartUtils";
+import { Tooltip } from "../Tooltip";
+import containerStyles from "../ChartPrimitives/ChartContainer.module.css";
 import type { CurveFactory } from "d3-shape";
 
 export interface LineChartProps<D = any>
-  extends Omit<ChartContainerProps<D>, "children" | "ariaLabel"> {
+  extends Omit<ChartContainerProps<D>, "children" | "ariaLabel" | "htmlOverlay"> {
   curve?: CurveFactory;
   showAreaFill?: boolean;
+  /** Persistent data-point annotations with always-visible tooltips. */
+  annotations?: ChartAnnotation[];
 }
 
 export function LineChart<D = any>(props: LineChartProps<D>) {
-  const { curve, showAreaFill = false, ...containerProps } = props;
+  const { curve, showAreaFill = false, annotations, ...containerProps } = props;
+
+  const htmlOverlay = useCallback(
+    (ctx: ChartRenderContext<D>) => {
+      if (!annotations?.length) return null;
+      return (
+        <AnnotationLayer
+          annotations={annotations}
+          ctx={ctx}
+          marginLeft={containerProps.margin?.left ?? 48}
+          marginTop={containerProps.margin?.top ?? 16}
+        />
+      );
+    },
+    [annotations, containerProps.margin],
+  );
 
   return (
-    <ChartContainer<D> {...containerProps} ariaLabel="Line chart">
+    <ChartContainer<D>
+      {...containerProps}
+      ariaLabel="Line chart"
+      htmlOverlay={annotations?.length ? htmlOverlay : undefined}
+    >
       {(ctx) => (
         <LineChartContent<D>
           ctx={ctx}
@@ -29,6 +53,73 @@ export function LineChart<D = any>(props: LineChartProps<D>) {
         />
       )}
     </ChartContainer>
+  );
+}
+
+function AnnotationLayer<D>({
+  annotations,
+  ctx,
+  marginLeft,
+  marginTop,
+}: {
+  annotations: ChartAnnotation[];
+  ctx: ChartRenderContext<D>;
+  marginLeft: number;
+  marginTop: number;
+}) {
+  const { xScale, yScale, yRightScale, allSeries } = ctx;
+
+  const seriesIndexMap = useMemo(() => {
+    const map = new Map<string, number>();
+    allSeries.forEach((s, i) => map.set(s.id, i));
+    return map;
+  }, [allSeries]);
+
+  return (
+    <>
+      {annotations.map((a, i) => {
+        const matchedSeries = a.seriesId
+          ? allSeries.find((s) => s.id === a.seriesId)
+          : allSeries[0];
+        const seriesIdx = matchedSeries
+          ? (seriesIndexMap.get(matchedSeries.id) ?? 0)
+          : 0;
+        const useRightAxis =
+          matchedSeries?.yAxis === "right" && yRightScale;
+        const scale = useRightAxis ? yRightScale : yScale;
+
+        const px = (xScale(a.x) ?? 0) + marginLeft;
+        const py = (scale(a.y) ?? 0) + marginTop;
+        const color =
+          a.color ?? getSeriesColor(seriesIdx, matchedSeries?.color);
+
+        return (
+          <Tooltip
+            key={i}
+            open
+            label={a.label}
+            description={a.description}
+            placement={a.placement ?? "top"}
+            showTail
+            offsetPx={4}
+            type="inverse"
+          >
+            <div
+              className={containerStyles.annotationAnchor}
+              style={{ left: px, top: py }}
+            >
+              <div className={containerStyles.indicatorBase}>
+                <div className={containerStyles.indicatorBg} />
+                <div
+                  className={containerStyles.indicatorDot}
+                  style={{ background: color }}
+                />
+              </div>
+            </div>
+          </Tooltip>
+        );
+      })}
+    </>
   );
 }
 

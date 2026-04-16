@@ -17,6 +17,8 @@ export interface ShortcutTooltipProps {
   placement?: Placement;
   offsetPx?: number;
   disabled?: boolean;
+  /** @see Tooltip `disableInteractive` — forwarded. */
+  disableInteractive?: boolean;
   className?: string;
 }
 
@@ -28,6 +30,7 @@ export function ShortcutTooltip({
   placement = "top",
   offsetPx,
   disabled = false,
+  disableInteractive,
   className,
 }: ShortcutTooltipProps) {
   const content = (
@@ -50,6 +53,7 @@ export function ShortcutTooltip({
       offsetPx={offsetPx}
       showTail={false}
       disabled={disabled}
+      disableInteractive={disableInteractive}
       content={content}
       className={cx(styles.wrapper, className)}
     >

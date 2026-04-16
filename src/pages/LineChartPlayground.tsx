@@ -1,6 +1,6 @@
 import { type CSSProperties, useMemo, useState, useCallback, createContext, useContext } from "react";
 import { LineChart as LineChartBase } from "../components/LineChart";
-import type { Series, LineChartProps } from "../components/LineChart";
+import type { Series, LineChartProps, ChartAnnotation } from "../components/LineChart";
 import { setOklchEnhancement, isOklchEnhanced } from "../components/ChartPrimitives";
 import { Icon } from "../components/Icon";
 import { Card, CardContent, CardBody, CardTitle } from "../components/Card";
@@ -259,6 +259,38 @@ function DualAxisDemo() {
   );
 }
 
+function AnnotationDemo() {
+  const data = useMemo(() => generateData(30, 100, 12), []);
+  const series = useMemo<Series<DataPoint>[]>(
+    () => [{ id: "metric", label: "Metric", data }],
+    [data],
+  );
+
+  const annotations = useMemo<ChartAnnotation[]>(() => {
+    if (data.length < 15) return [];
+    const a = data[8];
+    const b = data[14];
+    const c = data[20];
+    return [
+      { x: a.date, y: a.value, label: `${a.value}`, placement: "top" as const },
+      { x: b.date, y: b.value, label: `${b.value}`, placement: "bottom" as const },
+      { x: c.date, y: c.value, label: `${c.value}`, placement: "top" as const },
+    ];
+  }, [data]);
+
+  return (
+    <LineChart
+      series={series}
+      xAccessor={xAccessor}
+      yAccessor={yAccessor}
+      curve={curveMonotoneX}
+      height={350}
+      showLegend={false}
+      annotations={annotations}
+    />
+  );
+}
+
 function NoAnimationDemo() {
   const series = useMemo<Series<DataPoint>[]>(
     () => [
@@ -503,6 +535,16 @@ export default function LineChartPlayground() {
         </p>
         <div style={cardStyle}>
           <DualAxisDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Annotations</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Persistent indicator dots with always-visible tooltips at specific data points. Each annotation has its own placement.
+        </p>
+        <div style={cardStyle}>
+          <AnnotationDemo />
         </div>
       </section>
 

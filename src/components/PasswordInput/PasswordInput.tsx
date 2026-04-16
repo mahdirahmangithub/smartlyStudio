@@ -29,6 +29,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             showTail={false}
             placement="top"
             label={visible ? "Hide password" : "Show password"}
+            disableInteractive
           >
             <button
               type="button"

@@ -41,7 +41,7 @@ export {
   DEFAULT_MARGIN,
   CATEGORICAL_TOKENS,
 } from "./chartUtils";
-export type { Series, Margin, ConfidenceBand, LineDash, BarFillPattern } from "./chartUtils";
+export type { Series, Margin, ConfidenceBand, LineDash, BarFillPattern, ChartAnnotation } from "./chartUtils";
 
 export { FillPatternDefs } from "./FillPatternDefs";
 

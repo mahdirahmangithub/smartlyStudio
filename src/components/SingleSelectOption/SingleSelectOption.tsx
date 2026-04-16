@@ -21,6 +21,8 @@ export interface SingleSelectOptionProps
   leading?: ReactNode;
   /** Props forwarded to OptionItemTrailing */
   trailing?: Omit<OptionItemTrailingProps, "disabled">;
+  /** When true, omits the focus-visible ring (hover/press backgrounds unchanged). */
+  hideFocusRing?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
@@ -33,6 +35,7 @@ export function SingleSelectOption({
   descriptionText = "Description",
   leading,
   trailing,
+  hideFocusRing = true,
   onChange,
   className,
   ...rest
@@ -61,7 +64,8 @@ export function SingleSelectOption({
         className={cx(
           styles.content,
           checked && styles.checked,
-          disabled && styles.disabled
+          disabled && styles.disabled,
+          hideFocusRing && styles.noFocusRing
         )}
         onClick={handleClick}
         onKeyDown={handleKeyDown}

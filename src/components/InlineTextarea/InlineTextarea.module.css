@@ -1,0 +1,103 @@
+/* ── Root wrapper ── */
+
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 96px;
+  width: 100%;
+}
+
+/* ── Strip Textarea chrome ── */
+
+/* Scroll fades use --textarea-bg in gradients; transparent makes them invisible. */
+.textarea,
+.textarea:hover,
+.textarea:focus-within {
+  --textarea-bg: var(--element-surface-default);
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0;
+  min-height: 0;
+}
+
+.textarea.disabled,
+.textarea.disabled:hover,
+.textarea.disabled:focus-within {
+  --textarea-bg: var(--element-fill-neutral-primary-disable-active);
+}
+
+.textarea textarea {
+  padding: var(--spacing-2xs) 0 var(--spacing-2xs) var(--spacing-2xs) !important;
+}
+
+/* ── Size: sm — label/sm (14px) ── */
+
+.sm .textarea textarea {
+  font-family: var(--type-label-sm-family) !important;
+  font-size: var(--type-label-sm-size) !important;
+  font-weight: var(--type-label-sm-weight) !important;
+  line-height: var(--type-label-sm-line-height) !important;
+  letter-spacing: var(--type-label-sm-letter-spacing) !important;
+}
+
+/* ── Size: lg — label/md (16px) ── */
+
+.lg .textarea textarea {
+  font-family: var(--type-label-md-family) !important;
+  font-size: var(--type-label-md-size) !important;
+  font-weight: var(--type-label-md-weight) !important;
+  line-height: var(--type-label-md-line-height) !important;
+  letter-spacing: var(--type-label-md-letter-spacing) !important;
+}
+
+/* ── Focus indicator (optional outline around the component) ── */
+
+.focusRing {
+  position: absolute;
+  inset: calc(-1 * var(--spacing-2xs));
+  border: var(--spacing-px) solid var(--element-outline-brand-active);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  opacity: var(--opacity-0);
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.root:focus-within .focusRing {
+  opacity: var(--opacity-100);
+}
+
+/* ── Hover indicator (edit icon overlay on right) ── */
+
+.hoverOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to right,
+    var(--element-overlay-fader-start) 0%,
+    var(--element-overlay-fader-end) 84%
+  );
+  pointer-events: none;
+  opacity: var(--opacity-0);
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.root:hover:not(:focus-within):not(.disabled) .hoverOverlay {
+  opacity: var(--opacity-100);
+}
+
+.hoverIcon {
+  color: var(--text-neutral-secondary-default);
+}
+
+/* ── Disabled ── */
+
+.disabled {
+  pointer-events: none;
+}

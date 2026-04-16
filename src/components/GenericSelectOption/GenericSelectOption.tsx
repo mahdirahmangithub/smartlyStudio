@@ -1,4 +1,5 @@
-import { type HTMLAttributes, type ReactNode } from "react";
+import { useContext, type HTMLAttributes, type ReactNode } from "react";
+import { MenuItemRoleContext } from "../Dropdown/MenuContext";
 import { Icon } from "../Icon";
 import { OptionItemLeading } from "../OptionItemLeading";
 import {
@@ -27,6 +28,16 @@ export interface GenericSelectOptionProps
   onClick?: () => void;
   /** ARIA role for the interactive element — "option" (default) or "menuitem" */
   itemRole?: "option" | "menuitem";
+  /** When true, omits the focus-visible ring (hover/press backgrounds unchanged). */
+  hideFocusRing?: boolean;
+  /** `id` on the interactive row (e.g. `aria-activedescendant` target). */
+  optionId?: string;
+  /** Highlights the row (combobox / listbox active descendant). */
+  isActive?: boolean;
+  /**
+   * When true, row is not in the tab order (`tabIndex={-1}`) — host keeps focus (e.g. combobox textarea).
+   */
+  unmanagedFocus?: boolean;
 }
 
 
@@ -40,10 +51,20 @@ export function GenericSelectOption({
   trailing,
   subMenu = false,
   onClick,
-  itemRole = "option",
+  onFocus,
+  onMouseEnter,
+  itemRole,
+  hideFocusRing = true,
+  optionId,
+  isActive = false,
+  unmanagedFocus = false,
   className,
   ...rest
 }: GenericSelectOptionProps) {
+  // If the caller didn't specify a role, inherit from the nearest Dropdown context
+  // ("menuitem" inside role="menu", "option" inside role="listbox", "option" standalone).
+  const contextRole = useContext(MenuItemRoleContext);
+  const resolvedRole = itemRole ?? contextRole ?? "option";
   const [labelRef, isLabelTruncated] = useIsTruncated<HTMLSpanElement>(labelText);
 
   const handleClick = () => {
@@ -61,16 +82,22 @@ export function GenericSelectOption({
   return (
     <div className={cx(styles.option, className)} {...rest}>
       <div
-        role={itemRole}
+        id={optionId}
+        role={resolvedRole}
         aria-disabled={disabled || undefined}
-        tabIndex={disabled ? -1 : 0}
+        aria-selected={resolvedRole === "option" ? isActive : undefined}
+        tabIndex={disabled || unmanagedFocus ? -1 : 0}
         className={cx(
           styles.content,
           alert && styles.alert,
-          disabled && styles.disabled
+          disabled && styles.disabled,
+          hideFocusRing && styles.noFocusRing,
+          isActive && styles.active
         )}
         onClick={handleClick}
         onKeyDown={handleKeyDown}
+        onFocus={onFocus}
+        onMouseEnter={onMouseEnter}
       >
         {leading && (
           <OptionItemLeading

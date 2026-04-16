@@ -90,6 +90,34 @@ export default function FileAttachmentPlayground() {
         />
       </div>
 
+      {/* ── Auto thumbnail (file / fileName + shared inference) ── */}
+      <h3>Auto thumbnail (no `thumbnail` prop)</h3>
+      <p style={{ fontSize: 13, opacity: 0.75, margin: 0 }}>
+        Pass <code>fileName</code> or a mock <code>File</code> so the slot uses{" "}
+        <code>FileTypeThumbnail</code> from <code>inferFileTypeFromFileName</code> /{" "}
+        <code>inferFileTypeFromFile</code>.
+      </p>
+      <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>
+        <FileAttachment
+          fileName="slides.pptx"
+          title="slides.pptx"
+          description="1.2 MB"
+          onRemove={() => {}}
+        />
+        <FileAttachment
+          fileName="clip.mp4"
+          title="clip.mp4"
+          autoThumbnailSize="lg"
+          onRemove={() => {}}
+        />
+        <FileAttachment
+          file={new File([], "data.csv", { type: "text/csv" })}
+          title="data.csv"
+          description="Auto from File.name + MIME"
+          onRemove={() => {}}
+        />
+      </div>
+
       {/* ── File types ── */}
       <h3>Different file types</h3>
       <div style={{ display: "flex", gap: 16, alignItems: "flex-start", flexWrap: "wrap" }}>

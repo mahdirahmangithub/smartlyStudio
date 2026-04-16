@@ -1,5 +1,5 @@
 import { type CSSProperties, useMemo } from "react";
-import { LineChart, type Series as LineSeries } from "../components/LineChart";
+import { LineChart, type Series as LineSeries, type ChartAnnotation } from "../components/LineChart";
 import { curveMonotoneX } from "@visx/curve";
 import { BarChart } from "../components/BarChart";
 import type { Series } from "../components/ChartPrimitives";
@@ -36,17 +36,24 @@ const xAccessor = (d: DataPoint) => d.date;
 const yAccessor = (d: DataPoint) => d.value;
 
 function MonoLineDemo() {
+  const data = useMemo(() => generateLineData(30, 100, 10), []);
   const series = useMemo<LineSeries<DataPoint>[]>(
     () => [
       {
         id: "metric",
         label: "Metric",
-        data: generateLineData(30, 100, 10),
+        data,
         color: "var(--text-neutral-primary)",
       },
     ],
-    [],
+    [data],
   );
+
+  const annotations = useMemo<ChartAnnotation[]>(() => {
+    if (data.length < 15) return [];
+    const pt = data[15];
+    return [{ x: pt.date, y: pt.value, label: `${pt.value}`, placement: "top" as const }];
+  }, [data]);
 
   return (
     <LineChart
@@ -58,6 +65,7 @@ function MonoLineDemo() {
       showXGrid={false}
       height={300}
       showLegend={false}
+      annotations={annotations}
     />
   );
 }

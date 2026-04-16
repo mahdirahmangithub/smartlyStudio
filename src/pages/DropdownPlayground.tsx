@@ -1,5 +1,8 @@
 import { useState, useRef, type ChangeEvent } from "react";
-import { Dropdown } from "../components/Dropdown";
+import {
+  Dropdown,
+  HoverSubmenu,
+} from "../components/Dropdown";
 import { SelectOptionHeader } from "../components/SelectOptionHeader";
 import { MultiSelectOption } from "../components/MultiSelectOption";
 import { SingleSelectOption } from "../components/SingleSelectOption";
@@ -24,6 +27,10 @@ const PAGES = [
   { label: "Notifications", icon: "notifications" },
   { label: "Help Center", icon: "help" },
 ];
+
+/** Set to `false` to hide the gap bridge overlay in the nested-menu demo. */
+const NESTED_MENU_BRIDGE_DEBUG = true;
+
 
 export default function DropdownPlayground() {
   /* ── multi-select with search + add ─────────── */
@@ -107,6 +114,10 @@ export default function DropdownPlayground() {
   /* ── placement top ──────────────────────────── */
   const topRef = useRef<HTMLButtonElement>(null);
   const [topOpen, setTopOpen] = useState(false);
+
+  /* ── nested hover submenus (3 levels) ─────── */
+  const submenuRef = useRef<HTMLButtonElement>(null);
+  const [submenuOpen, setSubmenuOpen] = useState(false);
 
   const btnStyle: React.CSSProperties = {
     padding: "8px 16px",
@@ -378,6 +389,189 @@ export default function DropdownPlayground() {
           </Dropdown>
         </section>
       </div>
+
+      <section style={{ maxWidth: 560 }}>
+        <h3>Nested menus (hover submenus + pointer bridge)</h3>
+        <p
+          style={{
+            fontSize: "var(--type-body-sm-size)",
+            color: "var(--text-neutral-secondary)",
+            marginBottom: "var(--spacing-md)",
+          }}
+        >
+          The gap bridge fills the space between a row and its submenu panel so diagonal mouse
+          movement doesn't prematurely close it. The safety triangle (cyan, when debug is on)
+          shows the exact safe zone: cursor inside → close timer cancelled; outside → scheduled.
+          Use <kbd>ArrowRight</kbd> to open a submenu by keyboard, <kbd>ArrowLeft</kbd> or{" "}
+          <kbd>Escape</kbd> to close it.
+        </p>
+        <button
+          ref={submenuRef}
+          style={btnStyle}
+          type="button"
+          onClick={() => setSubmenuOpen(!submenuOpen)}
+        >
+          Open nested menu
+        </button>
+        <Dropdown
+          open={submenuOpen}
+          onClose={() => setSubmenuOpen(false)}
+          anchorRef={submenuRef}
+          role="menu"
+          width={260}
+          maxHeight={440}
+          zIndex={9999}
+          panelKeyboardNav
+          keyboardWrap
+          debugSubmenuBridge={NESTED_MENU_BRIDGE_DEBUG}
+        >
+          <GenericSelectOption
+            labelText="Root: Cut"
+            description={false}
+            onClick={() => setSubmenuOpen(false)}
+          />
+          <GenericSelectOption
+            labelText="Root: Copy"
+            description={false}
+            onClick={() => setSubmenuOpen(false)}
+          />
+          <GenericSelectOption
+            labelText="Root: Paste"
+            description={false}
+            onClick={() => setSubmenuOpen(false)}
+          />
+          <HoverSubmenu
+            labelText="Level 1 → (mid root)"
+            leading={<Icon name="folder" size={20} />}
+          >
+            <GenericSelectOption
+              labelText="L1: Rename"
+              description={false}
+              onClick={() => setSubmenuOpen(false)}
+            />
+            <GenericSelectOption
+              labelText="L1: Duplicate"
+              description={false}
+              onClick={() => setSubmenuOpen(false)}
+            />
+            <GenericSelectOption
+              labelText="L1: Move…"
+              description={false}
+              onClick={() => setSubmenuOpen(false)}
+            />
+            <HoverSubmenu
+              labelText="Level 2 → (mid L1)"
+              leading={<Icon name="create_new_folder" size={20} />}
+            >
+              <GenericSelectOption
+                labelText="L2: Export JSON"
+                description={false}
+                onClick={() => setSubmenuOpen(false)}
+              />
+              <GenericSelectOption
+                labelText="L2: Export CSV"
+                description={false}
+                onClick={() => setSubmenuOpen(false)}
+              />
+              <GenericSelectOption
+                labelText="L2: Print"
+                description={false}
+                onClick={() => setSubmenuOpen(false)}
+              />
+              <HoverSubmenu
+                labelText="Level 3 → (mid L2)"
+                leading={<Icon name="stacked_bar_chart" size={20} />}
+              >
+                <GenericSelectOption
+                  labelText="L3: Full page"
+                  description={false}
+                  onClick={() => setSubmenuOpen(false)}
+                />
+                <GenericSelectOption
+                  labelText="L3: Selection only"
+                  description={false}
+                  onClick={() => setSubmenuOpen(false)}
+                />
+                <GenericSelectOption
+                  labelText="L3: To PDF"
+                  description={false}
+                  onClick={() => setSubmenuOpen(false)}
+                />
+                <GenericSelectOption
+                  labelText="L3: To PNG"
+                  description={false}
+                  onClick={() => setSubmenuOpen(false)}
+                />
+              </HoverSubmenu>
+              <GenericSelectOption
+                labelText="L2: Share link"
+                description={false}
+                onClick={() => setSubmenuOpen(false)}
+              />
+              <GenericSelectOption
+                labelText="L2: Embed code"
+                description={false}
+                onClick={() => setSubmenuOpen(false)}
+              />
+            </HoverSubmenu>
+            <GenericSelectOption
+              labelText="L1: Archive"
+              description={false}
+              onClick={() => setSubmenuOpen(false)}
+            />
+            <GenericSelectOption
+              labelText="L1: Delete"
+              description={false}
+              onClick={() => setSubmenuOpen(false)}
+            />
+          </HoverSubmenu>
+          <HoverSubmenu
+            labelText="Level 1 → (near bottom)"
+            leading={<Icon name="folder" size={20} />}
+          >
+            <GenericSelectOption
+              labelText="L1b: Option A"
+              description={false}
+              onClick={() => setSubmenuOpen(false)}
+            />
+            <GenericSelectOption
+              labelText="L1b: Option B"
+              description={false}
+              onClick={() => setSubmenuOpen(false)}
+            />
+            <HoverSubmenu
+              labelText="L1b: Level 2 →"
+              leading={<Icon name="create_new_folder" size={20} />}
+            >
+              <GenericSelectOption
+                labelText="L1b→L2: Deep item 1"
+                description={false}
+                onClick={() => setSubmenuOpen(false)}
+              />
+              <GenericSelectOption
+                labelText="L1b→L2: Deep item 2"
+                description={false}
+                onClick={() => setSubmenuOpen(false)}
+              />
+              <GenericSelectOption
+                labelText="L1b→L2: Deep item 3"
+                description={false}
+                onClick={() => setSubmenuOpen(false)}
+              />
+            </HoverSubmenu>
+          </HoverSubmenu>
+          <GenericSelectOption
+            labelText="Root: Select all"
+            description={false}
+            onClick={() => setSubmenuOpen(false)}
+          />
+          <GenericSelectOption
+            labelText="Root: Preferences…"
+            description={false}
+            onClick={() => setSubmenuOpen(false)}
+          />
+        </Dropdown>
+      </section>
     </div>
   );
 }

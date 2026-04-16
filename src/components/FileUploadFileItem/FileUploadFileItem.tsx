@@ -5,22 +5,9 @@ import { IconButton } from "../IconButton";
 import { Spinner } from "../Spinner";
 import { Tooltip } from "../Tooltip";
 import { useIsTruncated } from "../../hooks/useIsTruncated";
+import { inferFileTypeFromFileName } from "../../utils/inferFileType";
 import styles from "./FileUploadFileItem.module.css";
 import { cx } from "../../utils/cx";
-
-const IMAGE_EXT = new Set(["jpg", "jpeg", "png", "gif", "svg", "webp", "bmp", "ico", "tiff", "avif"]);
-const VIDEO_EXT = new Set(["mp4", "mov", "avi", "webm", "mkv", "flv", "wmv", "m4v"]);
-const FONT_EXT = new Set(["woff", "woff2", "ttf", "otf", "eot"]);
-const DOC_EXT = new Set(["pdf", "doc", "docx", "txt", "rtf", "xls", "xlsx", "ppt", "pptx", "csv", "odt", "ods", "odp", "pages", "numbers", "key", "md"]);
-
-function inferFileType(fileName: string): FileType {
-  const ext = fileName.split(".").pop()?.toLowerCase() ?? "";
-  if (IMAGE_EXT.has(ext)) return "image";
-  if (VIDEO_EXT.has(ext)) return "video";
-  if (FONT_EXT.has(ext)) return "font";
-  if (DOC_EXT.has(ext)) return "document";
-  return "file";
-}
 
 export type FileUploadFileStatus = "loading" | "normal" | "error";
 
@@ -61,7 +48,7 @@ export const FileUploadFileItem = forwardRef<
     },
     ref
   ) => {
-    const resolvedFileType = fileType ?? inferFileType(fileName);
+    const resolvedFileType = fileType ?? inferFileTypeFromFileName(fileName);
     const isLoading = status === "loading";
     const isError = status === "error";
 
