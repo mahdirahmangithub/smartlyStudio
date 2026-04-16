@@ -86,7 +86,7 @@ export const BreadcrumbSelectItem = forwardRef<
     icon,
     current = false,
     disabled = false,
-    basic = false,
+    basic: _basic = false,
     children,
     className,
     href,

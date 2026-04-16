@@ -137,7 +137,7 @@ function CustomThumbnailDemo() {
         label="Avatar"
         checked={value === "avatar"}
         onChange={() => setValue("avatar")}
-        thumbnail={<Avatar size="sm" name="Jane Doe" />}
+        thumbnail={<Avatar size="sm" alt="Jane Doe" initials="JD" />}
       />
       <SelectTile
         value="media"

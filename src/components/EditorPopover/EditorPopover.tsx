@@ -102,6 +102,7 @@ export const EditorPopover = forwardRef<HTMLDivElement, EditorPopoverProps>(
       closeOnClickOutside = true,
       closeOnEscape = true,
       className,
+      role: _role, // consumed here so it doesn't override Popover's typed role prop via ...rest
       ...rest
     } = props;
 

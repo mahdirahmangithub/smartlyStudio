@@ -1,6 +1,5 @@
 import {
   forwardRef,
-  type TextareaHTMLAttributes,
 } from "react";
 import { Textarea, type TextareaProps } from "../Textarea";
 import { Icon } from "../Icon";

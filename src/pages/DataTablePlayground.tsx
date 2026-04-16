@@ -6,7 +6,7 @@ import { Badge } from "../components/Badge";
 import { Icon } from "../components/Icon";
 import { IconButton } from "../components/IconButton";
 import { TreeIndent, type TreeIndentLineStyle } from "../components/TreeIndent";
-import { computeConnectorGuides, type ConnectorType } from "../utils/treeConnectors";
+import { computeConnectorGuides } from "../utils/treeConnectors";
 
 /* ═══════════════════════════════════════════════════════════════
    Shared layout styles (mirrors other playground pages)

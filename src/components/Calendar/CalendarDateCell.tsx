@@ -155,9 +155,9 @@ export const CalendarDateCell = forwardRef<HTMLDivElement, CalendarDateCellProps
       ref={ref}
       className={styles.cell}
       role="gridcell"
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onMouseMove={onMouseMove}
+      onMouseEnter={onMouseEnter as unknown as React.MouseEventHandler<HTMLDivElement>}
+      onMouseLeave={onMouseLeave as unknown as React.MouseEventHandler<HTMLDivElement>}
+      onMouseMove={onMouseMove as unknown as React.MouseEventHandler<HTMLDivElement>}
     >
       {stripUnderlayTone && (
         <div

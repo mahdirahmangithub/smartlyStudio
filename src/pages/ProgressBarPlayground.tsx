@@ -97,7 +97,7 @@ function VisibilityDemo() {
 /* ── Animated Progress ── */
 function AnimatedDemo() {
   const [value, setValue] = useState(0);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     let start: number | null = null;

@@ -82,7 +82,6 @@ function EndSquareSvg({ w, overflow, r }: { w: number; overflow: number; r: numb
   const clampedR = Math.min(r, mid);
   const k = 0.5523;
   const cp1y = clampedR * k;
-  const cp2x = mid + (w - mid - (w - mid - clampedR)) * (1 - k);
 
   return (
     <>

@@ -115,7 +115,6 @@ export default function ShimmerPlayground() {
             icon={<Icon name="campaign" size={20} />}
             title="Create a new campaign"
             description="Set up targeting, budget, and creatives in one place."
-            isStatic
             contentClassName={shimmer}
           />
         </div>

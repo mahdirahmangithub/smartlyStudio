@@ -74,7 +74,7 @@ export const ProgressBar = forwardRef<HTMLDivElement, ProgressBarProps>(
     const resolvedAriaLabel =
       !resolvedLabelledBy ? ariaLabel : undefined;
 
-    if (process.env.NODE_ENV !== "production") {
+    if (import.meta.env.DEV) {
       if (!label && !ariaLabel && !ariaLabelledBy) {
         console.warn(
           "ProgressBar: missing accessible name. " +

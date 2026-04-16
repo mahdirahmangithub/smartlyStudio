@@ -215,7 +215,7 @@ function HeaderVariationsDemo() {
         }
         footerExtraAction={
           withFooter ? (
-            <Button variant="danger" emphasis="low" size="sm">
+            <Button variant="alert" emphasis="low" size="sm">
               Delete
             </Button>
           ) : undefined

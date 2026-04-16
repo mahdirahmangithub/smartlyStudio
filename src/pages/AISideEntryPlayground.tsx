@@ -12,7 +12,7 @@ export default function AISideEntryPlayground() {
   const [open, setOpen] = useState(false);
   const [buttonHidden, setButtonHidden] = useState(false);
   const anchorRef = useRef<HTMLButtonElement>(null);
-  const exitTimer = useRef<ReturnType<typeof setTimeout>>();
+  const exitTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleOpen = useCallback(() => {
     clearTimeout(exitTimer.current);
