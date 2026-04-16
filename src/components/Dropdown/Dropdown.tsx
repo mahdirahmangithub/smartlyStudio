@@ -590,8 +590,25 @@ export function Dropdown({
 
         requestAnimationFrame(() => {
           const f = document.activeElement as HTMLElement;
-          if (f && panel.contains(f))
-            f.scrollIntoView?.({ block: "nearest" });
+          if (!f || !panel.contains(f)) return;
+          const allOpts = getOptions();
+          const focusedIdx = allOpts.indexOf(f);
+          // Find the scroll container inside the panel (not the page).
+          const sc = Array.from(panel.querySelectorAll<HTMLElement>("*")).find((el) => {
+            const s = window.getComputedStyle(el);
+            return s.overflowY === "auto" || s.overflowY === "scroll";
+          }) ?? null;
+          if (!sc) return;
+          if (focusedIdx === 0) {
+            sc.scrollTop = 0;
+          } else if (focusedIdx === allOpts.length - 1) {
+            sc.scrollTop = sc.scrollHeight;
+          } else {
+            const itemRect = f.getBoundingClientRect();
+            const scRect = sc.getBoundingClientRect();
+            if (itemRect.top < scRect.top) sc.scrollTop -= scRect.top - itemRect.top;
+            else if (itemRect.bottom > scRect.bottom) sc.scrollTop += itemRect.bottom - scRect.bottom;
+          }
         });
         return;
       }

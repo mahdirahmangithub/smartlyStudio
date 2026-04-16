@@ -8,7 +8,10 @@ import {
   PromptInputAddMenu,
   PromptInputToolsButton,
   PromptInputSubmit,
+  PromptInputContextMenu,
   type PromptInputTriggerConfig,
+  type ContextMenuSuggestedItem,
+  type ContextMenuCategory,
 } from "../components/PromptInput";
 import type { AttachmentMenuItemDef } from "../components/PromptInput/PromptInputAttachmentMenu";
 
@@ -21,12 +24,65 @@ const cardStyle: CSSProperties = {
 };
 const promptWrapper: CSSProperties = { maxWidth: 520 };
 
+/* ── Shared context menu data ── */
+
+const SUGGESTED_ITEMS: ContextMenuSuggestedItem[] = [
+  {
+    id: "ws-1",
+    icon: "Meta_color",
+    label: "Summer 2026 - Run BMW",
+    subtitle: "Workspace",
+  },
+  {
+    id: "camp-1",
+    icon: "campaign_alt",
+    label: "Campaign_1209",
+    subtitle: "in Summer 2026 - Run BMW",
+  },
+  {
+    id: "camp-2",
+    icon: "campaign_alt",
+    label: "Campaign_freq",
+    subtitle: "in Summer 2026 - Run BMW",
+  },
+];
+
+const CATEGORIES: ContextMenuCategory[] = [
+  { id: "campaigns", icon: "campaign_alt", label: "Campaigns", onSelect: () => {} },
+  { id: "catalogs", icon: "shopping_cart", label: "Catalogs", onSelect: () => {} },
+  { id: "producers", icon: "data_table", label: "Producers", onSelect: () => {} },
+  { id: "projects", icon: "folder", label: "Projects", onSelect: () => {} },
+  { id: "reports-bar", icon: "reporting", label: "Reports", onSelect: () => {} },
+  { id: "reports-org", icon: "page_info", label: "Reports", onSelect: () => {} },
+  { id: "reports-lab", icon: "science", label: "Reports", onSelect: () => {} },
+];
+
+const DEFAULT_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
+  { char: "/" },
+  {
+    char: "@",
+    renderContent: (props) => (
+      <PromptInputContextMenu
+        {...props}
+        suggestedItems={SUGGESTED_ITEMS}
+        onSelectSuggested={(_item) => props.onClose()}
+        categories={CATEGORIES}
+      />
+    ),
+  },
+];
+
+/* ── Demos ── */
+
 function BasicDemo() {
   const [submitted, setSubmitted] = useState<string[]>([]);
 
   return (
     <div style={promptWrapper}>
-      <PromptInput onSubmit={(v) => setSubmitted((p) => [...p, v])}>
+      <PromptInput
+        triggerMenus={DEFAULT_TRIGGER_MENUS}
+        onSubmit={(v) => setSubmitted((p) => [...p, v])}
+      >
         <PromptInputAttachments />
         <PromptInputTextarea />
         <PromptInputFooter>
@@ -64,6 +120,7 @@ function ControlledDemo() {
   return (
     <div style={promptWrapper}>
       <PromptInput
+        triggerMenus={DEFAULT_TRIGGER_MENUS}
         value={value}
         onChange={setValue}
         loading={loading}
@@ -91,7 +148,7 @@ function ControlledDemo() {
 function DisabledDemo() {
   return (
     <div style={promptWrapper}>
-      <PromptInput disabled>
+      <PromptInput triggerMenus={DEFAULT_TRIGGER_MENUS} disabled>
         <PromptInputAttachments />
         <PromptInputTextarea placeholder="Disabled state..." />
         <PromptInputFooter>
@@ -124,7 +181,12 @@ function AttachmentsAndErrorDemo() {
         <input type="checkbox" checked={error} onChange={(e) => setError(e.target.checked)} />
         Error (submit stays brand / low / disabled)
       </label>
-      <PromptInput hasAttachments={hasAttachments} error={error} onSubmit={() => {}}>
+      <PromptInput
+        triggerMenus={DEFAULT_TRIGGER_MENUS}
+        hasAttachments={hasAttachments}
+        error={error}
+        onSubmit={() => {}}
+      >
         <PromptInputAttachments />
         <PromptInputTextarea placeholder="Try empty text + attachment…" />
         <PromptInputFooter>
@@ -144,21 +206,26 @@ const SLASH_ITEMS: AttachmentMenuItemDef[] = [
   { kind: "link", label: "Add link", icon: "link", keywords: ["url", "href"] },
 ];
 
-const AT_ITEMS: AttachmentMenuItemDef[] = [
-  { kind: "context", label: "Add context", icon: "forecasting_context", keywords: ["ai", "prompt", "smart"] },
-  { kind: "google-drive", label: "Add from Google Drive", icon: "Google Drive_color", keywords: ["drive", "google", "cloud"] },
-];
-
 const PER_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
   { char: "/", items: SLASH_ITEMS },
-  { char: "@", items: AT_ITEMS },
+  {
+    char: "@",
+    renderContent: (props) => (
+      <PromptInputContextMenu
+        {...props}
+        suggestedItems={SUGGESTED_ITEMS}
+        onSelectSuggested={(_item) => props.onClose()}
+        categories={CATEGORIES}
+      />
+    ),
+  },
 ];
 
 function PerTriggerDemo() {
   return (
     <div style={promptWrapper}>
       <p style={{ fontSize: 12, margin: "0 0 8px", opacity: 0.6 }}>
-        <kbd>/</kbd> → files &amp; links &nbsp;|&nbsp; <kbd>@</kbd> → context &amp; Drive
+        <kbd>/</kbd> → files &amp; links &nbsp;|&nbsp; <kbd>@</kbd> → context picker
       </p>
       <PromptInput triggerMenus={PER_TRIGGER_MENUS} onSubmit={() => {}}>
         <PromptInputAttachments />
@@ -185,8 +252,8 @@ export default function PromptInputPlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Type a message and press Enter or click the send button. Submitted
           prompts appear below. Use <kbd style={{ fontSize: 12 }}>/</kbd> or{" "}
-          <kbd style={{ fontSize: 12 }}>@</kbd> at the start or after whitespace to open the same
-          attachment menu at the caret (type to filter).
+          <kbd style={{ fontSize: 12 }}>@</kbd> at the start or after whitespace to open the
+          respective menus at the caret (type to filter).
         </p>
         <div style={cardStyle}>
           <BasicDemo />
@@ -217,8 +284,10 @@ export default function PromptInputPlayground() {
       <section style={sectionStyle}>
         <h2>Per-trigger menus</h2>
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
-          Different trigger characters open different item sets via the{" "}
-          <code style={{ fontSize: 12 }}>triggerMenus</code> prop.
+          <kbd style={{ fontSize: 12 }}>/</kbd> uses a custom{" "}
+          <code style={{ fontSize: 12 }}>items</code> list;{" "}
+          <kbd style={{ fontSize: 12 }}>@</kbd> uses{" "}
+          <code style={{ fontSize: 12 }}>renderContent</code> for the context picker.
         </p>
         <div style={cardStyle}>
           <PerTriggerDemo />

@@ -196,6 +196,11 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
     const prevCaretMenuOpenRef = useRef(false);
     const prevButtonMenuOpenRef = useRef(false);
 
+    /** Item count reported by a custom renderContent menu (for arrow-key wrap). */
+    const [renderContentItemCount, setRenderContentItemCount] = useState(0);
+    /** Pick handler registered by a custom renderContent menu. */
+    const renderContentPickHandlerRef = useRef<(() => void) | null>(null);
+
     const attachmentMenuId = useId();
 
     useLayoutEffect(() => {
@@ -454,7 +459,19 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       onStop?.();
     }, [onStop]);
 
+    /** Config for the trigger character that opened the current menu session. */
+    const activeConfig = useMemo(
+      () =>
+        attachmentMenu.char
+          ? triggerMenus.find((t) => t.char === attachmentMenu.char) ?? null
+          : null,
+      [attachmentMenu.char, triggerMenus],
+    );
+
     const filteredAttachmentItems = useMemo(() => {
+      // When the active trigger uses a custom renderer, skip filtering entirely.
+      if (activeConfig?.renderContent) return [];
+
       const query = attachmentMenu.source === "button" ? "" : attachmentMenu.query;
       const char = attachmentMenu.char;
 
@@ -462,19 +479,25 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       if (!char) return filterMenuItemsByQuery(ATTACHMENT_MENU_ITEMS, query);
 
       // Inline trigger: use the items configured for this char, falling back to the full list.
-      const config = triggerMenus.find((t) => t.char === char);
-      const baseItems = config?.items ?? ATTACHMENT_MENU_ITEMS;
+      const baseItems = activeConfig?.items ?? ATTACHMENT_MENU_ITEMS;
       return filterMenuItemsByQuery(baseItems, query);
-    }, [attachmentMenu.source, attachmentMenu.query, attachmentMenu.char, triggerMenus]);
+    }, [activeConfig, attachmentMenu.source, attachmentMenu.query, attachmentMenu.char]);
+
+    /** Effective item count for arrow-key wrap — custom renderContent reports its own count. */
+    const effectiveCaretItemCount = activeConfig?.renderContent
+      ? renderContentItemCount
+      : filteredAttachmentItems.length;
 
     const attachmentMenuCombobox =
       attachmentMenu.open &&
       attachmentMenu.source === "caret" &&
-      filteredAttachmentItems.length > 0;
+      (activeConfig?.renderContent
+        ? renderContentItemCount > 0
+        : filteredAttachmentItems.length > 0);
 
     useEffect(() => {
       const open = attachmentMenu.open && attachmentMenu.source === "caret";
-      const n = filteredAttachmentItems.length;
+      const n = effectiveCaretItemCount;
       if (!open) {
         prevCaretMenuOpenRef.current = false;
         return;
@@ -492,7 +515,7 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       attachmentMenu.open,
       attachmentMenu.source,
       attachmentMenu.query,
-      filteredAttachmentItems.length,
+      effectiveCaretItemCount,
     ]);
 
     useEffect(() => {
@@ -516,18 +539,42 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
     useLayoutEffect(() => {
       if (!attachmentMenuCombobox) return;
       const id = `${attachmentMenuId}-opt-${caretAttachmentActiveIndex}`;
-      document.getElementById(id)?.scrollIntoView({ block: "nearest" });
+      const el = document.getElementById(id);
+      if (!el) return;
+      // Walk up from the option element to find the nearest scroll container
+      // that is NOT the document/body (so we don't scroll the page).
+      let sc: HTMLElement | null = el.parentElement;
+      while (sc && sc !== document.documentElement) {
+        const s = window.getComputedStyle(sc);
+        if (s.overflowY === "auto" || s.overflowY === "scroll") break;
+        sc = sc.parentElement;
+      }
+      if (!sc || sc === document.documentElement) return;
+      if (caretAttachmentActiveIndex === 0) {
+        sc.scrollTop = 0;
+      } else if (caretAttachmentActiveIndex === effectiveCaretItemCount - 1) {
+        sc.scrollTop = sc.scrollHeight;
+      } else {
+        const itemRect = el.getBoundingClientRect();
+        const scRect = sc.getBoundingClientRect();
+        if (itemRect.top < scRect.top) sc.scrollTop -= scRect.top - itemRect.top;
+        else if (itemRect.bottom > scRect.bottom) sc.scrollTop += itemRect.bottom - scRect.bottom;
+      }
     }, [
       attachmentMenuCombobox,
       caretAttachmentActiveIndex,
       attachmentMenuId,
-      filteredAttachmentItems.length,
+      effectiveCaretItemCount,
     ]);
 
     const pickHighlightedCaretAttachment = useCallback(() => {
+      if (activeConfig?.renderContent) {
+        renderContentPickHandlerRef.current?.();
+        return;
+      }
       const item = filteredAttachmentItems[caretAttachmentActiveIndex];
       if (item) pickAttachmentKind(item.kind);
-    }, [filteredAttachmentItems, caretAttachmentActiveIndex, pickAttachmentKind]);
+    }, [activeConfig, filteredAttachmentItems, caretAttachmentActiveIndex, pickAttachmentKind]);
 
     if (attachmentMenu.open) {
       attachmentMenuLastOpenAnchorRef.current =
@@ -537,6 +584,24 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       attachmentMenuLastOpenAnchorRef.current === "button" ? menuButtonRef : caretAnchorRef;
 
     const layoutRevision = `${attachmentMenu.open}-${attachmentMenu.source}-${value.length}-${attachmentMenu.query}-${attachmentMenu.forcedAtCaret}`;
+
+    // Compute the context menu content while the menu is open.
+    // The ref preserves the last rendered content so the exit animation shows
+    // the real items fading out instead of an empty panel.
+    const lastContextMenuContentRef = useRef<ReactNode>(null);
+    const contextMenuContent = activeConfig?.renderContent
+      ? activeConfig.renderContent({
+          query: attachmentMenu.query,
+          onClose: closeAttachmentMenu,
+          activeIndex: caretAttachmentActiveIndex,
+          setItemCount: setRenderContentItemCount,
+          registerPickHandler: (fn) => { renderContentPickHandlerRef.current = fn; },
+          menuId: attachmentMenuId,
+        })
+      : null;
+    if (contextMenuContent !== null) {
+      lastContextMenuContentRef.current = contextMenuContent;
+    }
 
     const ctx: PromptInputContextValue = {
       value,
@@ -567,7 +632,7 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       setCaretAttachmentActiveIndex,
       buttonAttachmentActiveIndex,
       setButtonAttachmentActiveIndex,
-      caretAttachmentItemCount: filteredAttachmentItems.length,
+      caretAttachmentItemCount: effectiveCaretItemCount,
       attachmentMenuCombobox,
       pickHighlightedCaretAttachment,
     };
@@ -594,10 +659,12 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
             <div className={styles.fieldInner}>{bodyChildren}</div>
           </div>
           <div ref={caretAnchorRef} className={styles.caretAnchor} aria-hidden />
+
+          {/* Standard attachment menu — never opens when the active trigger uses renderContent */}
           <Dropdown
             id={attachmentMenuId}
             role={attachmentMenu.source === "caret" ? "listbox" : "menu"}
-            open={attachmentMenu.open}
+            open={attachmentMenu.open && !activeConfig?.renderContent}
             onClose={closeAttachmentMenu}
             anchorRef={dropdownAnchorRef}
             placement="bottom-start"
@@ -623,6 +690,26 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
             ) : (
               <PromptInputAttachmentMenuItems items={filteredAttachmentItems} />
             )}
+          </Dropdown>
+
+          {/* Custom renderContent menu — only opens when the active trigger provides renderContent */}
+          <Dropdown
+            id={attachmentMenuId}
+            role="listbox"
+            open={attachmentMenu.open && !!activeConfig?.renderContent}
+            onClose={closeAttachmentMenu}
+            anchorRef={caretAnchorRef}
+            placement="bottom-start"
+            width={280}
+            offset={4}
+            returnFocusRef={textareaRef}
+            autoFocus={false}
+            panelKeyboardNav={false}
+            keyboardWrap
+            layoutRevision={layoutRevision}
+            clickOutsideExtraRefs={[textareaRef]}
+          >
+            {lastContextMenuContentRef.current}
           </Dropdown>
         </div>
       </PromptInputContext.Provider>
