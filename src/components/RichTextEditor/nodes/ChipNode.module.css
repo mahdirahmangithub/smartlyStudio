@@ -1,0 +1,17 @@
+/* Inline host for the chip decorator */
+.wrapper {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  /* Small horizontal breathing room between chip and adjacent text */
+  margin: 0 var(--spacing-2xs);
+  border-radius: var(--radius-full);
+  outline: 2px solid transparent;
+  outline-offset: 1px;
+  transition: outline-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+/* Show a brand ring when the node is keyboard-selected in Lexical */
+.wrapper[data-selected] {
+  outline-color: var(--element-outline-brand-active);
+}

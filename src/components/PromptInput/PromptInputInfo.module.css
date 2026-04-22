@@ -1,0 +1,92 @@
+/* ── Root ── */
+
+.root {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--spacing-6xl);
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  padding-bottom: var(--spacing-xl);
+  margin-bottom: var(--spacing-negative-md);
+    box-shadow: inset 0 var(--spacing-negative-md) var(--blur-md) 0 var(--shadow-halo);
+
+}
+
+/* ── Type variants ── */
+
+.edit {
+  background: var(--element-fill-neutral-secondary-weak);
+  padding-top: var(--spacing-sm);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-sm-extra);
+}
+
+.error {
+  background: var(--element-fill-alert-secondary-default);
+  padding-top: var(--spacing-sm);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-sm);
+}
+
+.warning {
+  background: var(--element-fill-warning-secondary-default);
+  padding-top: var(--spacing-sm);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-sm);
+}
+
+.lengthLimit {
+  background: var(--element-fill-neutral-secondary-weak);
+  padding-top: var(--spacing-md);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+ }
+
+.cookBook {
+  background: var(--element-fill-info-tertiary-active-default);
+  padding-top: var(--spacing-sm);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-sm-extra);
+ }
+
+/* ── Left side: icon + label ── */
+
+.iconLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+}
+
+.leadingIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.title {
+  font-family: var(--type-label-strong-xs-family);
+  font-size: var(--type-label-strong-xs-size);
+  font-weight: var(--type-label-strong-xs-weight);
+  line-height: var(--type-label-strong-xs-line-height);
+  letter-spacing: var(--type-label-strong-xs-letter-spacing);
+  font-style: normal;
+  white-space: nowrap;
+}
+
+.title_edit      { color: var(--text-neutral-tertiary-default); }
+.title_error     { color: var(--text-alert-default); }
+.title_warning   { color: var(--text-warning-default); }
+.title_cook_book { color: var(--text-info-default); }
+
+/* ── Length-limit progress bar ── */
+
+.limitBar {
+  flex: 1 0 0;
+  min-width: 0;
+  padding-bottom: var(--spacing-sm);
+}

@@ -1,0 +1,143 @@
+/* ── Outer wrapper ── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Hint always sits below the main content with a small gap */
+.hint {
+  margin-top: var(--spacing-sm);
+}
+
+/* Reasoning without header — always visible, uniform padding */
+.reasoningFlat {
+  padding: var(--spacing-sm);
+}
+
+/* ── Task type card ── */
+
+.card {
+  background: var(--element-surface-over);
+  border: var(--spacing-hair-line, 0.5px) solid var(--element-divider-neutral-default);
+  border-radius: var(--radius-2xl);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Header (title row + optional progress row) ── */
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+/* Title toggle button — task type (expander left) */
+.titleButton {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+.titleButton:focus-visible {
+  outline: 2px solid var(--element-outline-focus-default);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* Title toggle button — reasoning type (title + expander inline, no stretch) */
+.titleButtonReasoning {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  max-width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+}
+
+/* Prevent TitleText from stretching full-width inside the inline button */
+.titleButtonReasoning > :first-child {
+  width: auto;
+}
+
+.titleButtonReasoning:focus-visible {
+  outline: 2px solid var(--element-outline-focus-default);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+
+/* ── Progress bar (task, running) ── */
+
+.progressRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  /* Indent to align with title text (skip 16px expander + 8px gap) */
+  padding-left: calc(16px + var(--spacing-sm));
+}
+
+.progressBar {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Collapsible items area ── */
+
+.items {
+  overflow: hidden;
+  height: 0;
+  opacity: 0;
+}
+
+/* Items inner — task type */
+.itemsInner {
+  padding-top: var(--spacing-xl);
+}
+
+/* Items inner — reasoning type (left indent) */
+.itemsInnerReasoning {
+  padding-top: var(--spacing-md);
+  padding-left: var(--spacing-sm);
+}
+
+/* ── Actions row (task, pre-start) ── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  /* Matches the Figma 24px spacer above the action buttons */
+  padding-top: 24px;
+}
+
+.actionsLeft {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.actionsRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}

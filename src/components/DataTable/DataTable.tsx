@@ -61,6 +61,10 @@ export interface ColumnDef<T = any> {
   ) => TdHTMLAttributes<HTMLTableCellElement>;
   onHeaderCell?: () => ThHTMLAttributes<HTMLTableHeaderCellElement>;
   density?: TableDensity;
+  /** Override the table-level column divider for this column's cells. */
+  dividerRight?: boolean;
+  /** Override the table-level row divider for this column's cells. */
+  dividerBottom?: boolean;
 }
 
 export interface RowSelection<T = any> {
@@ -134,6 +138,10 @@ export interface DataTableProps<T = any> {
   rowDisabled?: (record: T, index: number) => boolean;
   /** Controls cell padding. Columns can override via their own `density` prop. */
   density?: TableDensity;
+  /** Show/hide the right border between columns table-wide. Columns can override via `dividerRight`. Default true. */
+  columnDividers?: boolean;
+  /** Show/hide the bottom border between rows table-wide. Columns can override via `dividerBottom`. Default true. */
+  rowDividers?: boolean;
   /** Width per tree indent level in px (default 24). Forwarded to TreeIndent. */
   treeIndentWidth?: number;
   /** Show tree connector lines (default true). Set false for plain spacing. */
@@ -429,6 +437,8 @@ export function DataTable<T extends Record<string, any>>({
   rowError,
   rowDisabled,
   density = "md",
+  columnDividers = true,
+  rowDividers = true,
   treeIndentWidth,
   treeConnectorLines,
   treeLineStyle,
@@ -1424,7 +1434,11 @@ export function DataTable<T extends Record<string, any>>({
                   (dragCol === col.key || (cell.isLeaf && dragGroupLeafKeysRef.current?.has(col.key))) && styles.colBeingDragged,
                   cell.isLeaf && cellStickyClass(col),
                   hasSelection && allSelected && styles.cellChecked,
-                  cell.isLeaf && col.density && CELL_DENSITY_CLASS[col.density]
+                  cell.isLeaf && col.density && CELL_DENSITY_CLASS[col.density],
+                  cell.isLeaf && col.dividerRight === true && styles.dividerRightShow,
+                  cell.isLeaf && col.dividerRight === false && styles.dividerRightHide,
+                  cell.isLeaf && col.dividerBottom === true && styles.dividerBottomShow,
+                  cell.isLeaf && col.dividerBottom === false && styles.dividerBottomHide,
                 )}
                 style={{
                   width: cell.isLeaf ? activeWidths.get(col.key) : undefined,
@@ -1595,6 +1609,10 @@ export function DataTable<T extends Record<string, any>>({
                         isRowError && styles.cellError,
                         isRowDisabled && styles.cellDisabled,
                         col.density && CELL_DENSITY_CLASS[col.density],
+                        col.dividerRight === true && styles.dividerRightShow,
+                        col.dividerRight === false && styles.dividerRightHide,
+                        col.dividerBottom === true && styles.dividerBottomShow,
+                        col.dividerBottom === false && styles.dividerBottomHide,
                         (dragCol === col.key || dragGroupLeafKeysRef.current?.has(col.key)) && styles.colBeingDragged
                       )}
                       {...cellProps}
@@ -1715,7 +1733,7 @@ export function DataTable<T extends Record<string, any>>({
     >
       <table
         ref={tableRef}
-        className={cx(styles.table, DENSITY_CLASS[density], dragRow != null && styles.rowDragging, dragCol && styles.colDragging)}
+        className={cx(styles.table, DENSITY_CLASS[density], !columnDividers && styles.noColumnDividers, !rowDividers && styles.noRowDividers, dragRow != null && styles.rowDragging, dragCol && styles.colDragging)}
         style={{
           width:
             resizeMode === "overflow"

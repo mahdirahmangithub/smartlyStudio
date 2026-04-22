@@ -1,0 +1,126 @@
+/* ── Root wrapper ── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--spacing-sm);
+  /* Reserve vertical space below the bubble for the floating action bar */
+  padding-bottom: var(--spacing-xl-plus);
+  width: 100%;
+  /* article reset */
+  margin: 0;
+}
+
+/* ── Attachments strip ── */
+
+.attachments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: flex-end;
+  width: 100%;
+}
+
+.attachmentItem {
+  flex-shrink: 0;
+}
+
+/* ── Bubble ── */
+
+.bubble {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  padding-top: var(--spacing-sm-extra);
+  padding-bottom: var(--spacing-sm-extra);
+  background: var(--element-fill-neutral-secondary-weak);
+  /* Asymmetric radius: bottom-right is sm (4 px) — the "tail" indicating current user */
+  border-radius: var(--radius-2xl)  var(--radius-2xl) var(--radius-sm) var(--radius-2xl) ;
+  position: relative; /* establishes containing block for .actions */
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* ── Text area ── */
+
+.textArea {
+  display: flex;
+  flex-direction: column;
+  /* Horizontal inset matches the Figma px-md on the text wrapper */
+  padding: 0 var(--spacing-md);
+  position: relative; /* establishes containing block for .contentFader */
+}
+
+/* 20-line threshold before "Show full message" */
+.textContainerClamped {
+  max-height: calc(1.5rem * 21);
+  overflow: hidden;
+}
+
+/* ── Message text ── */
+
+.messageText {
+  margin: 0;
+  font-family: var(--type-body-lg-family);
+  font-size: var(--type-body-lg-size);
+  font-weight: var(--type-body-lg-weight);
+  line-height: var(--type-body-lg-line-height);
+  letter-spacing: var(--type-body-lg-letter-spacing);
+  color: var(--text-neutral-primary);
+  white-space: pre-wrap;    /* preserve explicit line breaks in the message */
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ── Content fader — gradient overlay at bottom of clamped text ── */
+
+.contentFader {
+  position: absolute;
+  bottom: var(--spacing-negative-sm-extra);
+  left: 0;   /* match text horizontal inset */
+  right: 0;
+  /* Gradient from transparent → bubble fill, creating the fade-out effect */
+  padding-top: var(--spacing-2xl);
+  padding-bottom: var(--spacing-sm-extra);
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+
+ background: linear-gradient(
+  180deg,
+  transparent 0%,
+  var(--element-fill-neutral-secondary-weak) 48%
+);
+  /* Round the two bottom corners to match bubble shape */
+  border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+  display: flex;
+  align-items: flex-end;
+  user-select: none;
+}
+
+/* ── Action bar ── */
+
+/* Floats in the padding-bottom zone below the bubble. */
+.actions {
+  position: absolute;
+  /* Offset equals the root's padding-bottom so it sits just below the bubble */
+  bottom: calc(-1 * var(--spacing-xl-plus));
+  right: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--animation-state-change-duration)
+    var(--animation-state-change-easing);
+}
+
+/* Reveal on hover or when an action button receives keyboard focus */
+.root:hover .actions,
+.root:focus-within .actions {
+  opacity: 1;
+  pointer-events: auto;
+}

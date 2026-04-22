@@ -20,3 +20,5 @@ export type {
 } from "./MenuContext";
 export { HoverSubmenu } from "./HoverSubmenu";
 export type { HoverSubmenuProps } from "./HoverSubmenu";
+export { DrilldownSubmenu } from "./DrilldownSubmenu";
+export type { DrilldownSubmenuProps } from "./DrilldownSubmenu";

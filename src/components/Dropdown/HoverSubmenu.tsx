@@ -132,10 +132,13 @@ export function HoverSubmenu({
   const onTriggerPointerEnter = useCallback((e: PointerEvent<HTMLDivElement>) => {
     if (e.pointerType !== "mouse") return;
     clearClose();
-    if (graceCtx?.isInGrace(e.clientX, e.clientY)) return;
+    // Entering a trigger row always wins — clear any active grace polygon so a
+    // sibling's open panel doesn't block this submenu from starting to open.
+    clearGrace();
+    graceCtx?.setGraceIntent(null);
     clearOpen();
     openTimerRef.current = window.setTimeout(() => openSubmenu(false), OPEN_DELAY_MS);
-  }, [clearClose, clearOpen, graceCtx, openSubmenu]);
+  }, [clearClose, clearOpen, clearGrace, graceCtx, openSubmenu]);
 
   /**
    * Cursor leaves the trigger row.
@@ -230,6 +233,7 @@ export function HoverSubmenu({
           labelText={labelText}
           description={false}
           leading={leading}
+          isActive={open}
           onClick={() => {}}
         />
         <Dropdown

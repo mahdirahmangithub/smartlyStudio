@@ -4,6 +4,7 @@ import {
   useContext,
   useMemo,
   useRef,
+  type MutableRefObject,
   type ReactNode,
 } from "react";
 
@@ -17,26 +18,44 @@ export interface DropdownMenuTreeContextValue {
 export const DropdownMenuTreeContext =
   createContext<DropdownMenuTreeContextValue | null>(null);
 
-export function DropdownMenuTreeProvider({ children }: { children: ReactNode }) {
-  const panelsRef = useRef(new Set<HTMLElement>());
+/**
+ * `panelsRef` — optional external registry ref created by the root Dropdown.
+ * Passing it in lets the root's click-outside handler read the same Set that
+ * nested panels register into, even though the root's own `treeCtx` is null.
+ */
+export function DropdownMenuTreeProvider({
+  children,
+  panelsRef: externalPanelsRef,
+}: {
+  children: ReactNode;
+  panelsRef?: MutableRefObject<Set<HTMLElement>>;
+}) {
+  const internalPanelsRef = useRef(new Set<HTMLElement>());
+  const panelsRef = externalPanelsRef ?? internalPanelsRef;
 
-  const registerTreePanel = useCallback((el: HTMLElement | null) => {
-    if (!el) return () => {};
-    panelsRef.current.add(el);
-    return () => {
-      panelsRef.current.delete(el);
-    };
-  }, []);
+  const registerTreePanel = useCallback(
+    (el: HTMLElement | null) => {
+      if (!el) return () => {};
+      panelsRef.current.add(el);
+      return () => {
+        panelsRef.current.delete(el);
+      };
+    },
+    [panelsRef],
+  );
 
-  const isInsideTreePanels = useCallback((node: Node | null) => {
-    if (!node) return false;
-    const el = node instanceof Element ? node : node.parentElement;
-    if (!el) return false;
-    for (const p of panelsRef.current) {
-      if (p.contains(el)) return true;
-    }
-    return false;
-  }, []);
+  const isInsideTreePanels = useCallback(
+    (node: Node | null) => {
+      if (!node) return false;
+      const el = node instanceof Element ? node : node.parentElement;
+      if (!el) return false;
+      for (const p of panelsRef.current) {
+        if (p.contains(el)) return true;
+      }
+      return false;
+    },
+    [panelsRef],
+  );
 
   const value = useMemo(
     () => ({ registerTreePanel, isInsideTreePanels }),

@@ -1,0 +1,84 @@
+import type { HTMLAttributes, ReactNode } from "react";
+
+/** Operational state — drives the leading icon and text colour. */
+export type CotItemStatus = "idle" | "loading" | "complete" | "error";
+
+/**
+ * Visual variant — determines the icon family shown in the leading column.
+ * - dot:  small dot indicator (generic progress)
+ * - icon: custom icon passed via the `icon` prop
+ * - todo: semantic icons that change with status (pending → complete → error)
+ */
+export type CotItemVariant = "dot" | "icon" | "todo";
+
+export interface CotItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "children"> {
+  /** Step title — primary label. */
+  title?: ReactNode;
+  /** Step description — secondary label below the title. */
+  description?: ReactNode;
+  /** Slot content rendered below the header. Hidden when expandable and collapsed. */
+  children?: ReactNode;
+
+  /** Icon family for the leading column. Defaults to "dot". */
+  variant?: CotItemVariant;
+  /** Custom icon element. Only used when variant="icon" and status is not "loading". */
+  icon?: ReactNode;
+  /** Operational status. Drives the leading icon and colour. Defaults to "idle". */
+  status?: CotItemStatus;
+
+  /** When true the step can be expanded/collapsed to reveal slot content. */
+  expandable?: boolean;
+  /** Initial expanded state (uncontrolled). */
+  defaultExpanded?: boolean;
+  /** Controlled expanded state. */
+  expanded?: boolean;
+  /** Called when the expanded state changes. */
+  onExpandedChange?: (expanded: boolean) => void;
+
+  /**
+   * Show the vertical connector line below this item.
+   * Defaults to true. The `<Cot>` parent automatically sets it to false on the
+   * last child so consumers rarely need to set this explicitly.
+   */
+  connector?: boolean;
+}
+
+export interface CotProps extends Omit<HTMLAttributes<HTMLOListElement>, "children"> {
+  children: ReactNode;
+  /**
+   * Override connectors on all items.
+   * When omitted, the parent automatically hides the connector on the last item.
+   */
+  connector?: boolean;
+}
+
+export interface CotContainerProps extends Omit<HTMLAttributes<HTMLDivElement>, "title"> {
+  /** "task" renders a bordered card with action buttons; "reasoning" is borderless with a compact header. */
+  type: "task" | "reasoning";
+  /** Container title. Omitting on reasoning type renders it without a header — always expanded, with uniform padding. */
+  title?: ReactNode;
+  /** Hint text shown below the container (neutral/low InlineMessage). */
+  hint?: string;
+
+  /* ── Task-type props ── */
+
+  /** When true, the progress bar + stop button are shown instead of Edit/Cancel/Start. */
+  running?: boolean;
+  /** Progress value 0–100 shown in the progress bar while running. */
+  progress?: number;
+  onEdit?: () => void;
+  onCancel?: () => void;
+  onStart?: () => void;
+  onStop?: () => void;
+
+  /* ── Expand / collapse ── */
+
+  /** Controlled expanded state. */
+  expanded?: boolean;
+  /** Initial expanded state (uncontrolled). Defaults to false. */
+  defaultExpanded?: boolean;
+  /** Called when the expanded state changes. */
+  onExpandedChange?: (expanded: boolean) => void;
+
+  children?: ReactNode;
+}

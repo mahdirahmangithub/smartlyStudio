@@ -15,21 +15,26 @@ import {
   type ReactNode,
 } from "react";
 import { InlineTextarea } from "../InlineTextarea";
+import { RichTextEditor } from "../RichTextEditor";
+import { TriggerMenuPlugin } from "../RichTextEditor/plugins/TriggerMenuPlugin";
+import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import type { Klass, LexicalNode } from "lexical";
 import { IconButton } from "../IconButton";
 import { Icon } from "../Icon";
 import { Button } from "../Button";
+import { Chip } from "../Chip";
 import { Dropdown } from "../Dropdown";
 import { FileAttachment } from "../FileAttachment";
 import { Thumbnail } from "../Thumbnail";
 import { RowContainer } from "../RowContainer";
 import { isImageFile, isVideoFile } from "../../utils/inferFileType";
-import { findActiveTrigger, replaceTextRange } from "../../utils/textareaTrigger";
+import { findActiveTrigger, replaceTextRange, type ActiveTextareaTrigger } from "../../utils/textareaTrigger";
 import { getTextareaCaretViewportRect } from "../../utils/textareaCaretRect";
 import { cx } from "../../utils/cx";
 import styles from "./PromptInput.module.css";
 import { ATTACHMENT_MENU_ITEMS } from "./promptInputAttachmentMenuData";
 import { PromptInputAttachmentMenuItems } from "./PromptInputAttachmentMenu";
-import type { PromptAttachedFile, PromptInputAttachmentKind, PromptInputTriggerConfig } from "./promptInputTypes";
+import type { PromptAttachedFile, PromptInputAttachmentKind, PromptInputTriggerConfig, PromptInputContextItem } from "./promptInputTypes";
 import {
   PromptInputContext,
   usePromptInput,
@@ -125,6 +130,12 @@ export interface PromptInputProps {
   error?: boolean;
   /** Called when user submits the prompt */
   onSubmit?: (value: string) => void;
+  /**
+   * When true (default), clears the text value and attached files after a
+   * successful submit. Context items are intentionally preserved.
+   * Pass false to manage clearing yourself (e.g. controlled loading flows).
+   */
+  clearOnSubmit?: boolean;
   /** Called when user clicks stop during loading */
   onStop?: () => void;
   /** Notified when built-in file attachments change (internal list). */
@@ -144,6 +155,18 @@ export interface PromptInputProps {
   /** Additional class on the field card */
   className?: string;
   children?: ReactNode;
+  // ── Context row ──
+  /**
+   * When true, the context row is always visible — showing an "Add context" chip
+   * even when no context items are present. Defaults to false (row hidden when empty).
+   */
+  showContextRow?: boolean;
+  /** Called when the "Add context" chip (or + button > Add context) is clicked. */
+  onAddContext?: () => void;
+  /** Controlled context items. When provided, internal state is bypassed. */
+  contextItems?: PromptInputContextItem[];
+  /** Fires whenever context items change (controlled or uncontrolled). */
+  onContextItemsChange?: (items: PromptInputContextItem[]) => void;
 }
 
 export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
@@ -157,11 +180,16 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       error = false,
       onSubmit,
       onStop,
+      clearOnSubmit = true,
       onAttachedFilesChange,
       onAddAttachmentSelect,
       triggerMenus = DEFAULT_TRIGGER_MENUS,
       className,
       children,
+      showContextRow = false,
+      onAddContext,
+      contextItems: controlledContextItems,
+      onContextItemsChange,
     },
     ref,
   ) => {
@@ -171,6 +199,42 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
 
     const [attachedFiles, setAttachedFiles] = useState<PromptAttachedFile[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    // ── Context items (controlled / uncontrolled) ──
+    const isContextControlled = controlledContextItems !== undefined;
+    const [internalContextItems, setInternalContextItems] = useState<PromptInputContextItem[]>([]);
+    const contextItems = isContextControlled ? controlledContextItems : internalContextItems;
+
+    const addContextItem = useCallback((item: PromptInputContextItem) => {
+      if (isContextControlled) {
+        const next = controlledContextItems.some((c) => c.id === item.id)
+          ? controlledContextItems
+          : [...controlledContextItems, item];
+        onContextItemsChange?.(next);
+      } else {
+        setInternalContextItems((prev) => {
+          if (prev.some((c) => c.id === item.id)) return prev;
+          const next = [...prev, item];
+          onContextItemsChange?.(next);
+          return next;
+        });
+      }
+    }, [isContextControlled, controlledContextItems, onContextItemsChange]);
+
+    const removeContextItem = useCallback((id: string) => {
+      if (isContextControlled) {
+        const next = controlledContextItems.filter((c) => c.id !== id);
+        onContextItemsChange?.(next);
+      } else {
+        setInternalContextItems((prev) => {
+          const next = prev.filter((c) => c.id !== id);
+          onContextItemsChange?.(next);
+          return next;
+        });
+      }
+    }, [isContextControlled, controlledContextItems, onContextItemsChange]);
+
+    const [lexicalEditor, setLexicalEditor] = useState<import("lexical").LexicalEditor | null>(null);
 
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
     const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -207,20 +271,28 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       attachmentMenuRef.current = attachmentMenu;
     }, [attachmentMenu]);
 
-    const { attachmentChild, bodyChildren } = useMemo(() => {
+    const { attachmentChild, infoChild, recommendationsChild, bodyChildren } = useMemo(() => {
       let attachment: ReactNode = null;
+      let info: ReactNode = null;
+      let recommendations: ReactNode = null;
       const body: ReactNode[] = [];
       Children.forEach(children, (child) => {
-        if (
-          isValidElement(child) &&
-          (child.type as { displayName?: string }).displayName === "PromptInputAttachments"
-        ) {
+        if (!isValidElement(child)) {
+          if (child != null && child !== false) body.push(child);
+          return;
+        }
+        const dn = (child.type as { displayName?: string }).displayName;
+        if (dn === "PromptInputAttachments") {
           if (attachment == null) attachment = child;
-        } else if (child != null && child !== false) {
+        } else if (dn === "PromptInputInfo") {
+          if (info == null) info = child;
+        } else if (dn === "PromptInputRecommendations") {
+          if (recommendations == null) recommendations = child;
+        } else {
           body.push(child);
         }
       });
-      return { attachmentChild: attachment, bodyChildren: body };
+      return { attachmentChild: attachment, infoChild: info, recommendationsChild: recommendations, bodyChildren: body };
     }, [children]);
 
     const hasAttachmentsEffective = Boolean(hasAttachments) || attachedFiles.length > 0;
@@ -265,6 +337,54 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
         e.target.value = "";
       },
       [onAttachedFilesChange],
+    );
+
+    const addFiles = useCallback(
+      (files: FileList | File[]) => {
+        const arr = Array.from(files);
+        if (!arr.length) return;
+        setAttachedFiles((prev) => {
+          const added = arr.map((file) => {
+            const previewUrl = isImageFile(file) ? URL.createObjectURL(file) : undefined;
+            return { id: newFileId(), file, previewUrl };
+          });
+          const next = [...prev, ...added];
+          onAttachedFilesChange?.(next.map((x) => x.file));
+          return next;
+        });
+      },
+      [onAttachedFilesChange],
+    );
+
+    // ── Drag-and-drop ──
+    const dragCounterRef = useRef(0);
+    const [isDragOver, setIsDragOver] = useState(false);
+
+    const onDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      if (!e.dataTransfer.types.includes("Files")) return;
+      dragCounterRef.current += 1;
+      setIsDragOver(true);
+    }, []);
+
+    const onDragLeave = useCallback((_e: React.DragEvent<HTMLDivElement>) => {
+      dragCounterRef.current -= 1;
+      if (dragCounterRef.current === 0) setIsDragOver(false);
+    }, []);
+
+    const onDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+    }, []);
+
+    const onDrop = useCallback(
+      (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        dragCounterRef.current = 0;
+        setIsDragOver(false);
+        const files = e.dataTransfer.files;
+        if (files?.length) addFiles(files);
+      },
+      [addFiles],
     );
 
     const setValue = useCallback(
@@ -325,7 +445,7 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
 
     const syncAttachmentMenuFromTextarea = useCallback(() => {
       const ta = textareaRef.current;
-      if (!ta || disabled || loading) return;
+      if (!ta || disabled) return;
 
       const m = attachmentMenuRef.current;
       if (m.open && m.source === "button") return;
@@ -370,7 +490,41 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       } else if (m.open && m.source === "caret" && !m.forcedAtCaret) {
         closeAttachmentMenu();
       }
-    }, [closeAttachmentMenu, disabled, loading, triggerCharsSet]);
+    }, [closeAttachmentMenu, disabled, triggerCharsSet]);
+
+    const syncAttachmentMenuFromEditor = useCallback(
+      (match: ActiveTextareaTrigger | null, caretRect: DOMRect | null) => {
+        if (disabled) return;
+        const m = attachmentMenuRef.current;
+        if (m.open && m.source === "button") return;
+
+        if (match && caretRect) {
+          const anchor = caretAnchorRef.current;
+          if (anchor) {
+            anchor.style.visibility = "visible";
+            anchor.style.left = `${caretRect.left - TRIGGER_MENU_OFFSET_BEFORE_CHAR_PX}px`;
+            anchor.style.top = `${caretRect.top}px`;
+            anchor.style.width = "2px";
+            anchor.style.height = `${Math.max(12, caretRect.height)}px`;
+          }
+          forcedAtCaretRef.current = false;
+          setAttachmentMenu({
+            open: true,
+            source: "caret",
+            forcedAtCaret: false,
+            query: match.query,
+            char: match.char,
+            replaceStart: match.triggerIndex,
+            replaceEnd: match.endIndex,
+          });
+        } else if (m.open && m.source === "caret" && !m.forcedAtCaret) {
+          // Don't close a forced-at-caret menu (e.g. openAttachmentMenuAtCaret) from here —
+          // it was opened programmatically and has no trigger character to track.
+          closeAttachmentMenu();
+        }
+      },
+      [disabled, closeAttachmentMenu],
+    );
 
     const pickAttachmentKind = useCallback(
       (kind: PromptInputAttachmentKind) => {
@@ -393,13 +547,17 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
           setValue(next);
           queueMicrotask(() => {
             const ta = textareaRef.current;
-            if (!ta) return;
-            ta.focus();
-            ta.setSelectionRange(replaceStart, replaceStart);
+            if (ta) {
+              ta.focus();
+              ta.setSelectionRange(replaceStart, replaceStart);
+            } else {
+              // RTE path: content was replaced via ControlledValuePlugin; restore focus
+              lexicalEditor?.focus();
+            }
           });
         }
       },
-      [closeAttachmentMenu, onAddAttachmentSelect, openAttachmentPicker, setValue, value],
+      [closeAttachmentMenu, onAddAttachmentSelect, openAttachmentPicker, setValue, value, lexicalEditor],
     );
 
     useLayoutEffect(() => {
@@ -408,18 +566,37 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
         if (anchor) anchor.style.visibility = "hidden";
         return;
       }
-      const ta = textareaRef.current;
       const anchor = caretAnchorRef.current;
-      if (!ta || !anchor) return;
-      const caret = ta.selectionStart ?? 0;
-      const inlineTrigger =
-        !attachmentMenu.forcedAtCaret && attachmentMenu.replaceStart != null;
-      if (inlineTrigger && attachmentMenu.replaceStart != null) {
-        const rtl = getComputedStyle(ta).direction === "rtl";
-        const dx = rtl ? TRIGGER_MENU_OFFSET_BEFORE_CHAR_PX : -TRIGGER_MENU_OFFSET_BEFORE_CHAR_PX;
-        layoutCaretAnchor(ta, attachmentMenu.replaceStart, anchor, { x: dx });
-      } else {
-        layoutCaretAnchor(ta, caret, anchor);
+      if (!anchor) return;
+
+      const ta = textareaRef.current;
+      if (ta) {
+        // Textarea path
+        const caret = ta.selectionStart ?? 0;
+        const inlineTrigger =
+          !attachmentMenu.forcedAtCaret && attachmentMenu.replaceStart != null;
+        if (inlineTrigger && attachmentMenu.replaceStart != null) {
+          const rtl = getComputedStyle(ta).direction === "rtl";
+          const dx = rtl ? TRIGGER_MENU_OFFSET_BEFORE_CHAR_PX : -TRIGGER_MENU_OFFSET_BEFORE_CHAR_PX;
+          layoutCaretAnchor(ta, attachmentMenu.replaceStart, anchor, { x: dx });
+        } else {
+          layoutCaretAnchor(ta, caret, anchor);
+        }
+      } else if (attachmentMenu.forcedAtCaret) {
+        // RTE path, forced open (e.g. openAttachmentMenuAtCaret called programmatically):
+        // position anchor at the current DOM caret. For inline triggers, syncAttachmentMenuFromEditor
+        // already positioned the anchor when the match was first detected — no re-positioning needed.
+        const domSel = window.getSelection();
+        if (domSel && domSel.rangeCount > 0) {
+          const rect = domSel.getRangeAt(0).getBoundingClientRect();
+          if (rect.height > 0) {
+            anchor.style.visibility = "visible";
+            anchor.style.left = `${rect.left}px`;
+            anchor.style.top = `${rect.top}px`;
+            anchor.style.width = "2px";
+            anchor.style.height = `${Math.max(12, rect.height)}px`;
+          }
+        }
       }
     }, [
       attachmentMenu.open,
@@ -433,7 +610,8 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
     useEffect(() => {
       const onSel = () => {
         const ta = textareaRef.current;
-        if (document.activeElement !== ta) return;
+        // In RTE mode textareaRef is null — skip entirely
+        if (!ta || document.activeElement !== ta) return;
         syncAttachmentMenuFromTextarea();
       };
       document.addEventListener("selectionchange", onSel);
@@ -445,6 +623,16 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       if ((!trimmed && !hasAttachmentsEffective) || loading || disabled || error) return;
       closeAttachmentMenu();
       onSubmit?.(trimmed);
+      textareaRef.current?.focus();
+      lexicalEditor?.focus();
+      if (clearOnSubmit) {
+        setValue("");
+        setAttachedFiles((prev) => {
+          prev.forEach((f) => { if (f.previewUrl) URL.revokeObjectURL(f.previewUrl); });
+          onAttachedFilesChange?.([]);
+          return [];
+        });
+      }
     }, [
       value,
       hasAttachmentsEffective,
@@ -452,7 +640,11 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       disabled,
       error,
       onSubmit,
+      clearOnSubmit,
+      setValue,
+      onAttachedFilesChange,
       closeAttachmentMenu,
+      lexicalEditor,
     ]);
 
     const stop = useCallback(() => {
@@ -589,10 +781,31 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
     // The ref preserves the last rendered content so the exit animation shows
     // the real items fading out instead of an empty panel.
     const lastContextMenuContentRef = useRef<ReactNode>(null);
+    const acceptRenderContentTrigger = useCallback(() => {
+      const state = attachmentMenuRef.current;
+      const { replaceStart, replaceEnd } = state;
+      if (replaceStart != null && replaceEnd != null) {
+        const next = replaceTextRange(value, replaceStart, replaceEnd, "");
+        setValue(next);
+        queueMicrotask(() => {
+          const ta = textareaRef.current;
+          if (ta) {
+            ta.focus();
+            ta.setSelectionRange(replaceStart, replaceStart);
+          } else {
+            // RTE path: content was replaced via ControlledValuePlugin; restore focus
+            lexicalEditor?.focus();
+          }
+        });
+      }
+      closeAttachmentMenu();
+    }, [closeAttachmentMenu, setValue, value, lexicalEditor]);
+
     const contextMenuContent = activeConfig?.renderContent
       ? activeConfig.renderContent({
           query: attachmentMenu.query,
           onClose: closeAttachmentMenu,
+          onAccept: acceptRenderContentTrigger,
           activeIndex: caretAttachmentActiveIndex,
           setItemCount: setRenderContentItemCount,
           registerPickHandler: (fn) => { renderContentPickHandlerRef.current = fn; },
@@ -617,6 +830,10 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       submit,
       stop,
       syncAttachmentMenuFromTextarea,
+      syncAttachmentMenuFromEditor,
+      triggerCharsSet,
+      lexicalEditor,
+      _registerLexicalEditor: setLexicalEditor,
       openAttachmentMenuAtCaret,
       openAttachmentMenuFromButton,
       pickAttachmentKind,
@@ -635,15 +852,23 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       caretAttachmentItemCount: effectiveCaretItemCount,
       attachmentMenuCombobox,
       pickHighlightedCaretAttachment,
+      contextItems,
+      addContextItem,
+      removeContextItem,
+      showContextRow,
+      onAddContext,
     };
 
-    return (
-      <PromptInputContext.Provider value={ctx}>
+    const fieldEl = (
         <div
           ref={ref}
           role="group"
           aria-label="Prompt input"
-          className={cx(styles.field, disabled && styles.disabled, className)}
+          className={cx(styles.field, infoChild && styles.fieldWithInfo, disabled && styles.disabled, isDragOver && styles.dragOver, className)}
+          onDragEnter={disabled ? undefined : onDragEnter}
+          onDragLeave={disabled ? undefined : onDragLeave}
+          onDragOver={disabled ? undefined : onDragOver}
+          onDrop={disabled ? undefined : onDrop}
         >
           <input
             ref={fileInputRef}
@@ -709,9 +934,25 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
             layoutRevision={layoutRevision}
             clickOutsideExtraRefs={[textareaRef]}
           >
-            {lastContextMenuContentRef.current}
+            {/* Prevent mousedown from moving focus out of the editor (combobox companion pattern) */}
+            <div onMouseDown={(e) => e.preventDefault()}>
+              {lastContextMenuContentRef.current}
+            </div>
           </Dropdown>
         </div>
+    );
+
+    return (
+      <PromptInputContext.Provider value={ctx}>
+        {recommendationsChild}
+        {infoChild ? (
+          <div className={styles.infoStack}>
+            {infoChild}
+            {fieldEl}
+          </div>
+        ) : (
+          fieldEl
+        )}
       </PromptInputContext.Provider>
     );
   },
@@ -728,14 +969,55 @@ export interface PromptInputAttachmentsProps {
 }
 
 export function PromptInputAttachments({ children, className }: PromptInputAttachmentsProps) {
-  const { attachedFiles, removeAttachedFile } = usePromptInput();
-  const showFiles = attachedFiles.length > 0;
+  const {
+    attachedFiles,
+    removeAttachedFile,
+    contextItems,
+    addContextItem: _addContextItem,
+    removeContextItem,
+    showContextRow,
+    onAddContext,
+  } = usePromptInput();
 
-  if (!showFiles && !children) return null;
+  const showFiles = attachedFiles.length > 0;
+  const hasContextItems = contextItems.length > 0;
+  const showContextSection = showContextRow || hasContextItems;
+
+  if (!showFiles && !children && !showContextSection) return null;
 
   return (
     <div className={cx(styles.attachmentShell, className)}>
       <div className={styles.attachmentRows}>
+        {showContextSection && (
+          <RowContainer wrap density="sm" insetLeft="sm" insetRight="sm" surface="default">
+            {/* Add context chip — full label when empty, icon-only when items present */}
+            {showContextRow && (
+              <Chip
+                size="md"
+                emphasis="medium"
+                variant="neutral"
+                leadingIcon={<Icon name="forecasting_context" size={16} />}
+                aria-label="Add context"
+                onClick={onAddContext}
+              >
+                {hasContextItems ? undefined : "Add context"}
+              </Chip>
+            )}
+            {/* Context item chips */}
+            {contextItems.map((item) => (
+              <Chip
+                key={item.id}
+                size="md"
+                emphasis="medium"
+                variant="neutral"
+                leadingIcon={<Icon name={item.icon} size={16} />}
+                onRemove={() => removeContextItem(item.id)}
+              >
+                {item.label}
+              </Chip>
+            ))}
+          </RowContainer>
+        )}
         {showFiles && (
           <RowContainer density="md" insetLeft="sm" insetRight="sm" surface="default">
             {attachedFiles.map(({ id, file, previewUrl }) => {
@@ -896,7 +1178,7 @@ export function PromptInputTextarea({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          disabled={disabled || loading}
+          disabled={disabled}
           autoExpand
           maxHeight={maxHeight}
           size="lg"
@@ -913,6 +1195,150 @@ export function PromptInputTextarea({
 }
 
 PromptInputTextarea.displayName = "PromptInputTextarea";
+
+/* ── PromptInputRichTextEditor ── */
+
+export interface PromptInputRichTextEditorProps {
+  /** Placeholder text */
+  placeholder?: string;
+  /** Max height before scrolling (px). Defaults to 132. */
+  maxHeight?: number;
+  /** Custom Lexical node classes (e.g. ChipNode, MentionNode). */
+  nodes?: Klass<LexicalNode>[];
+  /** Additional class on the RichTextEditor wrapper */
+  className?: string;
+}
+
+/**
+ * Drop-in replacement for PromptInputTextarea that uses a Lexical contenteditable
+ * instead of a plain textarea. Supports the same / and @ trigger menus and all
+ * other PromptInput context features, plus inline chip rendering via DecoratorNodes.
+ */
+/** Internal plugin — reports the Lexical editor instance up to PromptInputContext. */
+function EditorRegistrationPlugin({
+  register,
+}: {
+  register: (editor: import("lexical").LexicalEditor | null) => void;
+}) {
+  const [editor] = useLexicalComposerContext();
+  useEffect(() => {
+    register(editor);
+    return () => register(null);
+  }, [editor, register]);
+  return null;
+}
+
+export function PromptInputRichTextEditor({
+  placeholder = "Generate smartly...",
+  maxHeight = 132,
+  nodes,
+  className,
+}: PromptInputRichTextEditorProps) {
+  const {
+    value,
+    setValue,
+    loading,
+    disabled,
+    submit,
+    syncAttachmentMenuFromEditor,
+    triggerCharsSet,
+    _registerLexicalEditor,
+    attachmentMenuId,
+    attachmentMenuCombobox,
+    attachmentMenuSource,
+    caretAttachmentActiveIndex,
+    setCaretAttachmentActiveIndex,
+    caretAttachmentItemCount,
+    pickHighlightedCaretAttachment,
+    closeAttachmentMenu,
+  } = usePromptInput();
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent): boolean => {
+      if (e.isComposing) return false;
+
+      if (attachmentMenuCombobox) {
+        if (e.key === "ArrowDown" && !e.shiftKey) {
+          e.preventDefault();
+          setCaretAttachmentActiveIndex((i) => {
+            if (caretAttachmentItemCount <= 0) return 0;
+            return i >= caretAttachmentItemCount - 1 ? 0 : i + 1;
+          });
+          return true;
+        }
+        if (e.key === "ArrowUp" && !e.shiftKey) {
+          e.preventDefault();
+          setCaretAttachmentActiveIndex((i) => {
+            if (caretAttachmentItemCount <= 0) return 0;
+            return i <= 0 ? caretAttachmentItemCount - 1 : i - 1;
+          });
+          return true;
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          closeAttachmentMenu();
+          return true;
+        }
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          pickHighlightedCaretAttachment();
+          return true;
+        }
+      }
+
+      return false;
+    },
+    [
+      attachmentMenuCombobox,
+      caretAttachmentItemCount,
+      setCaretAttachmentActiveIndex,
+      closeAttachmentMenu,
+      pickHighlightedCaretAttachment,
+    ],
+  );
+
+  const activeDescendantId =
+    attachmentMenuCombobox && attachmentMenuSource === "caret"
+      ? `${attachmentMenuId}-opt-${caretAttachmentActiveIndex}`
+      : undefined;
+
+  return (
+    <div className={styles.textareaWrap}>
+      <div className={styles.textareaInset}>
+        <RichTextEditor
+          value={value}
+          onChange={setValue}
+          onSubmit={submit}
+          placeholder={placeholder}
+          maxHeight={maxHeight}
+          disabled={disabled}
+          nodes={nodes}
+          size="lg"
+          className={className}
+          role={attachmentMenuCombobox ? "combobox" : undefined}
+          aria-controls={attachmentMenuCombobox ? attachmentMenuId : undefined}
+          aria-expanded={attachmentMenuCombobox ? true : undefined}
+          aria-autocomplete={attachmentMenuCombobox ? "list" : undefined}
+          aria-activedescendant={activeDescendantId}
+          plugins={
+            <>
+              <EditorRegistrationPlugin register={_registerLexicalEditor} />
+              <TriggerMenuPlugin
+                triggers={triggerCharsSet}
+                disabled={disabled}
+                onMatch={(match, caretRect) => syncAttachmentMenuFromEditor(match, caretRect)}
+                onDismiss={() => syncAttachmentMenuFromEditor(null, null)}
+                onKeyDown={handleKeyDown}
+              />
+            </>
+          }
+        />
+      </div>
+    </div>
+  );
+}
+
+PromptInputRichTextEditor.displayName = "PromptInputRichTextEditor";
 
 /* ── Footer ── */
 

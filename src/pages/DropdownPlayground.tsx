@@ -2,6 +2,7 @@ import { useState, useRef, type ChangeEvent } from "react";
 import {
   Dropdown,
   HoverSubmenu,
+  DrilldownSubmenu,
 } from "../components/Dropdown";
 import { SelectOptionHeader } from "../components/SelectOptionHeader";
 import { MultiSelectOption } from "../components/MultiSelectOption";
@@ -118,6 +119,36 @@ export default function DropdownPlayground() {
   /* ── nested hover submenus (3 levels) ─────── */
   const submenuRef = useRef<HTMLButtonElement>(null);
   const [submenuOpen, setSubmenuOpen] = useState(false);
+
+  /* ── drill-down navigation ───────────────── */
+  const drillRef = useRef<HTMLButtonElement>(null);
+  const [drillOpen, setDrillOpen] = useState(false);
+
+  /* ── drill-down with select options ─────── */
+  const drillSelectRef = useRef<HTMLButtonElement>(null);
+  const [drillSelectOpen, setDrillSelectOpen] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedFeatures, setSelectedFeatures] = useState<Set<string>>(new Set());
+  const toggleFeature = (f: string) =>
+    setSelectedFeatures((prev) => {
+      const next = new Set(prev);
+      if (next.has(f)) next.delete(f); else next.add(f);
+      return next;
+    });
+
+  /* ── hover submenu with select options ─────── */
+  const hoverSelectRef = useRef<HTMLButtonElement>(null);
+  const [hoverSelectOpen, setHoverSelectOpen] = useState(false);
+  const [hoverColor, setHoverColor] = useState<string | null>(null);
+  const [hoverSize, setHoverSize] = useState<string | null>(null);
+  const [hoverFeatures, setHoverFeatures] = useState<Set<string>>(new Set());
+  const toggleHoverFeature = (f: string) =>
+    setHoverFeatures((prev) => {
+      const next = new Set(prev);
+      if (next.has(f)) next.delete(f); else next.add(f);
+      return next;
+    });
 
   const btnStyle: React.CSSProperties = {
     padding: "8px 16px",
@@ -570,6 +601,276 @@ export default function DropdownPlayground() {
             description={false}
             onClick={() => setSubmenuOpen(false)}
           />
+        </Dropdown>
+      </section>
+      <section style={{ maxWidth: 560 }}>
+        <h3>Drill-down navigation (in-panel slide)</h3>
+        <p
+          style={{
+            fontSize: "var(--type-body-sm-size)",
+            color: "var(--text-neutral-secondary)",
+            marginBottom: "var(--spacing-md)",
+          }}
+        >
+          Selecting a <strong>DrilldownSubmenu</strong> row slides the panel content to the
+          next level in-place — no side portal. Use <kbd>Enter</kbd>, <kbd>Space</kbd>, or{" "}
+          <kbd>ArrowRight</kbd> to drill in; <kbd>ArrowLeft</kbd> or the Back row to return.
+        </p>
+        <button
+          ref={drillRef}
+          style={btnStyle}
+          type="button"
+          onClick={() => setDrillOpen(!drillOpen)}
+        >
+          Open drill-down menu
+        </button>
+        <Dropdown
+          open={drillOpen}
+          onClose={() => setDrillOpen(false)}
+          anchorRef={drillRef}
+          role="menu"
+          width={260}
+          panelKeyboardNav
+          keyboardWrap
+        >
+          <GenericSelectOption
+            labelText="Edit"
+            description={false}
+            leading={<Icon name="edit" size={20} />}
+            onClick={() => setDrillOpen(false)}
+          />
+          <DrilldownSubmenu
+            labelText="Share"
+            leading={<Icon name="share" size={20} />}
+          >
+            <GenericSelectOption
+              labelText="Copy link"
+              description={false}
+              leading={<Icon name="link" size={20} />}
+              onClick={() => setDrillOpen(false)}
+            />
+            <GenericSelectOption
+              labelText="Send via email"
+              description={false}
+              leading={<Icon name="mail" size={20} />}
+              onClick={() => setDrillOpen(false)}
+            />
+            <DrilldownSubmenu
+              labelText="Export as…"
+              leading={<Icon name="download" size={20} />}
+            >
+              <GenericSelectOption
+                labelText="PDF"
+                description={false}
+                onClick={() => setDrillOpen(false)}
+              />
+              <GenericSelectOption
+                labelText="CSV"
+                description={false}
+                onClick={() => setDrillOpen(false)}
+              />
+              <GenericSelectOption
+                labelText="PNG"
+                description={false}
+                onClick={() => setDrillOpen(false)}
+              />
+            </DrilldownSubmenu>
+          </DrilldownSubmenu>
+          <DrilldownSubmenu
+            labelText="Move to…"
+            leading={<Icon name="folder" size={20} />}
+          >
+            <GenericSelectOption
+              labelText="My workspace"
+              description={false}
+              leading={<Icon name="home" size={20} />}
+              onClick={() => setDrillOpen(false)}
+            />
+            <GenericSelectOption
+              labelText="Shared with me"
+              description={false}
+              leading={<Icon name="people" size={20} />}
+              onClick={() => setDrillOpen(false)}
+            />
+            <GenericSelectOption
+              labelText="Archive"
+              description={false}
+              leading={<Icon name="inventory_2" size={20} />}
+              onClick={() => setDrillOpen(false)}
+            />
+          </DrilldownSubmenu>
+          <OptionSeparator type="divider" />
+          <GenericSelectOption
+            labelText="Delete"
+            description={false}
+            alert
+            leading={<Icon name="delete" size={20} />}
+            onClick={() => setDrillOpen(false)}
+          />
+        </Dropdown>
+      </section>
+
+      <section style={{ maxWidth: 560 }}>
+        <h3>Drill-down with any option type (listbox)</h3>
+        <p
+          style={{
+            fontSize: "var(--type-body-sm-size)",
+            color: "var(--text-neutral-secondary)",
+            marginBottom: "var(--spacing-md)",
+          }}
+        >
+          Drilled levels support any option type — single-select, multi-select, navigation, generic, etc.
+          The trigger row inherits its role from the parent Dropdown context automatically.
+        </p>
+        <button
+          ref={drillSelectRef}
+          style={btnStyle}
+          type="button"
+          onClick={() => setDrillSelectOpen(!drillSelectOpen)}
+        >
+          {[selectedColor, selectedSize, selectedFeatures.size ? `${selectedFeatures.size} features` : null]
+            .filter(Boolean).join(" · ") || "Configure…"}
+        </button>
+        <Dropdown
+          open={drillSelectOpen}
+          onClose={() => setDrillSelectOpen(false)}
+          anchorRef={drillSelectRef}
+          width={260}
+          panelKeyboardNav
+          keyboardWrap
+        >
+          <DrilldownSubmenu
+            labelText="Color"
+            leading={<Icon name="palette" size={20} />}
+          >
+            {["Red", "Green", "Blue", "Yellow", "Purple"].map((c) => (
+              <SingleSelectOption
+                key={c}
+                labelText={c}
+                description={false}
+                checked={selectedColor === c}
+                onChange={() => setSelectedColor(c)}
+              />
+            ))}
+          </DrilldownSubmenu>
+          <DrilldownSubmenu
+            labelText="Size"
+            leading={<Icon name="straighten" size={20} />}
+          >
+            {["XS", "S", "M", "L", "XL", "XXL"].map((s) => (
+              <SingleSelectOption
+                key={s}
+                labelText={s}
+                description={false}
+                checked={selectedSize === s}
+                onChange={() => setSelectedSize(s)}
+              />
+            ))}
+          </DrilldownSubmenu>
+          <DrilldownSubmenu
+            labelText="Features"
+            leading={<Icon name="tune" size={20} />}
+          >
+            {["Waterproof", "UV protection", "Reflective", "Breathable", "Insulated"].map((f) => (
+              <MultiSelectOption
+                key={f}
+                labelText={f}
+                description={false}
+                checked={selectedFeatures.has(f)}
+                onChange={() => toggleFeature(f)}
+              />
+            ))}
+          </DrilldownSubmenu>
+          <DrilldownSubmenu
+            labelText="Category"
+            leading={<Icon name="category" size={20} />}
+          >
+            {PAGES.map((p) => (
+              <NavigationSelectOption
+                key={p.label}
+                labelText={p.label}
+                leading={<Icon name={p.icon as IconName} size={20} />}
+                onClick={() => setDrillSelectOpen(false)}
+              />
+            ))}
+          </DrilldownSubmenu>
+        </Dropdown>
+      </section>
+
+      <section style={{ maxWidth: 560 }}>
+        <h3>Hover submenu with any option type (menu)</h3>
+        <p
+          style={{
+            fontSize: "var(--type-body-sm-size)",
+            color: "var(--text-neutral-secondary)",
+            marginBottom: "var(--spacing-md)",
+          }}
+        >
+          HoverSubmenu panels support any option type. Unlike drill-down, the panel is a
+          separate portal — children flow through props on every render so state changes
+          (checked, selected) reflect immediately with no special handling needed.
+        </p>
+        <button
+          ref={hoverSelectRef}
+          style={btnStyle}
+          type="button"
+          onClick={() => setHoverSelectOpen(!hoverSelectOpen)}
+        >
+          {[hoverColor, hoverSize, hoverFeatures.size ? `${hoverFeatures.size} features` : null]
+            .filter(Boolean).join(" · ") || "Configure…"}
+        </button>
+        <Dropdown
+          open={hoverSelectOpen}
+          onClose={() => setHoverSelectOpen(false)}
+          anchorRef={hoverSelectRef}
+          role="menu"
+          width={240}
+          panelKeyboardNav
+          keyboardWrap
+        >
+          <HoverSubmenu labelText="Color" leading={<Icon name="palette" size={20} />}>
+            {["Red", "Green", "Blue", "Yellow", "Purple"].map((c) => (
+              <SingleSelectOption
+                key={c}
+                labelText={c}
+                description={false}
+                checked={hoverColor === c}
+                onChange={() => setHoverColor(c)}
+              />
+            ))}
+          </HoverSubmenu>
+          <HoverSubmenu labelText="Size" leading={<Icon name="straighten" size={20} />}>
+            {["XS", "S", "M", "L", "XL", "XXL"].map((s) => (
+              <SingleSelectOption
+                key={s}
+                labelText={s}
+                description={false}
+                checked={hoverSize === s}
+                onChange={() => setHoverSize(s)}
+              />
+            ))}
+          </HoverSubmenu>
+          <HoverSubmenu labelText="Features" leading={<Icon name="tune" size={20} />}>
+            {["Waterproof", "UV protection", "Reflective", "Breathable", "Insulated"].map((f) => (
+              <MultiSelectOption
+                key={f}
+                labelText={f}
+                description={false}
+                checked={hoverFeatures.has(f)}
+                onChange={() => toggleHoverFeature(f)}
+              />
+            ))}
+          </HoverSubmenu>
+          <HoverSubmenu labelText="Category" leading={<Icon name="category" size={20} />}>
+            {PAGES.map((p) => (
+              <NavigationSelectOption
+                key={p.label}
+                labelText={p.label}
+                leading={<Icon name={p.icon as IconName} size={20} />}
+                onClick={() => setHoverSelectOpen(false)}
+              />
+            ))}
+          </HoverSubmenu>
         </Dropdown>
       </section>
     </div>

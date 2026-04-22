@@ -2,6 +2,7 @@ export {
   PromptInput,
   PromptInputAttachments,
   PromptInputTextarea,
+  PromptInputRichTextEditor,
   PromptInputFooter,
   PromptInputFooterStart,
   PromptInputAddMenu,
@@ -9,11 +10,17 @@ export {
   PromptInputSubmit,
   DEFAULT_TRIGGER_MENUS,
 } from "./PromptInput";
+export { PromptInputInfo } from "./PromptInputInfo";
+export { PromptInputRecommendations } from "./PromptInputRecommendations";
+export type { PromptInputRecommendationsProps, RecommendationItem } from "./PromptInputRecommendations";
+export type { PromptInputInfoProps, PromptInputInfoType } from "./PromptInputInfo";
 export { PromptInputContextMenu } from "./PromptInputContextMenu";
 export type {
   PromptInputContextMenuProps,
   ContextMenuSuggestedItem,
   ContextMenuCategory,
+  ContextMenuDrillLevel,
+  ContextMenuDrillItem,
 } from "./PromptInputContextMenu";
 export { usePromptInput } from "./promptInputContext";
 export type {
@@ -25,6 +32,7 @@ export type {
   PromptInputAttachmentsProps,
   PromptAttachedFile,
   PromptInputTextareaProps,
+  PromptInputRichTextEditorProps,
   PromptInputFooterProps,
   PromptInputFooterStartProps,
   PromptInputAddMenuProps,
@@ -33,3 +41,4 @@ export type {
   PromptInputSubmitProps,
   PromptInputTriggerConfig,
 } from "./PromptInput";
+export type { PromptInputContextItem } from "./promptInputTypes";

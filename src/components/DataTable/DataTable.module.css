@@ -19,6 +19,36 @@
   padding: 0;
 }
 
+/* ── Divider control ─────────────────────────────────────────────── */
+
+/* Table-level: hide all column (right) or row (bottom) dividers */
+.noColumnDividers td,
+.noColumnDividers th {
+  border-right: none;
+}
+
+.noRowDividers td,
+.noRowDividers th {
+  border-bottom: none;
+}
+
+/* Cell-level overrides — !important so they win over table-level classes */
+.dividerRightHide {
+  border-right: none !important;
+}
+
+.dividerRightShow {
+  border-right: var(--space-px) solid var(--element-divider-neutral-weak) !important;
+}
+
+.dividerBottomHide {
+  border-bottom: none !important;
+}
+
+.dividerBottomShow {
+  border-bottom: var(--space-px) solid var(--element-divider-neutral-weak) !important;
+}
+
 /* ── Density (table-level) ─────────────────────────────────────── */
 
 /* none: no padding at all */

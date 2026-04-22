@@ -1,0 +1,11 @@
+.container {
+  display: inline-flex;
+  align-items: flex-start;
+  background: var(--element-surface-default);
+  border: var(--spacing-hair-line) solid var(--element-outline-neutral-default);
+  box-shadow: var(--shadow-sm);
+}
+
+.sm { border-radius: var(--radius-md); }
+.md { border-radius: var(--radius-lg); }
+.lg { border-radius: var(--radius-lg); }

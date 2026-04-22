@@ -1,0 +1,134 @@
+/* ── Root ── */
+
+.root {
+  display: inline-block;
+  color: var(--text-neutral-primary);
+}
+
+/* ── Screen-reader-only announcement element ── */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Visual animation container ── */
+
+.visual {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  /* --fade is set per size so the soft clip never intrudes on the visible text */
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black var(--fade),
+    black calc(100% - var(--fade)),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    black var(--fade),
+    black calc(100% - var(--fade)),
+    transparent 100%
+  );
+}
+
+/* Invisible — holds the natural line-height so the container never collapses */
+.placeholder {
+  visibility: hidden;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Positioned label slots ── */
+
+.labelExit,
+.labelEnter,
+.labelIdle {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* display:inline-block required for mask-image (shimmer) to render on an inline span */
+.text {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Size variants ── */
+
+.sizeSm {
+  --fade: 0px;
+  font-family: var(--type-label-xs-family);
+  font-size: var(--type-label-xs-size);
+  font-weight: var(--type-label-xs-weight);
+  line-height: var(--type-label-xs-line-height);
+  letter-spacing: var(--type-label-xs-letter-spacing);
+}
+
+.sizeMd {
+  --fade: 1px;
+  font-family: var(--type-label-sm-family);
+  font-size: var(--type-label-sm-size);
+  font-weight: var(--type-label-sm-weight);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+}
+
+.sizeLg {
+  --fade: 2px;
+  font-family: var(--type-label-md-family);
+  font-size: var(--type-label-md-size);
+  font-weight: var(--type-label-md-weight);
+  line-height: var(--type-label-md-line-height);
+  letter-spacing: var(--type-label-md-letter-spacing);
+}
+
+/* ── Transition keyframes ── */
+
+@keyframes labelExit {
+  from {
+    transform: translateY(0) ;
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes labelEnter {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.labelExit {
+  animation: labelExit var(--animation-message-exit-duration) var(--animation-message-exit-easing)
+    forwards;
+}
+
+.labelEnter {
+  animation: labelEnter var(--animation-message-enter-duration) var(--animation-message-enter-easing)
+    forwards;
+}

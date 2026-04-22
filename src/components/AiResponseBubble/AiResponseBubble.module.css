@@ -1,0 +1,69 @@
+/* ── Root ── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding-bottom: var(--spacing-xl);
+}
+
+/* ── Loading row ── */
+
+.loadingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.cotToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  background: none;
+  border: none;
+  padding: var(--spacing-sm) 0;
+  cursor: pointer;
+  color: inherit;
+  min-width: 0;
+}
+
+.cotChevron {
+  color: var(--text-neutral-placeholder) !important;
+}
+
+.cotToggle:focus-visible {
+  outline: 2px solid var(--element-outline-focus-default);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+
+/* ── Content area (generating / done) ── */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+/* ── Typewriter / text ── */
+
+.textBlock {
+  color: var(--content-primary-default);
+}
+
+/* ── Slot ── */
+
+.slot {
+  /* No extra styling — the slot content owns its own layout */
+}
+
+/* ── Action bar ── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding-top: var(--spacing-sm);
+}

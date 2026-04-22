@@ -1,3 +1,13 @@
+/* ── Info stack (wraps PromptInputInfo + field when info is present) ── */
+
+.infoStack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  /* Compensate for the -spacing-md margin-bottom on PromptInputInfo */
+  padding-bottom: var(--spacing-md);
+}
+
 /* ── Field (main container card) ── */
 
 .field {
@@ -66,6 +76,12 @@
   border: 0;
 }
 
+/* When an info banner is above the field, raise the field above it */
+.fieldWithInfo {
+  position: relative;
+  z-index: 1;
+}
+
 .field:hover:not(.disabled):not(:focus-within) {
   border-color: var(--element-outline-neutral-hover);
 }
@@ -74,7 +90,15 @@
   pointer-events: none;
   box-shadow: none;
   border: var(--spacing-hair-line) solid var(--element-outline-neutral-disable);
+}
 
+.dragOver {
+  border-color: var(--element-outline-brand-default);
+  box-shadow:
+    0 0 0 var(--spacing-px) var(--element-outline-brand-default),
+    0 calc(-1 * var(--spacing-px)) var(--blur-2xs) 0 var(--shadow-ambient),
+    0 var(--spacing-2xs) var(--blur-xs) 0 var(--shadow-halo),
+    0 var(--spacing-px) var(--blur-2xs) 0 var(--shadow-ambient);
 }
 
 /* Outer shell — no padding (layout / grouping only) */

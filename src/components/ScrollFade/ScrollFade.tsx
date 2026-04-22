@@ -12,6 +12,7 @@ import { Icon } from "../Icon";
 import styles from "./ScrollFade.module.css";
 import { cx } from "../../utils/cx";
 import { easedGradient } from "../../utils/easedGradient";
+import { detectFadeColor } from "../../utils/detectSurface";
 
 export type ScrollFadeDirection = "horizontal" | "vertical";
 export type ScrollFadeSurface = "default" | "over" | "under" | "auto";
@@ -38,57 +39,11 @@ export interface ScrollFadeProps
 
 // ── helpers ────────────────────────────────────────────────────────────
 
-
 const SURFACE_TOKENS: Record<string, string> = {
   default: "--element-surface-default",
   over: "--element-surface-over",
   under: "--element-surface-under",
 };
-
-function extractBgToken(element: HTMLElement): string | null {
-  const raw = element.style.background || element.style.backgroundColor;
-  if (raw) {
-    const m = raw.match(/var\((--[^),]+)/);
-    if (m) return m[1];
-  }
-
-  let token: string | null = null;
-
-  const walk = (rules: CSSRuleList) => {
-    for (const rule of rules) {
-      if (rule instanceof CSSStyleRule) {
-        try { if (!element.matches(rule.selectorText)) continue; } catch { continue; }
-        for (const prop of ["background", "background-color"]) {
-          const val = rule.style.getPropertyValue(prop);
-          if (val) {
-            const m = val.match(/var\((--[^),]+)/);
-            if (m) token = m[1];
-          }
-        }
-      } else if ("cssRules" in rule) {
-        walk((rule as CSSGroupingRule).cssRules);
-      }
-    }
-  };
-
-  for (const sheet of document.styleSheets) {
-    try { walk(sheet.cssRules); } catch { /* cross-origin */ }
-  }
-  return token;
-}
-
-function detectFadeColor(element: HTMLElement): string {
-  let el: HTMLElement | null = element.parentElement;
-  while (el) {
-    const bg = getComputedStyle(el).backgroundColor;
-    if (bg && bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") {
-      const token = extractBgToken(el);
-      return token ? `var(${token})` : bg;
-    }
-    el = el.parentElement;
-  }
-  return "var(--element-surface-default)";
-}
 
 // ── hook ───────────────────────────────────────────────────────────────
 

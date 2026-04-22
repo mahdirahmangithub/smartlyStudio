@@ -1,0 +1,50 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm-extra);
+  margin-bottom: var(--spacing-sm);
+  width: 100%;
+}
+
+/* No overflow:hidden here — lets AiButton box-shadows breathe */
+.rowWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  gap: var(--spacing-sm);
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Vertical padding gives shadow room; negative margin keeps visual height unchanged */
+  padding-block: var(--spacing-xs);
+  margin-block: calc(-1 * var(--spacing-xs));
+  padding-inline: var(--spacing-2xs);
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+.fade {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 64px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.fadeStart {
+  left: 0;
+}
+
+.fadeEnd {
+  right: 0;
+}
+
+.fadeVisible {
+  opacity: 1;
+}

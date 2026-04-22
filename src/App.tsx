@@ -89,6 +89,10 @@ import PieChartPlayground from "./pages/PieChartPlayground";
 import PopoverPlayground from "./pages/PopoverPlayground";
 import ProgressBarPlayground from "./pages/ProgressBarPlayground";
 import PromptInputPlayground from "./pages/PromptInputPlayground";
+import PromptInputRichTextEditorPlayground from "./pages/PromptInputRichTextEditorPlayground";
+import PromptOptionInputPlayground from "./pages/PromptOptionInputPlayground";
+import UserBubblePlayground from "./pages/UserBubblePlayground";
+import RichTextEditorPlayground from "./pages/RichTextEditorPlayground";
 import LinkPlayground from "./pages/LinkPlayground";
 import TextShowcase from "./pages/TextShowcase";
 import TextareaPlayground from "./pages/TextareaPlayground";
@@ -102,6 +106,11 @@ import ShimmerPlayground from "./pages/ShimmerPlayground";
 import DataCellContentPlayground from "./pages/DataCellContentPlayground";
 import AccordionPlayground from "./pages/AccordionPlayground";
 import BreadcrumbPlayground from "./pages/BreadcrumbPlayground";
+import AiButtonPlayground from "./pages/AiButtonPlayground";
+import AiLoadingLabelPlayground from "./pages/AiLoadingLabelPlayground";
+import CotPlayground from "./pages/CotPlayground";
+import AiResponseBubblePlayground from "./pages/AiResponseBubblePlayground";
+import AiThreadPlayground from "./pages/AiThreadPlayground";
 import AISideEntryPlayground from "./pages/AISideEntryPlayground";
 import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import GlobalNavigationBarPlayground from "./pages/GlobalNavigationBarPlayground";
@@ -179,6 +188,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "test-progressive-blur"
 | "toast"
 | "toolbar-button"
+| "ai-button"
 | "ai-side-entry"
 | "ai-text-generation"
 | "container"
@@ -189,6 +199,14 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "editor-popover"
 | "icon-thumbnail"
 | "icon-thumbnail-row"
+| "rich-text-editor"
+| "prompt-input-rte"
+| "prompt-option-input"
+| "user-bubble"
+| "ai-loading-label"
+| "cot"
+| "ai-response-bubble"
+| "ai-thread"
 
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
@@ -328,6 +346,11 @@ function getPageFromPath(): Page {
 const PAGES: { key: Page; label: string }[] = [
   { key: "accordion", label: "Accordion" },
   { key: "add-item-option", label: "AddItemOpt" },
+  { key: "ai-button", label: "AiButton" },
+  { key: "ai-loading-label", label: "AiLoadingLabel" },
+  { key: "ai-response-bubble", label: "AiResponseBubble" },
+  { key: "ai-thread", label: "AiThread" },
+  { key: "cot", label: "CoT" },
   { key: "ai-side-entry", label: "AISideEntry" },
   { key: "ai-text-generation", label: "AI TextGen" },
   { key: "animated-icons", label: "AnimatedIcons" },
@@ -415,6 +438,10 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "popover", label: "Popover" },
   { key: "progress-bar", label: "ProgressBar" },
   { key: "prompt-input", label: "PromptInput" },
+  { key: "prompt-input-rte", label: "PromptInput RTE" },
+  { key: "prompt-option-input", label: "PromptOptionInput" },
+  { key: "user-bubble", label: "UserBubble" },
+  { key: "rich-text-editor", label: "RichTextEditor" },
   { key: "radio", label: "Radio" },
   { key: "row-container", label: "RowContainer" },
   { key: "scroll-fade", label: "ScrollFade" },
@@ -583,7 +610,16 @@ export default function App() {
             </ContentSwitcher>
           </div>
 
-          <div className="app-content" style={page === "navbar-content" ? { maxWidth: "none" } : undefined}>
+          <div
+            className="app-content"
+            style={
+              page === "navbar-content"
+                ? { maxWidth: "none" }
+                : page === "ai-thread"
+                  ? { maxWidth: "none", padding: 0, position: "relative", overflow: "hidden" }
+                  : undefined
+            }
+          >
             {page === "button" && <ButtonPlayground />}
             {page === "icon-container" && <IconContainerPlayground />}
             {page === "icon-thumbnail" && <IconThumbnailPlayground />}
@@ -684,6 +720,10 @@ export default function App() {
             {page === "popover" && <PopoverPlayground />}
             {page === "progress-bar" && <ProgressBarPlayground />}
             {page === "prompt-input" && <PromptInputPlayground />}
+            {page === "prompt-input-rte" && <PromptInputRichTextEditorPlayground />}
+            {page === "prompt-option-input" && <PromptOptionInputPlayground />}
+            {page === "user-bubble" && <UserBubblePlayground />}
+            {page === "rich-text-editor" && <RichTextEditorPlayground />}
             {page === "link" && <LinkPlayground />}
             {page === "text-showcase" && <TextShowcase />}
             {page === "textarea" && <TextareaPlayground />}
@@ -708,6 +748,11 @@ export default function App() {
             {page === "data-cell-content" && <DataCellContentPlayground />}
             {page === "accordion" && <AccordionPlayground />}
             {page === "breadcrumb" && <BreadcrumbPlayground />}
+            {page === "ai-button" && <AiButtonPlayground />}
+            {page === "ai-loading-label" && <AiLoadingLabelPlayground />}
+            {page === "ai-response-bubble" && <AiResponseBubblePlayground />}
+            {page === "ai-thread" && <AiThreadPlayground />}
+            {page === "cot" && <CotPlayground />}
             {page === "ai-side-entry" && <AISideEntryPlayground />}
             {page === "ai-text-generation" && <AITextGenerationPlayground />}
           </div>

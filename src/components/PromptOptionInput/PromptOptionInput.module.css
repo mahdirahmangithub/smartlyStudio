@@ -1,0 +1,140 @@
+/* ── Root card ── */
+
+.field {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm-extra);
+  padding: var(--spacing-sm-extra);
+  background: var(--element-surface-default);
+  border: var(--spacing-hair-line) solid var(--element-outline-neutral-default);
+  border-radius: var(--radius-2xl);
+  box-shadow:
+    0 calc(-1 * var(--spacing-px)) var(--blur-2xs) 0 var(--shadow-ambient),
+    0 var(--spacing-2xs) var(--blur-xs) 0 var(--shadow-halo),
+    0 var(--spacing-px) var(--blur-2xs) 0 var(--shadow-ambient);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Header row ── */
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.headerNoSearch {
+  padding-left: var(--spacing-sm);
+}
+
+.headerLabel {
+  flex: 1 0 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* ── Step navigation ── */
+
+.steps {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+.stepCount {
+  font-family: var(--type-caption-md-family);
+  font-size: var(--type-caption-md-size);
+  font-weight: var(--type-caption-md-weight);
+  line-height: var(--type-caption-md-line-height);
+  letter-spacing: var(--type-caption-md-letter-spacing);
+  color: var(--text-neutral-secondary-default);
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* ── Search input ── */
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  min-height: var(--spacing-xl);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--element-surface-default);
+  border: var(--spacing-px) solid var(--element-outline-neutral-default);
+  border-radius: var(--radius-lg);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  transition: border-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.search:focus-within {
+  border-color: var(--element-outline-neutral-hover);
+}
+
+.searchLeading {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+.searchIcon {
+  flex-shrink: 0;
+  color: var(--text-neutral-secondary-default);
+}
+
+.searchInput {
+  flex: 1 0 0;
+  min-width: 0;
+}
+
+/* ── Options slot ── */
+
+.slot {
+  width: 100%;
+  flex-shrink: 0;
+  min-width: 0;
+  /* Pull the slot flush against adjacent siblings by negating the parent gap */
+  margin-top: calc(-1 * var(--spacing-sm-extra));
+  margin-bottom: calc(-1 * var(--spacing-sm-extra));
+}
+
+/* ── Input + Actions row ── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  width: 100%;
+  flex-shrink: 0;
+  min-width: 0;
+}
+
+.inputArea {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm-plus);
+  flex: 1 0 0;
+  min-width: 0;
+  padding-left: var(--spacing-sm-plus);
+}
+
+.inputIcon {
+  flex-shrink: 0;
+  color: var(--text-neutral-secondary-default);
+}
+
+.actionInput {
+  flex: 1 0 0;
+  min-width: 0;
+}

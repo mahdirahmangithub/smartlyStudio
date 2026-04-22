@@ -1,3 +1,12 @@
+import type { IconName } from "../Icon";
+
+/** A single context item shown as a chip in the context row. */
+export interface PromptInputContextItem {
+  id: string;
+  icon: IconName;
+  label: string;
+}
+
 /**
  * Attachment entry points from the add (+) menu and inline trigger menus.
  * - `photos-files` — combined picker (images + any file); opens the native file dialog (unrestricted accept).
@@ -55,7 +64,13 @@ export interface PromptInputTriggerConfig {
    */
   renderContent?: (props: {
     query: string;
+    /** Dismiss the menu without removing the trigger character (Escape / click-outside). */
     onClose: () => void;
+    /**
+     * Call when the user accepts a selection — removes the trigger character + typed
+     * query from the textarea, then closes the menu.
+     */
+    onAccept: () => void;
     activeIndex: number;
     setItemCount: (n: number) => void;
     registerPickHandler: (fn: () => void) => void;

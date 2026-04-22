@@ -10,7 +10,6 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
-import { ScrollFade } from "../ScrollFade";
 import styles from "./Dropdown.module.css";
 import { cx } from "../../utils/cx";
 import { DropdownMenuTreeContext, DropdownMenuTreeProvider } from "./DropdownMenuTreeContext";
@@ -23,6 +22,7 @@ import {
   type MenuGraceContextValue,
   type SiblingSubmenuManager,
 } from "./MenuContext";
+import { DrilldownProvider, DrilldownPanelContent } from "./DrilldownContext";
 
 /* ═══════════════════════════════════════════════════════════════════════
    Types
@@ -268,6 +268,13 @@ export function Dropdown({
    */
   const isMenuRoot = panelRole === "menu" && treeCtx === null;
 
+  /**
+   * Registry for the root Dropdown only. Nested panels (HoverSubmenu portals) register
+   * into this Set via DropdownMenuTreeProvider. The click-outside handler reads it
+   * directly — the root's own treeCtx is null so it cannot use treeCtx.isInsideTreePanels.
+   */
+  const rootTreePanelsRef = useRef<Set<HTMLElement>>(new Set());
+
   /* ── Grace-area context (role="menu" panels only) ────────────────────────
      Tracks the active grace polygon + pointer direction so HoverSubmenu rows
      can skip opening when the cursor is traversing toward an open sibling panel.
@@ -316,17 +323,34 @@ export function Dropdown({
   }
   const siblingManager = siblingManagerRef.current;
 
-  /** Track horizontal pointer direction across the panel for grace-area checks. */
   const handlePanelPointerMove = useCallback((e: React.PointerEvent) => {
     if (e.pointerType !== "mouse") return;
-    if (e.clientX !== lastPointerXRef.current) {
+    // Grace-area direction tracking (menu panels only).
+    if (panelRole === "menu" && e.clientX !== lastPointerXRef.current) {
       pointerDirRef.current = e.clientX > lastPointerXRef.current ? "right" : "left";
       lastPointerXRef.current = e.clientX;
     }
-  }, []);
+    // When the mouse moves after keyboard navigation: restore pointer events on the
+    // options scope and blur the keyboard-focused item so :focus-visible clears.
+    // This ensures hover and keyboard focus never highlight two items simultaneously.
+    if (keyboardNavRef.current) {
+      keyboardNavRef.current = false;
+      const panel = panelRef.current;
+      if (panel) {
+        const scope =
+          panel.querySelector<HTMLElement>("[data-drill-active]") ?? panel;
+        scope.style.pointerEvents = "";
+        const focused = document.activeElement as HTMLElement | null;
+        if (focused && panel.contains(focused)) focused.blur();
+      }
+    }
+  }, [panelRole]);
   const panelRef = useRef<HTMLDivElement>(null);
   const headerRef = useRef<HTMLDivElement>(null);
   const footerRef = useRef<HTMLDivElement>(null);
+  const drillDepthRef = useRef(0);
+  const drillPopRef = useRef<(() => void) | null>(null);
+  const keyboardNavRef = useRef(false);
   const rafRef = useRef<number>(undefined);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -473,6 +497,15 @@ export function Dropdown({
         return;
       }
       if (treeCtx?.isInsideTreePanels(target)) return;
+      // Root menu (treeCtx === null): check the local registry that nested portals register into.
+      if (isMenuRoot) {
+        const el = target instanceof Element ? target : (target as Node).parentElement;
+        if (el) {
+          for (const p of rootTreePanelsRef.current) {
+            if (p.contains(el)) return;
+          }
+        }
+      }
       dismissReasonRef.current = "click-outside";
       onCloseRef.current();
     };
@@ -508,8 +541,12 @@ export function Dropdown({
   const getOptions = useCallback((): HTMLElement[] => {
     const panel = panelRef.current;
     if (!panel) return [];
+    // When a drill level is active, scope to it only — avoids returning off-screen options
+    // from other levels that would break arrow-key navigation and scroll-to-view.
+    const scope: Element =
+      panel.querySelector("[data-drill-active]") ?? panel;
     return Array.from(
-      panel.querySelectorAll<HTMLElement>(
+      scope.querySelectorAll<HTMLElement>(
         `[role="${itemRole}"]:not([aria-disabled="true"])`
       )
     );
@@ -551,12 +588,16 @@ export function Dropdown({
       const { key, shiftKey } = e;
       const active = document.activeElement as HTMLElement;
 
-      /* ── ArrowLeft: close submenu and return focus to trigger row ── */
+      /* ── ArrowLeft: pop drill level, or close submenu at root ── */
       if (key === "ArrowLeft" && panelRole === "menu") {
         e.preventDefault();
         e.stopPropagation();
-        dismissReasonRef.current = "escape"; // reuse escape path so returnFocusRef fires
-        onCloseRef.current();
+        if (drillDepthRef.current > 0 && drillPopRef.current) {
+          drillPopRef.current();
+        } else {
+          dismissReasonRef.current = "escape"; // reuse escape path so returnFocusRef fires
+          onCloseRef.current();
+        }
         return;
       }
 
@@ -564,6 +605,10 @@ export function Dropdown({
       if (key === "ArrowDown" || key === "ArrowUp") {
         e.preventDefault();
         e.stopPropagation(); // prevent bubbling to an ancestor menu panel via React portal tree
+        // Enter keyboard-nav mode: suppress hover so only one item is highlighted.
+        keyboardNavRef.current = true;
+        const navScope = panel.querySelector<HTMLElement>("[data-drill-active]") ?? panel;
+        navScope.style.pointerEvents = "none";
         const opts = getOptions();
         if (opts.length === 0) return;
 
@@ -593,8 +638,9 @@ export function Dropdown({
           if (!f || !panel.contains(f)) return;
           const allOpts = getOptions();
           const focusedIdx = allOpts.indexOf(f);
-          // Find the scroll container inside the panel (not the page).
-          const sc = Array.from(panel.querySelectorAll<HTMLElement>("*")).find((el) => {
+          // Find the scroll container inside the active drill level (or full panel).
+          const drillScope = panel.querySelector("[data-drill-active]") ?? panel;
+          const sc = Array.from(drillScope.querySelectorAll<HTMLElement>("*")).find((el) => {
             const s = window.getComputedStyle(el);
             return s.overflowY === "auto" || s.overflowY === "scroll";
           }) ?? null;
@@ -623,6 +669,9 @@ export function Dropdown({
 
         e.preventDefault();
         e.stopPropagation();
+        keyboardNavRef.current = true;
+        const navScope = panel.querySelector<HTMLElement>("[data-drill-active]") ?? panel;
+        navScope.style.pointerEvents = "none";
         const opts = getOptions();
         if (opts.length === 0) return;
         const target = key === "Home" ? opts[0] : opts[opts.length - 1];
@@ -700,20 +749,21 @@ export function Dropdown({
       data-theme={theme || undefined}
       onAnimationEnd={onAnimEnd}
       onKeyDown={panelKeyboardNav ? handlePanelKeyDown : undefined}
-      onPointerMove={panelRole === "menu" ? handlePanelPointerMove : undefined}
+      onPointerMove={handlePanelPointerMove}
     >
       {header && (
         <div ref={headerRef} className={styles.header}>{header}</div>
       )}
 
-      <ScrollFade
-        direction="vertical"
-        surface="over"
-        scrollAreaClassName={styles.options}
-        scrollAreaStyle={scrollMaxH != null ? { maxHeight: scrollMaxH } : undefined}
-      >
-        {children}
-      </ScrollFade>
+      <DrilldownProvider open={open}>
+        <DrilldownPanelContent
+          scrollMaxH={scrollMaxH}
+          drillDepthRef={drillDepthRef}
+          drillPopRef={drillPopRef}
+        >
+          {children}
+        </DrilldownPanelContent>
+      </DrilldownProvider>
 
       {footer && (
         <div ref={footerRef} className={styles.footer}>{footer}</div>
@@ -743,7 +793,7 @@ export function Dropdown({
 
   return createPortal(
     isMenuRoot ? (
-      <DropdownMenuTreeProvider>
+      <DropdownMenuTreeProvider panelsRef={rootTreePanelsRef}>
         <MenuDebugContext.Provider value={debugSubmenuBridge}>
           {maybeWrappedPanel}
         </MenuDebugContext.Provider>

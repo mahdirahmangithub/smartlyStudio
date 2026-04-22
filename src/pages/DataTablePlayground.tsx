@@ -148,7 +148,7 @@ const TREE_DATA: TreeRow[] = [
    Sub-demos (stateful sections)
    ═══════════════════════════════════════════════════════════════ */
 
-function CellStatesDemo({ density }: { density: TableDensity }) {
+function CellStatesDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([2, 5]);
 
   const columns: ColumnDef<Employee>[] = [
@@ -202,7 +202,7 @@ function CellStatesDemo({ density }: { density: TableDensity }) {
           columns={columns}
           dataSource={EMPLOYEES}
           rowKey="id"
-          density={density}
+          density={density} columnDividers={columnDividers} rowDividers={rowDividers}
           rowSelection={{
             selectedRowKeys: selectedKeys,
             onChange: (keys) => setSelectedKeys(keys),
@@ -220,7 +220,7 @@ function CellStatesDemo({ density }: { density: TableDensity }) {
           columns={columns}
           dataSource={EMPLOYEES}
           rowKey="id"
-          density={density}
+          density={density} columnDividers={columnDividers} rowDividers={rowDividers}
           rowError={(record) => record.salary < 85000}
           keyboardNavigation
         />
@@ -235,7 +235,7 @@ function CellStatesDemo({ density }: { density: TableDensity }) {
           columns={disabledColumns}
           dataSource={EMPLOYEES}
           rowKey="id"
-          density={density}
+          density={density} columnDividers={columnDividers} rowDividers={rowDividers}
           rowDisabled={(record) => record.department === "Marketing"}
           rowSelection={{
             selectedRowKeys: [1],
@@ -256,7 +256,7 @@ function CellStatesDemo({ density }: { density: TableDensity }) {
           columns={columns}
           dataSource={EMPLOYEES}
           rowKey="id"
-          density={density}
+          density={density} columnDividers={columnDividers} rowDividers={rowDividers}
           rowSelection={{
             selectedRowKeys: [1],
             onChange: () => {},
@@ -270,7 +270,7 @@ function CellStatesDemo({ density }: { density: TableDensity }) {
   );
 }
 
-function BasicDemo({ density }: { density: TableDensity }) {
+function BasicDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const columns: ColumnDef<Employee>[] = [
     {
       key: "name",
@@ -336,7 +336,7 @@ function BasicDemo({ density }: { density: TableDensity }) {
       columns={columns}
       dataSource={EMPLOYEES}
       rowKey="id"
-      density={density}
+      density={density} columnDividers={columnDividers} rowDividers={rowDividers}
     />
   );
 }
@@ -367,7 +367,7 @@ const deptSpans = (() => {
   return map;
 })();
 
-function RowSpanDemo({ density }: { density: TableDensity }) {
+function RowSpanDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const columns: ColumnDef<Employee>[] = [
     {
       key: "department",
@@ -403,7 +403,7 @@ function RowSpanDemo({ density }: { density: TableDensity }) {
       columns={columns}
       dataSource={ROWSPAN_DATA}
       rowKey="id"
-      density={density}
+      density={density} columnDividers={columnDividers} rowDividers={rowDividers}
     />
   );
 }
@@ -435,7 +435,7 @@ const COLSPAN_DATA: ColSpanRow[] = [
 
 const TOTAL_LEAF_COLS = 5;
 
-function ColSpanDemo({ density }: { density: TableDensity }) {
+function ColSpanDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const columns: ColumnDef<ColSpanRow>[] = [
     {
       key: "name",
@@ -494,12 +494,12 @@ function ColSpanDemo({ density }: { density: TableDensity }) {
       columns={columns}
       dataSource={COLSPAN_DATA}
       rowKey="id"
-      density={density}
+      density={density} columnDividers={columnDividers} rowDividers={rowDividers}
     />
   );
 }
 
-function GroupedHeaderDemo({ density }: { density: TableDensity }) {
+function GroupedHeaderDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 180,
       render: (v: string) => <DataCellContent title={v} />,
@@ -542,12 +542,12 @@ function GroupedHeaderDemo({ density }: { density: TableDensity }) {
       columns={columns}
       dataSource={EMPLOYEES}
       rowKey="id"
-      density={density}
+      density={density} columnDividers={columnDividers} rowDividers={rowDividers}
     />
   );
 }
 
-function SelectionDemo({ density }: { density: TableDensity }) {
+function SelectionDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [radioKey, setRadioKey] = useState<React.Key[]>([]);
 
@@ -576,7 +576,7 @@ function SelectionDemo({ density }: { density: TableDensity }) {
           columns={columns}
           dataSource={EMPLOYEES.slice(0, 5)}
           rowKey="id"
-          density={density}
+          density={density} columnDividers={columnDividers} rowDividers={rowDividers}
           rowDisabled={isDisabled}
           rowSelection={{
             type: "checkbox",
@@ -595,7 +595,7 @@ function SelectionDemo({ density }: { density: TableDensity }) {
           columns={columns}
           dataSource={EMPLOYEES.slice(0, 5)}
           rowKey="id"
-          density={density}
+          density={density} columnDividers={columnDividers} rowDividers={rowDividers}
           rowDisabled={isDisabled}
           rowSelection={{
             type: "radio",
@@ -609,7 +609,7 @@ function SelectionDemo({ density }: { density: TableDensity }) {
   );
 }
 
-function ExpandableDemo({ density }: { density: TableDensity }) {
+function ExpandableDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 180,
       render: (v: string) => <DataCellContent title={v} />,
@@ -633,7 +633,7 @@ function ExpandableDemo({ density }: { density: TableDensity }) {
       columns={columns}
       dataSource={EMPLOYEES.slice(0, 5)}
       rowKey="id"
-      density={density}
+      density={density} columnDividers={columnDividers} rowDividers={rowDividers}
       expandable={{
         expandedRowRender: (record) => (
           <div style={{ padding: 12 }}>
@@ -648,7 +648,7 @@ function ExpandableDemo({ density }: { density: TableDensity }) {
   );
 }
 
-function TreeDemo({ density }: { density: TableDensity }) {
+function TreeDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const [showConnectors, setShowConnectors] = useState(true);
   const [indentWidth, setIndentWidth] = useState(32);
   const [lineStyle, setLineStyle] = useState<TreeIndentLineStyle>("slope");
@@ -697,7 +697,7 @@ function TreeDemo({ density }: { density: TableDensity }) {
         columns={columns}
         dataSource={TREE_DATA}
         rowKey="id"
-        density={density}
+        density={density} columnDividers={columnDividers} rowDividers={rowDividers}
         expandable={{ defaultExpandedRowKeys: [1, 2, 3, 11, 12, 13, 21, 111, 123, 1232] }}
         treeConnectorLines={showConnectors}
         treeIndentWidth={indentWidth}
@@ -707,7 +707,7 @@ function TreeDemo({ density }: { density: TableDensity }) {
   );
 }
 
-function SortingDemo({ density }: { density: TableDensity }) {
+function SortingDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const [sortState, setSortState] = useState<SortState | null>(null);
 
   const sorted = [...EMPLOYEES].sort((a, b) => {
@@ -751,7 +751,7 @@ function SortingDemo({ density }: { density: TableDensity }) {
         columns={columns}
         dataSource={sorted}
         rowKey="id"
-        density={density}
+        density={density} columnDividers={columnDividers} rowDividers={rowDividers}
         sortState={sortState}
         onSort={setSortState}
       />
@@ -759,7 +759,7 @@ function SortingDemo({ density }: { density: TableDensity }) {
   );
 }
 
-function ColumnResizeDefaultDemo({ density }: { density: TableDensity }) {
+function ColumnResizeDefaultDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 180, minWidth: 80,
       render: (v: string, r: Employee) => <DataCellContent title={v} description={r.email} />,
@@ -783,7 +783,7 @@ function ColumnResizeDefaultDemo({ density }: { density: TableDensity }) {
       columns={columns}
       dataSource={EMPLOYEES}
       rowKey="id"
-      density={density}
+      density={density} columnDividers={columnDividers} rowDividers={rowDividers}
       columnResize={{ mode: "fixed" }}
       stickyHeader
       style={{ maxHeight: 320 }}
@@ -791,7 +791,7 @@ function ColumnResizeDefaultDemo({ density }: { density: TableDensity }) {
   );
 }
 
-function ColumnResizeFluidDemo({ density }: { density: TableDensity }) {
+function ColumnResizeFluidDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", flex: 2, minWidth: 120,
       render: (v: string, r: Employee) => <DataCellContent title={v} description={r.email} />,
@@ -815,7 +815,7 @@ function ColumnResizeFluidDemo({ density }: { density: TableDensity }) {
       columns={columns}
       dataSource={EMPLOYEES}
       rowKey="id"
-      density={density}
+      density={density} columnDividers={columnDividers} rowDividers={rowDividers}
       columnResize={{ mode: "overflow" }}
       stickyHeader
       style={{ maxHeight: 320 }}
@@ -835,7 +835,7 @@ const STICKY_DATA: Employee[] = [
   { id: 15, name: "Olivia Pope", age: 38, email: "olivia@example.com", department: "Engineering", salary: 115000 },
 ];
 
-function StickyDemo({ density }: { density: TableDensity }) {
+function StickyDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const fmt = (v: number) => `$${v.toLocaleString()}`;
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name (sticky left)", dataIndex: "name", width: 180, fixed: "left",
@@ -882,7 +882,7 @@ function StickyDemo({ density }: { density: TableDensity }) {
         columns={columns}
         dataSource={STICKY_DATA}
         rowKey="id"
-        density={density}
+        density={density} columnDividers={columnDividers} rowDividers={rowDividers}
         stickyHeader
         style={{ maxHeight: 250 }}
       />
@@ -890,7 +890,7 @@ function StickyDemo({ density }: { density: TableDensity }) {
   );
 }
 
-function RowDnDDemo({ density }: { density: TableDensity }) {
+function RowDnDDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const [data, setData] = useState(STICKY_DATA);
 
   const reorder = useCallback(
@@ -929,7 +929,7 @@ function RowDnDDemo({ density }: { density: TableDensity }) {
         columns={columns}
         dataSource={data}
         rowKey="id"
-        density={density}
+        density={density} columnDividers={columnDividers} rowDividers={rowDividers}
         stickyHeader
         rowDragAndDrop={{ onReorder: reorder }}
         style={{ maxHeight: 300 }}
@@ -938,7 +938,7 @@ function RowDnDDemo({ density }: { density: TableDensity }) {
   );
 }
 
-function ColumnDnDDemo({ density }: { density: TableDensity }) {
+function ColumnDnDDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 180,
       render: (v: string) => <DataCellContent title={v} />,
@@ -963,14 +963,14 @@ function ColumnDnDDemo({ density }: { density: TableDensity }) {
         columns={columns}
         dataSource={EMPLOYEES.slice(0, 4)}
         rowKey="id"
-        density={density}
+        density={density} columnDividers={columnDividers} rowDividers={rowDividers}
         columnDragAndDrop={{ onReorder: (from, to) => console.log("col move", from, to) }}
       />
     </>
   );
 }
 
-function KeyboardNavDemo({ density }: { density: TableDensity }) {
+function KeyboardNavDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const columns: ColumnDef<Employee>[] = [
     { key: "name", title: "Name", dataIndex: "name", width: 180,
       render: (v: string) => <DataCellContent title={v} />,
@@ -992,14 +992,14 @@ function KeyboardNavDemo({ density }: { density: TableDensity }) {
         columns={columns}
         dataSource={EMPLOYEES.slice(0, 4)}
         rowKey="id"
-        density={density}
+        density={density} columnDividers={columnDividers} rowDividers={rowDividers}
         keyboardNavigation
       />
     </>
   );
 }
 
-function CombinedDemo({ density }: { density: TableDensity }) {
+function CombinedDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const [selectedKeys, setSelectedKeys] = useState<React.Key[]>([]);
   const [sortState, setSortState] = useState<SortState | null>(null);
 
@@ -1062,7 +1062,7 @@ function CombinedDemo({ density }: { density: TableDensity }) {
         columns={columns}
         dataSource={sorted}
         rowKey="id"
-        density={density}
+        density={density} columnDividers={columnDividers} rowDividers={rowDividers}
         rowSelection={{
           selectedRowKeys: selectedKeys,
           onChange: (keys) => setSelectedKeys(keys),
@@ -1105,7 +1105,7 @@ const COMP_DATA: CompRow[] = [
   { id: 6, name: "Frank Lee", title: "VP Marketing", department: "Marketing", baseSalary: 210000, bonus: 50000, rsus: 80000, options: 20000 },
 ];
 
-function DeepHeaderGroupDemo({ density }: { density: TableDensity }) {
+function DeepHeaderGroupDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const fmt = (v: number) => `$${v.toLocaleString()}`;
 
   const columns: ColumnDef<CompRow>[] = [
@@ -1158,7 +1158,7 @@ function DeepHeaderGroupDemo({ density }: { density: TableDensity }) {
       columns={columns}
       dataSource={COMP_DATA}
       rowKey="id"
-      density={density}
+      density={density} columnDividers={columnDividers} rowDividers={rowDividers}
       columnResize={{ mode: "fixed" }}
     />
   );
@@ -1186,7 +1186,47 @@ const PROJECT_DATA: ProjectRow[] = [
   { id: 5, project: "Analytics Dashboard", lead: "Eve", startDate: "2025-01-20", endDate: "2025-04-30", budget: 95000, spent: 91000, priority: "Low", status: "Complete" },
 ];
 
-function GroupedHeaderColDnDDemo({ density }: { density: TableDensity }) {
+const DIVIDER_COLS: ColumnDef<Employee>[] = [
+  { key: "name", title: "Name", dataIndex: "name", width: 180, render: (v: string) => <DataCellContent title={v} /> },
+  { key: "department", title: "Department", dataIndex: "department", width: 140, render: (v: string) => <DataCellContent title={v} /> },
+  { key: "age", title: "Age", dataIndex: "age", width: 80, render: (v: number) => <DataCellContent title={String(v)} /> },
+  { key: "salary", title: "Salary", dataIndex: "salary", width: 120, render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} /> },
+];
+
+function NoColumnDividersDemo({ density }: { density: TableDensity }) {
+  return (
+    <DataTable columns={DIVIDER_COLS} dataSource={EMPLOYEES} rowKey="id" density={density} columnDividers={false} />
+  );
+}
+
+function NoRowDividersDemo({ density }: { density: TableDensity }) {
+  return (
+    <DataTable columns={DIVIDER_COLS} dataSource={EMPLOYEES} rowKey="id" density={density} rowDividers={false} />
+  );
+}
+
+function NoDividersDemo({ density }: { density: TableDensity }) {
+  return (
+    <DataTable columns={DIVIDER_COLS} dataSource={EMPLOYEES} rowKey="id" density={density} columnDividers={false} rowDividers={false} />
+  );
+}
+
+function CellOverrideDividersDemo({ density }: { density: TableDensity }) {
+  // Table has no column dividers, but "Name" column explicitly shows its right divider
+  // Table has row dividers, but "Age" column hides its bottom divider
+  const columns: ColumnDef<Employee>[] = [
+    { key: "name", title: "Name", dataIndex: "name", width: 180, dividerRight: true, render: (v: string) => <DataCellContent title={v} /> },
+    { key: "department", title: "Department", dataIndex: "department", width: 140, render: (v: string) => <DataCellContent title={v} /> },
+    { key: "age", title: "Age", dataIndex: "age", width: 80, dividerBottom: false, render: (v: number) => <DataCellContent title={String(v)} /> },
+    { key: "salary", title: "Salary", dataIndex: "salary", width: 120, render: (v: number) => <DataCellContent title={`$${v.toLocaleString()}`} /> },
+  ];
+
+  return (
+    <DataTable columns={columns} dataSource={EMPLOYEES} rowKey="id" density={density} columnDividers={false} />
+  );
+}
+
+function GroupedHeaderColDnDDemo({ density, columnDividers, rowDividers }: DemoProps) {
   const fmt = (v: number) => `$${v.toLocaleString()}`;
 
   const columns: ColumnDef<ProjectRow>[] = [
@@ -1245,7 +1285,7 @@ function GroupedHeaderColDnDDemo({ density }: { density: TableDensity }) {
         columns={columns}
         dataSource={PROJECT_DATA}
         rowKey="id"
-        density={density}
+        density={density} columnDividers={columnDividers} rowDividers={rowDividers}
         columnDragAndDrop={{ onReorder: (from, to) => console.log("grouped col move", from, to) }}
       />
     </>
@@ -1367,6 +1407,8 @@ function StandaloneTreeIndentDemo() {
    Playground Page
    ═══════════════════════════════════════════════════════════════ */
 
+interface DemoProps { density: TableDensity; columnDividers: boolean; rowDividers: boolean; }
+
 const DENSITIES: TableDensity[] = ["none", "sm", "md", "lg"];
 const selectStyle: CSSProperties = {
   padding: "4px 8px",
@@ -1379,6 +1421,8 @@ const selectStyle: CSSProperties = {
 
 export default function DataTablePlayground() {
   const [density, setDensity] = useState<TableDensity>("md");
+  const [columnDividers, setColumnDividers] = useState(true);
+  const [rowDividers, setRowDividers] = useState(true);
 
   return (
     <div>
@@ -1387,7 +1431,7 @@ export default function DataTablePlayground() {
         Functional demos — no decorative styling applied.
       </p>
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center", marginBottom: 32 }}>
+      <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 32 }}>
         <label style={{ fontSize: 13, fontWeight: 600 }}>
           Density:{" "}
           <select
@@ -1400,17 +1444,25 @@ export default function DataTablePlayground() {
             ))}
           </select>
         </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+          <input type="checkbox" checked={columnDividers} onChange={(e) => setColumnDividers(e.target.checked)} />
+          Column dividers
+        </label>
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+          <input type="checkbox" checked={rowDividers} onChange={(e) => setRowDividers(e.target.checked)} />
+          Row dividers
+        </label>
       </div>
 
       <div>
       <section style={sectionStyle}>
         <h2>Cell States (Checked / Error / Disabled / Hover / Focus)</h2>
-        <div style={cardStyle}><CellStatesDemo density={density} /></div>
+        <div style={cardStyle}><CellStatesDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Basic</h2>
-        <div style={cardStyle}><BasicDemo density={density} /></div>
+        <div style={cardStyle}><BasicDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1418,7 +1470,7 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Department column merges vertically for consecutive rows in the same department via <code>onCell</code> returning <code>rowSpan</code>.
         </p>
-        <div style={cardStyle}><RowSpanDemo density={density} /></div>
+        <div style={cardStyle}><RowSpanDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1426,22 +1478,22 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Section header rows span all columns using <code>colSpan</code>. Other columns return <code>colSpan: 0</code> to hide.
         </p>
-        <div style={cardStyle}><ColSpanDemo density={density} /></div>
+        <div style={cardStyle}><ColSpanDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Grouped Headers (Multi-Level)</h2>
-        <div style={cardStyle}><GroupedHeaderDemo density={density} /></div>
+        <div style={cardStyle}><GroupedHeaderDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Row Selection</h2>
-        <div style={cardStyle}><SelectionDemo density={density} /></div>
+        <div style={cardStyle}><SelectionDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Expandable Rows</h2>
-        <div style={cardStyle}><ExpandableDemo density={density} /></div>
+        <div style={cardStyle}><ExpandableDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1449,7 +1501,7 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Tree rows with connector lines showing parent–child relationships. Uses the reusable <code>TreeIndent</code> component.
         </p>
-        <div style={cardStyle}><TreeDemo density={density} /></div>
+        <div style={cardStyle}><TreeDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1463,7 +1515,7 @@ export default function DataTablePlayground() {
 
       <section style={sectionStyle}>
         <h2>Sorting</h2>
-        <div style={cardStyle}><SortingDemo density={density} /></div>
+        <div style={cardStyle}><SortingDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1472,38 +1524,38 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Table width stays constant. Dragging a column border grows/shrinks it and the neighbor column compensates — no overflow.
         </p>
-        <div style={cardStyle}><ColumnResizeDefaultDemo density={density} /></div>
+        <div style={cardStyle}><ColumnResizeDefaultDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
 
         <h3 style={{ marginTop: 24 }}>Overflow (flex widths)</h3>
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Columns use <code>flex</code> to share available space. Resizing a column converts it to a fixed width; the table can overflow.
         </p>
-        <div style={cardStyle}><ColumnResizeFluidDemo density={density} /></div>
+        <div style={cardStyle}><ColumnResizeFluidDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Sticky Header & Columns</h2>
-        <div style={cardStyle}><StickyDemo density={density} /></div>
+        <div style={cardStyle}><StickyDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Row Drag & Drop Reordering</h2>
-        <div style={cardStyle}><RowDnDDemo density={density} /></div>
+        <div style={cardStyle}><RowDnDDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Column Drag & Drop Reordering</h2>
-        <div style={cardStyle}><ColumnDnDDemo density={density} /></div>
+        <div style={cardStyle}><ColumnDnDDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Keyboard Navigation</h2>
-        <div style={cardStyle}><KeyboardNavDemo density={density} /></div>
+        <div style={cardStyle}><KeyboardNavDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Combined Features</h2>
-        <div style={cardStyle}><CombinedDemo density={density} /></div>
+        <div style={cardStyle}><CombinedDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1512,12 +1564,46 @@ export default function DataTablePlayground() {
           Three-level header groups: top-level "Employee" and "Compensation" groups,
           with "Compensation" further split into "Base" and "Equity" sub-groups.
         </p>
-        <div style={cardStyle}><DeepHeaderGroupDemo density={density} /></div>
+        <div style={cardStyle}><DeepHeaderGroupDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>
         <h2>Grouped Header Column Drag &amp; Drop</h2>
-        <div style={cardStyle}><GroupedHeaderColDnDDemo density={density} /></div>
+        <div style={cardStyle}><GroupedHeaderColDnDDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>No Column Dividers</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          <code>columnDividers=&#123;false&#125;</code> — hides the right border between all columns table-wide.
+        </p>
+        <div style={cardStyle}><NoColumnDividersDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>No Row Dividers</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          <code>rowDividers=&#123;false&#125;</code> — hides the bottom border between all rows table-wide.
+        </p>
+        <div style={cardStyle}><NoRowDividersDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>No Dividers</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Both <code>columnDividers=&#123;false&#125;</code> and <code>rowDividers=&#123;false&#125;</code>.
+        </p>
+        <div style={cardStyle}><NoDividersDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Cell-level Divider Overrides</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Table has <code>columnDividers=&#123;false&#125;</code>, but the "Name" column sets{" "}
+          <code>dividerRight=&#123;true&#125;</code> to restore its right border. The "Age" column
+          sets <code>dividerBottom=&#123;false&#125;</code> to hide its bottom border.
+        </p>
+        <div style={cardStyle}><CellOverrideDividersDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
       </div>
     </div>

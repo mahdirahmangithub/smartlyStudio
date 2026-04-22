@@ -1,0 +1,172 @@
+/* ── Root wrapper ── */
+
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 96px;
+  width: 100%;
+  /*
+   * Consumers override this to match their background.
+   * PromptInput sets --element-surface-default on its field card,
+   * so the default is already correct for that context.
+   */
+  --rte-fade-bg: var(--element-surface-default);
+}
+
+/* ── Size: sm — label/sm (14 px) ── */
+
+.sm {
+  font-family: var(--type-label-sm-family);
+  font-size: var(--type-label-sm-size);
+  font-weight: var(--type-label-sm-weight);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+}
+
+/* ── Size: lg — label/md (16 px) ── */
+
+.lg {
+  font-family: var(--type-label-md-family);
+  font-size: var(--type-label-md-size);
+  font-weight: var(--type-label-md-weight);
+  line-height: var(--type-label-md-line-height);
+  letter-spacing: var(--type-label-md-letter-spacing);
+}
+
+/* ── Editable content area ── */
+
+.editor {
+  position: relative;
+  z-index: 1;
+  /* Suppress browser :focus-visible outline — focus chrome is opt-in via focusIndicator */
+  outline: none !important;
+  padding: var(--spacing-2xs) 0 var(--spacing-2xs) var(--spacing-2xs);
+  /* Match InlineTextarea text tokens exactly */
+  color: var(--text-neutral-primary);
+  caret-color: var(--util-caret-default);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  overflow-y: auto;
+  /* Hide scrollbar — same as Textarea */
+  scrollbar-width: none;
+  cursor: text;
+  -webkit-user-select: text;
+  user-select: text;
+  /* font inherits from .sm / .lg on .root */
+}
+
+.editor::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Placeholder ── */
+
+/*
+ * Absolutely overlays the editor so it lines up with the first line of text.
+ * Uses the same padding as .editor so the text baseline is identical.
+ */
+.placeholder {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: var(--spacing-2xs) 0 var(--spacing-2xs) var(--spacing-2xs);
+  pointer-events: none;
+  /* Match InlineTextarea / Textarea placeholder token */
+  color: var(--text-neutral-placeholder);
+  /* font inherits from .sm / .lg on .root */
+}
+
+/* ── Scroll fades ── */
+
+/*
+ * The editor is the scrollable element; fades sit above it (z-index: 2)
+ * and are clipped by the root's overflow (if any is set by the parent).
+ */
+
+.fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: var(--spacing-md);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.fadeVisible {
+  opacity: 1;
+}
+
+.fadeTop {
+  top: 0;
+  background: linear-gradient(to bottom, var(--rte-fade-bg), transparent);
+}
+
+.fadeBottom {
+  bottom: 0;
+  background: linear-gradient(to top, var(--rte-fade-bg), transparent);
+}
+
+/* ── Disabled ── */
+
+.disabled {
+  pointer-events: none;
+}
+
+/* Match Textarea / InlineTextarea disabled text token */
+.disabled .editor {
+  color: var(--text-neutral-disable);
+}
+
+.disabled .placeholder {
+  color: var(--text-neutral-disable);
+}
+
+/* ── Focus ring (opt-in via focusIndicator prop) ── */
+
+.focusRing {
+  position: absolute;
+  inset: calc(-1 * var(--spacing-2xs));
+  border: var(--spacing-px) solid var(--element-outline-brand-active);
+  border-radius: var(--radius-sm);
+  pointer-events: none;
+  opacity: var(--opacity-0);
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.root:focus-within .focusRing {
+  opacity: var(--opacity-100);
+}
+
+/* ── Hover indicator (opt-in via hoverIndicator prop) ── */
+
+.hoverOverlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(
+    to right,
+    var(--element-overlay-fader-start) 0%,
+    var(--element-overlay-fader-end) 84%
+  );
+  pointer-events: none;
+  opacity: var(--opacity-0);
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.root:hover:not(:focus-within):not(.disabled) .hoverOverlay {
+  opacity: var(--opacity-100);
+}
+
+.hoverIcon {
+  color: var(--text-neutral-secondary-default);
+}
