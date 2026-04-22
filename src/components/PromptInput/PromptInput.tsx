@@ -1088,7 +1088,6 @@ export function PromptInputTextarea({
   const {
     value,
     setValue,
-    loading,
     disabled,
     textareaRef,
     submit,
@@ -1237,7 +1236,6 @@ export function PromptInputRichTextEditor({
   const {
     value,
     setValue,
-    loading,
     disabled,
     submit,
     syncAttachmentMenuFromEditor,
@@ -1254,7 +1252,7 @@ export function PromptInputRichTextEditor({
   } = usePromptInput();
 
   const handleKeyDown = useCallback(
-    (e: KeyboardEvent): boolean => {
+    (e: globalThis.KeyboardEvent): boolean => {
       if (e.isComposing) return false;
 
       if (attachmentMenuCombobox) {

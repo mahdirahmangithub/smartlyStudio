@@ -1577,7 +1577,7 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           <code>columnDividers=&#123;false&#125;</code> — hides the right border between all columns table-wide.
         </p>
-        <div style={cardStyle}><NoColumnDividersDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
+        <div style={cardStyle}><NoColumnDividersDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1585,7 +1585,7 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           <code>rowDividers=&#123;false&#125;</code> — hides the bottom border between all rows table-wide.
         </p>
-        <div style={cardStyle}><NoRowDividersDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
+        <div style={cardStyle}><NoRowDividersDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1593,7 +1593,7 @@ export default function DataTablePlayground() {
         <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
           Both <code>columnDividers=&#123;false&#125;</code> and <code>rowDividers=&#123;false&#125;</code>.
         </p>
-        <div style={cardStyle}><NoDividersDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
+        <div style={cardStyle}><NoDividersDemo density={density} /></div>
       </section>
 
       <section style={sectionStyle}>
@@ -1603,7 +1603,7 @@ export default function DataTablePlayground() {
           <code>dividerRight=&#123;true&#125;</code> to restore its right border. The "Age" column
           sets <code>dividerBottom=&#123;false&#125;</code> to hide its bottom border.
         </p>
-        <div style={cardStyle}><CellOverrideDividersDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
+        <div style={cardStyle}><CellOverrideDividersDemo density={density} /></div>
       </section>
       </div>
     </div>

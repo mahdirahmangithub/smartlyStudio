@@ -69,13 +69,13 @@ export default function AiLoadingLabelPlayground() {
       <div style={s.controls}>
 
         <div style={s.controlRow}>
-          <Label size="sm" label="Size" style={s.controlLabel} />
+          <Label size="sm" label="Size" />
           <Button
             ref={sizeAnchorRef}
             size="sm"
             variant="neutral"
             emphasis="low"
-            trailingIcon={<Icon name="chevron_down" size={14} aria-hidden />}
+            trailingIcon={<Icon name="arrow_chevron_down" size={14} aria-hidden />}
             onClick={() => setSizeOpen((o) => !o)}
             aria-haspopup="listbox"
             aria-expanded={sizeOpen}
@@ -102,12 +102,12 @@ export default function AiLoadingLabelPlayground() {
         </div>
 
         <div style={s.controlRow}>
-          <Label htmlFor="step-count" size="sm" label="Steps" style={s.controlLabel} />
+          <Label htmlFor="step-count" size="sm" label="Steps" />
           <div style={s.inputWrap}>
             <Input
               id="step-count"
               type="number"
-              size="sm"
+              size="md"
               value={stepCount}
               min={1}
               max={ALL_LABELS.length}
@@ -118,12 +118,12 @@ export default function AiLoadingLabelPlayground() {
         </div>
 
         <div style={s.controlRow}>
-          <Label htmlFor="interval-ms" size="sm" label="Interval (ms)" style={s.controlLabel} />
+          <Label htmlFor="interval-ms" size="sm" label="Interval (ms)" />
           <div style={s.inputWrap}>
             <Input
               id="interval-ms"
               type="number"
-              size="sm"
+              size="md"
               value={intervalMs}
               min={100}
               step={100}

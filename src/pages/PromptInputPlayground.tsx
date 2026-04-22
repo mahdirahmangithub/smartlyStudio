@@ -20,7 +20,6 @@ import {
   type ContextMenuDrillLevel,
   type PromptInputContextItem,
 } from "../components/PromptInput";
-import { Icon } from "../components/Icon";
 import type { AttachmentMenuItemDef } from "../components/PromptInput/PromptInputAttachmentMenu";
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
@@ -327,7 +326,6 @@ function ContextMenuWithAdd({
   return (
     <PromptInputContextMenu
       query={query}
-      onClose={onClose}
       activeIndex={activeIndex}
       setItemCount={setItemCount}
       registerPickHandler={registerPickHandler}

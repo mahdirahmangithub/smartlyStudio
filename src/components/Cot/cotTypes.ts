@@ -11,7 +11,7 @@ export type CotItemStatus = "idle" | "loading" | "complete" | "error";
  */
 export type CotItemVariant = "dot" | "icon" | "todo";
 
-export interface CotItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "children"> {
+export interface CotItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "children" | "title"> {
   /** Step title — primary label. */
   title?: ReactNode;
   /** Step description — secondary label below the title. */

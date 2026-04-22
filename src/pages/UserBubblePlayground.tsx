@@ -13,7 +13,6 @@ import {
   type PromptInputContextItem,
   type ContextMenuSuggestedItem,
   type ContextMenuCategory,
-  type ContextMenuDrillLevel,
 } from "../components/PromptInput";
 import type { PromptAttachedFile } from "../components/PromptInput/promptInputTypes";
 import { isImageFile } from "../utils/inferFileType";
@@ -95,7 +94,6 @@ function ContextMenuWithAdd(props: {
   return (
     <PromptInputContextMenu
       query={props.query}
-      onClose={props.onClose}
       activeIndex={props.activeIndex}
       setItemCount={props.setItemCount}
       registerPickHandler={props.registerPickHandler}
@@ -186,7 +184,7 @@ export default function UserBubblePlayground() {
             id="toggle-reply"
             size="sm"
           />
-          <Label htmlFor="toggle-reply" size="sm">Show reply label on bubbles</Label>
+          <Label htmlFor="toggle-reply" size="sm" label="Show reply label on bubbles" />
         </div>
       </div>
 

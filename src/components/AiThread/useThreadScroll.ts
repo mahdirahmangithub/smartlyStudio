@@ -10,9 +10,9 @@ export interface UseThreadScrollOptions {
 }
 
 export interface UseThreadScrollResult {
-  containerRef: React.RefObject<HTMLDivElement>;
-  sentinelRef: React.RefObject<HTMLDivElement>;
-  spacerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
+  sentinelRef: React.RefObject<HTMLDivElement | null>;
+  spacerRef: React.RefObject<HTMLDivElement | null>;
   showFab: boolean;
   onFabClick: () => void;
   scrollToBottom: (behavior?: ScrollBehavior) => void;

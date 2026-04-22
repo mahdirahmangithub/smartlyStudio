@@ -120,7 +120,7 @@ export default function CotPlayground() {
                 size="sm"
                 variant="neutral"
                 emphasis="low"
-                trailingIcon={<Icon name="chevron_down" size={14} aria-hidden />}
+                trailingIcon={<Icon name="arrow_chevron_down" size={14} aria-hidden />}
                 onClick={() => setIsoDropdownOpen((o) => o === "variant" ? null : "variant")}
                 aria-haspopup="listbox"
                 aria-expanded={isoDropdownOpen === "variant"}
@@ -154,7 +154,7 @@ export default function CotPlayground() {
                 size="sm"
                 variant="neutral"
                 emphasis="low"
-                trailingIcon={<Icon name="chevron_down" size={14} aria-hidden />}
+                trailingIcon={<Icon name="arrow_chevron_down" size={14} aria-hidden />}
                 onClick={() => setIsoDropdownOpen((o) => o === "status" ? null : "status")}
                 aria-haspopup="listbox"
                 aria-expanded={isoDropdownOpen === "status"}

@@ -3,7 +3,7 @@ import type { FeedbackValue } from "../FeedbackBoolean";
 
 export type AiResponseBubblePhase = "loading" | "generating" | "done";
 
-export interface AiResponseBubbleProps extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+export interface AiResponseBubbleProps extends Omit<HTMLAttributes<HTMLElement>, "children" | "slot"> {
   /** Current rendering phase. */
   phase: AiResponseBubblePhase;
 

@@ -121,7 +121,6 @@ function ContextMenuWithAdd({
   return (
     <PromptInputContextMenu
       query={query}
-      onClose={onClose}
       activeIndex={activeIndex}
       setItemCount={setItemCount}
       registerPickHandler={registerPickHandler}
@@ -232,7 +231,7 @@ function DisabledDemo() {
   );
 }
 
-function AttachmentsAndErrorDemo() {
+function _AttachmentsAndErrorDemo() {
   const [hasAttachments, setHasAttachments] = useState(false);
   const [error, setError] = useState(false);
 
@@ -545,7 +544,6 @@ function ChipInsertContextMenu({
   return (
     <PromptInputContextMenu
       query={query}
-      onClose={onClose}
       activeIndex={activeIndex}
       setItemCount={setItemCount}
       registerPickHandler={registerPickHandler}

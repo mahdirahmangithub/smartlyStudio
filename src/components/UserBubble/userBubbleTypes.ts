@@ -20,7 +20,7 @@ export interface UserBubbleContextItem {
 }
 
 export interface UserBubbleProps
-  extends Omit<HTMLAttributes<HTMLElement>, "children"> {
+  extends Omit<HTMLAttributes<HTMLElement>, "children" | "onCopy"> {
   /** Plain-text message body. */
   message: string;
   /** Attached files displayed above the bubble as compact read-only thumbnails. */

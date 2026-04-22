@@ -206,7 +206,6 @@ function ContextMenuWithAdd(props: {
   return (
     <PromptInputContextMenu
       query={props.query}
-      onClose={props.onClose}
       activeIndex={props.activeIndex}
       setItemCount={props.setItemCount}
       registerPickHandler={props.registerPickHandler}
