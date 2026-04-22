@@ -288,7 +288,7 @@ function PerTriggerDemo() {
  */
 function ContextMenuWithAdd({
   query,
-  onClose,
+  onClose: _onClose,
   onAccept,
   activeIndex,
   setItemCount,

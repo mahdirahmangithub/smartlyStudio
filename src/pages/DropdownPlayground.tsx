@@ -689,7 +689,7 @@ export default function DropdownPlayground() {
             <GenericSelectOption
               labelText="Shared with me"
               description={false}
-              leading={<Icon name="account" size={20} />}
+              leading={<Icon name="account_circle" size={20} />}
               onClick={() => setDrillOpen(false)}
             />
             <GenericSelectOption

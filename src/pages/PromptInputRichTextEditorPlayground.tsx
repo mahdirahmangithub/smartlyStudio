@@ -91,7 +91,7 @@ const DEFAULT_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
 
 function ContextMenuWithAdd({
   query,
-  onClose,
+  onClose: _onClose,
   onAccept,
   activeIndex,
   setItemCount,
@@ -231,41 +231,6 @@ function DisabledDemo() {
   );
 }
 
-function _AttachmentsAndErrorDemo() {
-  const [hasAttachments, setHasAttachments] = useState(false);
-  const [error, setError] = useState(false);
-
-  return (
-    <div>
-      <label style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, fontSize: 13 }}>
-        <input type="checkbox" checked={hasAttachments} onChange={(e) => setHasAttachments(e.target.checked)} />
-        Simulate attachment
-      </label>
-      <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13 }}>
-        <input type="checkbox" checked={error} onChange={(e) => setError(e.target.checked)} />
-        Error
-      </label>
-      <div style={promptWrapper}>
-        <PromptInput
-          triggerMenus={DEFAULT_TRIGGER_MENUS}
-          hasAttachments={hasAttachments}
-          error={error}
-          onSubmit={() => {}}
-        >
-          <PromptInputAttachments />
-          <PromptInputRichTextEditor placeholder="Try empty text + attachment…" />
-          <PromptInputFooter>
-            <PromptInputFooterStart>
-              <PromptInputAddMenu onSelect={() => {}} />
-              <PromptInputToolsButton onClick={() => {}} />
-            </PromptInputFooterStart>
-            <PromptInputSubmit />
-          </PromptInputFooter>
-        </PromptInput>
-      </div>
-    </div>
-  );
-}
 
 const SLASH_ITEMS: AttachmentMenuItemDef[] = [
   { kind: "photos-files", label: "Add photos & files", icon: "attach_file", keywords: ["upload", "file", "image", "photo"] },
