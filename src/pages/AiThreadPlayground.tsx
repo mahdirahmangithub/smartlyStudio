@@ -576,7 +576,7 @@ export default function AiThreadPlayground() {
 
   const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
   const editingPlanIdRef = useRef<string | null>(null);
-  const planRefsMap = useRef<Map<string, RefObject<PlanTestTaskHandle>>>(new Map());
+  const planRefsMap = useRef<Map<string, RefObject<PlanTestTaskHandle | null>>>(new Map());
 
   const threadRef = useRef<AiThreadHandle>(null);
   const promptRef = useRef<HTMLDivElement>(null);

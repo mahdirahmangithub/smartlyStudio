@@ -208,6 +208,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "ai-loading-label"
 | "cot"
 | "ai-response-bubble"
+| "ai-entity-preview"
 | "ai-thread"
 | "ai-generation"
 

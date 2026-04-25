@@ -449,7 +449,7 @@ export default function CotPlayground() {
             type="task"
             title="Build landing page"
             hint="Working on it…"
-            running
+            status="running"
             progress={60}
             defaultExpanded={true}
             onStop={() => {}}

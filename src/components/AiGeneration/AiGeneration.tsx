@@ -1,6 +1,7 @@
 import type { AiGenerationProps } from "./aiGenerationTypes";
 import { Header } from "../Header";
 import { Tag } from "../Tag";
+import { TitleText } from "../TitleText";
 import { cx } from "../../utils/cx";
 import { getSpacing } from "../../utils/spacing";
 import styles from "./AiGeneration.module.css";

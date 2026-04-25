@@ -32,7 +32,7 @@ export function CotContainer({
 }: CotContainerProps) {
   const isRunning = status === "running";
   const isCancelled = status === "cancelled";
-  const isEditing = status === "editing";
+  const _isEditing = status === "editing";
   const isEdited = status === "edited";
   const isIdle = status === "idle";
 

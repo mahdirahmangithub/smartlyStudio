@@ -32,7 +32,7 @@ function AnimatedPlaceholderOverlay({
 
   useEffect(() => {
     if (!active || !textsRef.current.length) return;
-    const el = containerRef.current;
+    const el = containerRef.current as HTMLDivElement;
     if (!el) return;
 
     const ctrl = { cancelled: false };
