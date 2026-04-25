@@ -110,7 +110,9 @@ import AiButtonPlayground from "./pages/AiButtonPlayground";
 import AiLoadingLabelPlayground from "./pages/AiLoadingLabelPlayground";
 import CotPlayground from "./pages/CotPlayground";
 import AiResponseBubblePlayground from "./pages/AiResponseBubblePlayground";
+import AiEntityPreviewPlayground from "./pages/AiEntityPreviewPlayground";
 import AiThreadPlayground from "./pages/AiThreadPlayground";
+import AiGenerationPlayground from "./pages/AiGenerationPlayground";
 import AISideEntryPlayground from "./pages/AISideEntryPlayground";
 import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import GlobalNavigationBarPlayground from "./pages/GlobalNavigationBarPlayground";
@@ -207,6 +209,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "cot"
 | "ai-response-bubble"
 | "ai-thread"
+| "ai-generation"
 
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
@@ -349,7 +352,9 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "ai-button", label: "AiButton" },
   { key: "ai-loading-label", label: "AiLoadingLabel" },
   { key: "ai-response-bubble", label: "AiResponseBubble" },
+  { key: "ai-entity-preview", label: "AiEntityPreview" },
   { key: "ai-thread", label: "AiThread" },
+  { key: "ai-generation", label: "AiGeneration" },
   { key: "cot", label: "CoT" },
   { key: "ai-side-entry", label: "AISideEntry" },
   { key: "ai-text-generation", label: "AI TextGen" },
@@ -751,10 +756,12 @@ export default function App() {
             {page === "ai-button" && <AiButtonPlayground />}
             {page === "ai-loading-label" && <AiLoadingLabelPlayground />}
             {page === "ai-response-bubble" && <AiResponseBubblePlayground />}
+            {page === "ai-entity-preview" && <AiEntityPreviewPlayground />}
             {page === "ai-thread" && <AiThreadPlayground />}
             {page === "cot" && <CotPlayground />}
             {page === "ai-side-entry" && <AISideEntryPlayground />}
             {page === "ai-text-generation" && <AITextGenerationPlayground />}
+            {page === "ai-generation" && <AiGenerationPlayground />}
           </div>
         </main>
       </div>

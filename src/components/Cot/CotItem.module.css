@@ -6,6 +6,38 @@
   color: var(--text-neutral-primary);
 }
 
+/* ── Idle state — mutes the leading icon only ── */
+
+.statusIdle .leadingIcon {
+  color: var(--text-neutral-disable);
+}
+
+/* ── Disabled state (explicit prop) ── */
+
+.disabled {
+  pointer-events: none;
+}
+
+.disabled .leadingIcon,
+.disabled .title,
+.disabled .description,
+.disabled .slotInner {
+  color: var(--text-neutral-disable);
+}
+
+/* ── Disabled state (via container cancellation) ── */
+
+[data-items-disabled] .root {
+  pointer-events: none;
+}
+
+[data-items-disabled] .leadingIcon,
+[data-items-disabled] .title,
+[data-items-disabled] .description,
+[data-items-disabled] .slotInner {
+  color: var(--text-neutral-disable);
+}
+
 /* ── Error state — cascades to title, icon ── */
 
 .statusError {

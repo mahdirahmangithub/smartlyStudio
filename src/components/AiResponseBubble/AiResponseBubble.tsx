@@ -25,6 +25,7 @@ export function AiResponseBubble({
   onCotExpandedChange,
   text = "",
   slot,
+  components,
   copyValue,
   onRegenerate,
   showFeedback = false,
@@ -108,6 +109,7 @@ export function AiResponseBubble({
             <ResponseBody
               html={text}
               className={styles.textBlock}
+              components={components}
             />
           )}
 

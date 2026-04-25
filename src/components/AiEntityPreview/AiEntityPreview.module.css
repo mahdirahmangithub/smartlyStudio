@@ -1,0 +1,72 @@
+.card {
+  padding: var(--spacing-sm-extra);
+}
+
+.tableWrap table {
+  table-layout: auto !important;
+}
+
+.tableWrap tbody tr td:first-child {
+  border-top-left-radius: var(--radius-sm);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.tableWrap tbody tr td:last-child {
+  border-top-right-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.tableWrapNoHover {
+  --element-fill-neutral-tertiary-hover: transparent;
+}
+
+
+/* ── Action bar ── */
+
+.actions {
+  display: flex;
+  align-items: center;
+  width: calc(100% + var(--spacing-xl));
+  padding-top: var(--spacing-xl);
+  padding: var(--spacing-sm-extra) var(--spacing-sm-extra) 0 var(--spacing-sm-extra);
+   margin:var(--spacing-sm-extra) var(--spacing-negative-sm-extra) 0 var(--spacing-negative-sm-extra);
+   border-top: var(--spacing-hair-line) solid var(--element-outline-neutral-disable);
+  
+}
+
+.actionsLeft {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.actionsRight {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+/* ── Show more row ── */
+
+.showMoreRow {
+  padding: var(--spacing-sm-extra) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+.showMoreRow:hover {
+  background-image: linear-gradient(
+    var(--element-fill-neutral-tertiary-hover),
+    var(--element-fill-neutral-tertiary-hover)
+  );
+}
+
+/* Strip the Tooltip neutral wrapper so AiEntityPreview Card is the only chrome */
+.tooltipContent {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-radius: var(--radius-lg);
+}

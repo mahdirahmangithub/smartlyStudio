@@ -67,7 +67,8 @@
    STATE — text color
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* normal: title inherits primary, description is tertiary */
+/* normal: root sets primary so currentColor works for slot icons */
+.normal              { color: var(--text-neutral-primary); }
 .normal .title       { color: var(--text-neutral-primary); }
 .normal .description { color: var(--text-neutral-tertiary-default); }
 
@@ -83,4 +84,5 @@
 
 .slot {
   flex-shrink: 0;
+  line-height: 0;
 }

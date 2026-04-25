@@ -5,6 +5,7 @@ import { IconButton } from "../IconButton";
 import { InlineMessage } from "../InlineMessage";
 import { TitleText } from "../TitleText";
 import { ProgressBar } from "../ProgressBar";
+import { Tag } from "../Tag";
 import { Icon } from "../Icon";
 import { useCollapsible } from "../../hooks/useCollapsible";
 import { cx } from "../../utils/cx";
@@ -15,8 +16,9 @@ export function CotContainer({
   type,
   title,
   hint,
-  running = false,
+  status = "idle",
   progress = 0,
+  tag,
   onEdit,
   onCancel,
   onStart,
@@ -28,6 +30,19 @@ export function CotContainer({
   className,
   ...rest
 }: CotContainerProps) {
+  const isRunning = status === "running";
+  const isCancelled = status === "cancelled";
+  const isEditing = status === "editing";
+  const isEdited = status === "edited";
+  const isIdle = status === "idle";
+
+  const autoTag = isCancelled
+    ? <Tag size="md" variant="neutral" emphasis="low" label="Canceled" />
+    : isEdited
+    ? <Tag size="md" variant="neutral" emphasis="low" label="Edited" />
+    : undefined;
+
+  const resolvedTag = tag ?? autoTag;
   const contentId = useId();
   const isControlled = expandedProp !== undefined;
   const [expandedInternal, setExpandedInternal] = useState(defaultExpanded);
@@ -94,20 +109,23 @@ export function CotContainer({
     <div className={cx(styles.root, className)} {...rest}>
       <div className={styles.card}>
         <div className={styles.header}>
-          {/* Expand/collapse title button */}
-          <button
-            type="button"
-            className={styles.titleButton}
-            onClick={toggle}
-            aria-expanded={isExpanded}
-            aria-controls={contentId}
-          >
-            <Expander expanded={isExpanded} size="sm" emphasis="medium" />
-            <TitleText size="xs" title={title} as="span" />
-          </button>
+          {/* Title row: expand/collapse button + optional tag */}
+          <div className={styles.titleRow}>
+            <button
+              type="button"
+              className={styles.titleButton}
+              onClick={toggle}
+              aria-expanded={isExpanded}
+              aria-controls={contentId}
+            >
+              <Expander expanded={isExpanded} size="sm" emphasis="medium" />
+              <TitleText size="xs" title={title} as="span" />
+            </button>
+            {resolvedTag && <div className={styles.titleTag}>{resolvedTag}</div>}
+          </div>
 
           {/* Progress + stop (running state) */}
-          {running && (
+          {isRunning && (
             <div className={styles.progressRow}>
               <ProgressBar
                 type="neutral"
@@ -136,13 +154,14 @@ export function CotContainer({
             className={styles.items}
             aria-hidden={!isExpanded}
             inert={!isExpanded ? true : undefined}
+            data-items-disabled={isCancelled || undefined}
           >
             <div className={styles.itemsInner}>{children}</div>
           </div>
         )}
 
-        {/* Actions (pre-start state) */}
-        {!running && (onEdit || onCancel || onStart) && (
+        {/* Actions (idle state only) */}
+        {isIdle && (onEdit || onCancel || onStart) && (
           <div className={styles.actions}>
             <div className={styles.actionsLeft}>
               <Button size="md" variant="neutral" emphasis="low" onClick={onEdit}>

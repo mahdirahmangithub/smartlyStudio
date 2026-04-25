@@ -14,6 +14,121 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+
+/* ── Animated placeholder overlay ── */
+
+function AnimatedPlaceholderOverlay({
+  texts,
+  active,
+}: {
+  texts: string[];
+  active: boolean;
+}) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textsRef = useRef(texts);
+  useLayoutEffect(() => {
+    textsRef.current = texts;
+  });
+
+  useEffect(() => {
+    if (!active || !textsRef.current.length) return;
+    const el = containerRef.current;
+    if (!el) return;
+
+    const ctrl = { cancelled: false };
+    const timers = new Set<number>();
+    const anims = new Set<Animation>();
+
+    function schedule(fn: () => void, ms: number) {
+      const id = window.setTimeout(() => {
+        timers.delete(id);
+        if (!ctrl.cancelled) fn();
+      }, ms);
+      timers.add(id);
+    }
+
+    function sleep(ms: number) {
+      return new Promise<void>((res) => {
+        if (ms <= 0 || ctrl.cancelled) { res(); return; }
+        schedule(res, ms);
+      });
+    }
+
+    function reg(a: Animation) {
+      anims.add(a);
+      void a.finished.finally(() => anims.delete(a));
+      return a;
+    }
+
+    async function run() {
+      let idx = 0;
+      await sleep(Math.random() * 400);
+
+      while (!ctrl.cancelled) {
+        const text = textsRef.current[idx % textsRef.current.length];
+
+        el.innerHTML = "";
+        const spans: HTMLSpanElement[] = [];
+        for (const ch of text) {
+          const span = document.createElement("span");
+          span.textContent = ch;
+          if (!/\s/.test(ch)) {
+            span.style.cssText = "display:inline-block;opacity:0";
+            spans.push(span);
+          }
+          el.appendChild(span);
+        }
+
+        spans.forEach((span, i) => {
+          reg(span.animate(
+            [
+              { opacity: 0, transform: "translate3d(0,2px,0)", filter: "blur(12px)" },
+              { opacity: 1, transform: "translate3d(0,0,0)", filter: "blur(0px)" },
+            ],
+            { delay: i * 18, duration: 648, easing: "cubic-bezier(0.22,1,0.36,1)", fill: "forwards" },
+          ));
+        });
+
+        const enterTotal = 648 + Math.max(0, spans.length - 1) * 18;
+        await sleep(enterTotal + 1000);
+        if (ctrl.cancelled) break;
+
+        spans.forEach((span, i) => {
+          reg(span.animate(
+            [
+              { opacity: 1, transform: "translate3d(0,0,0)", filter: "blur(0px)" },
+              { opacity: 0, transform: "translate3d(0,-0px,0)", filter: "blur(4px)" },
+            ],
+            { delay: (spans.length - 1 - i) * 11, duration: 232, easing: "cubic-bezier(0.64,0,0.78,0)", fill: "forwards" },
+          ));
+        });
+
+        const exitTotal = 432 + Math.max(0, spans.length - 1) * 11;
+        await sleep(exitTotal + 320);
+        if (ctrl.cancelled) break;
+
+        idx++;
+      }
+    }
+
+    void run();
+
+    return () => {
+      ctrl.cancelled = true;
+      timers.forEach(clearTimeout);
+      anims.forEach((a) => a.cancel());
+      el.innerHTML = "";
+    };
+  }, [active]);
+
+  return (
+    <div
+      ref={containerRef}
+      className={styles.animatedPlaceholderOverlay}
+      aria-hidden="true"
+    />
+  );
+}
 import { InlineTextarea } from "../InlineTextarea";
 import { RichTextEditor } from "../RichTextEditor";
 import { TriggerMenuPlugin } from "../RichTextEditor/plugins/TriggerMenuPlugin";
@@ -859,12 +974,24 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       onAddContext,
     };
 
+    const handleFieldClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+      if (disabled) return;
+      const target = e.target as HTMLElement;
+      if (target.closest('button, a, input, select, textarea, [contenteditable], [role="button"], [role="menuitem"], [role="option"]')) return;
+      if (textareaRef.current) {
+        textareaRef.current.focus();
+      } else {
+        lexicalEditor?.focus();
+      }
+    }, [disabled, lexicalEditor]);
+
     const fieldEl = (
         <div
           ref={ref}
           role="group"
           aria-label="Prompt input"
           className={cx(styles.field, infoChild && styles.fieldWithInfo, disabled && styles.disabled, isDragOver && styles.dragOver, className)}
+          onClick={handleFieldClick}
           onDragEnter={disabled ? undefined : onDragEnter}
           onDragLeave={disabled ? undefined : onDragLeave}
           onDragOver={disabled ? undefined : onDragOver}
@@ -945,14 +1072,8 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
     return (
       <PromptInputContext.Provider value={ctx}>
         {recommendationsChild}
-        {infoChild ? (
-          <div className={styles.infoStack}>
-            {infoChild}
-            {fieldEl}
-          </div>
-        ) : (
-          fieldEl
-        )}
+        {infoChild}
+        {fieldEl}
       </PromptInputContext.Provider>
     );
   },
@@ -1078,12 +1199,18 @@ export interface PromptInputTextareaProps {
   maxHeight?: number;
   /** Additional class on the InlineTextarea wrapper */
   className?: string;
+  /** Strings to cycle through with the soft-blur-in animation when the input is empty and unfocused. */
+  animatedPlaceholders?: string[];
+  /** Controls whether the animated placeholder is visible. Set to false after submit to suppress it. */
+  showAnimatedPlaceholder?: boolean;
 }
 
 export function PromptInputTextarea({
   placeholder = "Generate smartly...",
   maxHeight = 132,
   className,
+  animatedPlaceholders,
+  showAnimatedPlaceholder = false,
 }: PromptInputTextareaProps) {
   const {
     value,
@@ -1102,6 +1229,10 @@ export function PromptInputTextarea({
     closeAttachmentMenu,
   } = usePromptInput();
   const id = useId();
+  const [isFocused, setIsFocused] = useState(false);
+
+  const hasAnimatedPlaceholders = Boolean(animatedPlaceholders?.length);
+  const animOverlayActive = hasAnimatedPlaceholders && showAnimatedPlaceholder && value === "" && !isFocused;
 
   const handleChange = useCallback(
     (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -1176,7 +1307,9 @@ export function PromptInputTextarea({
           value={value}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          placeholder={animOverlayActive ? "" : placeholder}
           disabled={disabled}
           autoExpand
           maxHeight={maxHeight}
@@ -1188,6 +1321,12 @@ export function PromptInputTextarea({
           aria-autocomplete={attachmentMenuCombobox ? "list" : undefined}
           aria-activedescendant={activeDescendantId}
         />
+        {hasAnimatedPlaceholders && (
+          <AnimatedPlaceholderOverlay
+            texts={animatedPlaceholders!}
+            active={animOverlayActive}
+          />
+        )}
       </div>
     </div>
   );
@@ -1206,6 +1345,10 @@ export interface PromptInputRichTextEditorProps {
   nodes?: Klass<LexicalNode>[];
   /** Additional class on the RichTextEditor wrapper */
   className?: string;
+  /** Strings to cycle through with the soft-blur-in animation when the input is empty and unfocused. */
+  animatedPlaceholders?: string[];
+  /** Controls whether the animated placeholder is visible. Set to false after submit to suppress it. */
+  showAnimatedPlaceholder?: boolean;
 }
 
 /**
@@ -1232,6 +1375,8 @@ export function PromptInputRichTextEditor({
   maxHeight = 132,
   nodes,
   className,
+  animatedPlaceholders,
+  showAnimatedPlaceholder = false,
 }: PromptInputRichTextEditorProps) {
   const {
     value,
@@ -1250,6 +1395,10 @@ export function PromptInputRichTextEditor({
     pickHighlightedCaretAttachment,
     closeAttachmentMenu,
   } = usePromptInput();
+  const [isFocused, setIsFocused] = useState(false);
+
+  const hasAnimatedPlaceholders = Boolean(animatedPlaceholders?.length);
+  const animOverlayActive = hasAnimatedPlaceholders && showAnimatedPlaceholder && value === "" && !isFocused;
 
   const handleKeyDown = useCallback(
     (e: globalThis.KeyboardEvent): boolean => {
@@ -1301,13 +1450,17 @@ export function PromptInputRichTextEditor({
       : undefined;
 
   return (
-    <div className={styles.textareaWrap}>
+    <div
+      className={styles.textareaWrap}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
+    >
       <div className={styles.textareaInset}>
         <RichTextEditor
           value={value}
           onChange={setValue}
           onSubmit={submit}
-          placeholder={placeholder}
+          placeholder={animOverlayActive ? "" : placeholder}
           maxHeight={maxHeight}
           disabled={disabled}
           nodes={nodes}
@@ -1331,6 +1484,12 @@ export function PromptInputRichTextEditor({
             </>
           }
         />
+        {hasAnimatedPlaceholders && (
+          <AnimatedPlaceholderOverlay
+            texts={animatedPlaceholders!}
+            active={animOverlayActive}
+          />
+        )}
       </div>
     </div>
   );

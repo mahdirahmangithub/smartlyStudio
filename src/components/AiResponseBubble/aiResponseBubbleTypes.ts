@@ -36,6 +36,12 @@ export interface AiResponseBubbleProps extends Omit<HTMLAttributes<HTMLElement>,
   /** Arbitrary content rendered below the text (code blocks, cards, etc.). */
   slot?: ReactNode;
 
+  /**
+   * Custom element renderers passed to ResponseBody. Map a tag name (e.g. "entity-preview")
+   * to a function that receives the element's attributes and returns a ReactNode.
+   */
+  components?: Record<string, (attrs: Record<string, string>) => ReactNode>;
+
   /** When provided, shows a CopyButton. Should be the plain-text value to copy. */
   copyValue?: string;
   /** When provided, shows a regenerate icon button. */

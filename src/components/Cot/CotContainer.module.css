@@ -38,12 +38,26 @@
   width: 100%;
 }
 
+/* Title row — wraps button + optional tag */
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  min-width: 0;
+}
+
+.titleTag {
+  flex-shrink: 0;
+}
+
 /* Title toggle button — task type (expander left) */
 .titleButton {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   background: none;
   border: none;
   padding: 0;
@@ -111,6 +125,7 @@
 /* Items inner — task type */
 .itemsInner {
   padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-sm);
 }
 
 /* Items inner — reasoning type (left indent) */

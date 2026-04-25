@@ -535,6 +535,49 @@ function InfoBannerDemo() {
   );
 }
 
+const ANIMATED_PLACEHOLDERS = [
+  "Analyze my Q3 performance report",
+  "Draft a follow-up email for today's meeting",
+  "Summarize the attached document",
+  "Create a campaign brief for the new product launch",
+  "What's the best audience for this campaign?",
+];
+
+function AnimatedPlaceholderDemo() {
+  const [showAnim, setShowAnim] = useState(true);
+
+  return (
+    <div>
+      <div style={promptWrapper}>
+        <PromptInput onSubmit={() => setShowAnim(false)}>
+          <PromptInputTextarea
+            placeholder="Ask anything..."
+            animatedPlaceholders={ANIMATED_PLACEHOLDERS}
+            showAnimatedPlaceholder={showAnim}
+          />
+          <PromptInputFooter>
+            <PromptInputFooterStart>
+              <PromptInputAddMenu />
+            </PromptInputFooterStart>
+            <PromptInputSubmit />
+          </PromptInputFooter>
+        </PromptInput>
+      </div>
+      {!showAnim && (
+        <div style={{ marginTop: 12, textAlign: "center" }}>
+          <button
+            type="button"
+            onClick={() => setShowAnim(true)}
+            style={{ fontSize: 13, cursor: "pointer" }}
+          >
+            Reset animation
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PromptInputPlayground() {
   return (
     <>
@@ -653,6 +696,18 @@ export default function PromptInputPlayground() {
         </p>
         <div style={cardStyle}>
           <AttachmentsAndErrorDemo />
+        </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Animated placeholder</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Pass <code>animatedPlaceholders</code> and <code>showAnimatedPlaceholder</code> to cycle
+          through prompt suggestions with a soft-blur-in animation. Focus snaps it away and restores
+          the static placeholder. Submit hides the animation — reset to bring it back.
+        </p>
+        <div style={cardStyle}>
+          <AnimatedPlaceholderDemo />
         </div>
       </section>
     </>

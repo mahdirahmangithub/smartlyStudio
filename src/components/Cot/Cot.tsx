@@ -11,9 +11,10 @@ export function Cot({ children, connector, className, ...rest }: CotProps) {
       {items.map((child, i) => {
         const isLast = i === items.length - 1;
         // connector=false on Cot hides all connectors
-        // otherwise last child gets connector=false automatically
+        // last child always gets false; other items get undefined so CotItem
+        // can decide based on its own status (idle hides connector by default)
         const connectorValue =
-          connector === false ? false : isLast ? false : true;
+          connector === false || isLast ? false : undefined;
 
         return cloneElement(child as React.ReactElement<{ connector?: boolean }>, {
           connector: connectorValue,

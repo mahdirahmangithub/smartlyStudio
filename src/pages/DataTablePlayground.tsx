@@ -1164,6 +1164,67 @@ function DeepHeaderGroupDemo({ density, columnDividers, rowDividers }: DemoProps
   );
 }
 
+function DeepHeaderGroupOverflowDemo({ density, columnDividers, rowDividers }: DemoProps) {
+  const fmt = (v: number) => `$${v.toLocaleString()}`;
+
+  const columns: ColumnDef<CompRow>[] = [
+    {
+      key: "employee",
+      title: "Employee",
+      children: [
+        { key: "name", title: "Name", dataIndex: "name", flex: 2, minWidth: 140,
+          render: (v: string, r) => <DataCellContent title={v} description={r.title} />,
+        },
+        { key: "department", title: "Dept", dataIndex: "department", flex: 1, minWidth: 100,
+          render: (v: string) => <DataCellContent title={v} />,
+        },
+      ],
+    },
+    {
+      key: "compensation",
+      title: "Compensation",
+      children: [
+        {
+          key: "base",
+          title: "Base",
+          children: [
+            { key: "baseSalary", title: "Salary", dataIndex: "baseSalary", flex: 1, minWidth: 100, align: "right",
+              render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+            },
+            { key: "bonus", title: "Bonus", dataIndex: "bonus", flex: 1, minWidth: 90, align: "right",
+              render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+            },
+          ],
+        },
+        {
+          key: "equity",
+          title: "Equity",
+          children: [
+            { key: "rsus", title: "RSUs", dataIndex: "rsus", flex: 1, minWidth: 90, align: "right",
+              render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+            },
+            { key: "options", title: "Options", dataIndex: "options", flex: 1, minWidth: 90, align: "right",
+              render: (v: number) => <DataCellContent title={fmt(v)} textAlignment="right" />,
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  return (
+    <DataTable<CompRow>
+      columns={columns}
+      dataSource={COMP_DATA}
+      rowKey="id"
+      density={density} columnDividers={columnDividers} rowDividers={rowDividers}
+      columnResize={{ mode: "overflow" }}
+      stickyHeader
+      style={{ maxHeight: 320 }}
+    />
+  );
+}
+
 /* ── Grouped Header Column DnD demo ── */
 
 interface ProjectRow {
@@ -1565,6 +1626,16 @@ export default function DataTablePlayground() {
           with "Compensation" further split into "Base" and "Equity" sub-groups.
         </p>
         <div style={cardStyle}><DeepHeaderGroupDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Header Groups (Deep Nesting — Overflow)</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Same three-level structure but columns use <code>flex</code> with <code>minWidth</code> and{" "}
+          <code>columnResize&#123;&#123; mode: "overflow" &#125;&#125;</code> — resizing expands the table beyond its
+          container and triggers horizontal scroll.
+        </p>
+        <div style={cardStyle}><DeepHeaderGroupOverflowDemo density={density} columnDividers={columnDividers} rowDividers={rowDividers} /></div>
       </section>
 
       <section style={sectionStyle}>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Cot, CotItem, CotContainer } from "../components/Cot";
 import type { CotItemStatus, CotItemVariant } from "../components/Cot";
+import { Tag } from "../components/Tag";
 import { Toggle } from "../components/Toggle";
 import { Label } from "../components/Label";
 import { Button } from "../components/Button";
@@ -284,7 +285,45 @@ export default function CotPlayground() {
           </Cot>
         </section>
 
-        {/* ── Section 4: Error states ── */}
+        {/* ── Section 4: Disabled items ── */}
+        <section style={s.section}>
+          <h3 style={s.sectionTitle}>Disabled items</h3>
+          <Cot aria-label="Disabled state examples">
+            <CotItem variant="todo" title="Completed step" description="This step has finished" status="complete" />
+            <CotItem variant="todo" title="Disabled step" description="Not available in this context" status="idle" disabled />
+            <CotItem variant="todo" title="Another disabled step" description="Requires previous step to complete" status="idle" disabled />
+            <CotItem variant="todo" title="Pending step" description="Will run after disabled steps" status="idle" />
+          </Cot>
+        </section>
+
+        {/* ── Section 4b: Disabled expandable ── */}
+        <section style={s.section}>
+          <h3 style={s.sectionTitle}>Disabled expandable</h3>
+          <Cot aria-label="Disabled expandable examples">
+            <CotItem
+              variant="todo"
+              title="Active expandable"
+              description="Click to expand"
+              status="idle"
+              expandable
+              defaultExpanded
+            >
+              {showSlot && <div style={s.slotDemo}><p style={s.slotText}>Slot content visible and interactive.</p></div>}
+            </CotItem>
+            <CotItem
+              variant="todo"
+              title="Disabled expandable"
+              description="Locked — cannot expand"
+              status="idle"
+              expandable
+              disabled
+            >
+              {showSlot && <div style={s.slotDemo}><p style={s.slotText}>This content is inaccessible.</p></div>}
+            </CotItem>
+          </Cot>
+        </section>
+
+        {/* ── Section 5: Error states ── */}
         <section style={s.section}>
           <h3 style={s.sectionTitle}>Error states</h3>
           <Cot aria-label="Error state examples">
@@ -339,6 +378,27 @@ export default function CotPlayground() {
       <div style={s.containerDivider} />
       <h2 style={s.containerHeading}>CotContainer</h2>
       <div style={s.sections}>
+
+        {/* ── Task type: with tag ── */}
+        <section style={s.section}>
+          <h3 style={s.sectionTitle}>Task — with title tag</h3>
+          <CotContainer
+            type="task"
+            title="Optimise ad campaigns"
+            tag={<Tag size="md" variant="brand" emphasis="low" label="4 steps" />}
+            defaultExpanded={true}
+            onEdit={() => {}}
+            onCancel={() => {}}
+            onStart={() => {}}
+          >
+            <Cot>
+              <CotItem variant="todo" title="Analyse performance data" description="Review ROAS and CTR across placements" status="idle" />
+              <CotItem variant="todo" title="Identify underperforming channels" description="Flag spend efficiency below threshold" status="idle" />
+              <CotItem variant="todo" title="Reallocate budget" description="Shift spend to top-performing channels" status="idle" />
+              <CotItem variant="todo" title="Generate report" description="Summarise changes and projected impact" status="idle" />
+            </Cot>
+          </CotContainer>
+        </section>
 
         {/* ── Task type: pre-start ── */}
         <section style={s.section}>
@@ -469,13 +529,13 @@ export default function CotPlayground() {
 /* ── Interactive task container demo ── */
 
 function TaskContainerDemo() {
-  const [running, setRunning] = useState(false);
+  const [status, setStatus] = useState<"idle" | "running" | "cancelled" | "completed">("idle");
   const [progress, setProgress] = useState(0);
   const [statuses, setStatuses] = useState<CotItemStatus[]>(["idle", "idle", "idle", "idle"]);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleStart = () => {
-    setRunning(true);
+    setStatus("running");
     setProgress(0);
     setStatuses(["idle", "idle", "idle", "idle"]);
 
@@ -483,7 +543,7 @@ function TaskContainerDemo() {
     const advance = () => {
       if (step >= 4) {
         setProgress(100);
-        setRunning(false);
+        setStatus("completed");
         return;
       }
       setStatuses((prev) => {
@@ -507,7 +567,13 @@ function TaskContainerDemo() {
 
   const handleStop = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    setRunning(false);
+    setStatus("idle");
+  };
+
+  const handleCancel = () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setStatuses(["idle", "idle", "idle", "idle"]);
+    setStatus("cancelled");
   };
 
   useEffect(() => () => {
@@ -525,13 +591,13 @@ function TaskContainerDemo() {
     <CotContainer
       type="task"
       title="Build landing page"
-      hint={running ? "Working on it…" : progress === 100 ? "All steps completed" : "Review the plan before starting"}
-      running={running}
+      status={status}
+      hint={status === "running" ? "Working on it…" : status === "completed" ? "All steps completed" : "Review the plan before starting"}
       progress={progress}
       defaultExpanded={true}
-      onEdit={() => {}}
-      onCancel={() => setStatuses(["idle", "idle", "idle", "idle"])}
-      onStart={handleStart}
+      onEdit={status === "idle" ? () => {} : undefined}
+      onCancel={status === "idle" ? handleCancel : undefined}
+      onStart={status === "idle" ? handleStart : undefined}
       onStop={handleStop}
     >
       <Cot>

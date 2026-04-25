@@ -118,13 +118,13 @@ export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
           className={styles.fab}
           style={{
             bottom: fabBottom,
-            transform: `translateX(-50%) translateY(${showFab ? "0" : "calc(100% + 48px)"})`,
+            transform: `translateX(-50%) translateY(${showFab ? "0" : "calc(100% + 48px)"}) scale(${showFab ? 1 : 0.4})`,
             opacity: showFab ? 1 : 0,
             pointerEvents: showFab ? "auto" : "none",
           }}
           aria-hidden={!showFab}
         >
-          <AiButton size="md" style={{ borderRadius: "var(--radius-full)", boxShadow: "var(--shadow-md)" }}>
+          <AiButton size="md" style={{ borderRadius: "var(--radius-full)", boxShadow: "var(--shadow-md)", backgroundColor:"var(--util-subtle-inverse-strongest)", backdropFilter:"blur(4px)" }}>
             <IconButton
               size="md"
               variant="neutral"

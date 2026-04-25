@@ -25,6 +25,8 @@ export interface CotItemProps extends Omit<HTMLAttributes<HTMLLIElement>, "child
   icon?: ReactNode;
   /** Operational status. Drives the leading icon and colour. Defaults to "idle". */
   status?: CotItemStatus;
+  /** Disables the item — mutes all colours, blocks interaction, and passes disabled to direct slot children. */
+  disabled?: boolean;
 
   /** When true the step can be expanded/collapsed to reveal slot content. */
   expandable?: boolean;
@@ -62,10 +64,12 @@ export interface CotContainerProps extends Omit<HTMLAttributes<HTMLDivElement>, 
 
   /* ── Task-type props ── */
 
-  /** When true, the progress bar + stop button are shown instead of Edit/Cancel/Start. */
-  running?: boolean;
+  /** Drives the visual state of the task card. Defaults to "idle". */
+  status?: "idle" | "running" | "cancelled" | "completed" | "editing" | "edited";
   /** Progress value 0–100 shown in the progress bar while running. */
   progress?: number;
+  /** Overrides the auto-derived tag for the title row. */
+  tag?: ReactNode;
   onEdit?: () => void;
   onCancel?: () => void;
   onStart?: () => void;

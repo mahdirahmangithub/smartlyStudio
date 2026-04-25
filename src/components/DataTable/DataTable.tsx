@@ -4,6 +4,8 @@ import {
   useRef,
   useEffect,
   useMemo,
+  forwardRef,
+  useImperativeHandle,
   Fragment,
   isValidElement,
   cloneElement,
@@ -21,7 +23,7 @@ import {
 import styles from "./DataTable.module.css";
 import { IconButton } from "../IconButton";
 import { Expander } from "../Expander";
-import { DataCellContent } from "../DataCellContent";
+import { DataCellContent, type DataCellContentProps } from "../DataCellContent";
 import { Checkbox } from "../Checkbox";
 import { Radio } from "../Radio";
 import { TreeIndent, type TreeIndentLineStyle } from "../TreeIndent";
@@ -60,6 +62,8 @@ export interface ColumnDef<T = any> {
     index: number
   ) => TdHTMLAttributes<HTMLTableCellElement>;
   onHeaderCell?: () => ThHTMLAttributes<HTMLTableHeaderCellElement>;
+  /** Extra props spread onto the header DataCellContent — overrides title/switchSlot/trailing if provided */
+  headerCellContent?: Partial<DataCellContentProps>;
   density?: TableDensity;
   /** Override the table-level column divider for this column's cells. */
   dividerRight?: boolean;
@@ -415,7 +419,7 @@ function calcStickyOffsets<T>(
    DataTable Component
    ═══════════════════════════════════════════════════════════════ */
 
-export function DataTable<T extends Record<string, any>>({
+function DataTableInner<T extends Record<string, any>>({
   columns,
   dataSource,
   rowKey,
@@ -442,9 +446,11 @@ export function DataTable<T extends Record<string, any>>({
   treeIndentWidth,
   treeConnectorLines,
   treeLineStyle,
-}: DataTableProps<T>) {
+}: DataTableProps<T>, ref: React.ForwardedRef<HTMLDivElement>) {
   const tableRef = useRef<HTMLTableElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useImperativeHandle(ref, () => wrapperRef.current!, []);
 
   /* ── Container width (for flex columns) ── */
   const [containerWidth, setContainerWidth] = useState(0);
@@ -1468,6 +1474,7 @@ export function DataTable<T extends Record<string, any>>({
                       </span>
                     ) : undefined
                   }
+                  {...col.headerCellContent}
                 />
                 {canResize && (
                   <span
@@ -1755,3 +1762,7 @@ export function DataTable<T extends Record<string, any>>({
     </div>
   );
 }
+
+export const DataTable = forwardRef(DataTableInner) as <T extends Record<string, any>>(
+  props: DataTableProps<T> & { ref?: React.Ref<HTMLDivElement> }
+) => ReturnType<typeof DataTableInner>;

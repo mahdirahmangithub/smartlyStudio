@@ -1,13 +1,3 @@
-/* ── Info stack (wraps PromptInputInfo + field when info is present) ── */
-
-.infoStack {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  /* Compensate for the -spacing-md margin-bottom on PromptInputInfo */
-  padding-bottom: var(--spacing-md);
-}
-
 /* ── Field (main container card) ── */
 
 .field {
@@ -156,5 +146,26 @@
   align-items: center;
   gap: var(--spacing-xs);
   margin-left: auto;
+}
+
+/* ── Animated placeholder overlay ── */
+
+.animatedPlaceholderOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* Align with native textarea/RTE placeholder text: textareaInset padding + inner text padding */
+  padding: calc(var(--spacing-xs) + var(--spacing-2xs)) 0 0 calc(var(--spacing-xs) + var(--spacing-2xs));
+  pointer-events: none;
+  z-index: 1;
+  font-family: var(--type-label-md-family);
+  font-size: var(--type-label-md-size);
+  font-weight: var(--type-label-md-weight);
+  line-height: var(--type-label-md-line-height);
+  letter-spacing: var(--type-label-md-letter-spacing);
+  color: var(--text-neutral-placeholder);
+  white-space: nowrap;
+  overflow: hidden;
 }
 

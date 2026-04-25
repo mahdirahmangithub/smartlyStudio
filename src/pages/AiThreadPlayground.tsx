@@ -1,6 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, forwardRef, useImperativeHandle, createRef, useMemo, useRef, useState, type RefObject } from "react";
 import { flushSync } from "react-dom";
 import { AiThread, type AiThreadHandle, type AiThreadMessage } from "../components/AiThread";
+import { AiGeneration } from "../components/AiGeneration";
+import { DataTable, type ColumnDef } from "../components/DataTable";
+import { DataCellContent } from "../components/DataCellContent";
+import { useScrollFade } from "../components/ScrollFade";
 import { LineChart, type Series as LineSeries } from "../components/LineChart";
 import { curveMonotoneX } from "@visx/curve";
 import {
@@ -28,6 +32,7 @@ import { ResponseBody } from "../components/ResponseBody";
 import { PromptOptionInput, usePromptOptionInput } from "../components/PromptOptionInput";
 import { MultiSelectOption } from "../components/MultiSelectOption";
 import { Cot, CotItem, CotContainer } from "../components/Cot";
+import { BodyText } from "../components/BodyText";
 
 /* ── Response content ─────────────────────────────────────────── */
 
@@ -112,10 +117,88 @@ const LONG_CHUNKS = toStreamChunks(LONG_HTML);
 
 const CHART_BEFORE_HTML = `<p>Here's a look at your metric performance over the last 30 days. The chart below shows daily values — you can see a general upward trend with some mid-period volatility.</p>`;
 
+const TABLE_BEFORE_HTML = `<p>Here's the campaign performance breakdown across your active placements. The table shows impressions, clicks, CTR, spend, and ROAS for each channel.</p>`;
+const TABLE_BEFORE_CHUNKS = toStreamChunks(TABLE_BEFORE_HTML);
+
+const PLAN_BEFORE_HTML = `<p>I've put together a six-step strategy plan for your summer campaign. Review the steps below and click <strong>Start</strong> when you're ready to run it.</p>`;
+const PLAN_BEFORE_CHUNKS = toStreamChunks(PLAN_BEFORE_HTML);
+
+type CampaignRow = { key: string; channel: string; platform: string; impressions: string; reach: string; frequency: string; clicks: string; ctr: string; cpc: string; cpm: string; conversions: string; cvr: string; spend: string; budget: string; roas: string; status: "active" | "paused" | "ended" };
+
+const CAMPAIGN_TABLE_DATA: CampaignRow[] = [
+  { key: "1", channel: "Instagram Feed",   platform: "Meta",    impressions: "142,300", reach: "98,400",  frequency: "1.45", clicks: "4,838",  ctr: "3.4%", cpc: "$0.50", cpm: "$16.94", conversions: "382",  cvr: "7.9%", spend: "$2,410", budget: "$3,000", roas: "4.2×", status: "active" },
+  { key: "2", channel: "Facebook Feed",    platform: "Meta",    impressions: "98,700",  reach: "71,200",  frequency: "1.39", clicks: "2,073",  ctr: "2.1%", cpc: "$0.89", cpm: "$18.64", conversions: "148",  cvr: "7.1%", spend: "$1,840", budget: "$2,500", roas: "3.1×", status: "active" },
+  { key: "3", channel: "TikTok In-Feed",   platform: "TikTok",  impressions: "210,500", reach: "185,300", frequency: "1.14", clicks: "11,998", ctr: "5.7%", cpc: "$0.27", cpm: "$15.20", conversions: "1,044",cvr: "8.7%", spend: "$3,200", budget: "$4,000", roas: "5.8×", status: "active" },
+  { key: "4", channel: "Google Search",    platform: "Google",  impressions: "67,200",  reach: "67,200",  frequency: "1.00", clicks: "3,494",  ctr: "5.2%", cpc: "$1.17", cpm: "$61.01", conversions: "490",  cvr: "14.0%",spend: "$4,100", budget: "$4,500", roas: "6.3×", status: "paused" },
+  { key: "5", channel: "YouTube Pre-roll", platform: "Google",  impressions: "88,900",  reach: "54,100",  frequency: "1.64", clicks: "1,245",  ctr: "1.4%", cpc: "$1.25", cpm: "$17.55", conversions: "62",   cvr: "5.0%", spend: "$1,560", budget: "$2,000", roas: "2.4×", status: "ended"  },
+  { key: "6", channel: "Pinterest Ads",    platform: "Pinterest",impressions: "54,300",  reach: "48,900",  frequency: "1.11", clicks: "980",    ctr: "1.8%", cpc: "$0.72", cpm: "$12.98", conversions: "74",   cvr: "7.6%", spend: "$706",  budget: "$1,000", roas: "3.4×", status: "active" },
+  { key: "7", channel: "Snapchat Story",   platform: "Snapchat",impressions: "76,400",  reach: "70,200",  frequency: "1.09", clicks: "2,140",  ctr: "2.8%", cpc: "$0.41", cpm: "$11.52", conversions: "163",  cvr: "7.6%", spend: "$880",  budget: "$1,200", roas: "3.7×", status: "active" },
+];
+
+const STATUS_COLOR: Record<CampaignRow["status"], string> = {
+  active: "var(--text-success-default)",
+  paused: "var(--text-warning-default)",
+  ended:  "var(--text-neutral-secondary-default)",
+};
+
+const CAMPAIGN_TABLE_COLUMNS: ColumnDef<CampaignRow>[] = [
+  { key: "channel",     title: "Channel",      width: 160, fixed: "left", render: (_, r) => <DataCellContent title={r.channel} description={r.platform} /> },
+  { key: "status",      title: "Status",       width: 90,  render: (_, r) => <DataCellContent title={r.status.charAt(0).toUpperCase() + r.status.slice(1)} trailing={<span style={{ width: 8, height: 8, borderRadius: "50%", background: STATUS_COLOR[r.status], flexShrink: 0 }} />} /> },
+  { key: "impressions", title: "Impressions",  width: 110, render: (_, r) => <DataCellContent title={r.impressions} textAlignment="right" cellAlignment="right" /> },
+  { key: "reach",       title: "Reach",        width: 100, render: (_, r) => <DataCellContent title={r.reach} textAlignment="right" cellAlignment="right" /> },
+  { key: "frequency",   title: "Frequency",    width: 95,  render: (_, r) => <DataCellContent title={r.frequency} textAlignment="right" cellAlignment="right" /> },
+  { key: "clicks",      title: "Clicks",       width: 90,  render: (_, r) => <DataCellContent title={r.clicks} textAlignment="right" cellAlignment="right" /> },
+  { key: "ctr",         title: "CTR",          width: 70,  render: (_, r) => <DataCellContent title={r.ctr} textAlignment="right" cellAlignment="right" /> },
+  { key: "cpc",         title: "CPC",          width: 80,  render: (_, r) => <DataCellContent title={r.cpc} textAlignment="right" cellAlignment="right" /> },
+  { key: "cpm",         title: "CPM",          width: 80,  render: (_, r) => <DataCellContent title={r.cpm} textAlignment="right" cellAlignment="right" /> },
+  { key: "conversions", title: "Conversions",  width: 110, render: (_, r) => <DataCellContent title={r.conversions} textAlignment="right" cellAlignment="right" /> },
+  { key: "cvr",         title: "CVR",          width: 70,  render: (_, r) => <DataCellContent title={r.cvr} textAlignment="right" cellAlignment="right" /> },
+  { key: "spend",       title: "Spend",        width: 90,  render: (_, r) => <DataCellContent title={r.spend} textAlignment="right" cellAlignment="right" /> },
+  { key: "budget",      title: "Budget",       width: 90,  render: (_, r) => <DataCellContent title={r.budget} textAlignment="right" cellAlignment="right" /> },
+  { key: "roas",        title: "ROAS",         width: 80,  render: (_, r) => <DataCellContent title={r.roas} textAlignment="right" cellAlignment="right" /> },
+];
+
 const CHART_AFTER_HTML = `<p>Overall the metric is up roughly <strong>18%</strong> from the start of the period. The dip around day 14 correlates with a known campaign pause — performance recovered within three days. If you'd like a breakdown by segment or a comparison against a benchmark, just ask.</p>`;
 
 const CHART_BEFORE_CHUNKS = toStreamChunks(CHART_BEFORE_HTML);
 const CHART_AFTER_HTML_STATIC = CHART_AFTER_HTML;
+
+function CampaignTableWithFade() {
+  const tableRef = useRef<HTMLDivElement>(null);
+  const { showStart, showEnd, onScroll } = useScrollFade(tableRef, "horizontal");
+
+  useEffect(() => {
+    const el = tableRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", onScroll);
+    return () => el.removeEventListener("scroll", onScroll);
+  }, [onScroll]);
+
+  return (
+    <div style={{ position: "relative", width: "100%" }}>
+      <DataTable
+        ref={tableRef}
+        columns={CAMPAIGN_TABLE_COLUMNS}
+        dataSource={CAMPAIGN_TABLE_DATA}
+        density="sm"
+        rowKey="key"
+        style={{ width: "100%" }}
+      />
+      {showStart && (
+        <div aria-hidden="true" style={{
+          position: "absolute", top: 0, bottom: 0, left: 0, width: 40, pointerEvents: "none",
+          background: "linear-gradient(to right, var(--element-surface-over), transparent)",
+        }} />
+      )}
+      {showEnd && (
+        <div aria-hidden="true" style={{
+          position: "absolute", top: 0, bottom: 0, right: 0, width: 40, pointerEvents: "none",
+          background: "linear-gradient(to left, var(--element-surface-over), transparent)",
+        }} />
+      )}
+    </div>
+  );
+}
 
 /* ── Chart response slot ─────────────────────────────────────── */
 
@@ -153,6 +236,137 @@ function ChartSlot() {
     />
   );
 }
+
+/* ── Plan test task ──────────────────────────────────────────── */
+
+const PLAN_STEPS: {
+  title: string;
+  description: string;
+  expandable?: boolean;
+  detail?: string;
+}[] = [
+  {
+    title: "Analyse current campaign performance",
+    description: "Review ROAS, CTR, and spend efficiency across all active placements.",
+    expandable: true,
+    detail: "Pull the last 30-day report for Meta, TikTok, and Google. Flag any channel with ROAS below 3× or CTR below 1.5% for review.",
+  },
+  {
+    title: "Identify high-value audience segments",
+    description: "Use first-party data to surface segments with the highest conversion rate.",
+    expandable: true,
+    detail: "Cross-reference purchase history with lookalike expansion. Prioritise the 25–34 age band and retargeting pools above 10k users.",
+  },
+  {
+    title: "Define channel mix and budget allocation",
+    description: "Distribute budget based on projected ROAS per channel.",
+  },
+  {
+    title: "Draft creative briefs per channel",
+    description: "Write format-specific briefs for static, video, and story placements.",
+    expandable: true,
+    detail: "Each brief should include: hook (first 3 seconds), key message, CTA, aspect ratio, and max duration. Align tone to segment persona.",
+  },
+  {
+    title: "Set up A/B test variants",
+    description: "Create two variants per placement — one control, one challenger.",
+  },
+  {
+    title: "Define KPIs and success metrics",
+    description: "Set primary (ROAS, CVR) and secondary (CPM, frequency) targets before launch.",
+  },
+];
+
+export interface PlanTestTaskHandle {
+  startEdit: () => void;
+  cancelEdit: () => void;
+  markEdited: () => void;
+}
+
+const PlanTestTask = forwardRef<PlanTestTaskHandle, { onEdit?: () => void }>(
+  ({ onEdit }, ref) => {
+    const [status, setStatus] = useState<"idle" | "running" | "cancelled" | "completed" | "editing" | "edited">("idle");
+    const [progress, setProgress] = useState(0);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current); }, []);
+
+    useImperativeHandle(ref, () => ({
+      startEdit: () => setStatus("editing"),
+      cancelEdit: () => setStatus("idle"),
+      markEdited: () => setStatus("edited"),
+    }));
+
+    const handleEdit = () => {
+      setStatus("editing");
+      onEdit?.();
+    };
+
+    const handleStart = () => {
+      setStatus("running");
+      setProgress(0);
+      intervalRef.current = setInterval(() => {
+        setProgress((p) => {
+          const next = p + 2;
+          if (next >= 100) {
+            clearInterval(intervalRef.current!);
+            intervalRef.current = null;
+            setStatus("completed");
+            return 100;
+          }
+          return next;
+        });
+      }, 80);
+    };
+
+    const handleStop = () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      setStatus("idle");
+    };
+
+    const handleCancel = () => {
+      handleStop();
+      setProgress(0);
+      setStatus("cancelled");
+    };
+
+    return (
+      <CotContainer
+        type="task"
+        title="Campaign Strategy Plan"
+        defaultExpanded
+        status={status}
+        progress={progress}
+        onStart={status === "idle" ? handleStart : undefined}
+        onStop={status === "running" ? handleStop : undefined}
+        onCancel={status === "idle" ? handleCancel : undefined}
+        onEdit={status === "idle" ? handleEdit : undefined}
+      >
+        <Cot>
+          {PLAN_STEPS.map((step, i) => (
+            <CotItem
+              key={step.title}
+              variant="todo"
+              title={step.title}
+              description={step.description}
+              expandable={step.expandable}
+              status={
+                status === "completed" ? "complete"
+                : status === "running" && progress >= ((i + 1) / PLAN_STEPS.length) * 100 ? "complete"
+                : "idle"
+              }
+            >
+              {step.detail && (
+                <BodyText size="sm" emphasis="medium">{step.detail}</BodyText>
+              )}
+            </CotItem>
+          ))}
+        </Cot>
+      </CotContainer>
+    );
+  }
+);
 
 /* ── Context menu data ───────────────────────────────────────── */
 
@@ -268,9 +482,8 @@ function ShoppingMultiOption({ label, checked, onChange }: { label: string; chec
 /* ── Shopping plan task ──────────────────────────────────────── */
 
 function ShoppingPlanTask({ categories, items }: { categories: string[]; items: string[] }) {
-  const [running, setRunning] = useState(false);
+  const [status, setStatus] = useState<"idle" | "running" | "cancelled" | "completed">("idle");
   const [progress, setProgress] = useState(0);
-  const [completed, setCompleted] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current); }, []);
@@ -283,17 +496,15 @@ function ShoppingPlanTask({ categories, items }: { categories: string[]; items: 
   ];
 
   const handleStart = () => {
-    setRunning(true);
+    setStatus("running");
     setProgress(0);
-    setCompleted(false);
     intervalRef.current = setInterval(() => {
       setProgress((p) => {
         const next = p + 2;
         if (next >= 100) {
           clearInterval(intervalRef.current!);
           intervalRef.current = null;
-          setRunning(false);
-          setCompleted(true);
+          setStatus("completed");
           return 100;
         }
         return next;
@@ -304,13 +515,13 @@ function ShoppingPlanTask({ categories, items }: { categories: string[]; items: 
   const handleStop = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = null;
-    setRunning(false);
+    setStatus("idle");
   };
 
   const handleCancel = () => {
     handleStop();
     setProgress(0);
-    setCompleted(false);
+    setStatus("cancelled");
   };
 
   return (
@@ -318,12 +529,12 @@ function ShoppingPlanTask({ categories, items }: { categories: string[]; items: 
       type="task"
       title="Shopping Plan"
       defaultExpanded
-      running={running}
+      status={status}
       progress={progress}
-      onStart={completed ? undefined : handleStart}
+      onStart={status === "idle" ? handleStart : undefined}
       onStop={handleStop}
-      onCancel={completed ? undefined : handleCancel}
-      onEdit={completed ? undefined : handleCancel}
+      onCancel={status === "idle" ? handleCancel : undefined}
+      onEdit={status === "idle" ? handleCancel : undefined}
     >
       <Cot>
         {steps.map((step, i) => (
@@ -332,8 +543,8 @@ function ShoppingPlanTask({ categories, items }: { categories: string[]; items: 
             variant="todo"
             title={step}
             status={
-              completed ? "complete"
-              : running && progress >= ((i + 1) / steps.length) * 100 ? "complete"
+              status === "completed" ? "complete"
+              : status === "running" && progress >= ((i + 1) / steps.length) * 100 ? "complete"
               : "idle"
             }
           />
@@ -362,6 +573,10 @@ export default function AiThreadPlayground() {
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showInfoBanner, setShowInfoBanner] = useState(false);
   const [infoType, setInfoType] = useState<PromptInputInfoType>("edit");
+
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
+  const editingPlanIdRef = useRef<string | null>(null);
+  const planRefsMap = useRef<Map<string, RefObject<PlanTestTaskHandle>>>(new Map());
 
   const threadRef = useRef<AiThreadHandle>(null);
   const promptRef = useRef<HTMLDivElement>(null);
@@ -408,9 +623,28 @@ export default function AiThreadPlayground() {
     });
   }, [stopGeneration]);
 
+  const handlePlanEditStart = useCallback((planAssistId: string) => {
+    setEditingPlanId(planAssistId);
+    editingPlanIdRef.current = planAssistId;
+    promptRef.current?.querySelector<HTMLTextAreaElement>("textarea")?.focus();
+  }, []);
+
+  const handleCancelEdit = useCallback(() => {
+    const id = editingPlanIdRef.current;
+    if (id) planRefsMap.current.get(id)?.current?.cancelEdit();
+    setEditingPlanId(null);
+    editingPlanIdRef.current = null;
+  }, []);
+
   const handleSubmit = useCallback((text: string) => {
     const trimmed = text.trim();
     if (!trimmed) return;
+
+    const capturedEditId = editingPlanIdRef.current;
+    if (capturedEditId) {
+      setEditingPlanId(null);
+      editingPlanIdRef.current = null;
+    }
 
     const userId = crypto.randomUUID();
     const assistId = crypto.randomUUID();
@@ -420,11 +654,48 @@ export default function AiThreadPlayground() {
     flushSync(() => {
       setMessages((prev) => [
         ...prev,
-        { id: userId, role: "user" as const, message: trimmed },
+        {
+          id: userId,
+          role: "user" as const,
+          message: trimmed,
+          ...(capturedEditId ? { replyLabel: "Editing plan" } : {}),
+        },
         { id: assistId, role: "assistant" as const, phase: "loading" as const },
       ]);
     });
     threadRef.current?.scrollToMessage(userId, "smooth");
+
+    if (capturedEditId) {
+      loadingTimerRef.current = setTimeout(() => {
+        loadingTimerRef.current = null;
+        if (activeIdRef.current !== assistId) return;
+        setMessages((prev) => prev.map((m) => (m.id === assistId ? { ...m, phase: "generating" as const } : m)));
+        let idx = 0;
+        streamTimerRef.current = setInterval(() => {
+          if (activeIdRef.current !== assistId) { clearInterval(streamTimerRef.current!); streamTimerRef.current = null; return; }
+          if (idx >= PLAN_BEFORE_CHUNKS.length) {
+            clearInterval(streamTimerRef.current!);
+            streamTimerRef.current = null;
+            activeIdRef.current = null;
+            setGenerating(false);
+            planRefsMap.current.get(capturedEditId)?.current?.markEdited();
+            const planRef = createRef<PlanTestTaskHandle>();
+            planRefsMap.current.set(assistId, planRef);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistId
+                  ? { ...m, phase: "done" as const, showFeedback: true, slot: <PlanTestTask ref={planRef} onEdit={() => handlePlanEditStart(assistId)} /> }
+                  : m,
+              ),
+            );
+            return;
+          }
+          idx++;
+          setMessages((prev) => prev.map((m) => m.id === assistId ? { ...m, text: PLAN_BEFORE_CHUNKS.slice(0, idx).join("") } : m));
+        }, 40);
+      }, 1200);
+      return;
+    }
 
     if (trimmed.toLowerCase().startsWith("chart test")) {
       loadingTimerRef.current = setTimeout(() => {
@@ -470,6 +741,80 @@ export default function AiThreadPlayground() {
               m.id === assistId ? { ...m, text: CHART_BEFORE_CHUNKS.slice(0, idx).join("") } : m,
             ),
           );
+        }, 40);
+      }, 1200);
+      return;
+    }
+
+    if (trimmed.toLowerCase().startsWith("table test")) {
+      loadingTimerRef.current = setTimeout(() => {
+        loadingTimerRef.current = null;
+        if (activeIdRef.current !== assistId) return;
+        setMessages((prev) => prev.map((m) => (m.id === assistId ? { ...m, phase: "generating" as const } : m)));
+        let idx = 0;
+        streamTimerRef.current = setInterval(() => {
+          if (activeIdRef.current !== assistId) { clearInterval(streamTimerRef.current!); streamTimerRef.current = null; return; }
+          if (idx >= TABLE_BEFORE_CHUNKS.length) {
+            clearInterval(streamTimerRef.current!);
+            streamTimerRef.current = null;
+            activeIdRef.current = null;
+            setGenerating(false);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistId
+                  ? {
+                      ...m,
+                      phase: "done" as const,
+                      showFeedback: true,
+                      slot: (
+                        <AiGeneration
+                          title="Campaign Performance"
+                          description="Summer Campaign · Paid Social"
+                          paddingTop="md"
+                          paddingBottom="md"
+                        >
+                          <CampaignTableWithFade />
+                        </AiGeneration>
+                      ),
+                    }
+                  : m,
+              ),
+            );
+            return;
+          }
+          idx++;
+          setMessages((prev) => prev.map((m) => m.id === assistId ? { ...m, text: TABLE_BEFORE_CHUNKS.slice(0, idx).join("") } : m));
+        }, 40);
+      }, 1200);
+      return;
+    }
+
+    if (trimmed.toLowerCase().startsWith("plan test")) {
+      loadingTimerRef.current = setTimeout(() => {
+        loadingTimerRef.current = null;
+        if (activeIdRef.current !== assistId) return;
+        setMessages((prev) => prev.map((m) => (m.id === assistId ? { ...m, phase: "generating" as const } : m)));
+        let idx = 0;
+        streamTimerRef.current = setInterval(() => {
+          if (activeIdRef.current !== assistId) { clearInterval(streamTimerRef.current!); streamTimerRef.current = null; return; }
+          if (idx >= PLAN_BEFORE_CHUNKS.length) {
+            clearInterval(streamTimerRef.current!);
+            streamTimerRef.current = null;
+            activeIdRef.current = null;
+            setGenerating(false);
+            const planRef = createRef<PlanTestTaskHandle>();
+            planRefsMap.current.set(assistId, planRef);
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistId
+                  ? { ...m, phase: "done" as const, showFeedback: true, slot: <PlanTestTask ref={planRef} onEdit={() => handlePlanEditStart(assistId)} /> }
+                  : m,
+              ),
+            );
+            return;
+          }
+          idx++;
+          setMessages((prev) => prev.map((m) => m.id === assistId ? { ...m, text: PLAN_BEFORE_CHUNKS.slice(0, idx).join("") } : m));
         }, 40);
       }, 1200);
       return;
@@ -648,17 +993,15 @@ export default function AiThreadPlayground() {
           Info Banner
         </label>
 
-        {showInfoBanner && (
-          <select
-            value={infoType}
-            onChange={(e) => setInfoType(e.target.value as PromptInputInfoType)}
-            style={{ fontSize: 12, padding: "2px 6px", borderRadius: 4, border: "1px solid var(--element-outline-neutral-default)" }}
-          >
-            {INFO_TYPE_OPTIONS.map((o) => (
-              <option key={o.value} value={o.value}>{o.label}</option>
-            ))}
-          </select>
-        )}
+        <select
+          value={infoType}
+          onChange={(e) => setInfoType(e.target.value as PromptInputInfoType)}
+          style={{ fontSize: 12, padding: "2px 6px", borderRadius: 4, border: "1px solid var(--element-outline-neutral-default)" }}
+        >
+          {INFO_TYPE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
       </div>
 
       {/* ── Thread + PromptInput ── */}
@@ -744,7 +1087,15 @@ export default function AiThreadPlayground() {
                   />
                 )}
 
-                {showInfoBanner && (
+                {editingPlanId && (
+                  <PromptInputInfo
+                    type="edit"
+                    title="Editing plan"
+                    onAction={handleCancelEdit}
+                  />
+                )}
+
+                {showInfoBanner && !editingPlanId && (
                   <PromptInputInfo
                     type={infoType}
                     title={
@@ -760,7 +1111,7 @@ export default function AiThreadPlayground() {
                 )}
 
                 <PromptInputAttachments />
-                <PromptInputTextarea placeholder='Try "test", "long test", "chart test", "shopping", or @ to add context' />
+                <PromptInputTextarea placeholder='Try "test", "long test", "chart test", "table test", "plan test", "shopping", or @ to add context' />
                 <PromptInputFooter>
                   <PromptInputFooterStart>
                     <PromptInputAddMenu />

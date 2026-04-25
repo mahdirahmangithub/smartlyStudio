@@ -1,0 +1,211 @@
+/* ── Root ─────────────────────────────────────────────────────────────────── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  container-type: inline-size;
+}
+
+@container (min-width: 448px) {
+  .card {
+    padding: var(--spacing-md);
+  }
+}
+
+/* ── Base layout (positions card + version indicator) ─────────────────────── */
+
+.base {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  width: 100%;
+  position: relative;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--element-surface-over);
+  border-style: solid;
+  border-width: var(--spacing-2xs);
+  border-color: transparent;
+  border-radius: var(--radius-2xl);
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  border: var(--spacing-px) solid var(--element-divider-neutral-weak);
+  transition:
+    border-color var(--animation-state-change-duration) var(--animation-state-change-easing),
+    box-shadow var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.cardActive {
+  box-shadow: inset 0 0 0 var(--spacing-px) var(--element-outline-brand-default);
+  border:var(--spacing-px) solid  var(--element-outline-brand-default);
+
+}
+
+/* ── Card inner ───────────────────────────────────────────────────────────── */
+
+.cardInner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: flex-start;
+  width: 100%;
+  border-radius: var(--radius-2xl);
+}
+
+/* ── Header (override Header component to sit at z-index 2) ──────────────── */
+
+.header {
+  position: relative;
+  z-index: 2;
+  background: transparent;
+}
+
+/* ── Content area ─────────────────────────────────────────────────────────── */
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-2xl);
+  padding: var(--spacing-md);
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Context tags row ─────────────────────────────────────────────────────── */
+
+.contextRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+.contextTagItem {
+  display: flex;
+  flex-shrink: 0;
+}
+
+/* ── Version indicator ────────────────────────────────────────────────────── */
+
+.version {
+  position: absolute;
+  right: -24px;
+  top: var(--spacing-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-xs) var(--spacing-sm) var(--space-sm-extra);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.versionBg {
+  position: absolute;
+  inset: 0;
+  opacity: var(--opacity-40);
+  background: var(--element-fill-neutral-secondary-default);
+}
+
+.versionBgActive {
+  opacity: var(--opacity-56);
+  background: var(--element-fill-brand-secondary-default);
+}
+
+.versionLabel,
+.versionNumber {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.versionText {
+  font-family: var(--type-caption-strong-md-family);
+  font-size: var(--type-caption-strong-md-size);
+  font-weight: var(--type-caption-strong-md-weight);
+  line-height: var(--type-caption-strong-md-line-height);
+  letter-spacing: var(--type-caption-strong-md-letter-spacing);
+  font-style: normal;
+  color: var(--text-neutral-secondary-default);
+  white-space: nowrap;
+}
+
+.versionTextActive {
+  color: var(--text-brand-default);
+}
+
+.versionInnerShadow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 10px 0 var(--blur-xs) 0 var(--shadow-halo);
+}
+
+/* ── Suggestion section ───────────────────────────────────────────────────── */
+
+.suggestions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.suggestionTitle {
+  display: flex;
+  align-items: center;
+  padding-left: var(--spacing-md);
+  height: 16px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.suggestionCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-md);
+  background: var(--element-surface-over);
+  border: var(--spacing-px) solid var(--element-divider-neutral-weak);
+  border-radius: var(--radius-2xl);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.suggestionCardInner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-md);
+  width: 100%;
+  border-radius: var(--radius-2xl);
+}
+
+.suggestionContent {
+  padding: var(--spacing-md);
+  width: 100%;
+  box-sizing: border-box;
+}

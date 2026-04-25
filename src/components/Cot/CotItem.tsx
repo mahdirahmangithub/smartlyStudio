@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useState, Children, cloneElement, isValidElement } from "react";
 import { Icon } from "../Icon";
 import { Spinner } from "../Spinner";
 import { Expander } from "../Expander";
@@ -45,10 +45,20 @@ export function CotItem({
   defaultExpanded = false,
   expanded: expandedProp,
   onExpandedChange,
-  connector = true,
+  connector,
+  disabled = false,
   className,
   ...rest
 }: CotItemProps) {
+  const showConnector = connector ?? (status !== "idle");
+
+  const slotChildren = disabled
+    ? Children.map(children, (child) =>
+        isValidElement(child)
+          ? cloneElement(child as React.ReactElement<{ disabled?: boolean }>, { disabled: true })
+          : child
+      )
+    : children;
   const slotId = useId();
   const isControlled = expandedProp !== undefined;
   const [expandedInternal, setExpandedInternal] = useState(defaultExpanded);
@@ -109,8 +119,10 @@ export function CotItem({
     <li
       className={cx(
         styles.root,
-        connector && styles.withConnector,
+        showConnector && styles.withConnector,
+        status === "idle" && styles.statusIdle,
         status === "error" && styles.statusError,
+        disabled && styles.disabled,
         className
       )}
       aria-label={
@@ -137,7 +149,7 @@ export function CotItem({
       )}
 
       {/* ── Slot content ── */}
-      {children != null && (
+      {slotChildren != null && (
         expandable ? (
           <div
             id={slotId}
@@ -146,11 +158,11 @@ export function CotItem({
             aria-hidden={!isExpanded}
             inert={!isExpanded ? true : undefined}
           >
-            <div className={styles.slotInner}>{children}</div>
+            <div className={styles.slotInner}>{slotChildren}</div>
           </div>
         ) : (
           <div className={styles.slotNormal}>
-            <div className={styles.slotInner}>{children}</div>
+            <div className={styles.slotInner}>{slotChildren}</div>
           </div>
         )
       )}

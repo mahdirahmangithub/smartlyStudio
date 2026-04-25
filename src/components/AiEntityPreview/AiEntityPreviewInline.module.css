@@ -1,0 +1,89 @@
+/* ── Root ── */
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  background: var(--element-surface-over);
+  border: var(--spacing-hair-line) solid var(--element-outline-neutral-default);
+  border-radius: var(--radius-xs);
+  overflow: clip;
+  padding: 0 var(--spacing-2xs);
+  margin: 0 var(--spacing-2xs);
+  text-decoration: none;
+  cursor: pointer;
+  vertical-align: middle;
+  transition: border-color var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.root:hover {
+  border-color: var(--element-outline-neutral-hover);
+}
+
+.root:active {
+  border-color: var(--element-outline-neutral-press);
+}
+
+.root:focus-visible {
+  outline: none;
+  border-color: var(--element-outline-neutral-hover);
+  box-shadow:
+    0 0 0 var(--space-2xs) var(--element-surface-over),
+    0 0 0 var(--space-xs) var(--element-outline-neutral-default);
+}
+
+/* ── Disabled ── */
+
+.root.disabled {
+  border-color: var(--element-outline-neutral-disable);
+  pointer-events: none;
+  cursor: default;
+}
+
+/* ── Content area ── */
+
+.content {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--spacing-px);
+  padding: 0 var(--spacing-2xs);
+  white-space: nowrap;
+}
+
+/* ── Label ── */
+
+.label {
+  font-family: var(--type-body-md-family);
+  font-weight: var(--type-body-md-weight);
+  font-size: var(--type-body-md-size);
+  line-height: var(--type-body-md-line-height);
+  letter-spacing: var(--type-body-md-letter-spacing);
+  color: var(--text-neutral-primary);
+}
+
+.root.disabled .label {
+  color: var(--text-neutral-disable);
+}
+
+/* ── Dot + status ── */
+
+.dot,
+.status {
+  font-family: var(--type-body-sm-family);
+  font-weight: var(--type-body-sm-weight);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line-height);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+  color: var(--text-neutral-placeholder);
+}
+
+.root.disabled .dot,
+.root.disabled .status {
+  color: var(--text-neutral-disable);
+}
+
+/* ── Icon ── */
+
+.root.disabled .icon {
+  color: var(--text-neutral-disable);
+}
