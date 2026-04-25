@@ -135,8 +135,45 @@
   }
 }
 
-/* ── Offset ── */
+/* ── Offset — responsive cascade mirrors span cascade ── */
 
 .hasOffset {
-  grid-column: calc(var(--col-offset) + 1) / span var(--_span);
+  --_offset: var(--col-offset, 0);
+  grid-column: calc(var(--_offset) + 1) / span var(--_span);
+}
+
+@media (min-width: 376px) {
+  .hasOffset {
+    --_offset: var(--col-offset-xs, var(--col-offset, 0));
+  }
+}
+
+@media (min-width: 521px) {
+  .hasOffset {
+    --_offset: var(--col-offset-sm, var(--col-offset-xs, var(--col-offset, 0)));
+  }
+}
+
+@media (min-width: 1025px) {
+  .hasOffset {
+    --_offset: var(--col-offset-md, var(--col-offset-sm, var(--col-offset-xs, var(--col-offset, 0))));
+  }
+}
+
+@media (min-width: 1281px) {
+  .hasOffset {
+    --_offset: var(--col-offset-lg, var(--col-offset-md, var(--col-offset-sm, var(--col-offset-xs, var(--col-offset, 0)))));
+  }
+}
+
+@media (min-width: 1441px) {
+  .hasOffset {
+    --_offset: var(--col-offset-xl, var(--col-offset-lg, var(--col-offset-md, var(--col-offset-sm, var(--col-offset-xs, var(--col-offset, 0))))));
+  }
+}
+
+@media (min-width: 1921px) {
+  .hasOffset {
+    --_offset: var(--col-offset-2xl, var(--col-offset-xl, var(--col-offset-lg, var(--col-offset-md, var(--col-offset-sm, var(--col-offset-xs, var(--col-offset, 0)))))));
+  }
 }

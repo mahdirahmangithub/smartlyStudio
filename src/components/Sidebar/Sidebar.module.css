@@ -121,6 +121,15 @@
   padding-inline: var(--spacing-xs);
 }
 
+/* ── Footer (fixed at bottom, outside scroll area) ── */
+
+.footer {
+  flex-shrink: 0;
+  margin-inline: calc(-1 * var(--spacing-xs));
+  padding-inline: var(--spacing-xs);
+  padding-bottom: var(--spacing-md);
+}
+
 /* ── Right-edge divider ── */
 
 .edgeDivider {

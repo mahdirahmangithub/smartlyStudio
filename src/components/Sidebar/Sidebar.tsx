@@ -73,6 +73,8 @@ export interface SidebarProps
   headerActions?: ReactNode;
 
   children?: ReactNode;
+  /** Fixed content rendered at the bottom of the sidebar, outside the scroll area */
+  footer?: ReactNode;
 }
 
 const COLLAPSED_WIDTH = 72; // var(--spacing-7xl)
@@ -96,6 +98,7 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
       titleIcon,
       headerActions,
       children,
+      footer,
       className,
       style,
       ...rest
@@ -393,6 +396,9 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
 
               {/* ── Content ── */}
               <div className={styles.content}>{children}</div>
+
+              {/* ── Footer ── */}
+              {footer && <div className={styles.footer}>{footer}</div>}
             </div>
 
             {/* ── Right-edge divider ── */}

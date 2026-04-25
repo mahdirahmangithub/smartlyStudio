@@ -108,8 +108,20 @@ export interface ColProps extends HTMLAttributes<HTMLDivElement> {
   xl?: number;
   /** Override span from 2xl (1921 px) and up */
   "2xl"?: number;
-  /** Column offset — pushes the column start by N columns */
+  /** Base column offset — pushes the column start by N columns */
   offset?: number;
+  /** Override offset from xs (376 px) and up */
+  offsetXs?: number;
+  /** Override offset from sm (521 px) and up */
+  offsetSm?: number;
+  /** Override offset from md (1025 px) and up */
+  offsetMd?: number;
+  /** Override offset from lg (1281 px) and up */
+  offsetLg?: number;
+  /** Override offset from xl (1441 px) and up */
+  offsetXl?: number;
+  /** Override offset from 2xl (1921 px) and up */
+  offset2xl?: number;
   children?: ReactNode;
 }
 
@@ -124,6 +136,12 @@ export const Col = forwardRef<HTMLDivElement, ColProps>(
       xl,
       "2xl": xxl,
       offset,
+      offsetXs,
+      offsetSm,
+      offsetMd,
+      offsetLg,
+      offsetXl,
+      offset2xl,
       children,
       className,
       style,
@@ -140,13 +158,19 @@ export const Col = forwardRef<HTMLDivElement, ColProps>(
     if (xl != null) vars["--col-xl"] = xl;
     if (xxl != null) vars["--col-2xl"] = xxl;
     if (offset != null) vars["--col-offset"] = offset;
+    if (offsetXs != null) vars["--col-offset-xs"] = offsetXs;
+    if (offsetSm != null) vars["--col-offset-sm"] = offsetSm;
+    if (offsetMd != null) vars["--col-offset-md"] = offsetMd;
+    if (offsetLg != null) vars["--col-offset-lg"] = offsetLg;
+    if (offsetXl != null) vars["--col-offset-xl"] = offsetXl;
+    if (offset2xl != null) vars["--col-offset-2xl"] = offset2xl;
 
     return (
       <div
         ref={ref}
         className={cx(
           styles.col,
-          offset != null && styles.hasOffset,
+          (offset != null || offsetXs != null || offsetSm != null || offsetMd != null || offsetLg != null || offsetXl != null || offset2xl != null) && styles.hasOffset,
           className,
         )}
         style={{ ...vars, ...style } as CSSProperties}

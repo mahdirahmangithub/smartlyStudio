@@ -9,6 +9,7 @@
 .root {
   display: flex;
   align-items: center;
+  min-height: var(--spacing-4xl);
   padding: var(--spacing-sm-plus);
   border-radius: var(--radius-lg);
   position: relative;

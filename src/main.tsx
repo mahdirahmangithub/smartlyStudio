@@ -11,9 +11,14 @@ import "./tokens/shadow.css";
 import "./tokens/breakpoints.css";
 import "./tokens/tokens.css";
 import App from "./App.tsx";
+import AiChatPage from "./pages/AiChatPage.tsx";
+
+const path = window.location.pathname;
+
+const Root = path === "/chat" ? AiChatPage : App;
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <App />
+    <Root />
   </StrictMode>,
 );

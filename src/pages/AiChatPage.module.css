@@ -1,0 +1,28 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--element-surface-default);
+  overflow: hidden;
+}
+
+/* ── Body: sidebar + main side by side ── */
+
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── Main content — fills remaining space after sidebar rail ── */
+
+.main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
