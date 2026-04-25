@@ -221,7 +221,7 @@ export default function AiGenerationPlayground() {
             <SelectButton
               key={t}
               size="sm"
-              emphasis={contentType === t ? "high" : "low"}
+              emphasis={contentType === t ? "medium" : "low"}
               onClick={() => setContentType(t)}
             >
               {t.charAt(0).toUpperCase() + t.slice(1)}
