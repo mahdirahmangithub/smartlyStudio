@@ -11,14 +11,16 @@ import styles from "./AiThread.module.css";
 import type { AiThreadHandle, AiThreadProps } from "./aiThreadTypes";
 
 export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
-  function AiThread({ messages, introContent, bottomOffset = 0, hasMore, onLoadMore, className, style }, handle) {
+  function AiThread({ messages, scrollContainerRef, introContent, bottomOffset = 0, hasMore, onLoadMore, className, style }, handle) {
+    const external = !!scrollContainerRef;
+
     const lastMsg = messages[messages.length - 1];
     const generating =
       lastMsg?.role === "assistant" &&
       (lastMsg.phase === "loading" || lastMsg.phase === "generating");
 
     const { containerRef, sentinelRef, spacerRef, showFab, onFabClick, scrollToBottom, scrollToMessage, scrollIfSticking } =
-      useThreadScroll({ generating, bottomOffset });
+      useThreadScroll({ generating, bottomOffset, scrollContainerRef });
 
     useImperativeHandle(handle, () => ({ scrollToBottom, scrollToMessage }), [scrollToBottom, scrollToMessage]);
 
@@ -26,6 +28,29 @@ export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
     useEffect(() => {
       if (containerRef.current) setFaderColor(detectFadeColor(containerRef.current));
     }, []);
+
+    // Track the AiThread root's viewport-x bounds so fixed-position children
+    // (FAB, fader) can centre on the thread itself instead of the page —
+    // avoids sidebar/asymmetric layout offsets.
+    const rootRef = useRef<HTMLDivElement>(null);
+    const [rootRect, setRootRect] = useState<{ left: number; width: number } | null>(null);
+    useEffect(() => {
+      if (!external) return;
+      const el = rootRef.current;
+      if (!el) return;
+      const update = () => {
+        const rect = el.getBoundingClientRect();
+        setRootRect({ left: rect.left, width: rect.width });
+      };
+      update();
+      const ro = new ResizeObserver(update);
+      ro.observe(el);
+      window.addEventListener("resize", update);
+      return () => {
+        ro.disconnect();
+        window.removeEventListener("resize", update);
+      };
+    }, [external]);
 
     useEffect(() => {
       if (generating) scrollIfSticking();
@@ -35,29 +60,43 @@ export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
     useEffect(() => {
       if (!hasMore || !onLoadMore) return;
       const sentinel = topSentinelRef.current;
-      const container = containerRef.current;
-      if (!sentinel || !container) return;
+      // In external mode use the external scroll container as the observer root.
+      const root = scrollContainerRef?.current ?? containerRef.current;
+      if (!sentinel || !root) return;
       const observer = new IntersectionObserver(
         ([entry]) => { if (entry.isIntersecting) onLoadMore(); },
-        { root: container, rootMargin: "120px 0px 0px 0px" },
+        { root, rootMargin: "120px 0px 0px 0px" },
       );
       observer.observe(sentinel);
       return () => observer.disconnect();
-    }, [hasMore, onLoadMore, containerRef]);
+    }, [hasMore, onLoadMore, scrollContainerRef, containerRef]);
 
     const fabBottom = bottomOffset + 32;
 
     return (
-      <div className={cx(styles.root, className)} style={style}>
+      <div
+        ref={rootRef}
+        className={cx(styles.root, external && styles.rootExternal, className)}
+        style={external && rootRect
+          ? {
+              ...style,
+              ["--ai-fab-center" as string]: `${rootRect.left + rootRect.width / 2}px`,
+              ["--ai-thread-left" as string]: `${rootRect.left}px`,
+              ["--ai-thread-width" as string]: `${rootRect.width}px`,
+            }
+          : style}
+      >
         <div
           ref={containerRef}
-          className={styles.scroll}
+          className={cx(styles.scroll, external && styles.scrollExternal)}
           role="log"
           aria-live="polite"
           aria-label="Conversation"
-          tabIndex={0}
+          tabIndex={external ? undefined : 0}
         >
-          <div className={styles.list} style={{ paddingBottom: bottomOffset }}>
+          {/* In external mode bottomOffset does not pad the list — PromptInput
+              is in-flow below the thread, not overlapping it. */}
+          <div className={cx(styles.list, external && styles.listExternal)} style={{ paddingBottom: external ? undefined : bottomOffset }}>
             <div ref={topSentinelRef} className={styles.topSentinel} aria-hidden />
 
             {messages.length === 0 && introContent && (
@@ -99,17 +138,23 @@ export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
               ),
             )}
 
-            {/* Sentinel: marks actual content end — scroll targets are based on this,
-                never on scrollHeight, so the spacer below never affects auto-follow. */}
             <div ref={sentinelRef} className={styles.sentinel} aria-hidden />
-
-            {/* Spacer: purely visual space managed imperatively by useThreadScroll.
-                Height = containerHeight on generation start, dissolves on user scroll. */}
             <div ref={spacerRef} className={styles.spacer} aria-hidden />
           </div>
         </div>
 
-        {bottomOffset > 0 && (
+        {bottomOffset > 0 && (external ? (
+          <div
+            className={styles.faderFixed}
+            style={{ height: `calc(${bottomOffset}px + var(--spacing-2xl))` }}
+            aria-hidden
+          >
+            <div
+              className={styles.faderFixedInner}
+              style={{ background: `linear-gradient(180deg, transparent 0%, ${faderColor} var(--spacing-4xl))` }}
+            />
+          </div>
+        ) : (
           <div
             className={styles.fader}
             style={{
@@ -118,10 +163,10 @@ export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
             }}
             aria-hidden
           />
-        )}
+        ))}
 
         <div
-          className={styles.fab}
+          className={external ? styles.fabFixed : styles.fab}
           style={{
             bottom: fabBottom,
             transform: `translateX(-50%) translateY(${showFab ? "0" : "calc(100% + 48px)"}) scale(${showFab ? 1 : 0.4})`,

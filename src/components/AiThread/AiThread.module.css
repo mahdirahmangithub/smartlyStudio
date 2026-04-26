@@ -35,6 +35,28 @@
   transition: padding-bottom 280ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* ── External scroll mode modifiers ──
+   Defined AFTER their base rules so they win on equal-specificity cascade. */
+
+.rootExternal {
+  position: static;
+  overflow: visible;
+}
+
+.scrollExternal {
+  position: static;
+  overflow: visible;
+  overscroll-behavior: auto;
+}
+
+/* List min-height in external mode: consumer-controlled via CSS variable.
+   Default 100dvh fills the viewport (works when AiThread is the only thing
+   on the page). Set --thread-min-height to subtract any sticky navbar/prompt
+   that sit outside the thread so the page doesn't gain unwanted scroll. */
+.listExternal {
+  min-height: var(--thread-min-height, 100dvh);
+}
+
 /* ── Intro (empty state) ── */
 
 .intro {
@@ -98,11 +120,47 @@
   transition: height 280ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* External scroll mode: fader fixed to viewport bottom, spanning the thread's
+   horizontal extent (so it sits above the sticky prompt inside the scroll
+   container). Inner gradient is centred and capped at 720px to match the list. */
+.faderFixed {
+  position: fixed;
+  bottom: 0;
+  left: var(--ai-thread-left, 0);
+  width: var(--ai-thread-width, 100%);
+  pointer-events: none;
+  z-index: 5;
+  display: flex;
+  justify-content: center;
+  transition: height 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faderFixedInner {
+  width: 100%;
+  max-width: 720px;
+  height: 100%;
+}
+
 /* ── Scroll-to-bottom FAB ── */
 
 .fab {
   position: absolute;
   left: 50%;
+  z-index: 10;
+  pointer-events: none;
+  transition:
+    transform 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 300ms cubic-bezier(0.4, 0, 0.2, 1),
+    bottom 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* External scroll mode: FAB fixed to viewport.
+   --ai-fab-center is set by JS to the horizontal centre of the AiThread root
+   in viewport coordinates, so the FAB centres on the thread regardless of
+   surrounding layout (sidebars, padding, asymmetric grids). */
+.fabFixed {
+  position: fixed;
+  left: var(--ai-fab-center, 50%);
   z-index: 10;
   pointer-events: none;
   transition:

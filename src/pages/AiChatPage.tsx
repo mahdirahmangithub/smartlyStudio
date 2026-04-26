@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useLayoutEffect, type ReactNode } from "react";
+import { useRef, useState, useCallback, useEffect, type ReactNode } from "react";
 import { NavBarContent } from "../components/NavBarContent";
 import { Navbar } from "../components/Navbar";
 import { Sidebar } from "../components/Sidebar";
@@ -239,9 +239,23 @@ export default function AiChatPage() {
   const [theme, setTheme] = useState<Theme>("light");
   const [typeface, setTypeface] = useState<Typeface>("mac");
 
+  const mainScrollRef = useRef<HTMLElement>(null);
   const promptRef = useRef<HTMLDivElement>(null);
   const [promptHeight, setPromptHeight] = useState(0);
   const streamRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const el = promptRef.current;
+    if (!el) return;
+    // Use border-box (full element height incl. padding) so the calc accounts
+    // for the wrapper's padding-bottom — contentRect would exclude it and
+    // leave the page slightly taller than the viewport.
+    const update = () => setPromptHeight(el.getBoundingClientRect().height);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   const streamAiMessage = useCallback((
     scenarioId: string,
@@ -283,14 +297,6 @@ export default function AiChatPage() {
     }
   }, []);
 
-  useLayoutEffect(() => {
-    const el = promptRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([entry]) => setPromptHeight(entry.contentRect.height));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-
   interface Scenario {
     id: string;
     label: string;
@@ -302,15 +308,30 @@ export default function AiChatPage() {
   const [scenarioStep, setScenarioStep] = useState(0);
   const [workspaceChoice, setWorkspaceChoice] = useState<"new" | "existing" | null>(null);
   const [campaignNameInput, setCampaignNameInput] = useState("");
-  const [campaignSearch, setCampaignSearch] = useState("");
-  const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
+  const [workspaceSearch, setWorkspaceSearch] = useState("");
+  const [selectedWorkspaceId, setSelectedWorkspaceId] = useState<string | null>(null);
   const [adAccountSearch, setAdAccountSearch] = useState("");
   const [selectedAdAccountId, setSelectedAdAccountId] = useState<string | null>(null);
 
   const WORKSPACES: Workspace[] = [
-    { id: "w-1", name: "BMW Global",     platform: "Meta",   campaignCount: 8, adSetCount: 24, adCount: 72 },
-    { id: "w-2", name: "Nike EMEA",      platform: "Google", campaignCount: 5, adSetCount: 15, adCount: 45 },
-    { id: "w-3", name: "Acme Corp",      platform: "TikTok", campaignCount: 3, adSetCount: 9,  adCount: 27 },
+    { id: "w-1",  name: "BMW Global",            platform: "Meta",      campaignCount: 8,  adSetCount: 24, adCount: 72  },
+    { id: "w-2",  name: "Nike EMEA",             platform: "Google",    campaignCount: 5,  adSetCount: 15, adCount: 45  },
+    { id: "w-3",  name: "Acme Corp",             platform: "TikTok",    campaignCount: 3,  adSetCount: 9,  adCount: 27  },
+    { id: "w-4",  name: "Unilever NA",           platform: "Meta",      campaignCount: 12, adSetCount: 38, adCount: 104 },
+    { id: "w-5",  name: "Adidas APAC",           platform: "TikTok",    campaignCount: 6,  adSetCount: 18, adCount: 54  },
+    { id: "w-6",  name: "Spotify Brand",         platform: "Google",    campaignCount: 4,  adSetCount: 12, adCount: 36  },
+    { id: "w-7",  name: "Zara EU",               platform: "Meta",      campaignCount: 9,  adSetCount: 27, adCount: 81  },
+    { id: "w-8",  name: "L'Oréal Global",        platform: "Pinterest", campaignCount: 7,  adSetCount: 21, adCount: 63  },
+    { id: "w-9",  name: "Sephora Beauty",        platform: "Snapchat",  campaignCount: 5,  adSetCount: 15, adCount: 45  },
+    { id: "w-10", name: "Coca-Cola US",          platform: "Meta",      campaignCount: 11, adSetCount: 33, adCount: 99  },
+    { id: "w-11", name: "Pepsi Latam",           platform: "TikTok",    campaignCount: 6,  adSetCount: 18, adCount: 54  },
+    { id: "w-12", name: "Heineken EU",           platform: "Google",    campaignCount: 4,  adSetCount: 12, adCount: 36  },
+    { id: "w-13", name: "Toyota Motor Co",       platform: "Meta",      campaignCount: 8,  adSetCount: 24, adCount: 72  },
+    { id: "w-14", name: "Samsung Mobile",        platform: "Google",    campaignCount: 10, adSetCount: 30, adCount: 90  },
+    { id: "w-15", name: "Netflix Originals",     platform: "TikTok",    campaignCount: 7,  adSetCount: 21, adCount: 63  },
+    { id: "w-16", name: "Airbnb Travel",         platform: "Pinterest", campaignCount: 5,  adSetCount: 15, adCount: 45  },
+    { id: "w-17", name: "Uber Mobility",         platform: "Meta",      campaignCount: 6,  adSetCount: 18, adCount: 54  },
+    { id: "w-18", name: "Shopify Merchants",     platform: "Google",    campaignCount: 4,  adSetCount: 12, adCount: 36  },
   ];
 
   const AD_ACCOUNTS = [
@@ -324,21 +345,6 @@ export default function AiChatPage() {
     { id: "aa-8",  label: "Nike YouTube EU" },
   ];
 
-  const EXISTING_CAMPAIGNS = [
-    { id: "ec-1",  label: "Summer 2026 – Run BMW" },
-    { id: "ec-2",  label: "Campaign_1209" },
-    { id: "ec-3",  label: "Q4 Retargeting" },
-    { id: "ec-4",  label: "Spring Brand Awareness" },
-    { id: "ec-5",  label: "Holiday Promo" },
-    { id: "ec-6",  label: "Loyalty Reactivation" },
-    { id: "ec-7",  label: "New User Acquisition" },
-    { id: "ec-8",  label: "Retargeting – EMEA" },
-    { id: "ec-9",  label: "Video Push – TikTok" },
-    { id: "ec-10", label: "Performance Max – US" },
-    { id: "ec-11", label: "Brand Lift – YouTube" },
-    { id: "ec-12", label: "App Install – Android" },
-  ];
-
   const [scenarios, setScenarios] = useState<Scenario[]>([
     { id: "s-1", label: "Campaign Creation",               messages: [],                      pinned: false, order: 0 },
     { id: "s-2", label: "Q3 performance analysis",         messages: [],                      pinned: false, order: 1 },
@@ -350,7 +356,7 @@ export default function AiChatPage() {
   const [activeScenarioId, setActiveScenarioId] = useState<string>("s-1");
   const [historyExpanded, setHistoryExpanded] = useState(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (streamRef.current) clearInterval(streamRef.current);
   }, [activeScenarioId]);
 
@@ -383,8 +389,8 @@ export default function AiChatPage() {
   const handleWorkspaceSelect = useCallback((type: "new" | "existing") => {
     setWorkspaceChoice(type);
     setCampaignNameInput("");
-    setCampaignSearch("");
-    setSelectedCampaignId(null);
+    setWorkspaceSearch("");
+    setSelectedWorkspaceId(null);
     setScenarioStep(2);
   }, []);
 
@@ -392,13 +398,13 @@ export default function AiChatPage() {
     let message = "";
     if (workspaceChoice === "new") {
       message = campaignNameInput.trim()
-        ? `Create a new campaign named "${campaignNameInput.trim()}"`
-        : "Create a new campaign in a new workspace";
+        ? `Create a new workspace named "${campaignNameInput.trim()}"`
+        : "Create a new workspace";
     } else {
-      const campaign = EXISTING_CAMPAIGNS.find((c) => c.id === selectedCampaignId);
-      message = campaign
-        ? `Use existing campaign: ${campaign.label}`
-        : "Use an existing campaign";
+      const workspace = WORKSPACES.find((w) => w.id === selectedWorkspaceId);
+      message = workspace
+        ? `Use existing workspace: ${workspace.name}`
+        : "Use an existing workspace";
     }
     const userMsg = { id: `u-${Date.now()}`, role: "user" as const, message };
     const aiId = `a-${Date.now() + 1}`;
@@ -428,7 +434,7 @@ export default function AiChatPage() {
         true, // skip internal loading — already loading
       );
     }, 2800);
-  }, [workspaceChoice, campaignNameInput, selectedCampaignId, streamAiMessage]);
+  }, [workspaceChoice, campaignNameInput, selectedWorkspaceId, streamAiMessage]);
 
   const LOADING_LABELS = [
     "Thinking...",
@@ -472,7 +478,9 @@ export default function AiChatPage() {
       message: adAccount ? `Using ad account: ${adAccount.label}` : "Using selected ad account",
     };
     const aiId = `a-${Date.now() + 1}`;
-    const workspace = WORKSPACES[0];
+    const workspace = (workspaceChoice === "existing"
+      ? WORKSPACES.find((w) => w.id === selectedWorkspaceId)
+      : null) ?? WORKSPACES[0];
 
     const finalSlot = (
       <CotContainer
@@ -484,11 +492,11 @@ export default function AiChatPage() {
         onStart={() => {}}
       >
         <Cot>
-          <CotItem title="Set up campaign structure" description="Create the campaign shell in BMW Global workspace" variant="dot" connector />
-          <CotItem title="Configure audience targeting" description="Set audience segments and targeting parameters" variant="dot" connector />
-          <CotItem title="Set budget & schedule" description="Define daily budget, lifetime budget, and flight dates" variant="dot" connector />
-          <CotItem title="Prepare ad creatives" description="Upload or generate ad copy and visuals" variant="dot" connector />
-          <CotItem title="Review & activate campaign" description="Final review before going live" variant="dot" />
+          <CotItem title="Set up campaign structure" description="Create the campaign shell in BMW Global workspace" variant="todo" connector />
+          <CotItem title="Configure audience targeting" description="Set audience segments and targeting parameters" variant="todo" connector />
+          <CotItem title="Set budget & schedule" description="Define daily budget, lifetime budget, and flight dates" variant="todo" connector />
+          <CotItem title="Prepare ad creatives" description="Upload or generate ad copy and visuals" variant="todo" connector />
+          <CotItem title="Review & activate campaign" description="Final review before going live" variant="todo" />
         </Cot>
       </CotContainer>
     );
@@ -550,7 +558,7 @@ export default function AiChatPage() {
         true,
       );
     }, LOADING_LABELS.length * 1500 + 400);
-  }, [selectedAdAccountId, streamAiMessage]);
+  }, [selectedAdAccountId, workspaceChoice, selectedWorkspaceId, streamAiMessage]);
 
   const sortedHistory = [
     ...scenarios.filter((s) => s.pinned),
@@ -620,7 +628,6 @@ export default function AiChatPage() {
 
       {/* ── Body ── */}
       <div className={styles.body}>
-        {/* Persistent · Collapsible · Overlay · Resizable */}
         <Sidebar
           collapsible
           expandBehavior="overlay"
@@ -685,15 +692,16 @@ export default function AiChatPage() {
           </NavigationCategoryItem>
         </Sidebar>
 
-        {/* Content — always starts at the 72px collapsed rail offset */}
-        <main className={styles.main}>
-          <Grid inset="md" style={{ flex: 1, minHeight: 0, gridAutoRows: "1fr" }}>
-            <Col span={8} md={8} offsetMd={2} style={{ position: "relative" }}>
-              <div style={{ position: "absolute", inset: 0,  marginInline: "auto" }}>
-                <AiThread
+        {/* Content — always starts at the 72px collapsed rail offset.
+            This <main> is the scroll container; the navbar sits outside it. */}
+        <main className={styles.main} ref={mainScrollRef}>
+          <Grid inset="md">
+            <Col span={8} md={8} offsetMd={2}>
+              <AiThread
                   messages={activeMessages}
+                  scrollContainerRef={mainScrollRef}
                   bottomOffset={promptHeight}
-                  style={{ position: "absolute", inset: 0 }}
+                  style={{ ["--thread-min-height" as string]: `calc(100dvh - var(--spacing-7xl) - ${promptHeight}px)` }}
                   introContent={
                     <AiThreadIntro>
                       <EmptyState
@@ -731,10 +739,7 @@ export default function AiChatPage() {
                     </AiThreadIntro>
                   }
                 />
-                <div
-                  ref={promptRef}
-                  style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 10, padding: "0 0 var(--spacing-xl)", maxWidth: 720, marginInline: "auto" }}
-                >
+                <div ref={promptRef} className={styles.promptDock}>
                   {activeScenarioId === "s-1" && scenarioStep === 4 ? (
                     <PromptOptionInput
                       label="Select an Ad account"
@@ -759,7 +764,7 @@ export default function AiChatPage() {
                     </PromptOptionInput>
                   ) : activeScenarioId === "s-1" && scenarioStep === 2 && workspaceChoice === "new" ? (
                     <PromptOptionInput
-                      label="Input your campaign name"
+                      label="Input your workspace name"
                       steps={{ current: 2, total: 2, onPrev: () => setScenarioStep(1) }}
                       input={{ value: campaignNameInput, onChange: setCampaignNameInput, placeholder: "e.g. Summer 2026 – Run BMW" }}
                       hasValue={campaignNameInput.length > 0}
@@ -770,24 +775,25 @@ export default function AiChatPage() {
                     />
                   ) : activeScenarioId === "s-1" && scenarioStep === 2 && workspaceChoice === "existing" ? (
                     <PromptOptionInput
-                      label="Select an existing campaign"
+                      label="Select an existing workspace"
                       steps={{ current: 2, total: 2, onPrev: () => setScenarioStep(1) }}
-                      search={{ value: campaignSearch, onChange: setCampaignSearch, placeholder: "Search campaigns…" }}
-                      hasValue={selectedCampaignId !== null}
+                      search={{ value: workspaceSearch, onChange: setWorkspaceSearch, placeholder: "Search workspaces…" }}
+                      hasValue={selectedWorkspaceId !== null}
                       isLastStep
                       onClose={() => setScenarioStep(0)}
                       onSkip={handleFinalSubmit}
                       onSubmit={handleFinalSubmit}
                     >
-                      {EXISTING_CAMPAIGNS
-                        .filter((c) => c.label.toLowerCase().includes(campaignSearch.toLowerCase()))
-                        .map((c) => (
+                      {WORKSPACES
+                        .filter((w) => w.name.toLowerCase().includes(workspaceSearch.toLowerCase()))
+                        .map((w) => (
                           <SingleSelectOption
-                            key={c.id}
-                            labelText={c.label}
+                            key={w.id}
+                            leading={<Icon name={`${w.platform}_color` as never} size={20} />}
+                            labelText={w.name}
                             description={false}
-                            checked={selectedCampaignId === c.id}
-                            onChange={() => setSelectedCampaignId(c.id)}
+                            checked={selectedWorkspaceId === w.id}
+                            onChange={() => setSelectedWorkspaceId(w.id)}
                           />
                         ))}
                     </PromptOptionInput>
@@ -834,7 +840,6 @@ export default function AiChatPage() {
                     </PromptInput>
                   )}
                 </div>
-              </div>
             </Col>
           </Grid>
         </main>

@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode, RefObject } from "react";
 import type { AiResponseBubblePhase } from "../AiResponseBubble";
 import type { UserBubbleAttachment, UserBubbleContextItem } from "../UserBubble";
 import type { FeedbackValue } from "../FeedbackBoolean";
@@ -39,10 +39,17 @@ export type AiThreadMessage = UserThreadMessage | AssistantThreadMessage;
 export interface AiThreadProps {
   messages: AiThreadMessage[];
   /**
+   * External scroll container ref. When provided, the thread renders as plain
+   * flow content and delegates all scrolling to this element (e.g. page scroll
+   * or a drawer's scroll div). Omit to use the default self-contained scroll.
+   */
+  scrollContainerRef?: RefObject<HTMLElement>;
+  /**
    * Height in px of a fixed/overlapping PromptInput outside the thread.
-   * Applied as padding-bottom on the message list, FAB sticky offset, and
-   * IntersectionObserver rootMargin so "at bottom" excludes the covered zone.
-   * Default 0 — not needed when PromptInput is in-flow (drawer/popup/flex mode).
+   * Applied as FAB sticky offset and IntersectionObserver rootMargin so
+   * "at bottom" excludes the covered zone. In external scroll mode this does
+   * NOT add padding-bottom to the list since the PromptInput is in-flow below.
+   * Default 0.
    */
   bottomOffset?: number;
   /**

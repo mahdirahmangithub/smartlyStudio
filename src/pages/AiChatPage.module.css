@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  background: var(--element-surface-default);
   overflow: hidden;
+  background: var(--element-surface-default);
 }
 
 /* ── Body: sidebar + main side by side ── */
@@ -15,14 +15,40 @@
   position: relative;
 }
 
-/* ── Main content — fills remaining space after sidebar rail ── */
+/* ── Main content — scroll container below the navbar.
+   The navbar sits outside this element so it's never affected by scroll;
+   scroll only happens inside .main, exactly below the navbar. */
 
 .main {
   flex: 1;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
 
+/* ── Prompt dock — sticky wrapper that holds the PromptInput at the bottom
+   of the scroll area. The bottom gap defaults to var(--spacing-xl) (32px),
+   collapses to var(--spacing-md) (16px) on mobile (≤520px / xs and 2xs).
+   Consumer can override the gap by setting --prompt-bottom-gap on the
+   element (or via a wrapper class) — that value wins at every viewport size
+   because it short-circuits the var() fallback. */
+
+.promptDock {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  max-width: 720px;
+  margin-inline: auto;
+  padding: 0 0 var(--prompt-bottom-gap, var(--spacing-xl));
+}
+
+/* Mobile-only (xs and 2xs). 520px = --breakpoint-xs-max.
+   Hardcoded because CSS @media queries can't read custom properties;
+   matches the convention in Grid.module.css. */
+@media (max-width: 520px) {
+  .promptDock {
+    padding: 0 0 var(--prompt-bottom-gap, var(--spacing-md));
+  }
+}
