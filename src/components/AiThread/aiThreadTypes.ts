@@ -43,7 +43,7 @@ export interface AiThreadProps {
    * flow content and delegates all scrolling to this element (e.g. page scroll
    * or a drawer's scroll div). Omit to use the default self-contained scroll.
    */
-  scrollContainerRef?: RefObject<HTMLElement>;
+  scrollContainerRef?: RefObject<HTMLElement | null>;
   /**
    * Height in px of a fixed/overlapping PromptInput outside the thread.
    * Applied as FAB sticky offset and IntersectionObserver rootMargin so

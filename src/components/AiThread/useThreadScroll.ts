@@ -9,7 +9,7 @@ export interface UseThreadScrollOptions {
   generating: boolean;
   bottomOffset: number;
   /** When provided, scroll operations target this element instead of the internal container. */
-  scrollContainerRef?: RefObject<HTMLElement>;
+  scrollContainerRef?: RefObject<HTMLElement | null>;
 }
 
 export interface UseThreadScrollResult {
