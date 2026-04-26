@@ -17,6 +17,8 @@ export interface RowContainerProps
   fullWidth?: boolean;
   /** Surface hint forwarded to ScrollFade for fade-overlay colours */
   surface?: ScrollFadeSurface;
+  /** Fade overlay size in px forwarded to ScrollFade. Defaults to ScrollFade's own default (40px). */
+  fadeSize?: number;
   children: ReactNode;
 }
 
@@ -51,6 +53,7 @@ export const RowContainer = forwardRef<HTMLDivElement, RowContainerProps>(
       wrap = false,
       fullWidth = false,
       surface = "auto",
+      fadeSize,
       paddingTop,
       paddingBottom,
       insetLeft,
@@ -99,6 +102,7 @@ export const RowContainer = forwardRef<HTMLDivElement, RowContainerProps>(
           <ScrollFade
             direction="horizontal"
             surface={surface}
+            fadeSize={fadeSize}
             className={styles.scrollWrapper}
             scrollAreaClassName={itemsClassName}
             scrollAreaStyle={innerInset}

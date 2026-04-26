@@ -1,0 +1,26 @@
+/* ── AiThreadIntro — outer flex column ── */
+
+.intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xl);
+  width: 100%;
+}
+
+/* ── AiThreadIntroEntities — entity list ── */
+
+.entities {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  align-items: center;
+  width: 100%;
+}
+
+.entity {
+  padding: var(--spacing-md);
+  border: var(--spacing-hair-line) solid var(--element-outline-neutral-default);
+  border-radius: var(--radius-lg);
+  max-width: 420px;
+  width: 100%;
+}

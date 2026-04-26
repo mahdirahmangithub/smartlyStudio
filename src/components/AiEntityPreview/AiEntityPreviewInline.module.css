@@ -11,6 +11,7 @@
   padding: 0 var(--spacing-2xs);
   margin: 0 var(--spacing-2xs);
   text-decoration: none;
+  color: var(--text-neutral-secondary-default);
   cursor: pointer;
   vertical-align: middle;
   transition: border-color var(--animation-state-change-duration) var(--animation-state-change-easing);

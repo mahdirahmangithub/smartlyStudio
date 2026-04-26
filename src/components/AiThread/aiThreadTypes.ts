@@ -31,6 +31,7 @@ export interface AssistantThreadMessage {
   feedbackValue?: FeedbackValue;
   onFeedbackChange?: (value: FeedbackValue) => void;
   slot?: ReactNode;
+  components?: Record<string, (attrs: Record<string, string>) => ReactNode>;
 }
 
 export type AiThreadMessage = UserThreadMessage | AssistantThreadMessage;
@@ -44,6 +45,11 @@ export interface AiThreadProps {
    * Default 0 — not needed when PromptInput is in-flow (drawer/popup/flex mode).
    */
   bottomOffset?: number;
+  /**
+   * Content shown when messages is empty. Disappears automatically once the
+   * first message is added. Typically an EmptyState component.
+   */
+  introContent?: ReactNode;
   /** When true, shows a top loading indicator for upward history paging. */
   hasMore?: boolean;
   /** Called when the user scrolls near the top and hasMore is true. */

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, forwardRef, useImperativeHandle, createRef, useMemo, useRef, useState, type RefObject } from "react";
 import { flushSync } from "react-dom";
 import { AiThread, type AiThreadHandle, type AiThreadMessage } from "../components/AiThread";
+import { EmptyState } from "../components/EmptyState";
 import { AiGeneration } from "../components/AiGeneration";
 import { DataTable, type ColumnDef } from "../components/DataTable";
 import { DataCellContent } from "../components/DataCellContent";
@@ -572,6 +573,7 @@ export default function AiThreadPlayground() {
   // Controls
   const [showRecommendations, setShowRecommendations] = useState(false);
   const [showInfoBanner, setShowInfoBanner] = useState(false);
+  const [showIntro, setShowIntro] = useState(false);
   const [infoType, setInfoType] = useState<PromptInputInfoType>("edit");
 
   const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
@@ -993,6 +995,15 @@ export default function AiThreadPlayground() {
           Info Banner
         </label>
 
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={showIntro}
+            onChange={(e) => setShowIntro(e.target.checked)}
+          />
+          Intro state
+        </label>
+
         <select
           value={infoType}
           onChange={(e) => setInfoType(e.target.value as PromptInputInfoType)}
@@ -1011,6 +1022,14 @@ export default function AiThreadPlayground() {
           messages={messages}
           bottomOffset={promptHeight}
           style={{ position: "absolute", inset: 0 }}
+          introContent={showIntro ? (
+            <EmptyState
+              size="sm"
+              illustration="bolt"
+              title="Hi there!"
+              description="Here are a few things I can do"
+            />
+          ) : undefined}
         />
 
         <div

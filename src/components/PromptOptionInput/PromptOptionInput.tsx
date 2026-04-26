@@ -196,6 +196,12 @@ export function PromptOptionInput({
                   className={styles.actionInput}
                   value={inputValue}
                   onChange={handleInputChange}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && hasValue && onSubmit) {
+                      e.preventDefault();
+                      onSubmit();
+                    }
+                  }}
                   placeholder={input.placeholder ?? "Type a value..."}
                   focusIndicator={false}
                   hoverIndicator={false}

@@ -179,6 +179,7 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
+  color: var(--text-neutral-secondary-default);
 }
 
 /* ── Content panel (accordion body, driven by useCollapsible) ── */

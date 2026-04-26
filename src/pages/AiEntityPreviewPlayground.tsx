@@ -5,9 +5,11 @@ import {
   AiEntityPreviewInlineTyped,
   CAMPAIGN_CONFIG,
   AUDIENCE_CONFIG,
+  WORKSPACE_CONFIG,
   type AiEntityConfig,
   type Campaign,
   type Audience,
+  type Workspace,
 } from "../components/AiEntityPreview";
 import { AiResponseBubble } from "../components/AiResponseBubble";
 
@@ -50,13 +52,24 @@ const AUDIENCES: Audience[] = [
   { id: "a-8", name: "Contextual – Sports",   size: "1.8M",  cpm: "$8.90",  overlap: "7%",  region: "US" },
 ];
 
+/* ── Workspace sample data ── */
+
+const WORKSPACES: Workspace[] = [
+  { id: "w-1", name: "BMW Global",      platform: "Meta",     campaignCount: 8,  adSetCount: 24, adCount: 72 },
+  { id: "w-2", name: "Nike EMEA",       platform: "Google",   campaignCount: 5,  adSetCount: 15, adCount: 45 },
+  { id: "w-3", name: "Acme Corp",       platform: "TikTok",   campaignCount: 3,  adSetCount: 9,  adCount: 27 },
+  { id: "w-4", name: "Unilever Brand",  platform: "YouTube",  campaignCount: 4,  adSetCount: 12, adCount: 36 },
+  { id: "w-5", name: "Snapchat Ads",    platform: "Snapchat", campaignCount: 2,  adSetCount: 6,  adCount: 18 },
+];
+
 /* ── Type registry ── */
 
-type TypeKey = "campaign" | "audience";
+type TypeKey = "campaign" | "audience" | "workspace";
 
 const REGISTRY: Record<TypeKey, { config: AiEntityConfig<any>; data: any[]; itemName: string; label: string }> = {
-  campaign: { config: CAMPAIGN_CONFIG, data: CAMPAIGNS, itemName: "campaigns", label: "Campaign" },
-  audience: { config: AUDIENCE_CONFIG, data: AUDIENCES, itemName: "audiences", label: "Audience" },
+  campaign:  { config: CAMPAIGN_CONFIG,  data: CAMPAIGNS,   itemName: "campaigns",  label: "Campaign" },
+  audience:  { config: AUDIENCE_CONFIG,  data: AUDIENCES,   itemName: "audiences",  label: "Audience" },
+  workspace: { config: WORKSPACE_CONFIG, data: WORKSPACES,  itemName: "workspaces", label: "Workspace" },
 };
 
 /* ── Playground ── */
@@ -107,6 +120,13 @@ export default function AiEntityPreviewPlayground() {
           />
           Show more
         </label>
+      </div>
+
+      <div style={{ marginBottom: 16, fontSize: 14, lineHeight: "24px" }}>
+        <p style={{ margin: 0 }}>
+          Inline chip for selected type:{" "}
+          <AiEntityPreviewInlineTyped config={config} data={data[0]} />
+        </p>
       </div>
 
       <div style={{ marginBottom: 32, maxWidth: 560 }}>

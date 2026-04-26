@@ -11,7 +11,7 @@ import styles from "./AiThread.module.css";
 import type { AiThreadHandle, AiThreadProps } from "./aiThreadTypes";
 
 export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
-  function AiThread({ messages, bottomOffset = 0, hasMore, onLoadMore, className, style }, handle) {
+  function AiThread({ messages, introContent, bottomOffset = 0, hasMore, onLoadMore, className, style }, handle) {
     const lastMsg = messages[messages.length - 1];
     const generating =
       lastMsg?.role === "assistant" &&
@@ -59,6 +59,11 @@ export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
         >
           <div className={styles.list} style={{ paddingBottom: bottomOffset }}>
             <div ref={topSentinelRef} className={styles.topSentinel} aria-hidden />
+
+            {messages.length === 0 && introContent && (
+              <div className={styles.intro}>{introContent}</div>
+            )}
+
             {messages.map((msg) =>
               msg.role === "user" ? (
                 <div key={msg.id} className={styles.item} data-message-id={msg.id}>
@@ -88,6 +93,7 @@ export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
                     feedbackValue={msg.feedbackValue}
                     onFeedbackChange={msg.onFeedbackChange}
                     slot={msg.slot}
+                    components={msg.components}
                   />
                 </div>
               ),

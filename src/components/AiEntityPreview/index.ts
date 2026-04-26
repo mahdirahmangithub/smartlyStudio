@@ -23,3 +23,6 @@ export type { Campaign } from "./configs/campaign";
 
 export { AUDIENCE_CONFIG } from "./configs/audience";
 export type { Audience } from "./configs/audience";
+
+export { WORKSPACE_CONFIG } from "./configs/workspace";
+export type { Workspace } from "./configs/workspace";

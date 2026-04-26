@@ -6,6 +6,7 @@
   gap: var(--spacing-sm);
   width: 100%;
   padding-bottom: var(--spacing-xl);
+  color: var(--text-neutral-secondary-default);
 }
 
 /* ── Loading row ── */
