@@ -112,6 +112,7 @@ import CotPlayground from "./pages/CotPlayground";
 import AiResponseBubblePlayground from "./pages/AiResponseBubblePlayground";
 import AiEntityPreviewPlayground from "./pages/AiEntityPreviewPlayground";
 import AiThreadPlayground from "./pages/AiThreadPlayground";
+import AiChatPage from "./pages/AiChatPage";
 import AiGenerationPlayground from "./pages/AiGenerationPlayground";
 import AISideEntryPlayground from "./pages/AISideEntryPlayground";
 import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
@@ -210,6 +211,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "ai-response-bubble"
 | "ai-entity-preview"
 | "ai-thread"
+| "ai-chat"
 | "ai-generation"
 
 
@@ -355,6 +357,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "ai-response-bubble", label: "AiResponseBubble" },
   { key: "ai-entity-preview", label: "AiEntityPreview" },
   { key: "ai-thread", label: "AiThread" },
+  { key: "ai-chat", label: "AiChat" },
   { key: "ai-generation", label: "AiGeneration" },
   { key: "cot", label: "CoT" },
   { key: "ai-side-entry", label: "AISideEntry" },
@@ -547,6 +550,13 @@ export default function App() {
     },
     [filteredPages, setPage],
   );
+
+  // AiChat is treated as a real app, not a playground component — render it
+  // standalone (no sidebar, search, theme bar, etc.). It manages its own
+  // theming/typeface internally via its SettingsMenu.
+  if (page === "ai-chat") {
+    return <AiChatPage />;
+  }
 
   return (
     <div className="app" data-theme={theme} data-density={density} data-typeface={typeface}>
