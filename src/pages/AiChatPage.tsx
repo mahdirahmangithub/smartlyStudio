@@ -11,7 +11,7 @@ import { GenericSelectOption } from "../components/GenericSelectOption";
 import { SingleSelectOption } from "../components/SingleSelectOption";
 import { OptionSeparator } from "../components/OptionSeparator";
 import { Grid, Col } from "../components/Grid";
-import { AiThread, AiThreadIntro, AiThreadIntroActions, AiThreadIntroEntities, type AiThreadMessage } from "../components/AiThread";
+import { AiThread, AiThreadIntro, AiThreadIntroActions, type AiThreadMessage } from "../components/AiThread";
 import { CotContainer, CotItem, Cot } from "../components/Cot";
 import { AiEntityPreviewInlineTyped, WORKSPACE_CONFIG, type Workspace } from "../components/AiEntityPreview";
 import { EmptyState } from "../components/EmptyState";
