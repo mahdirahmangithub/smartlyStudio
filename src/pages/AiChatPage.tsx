@@ -559,6 +559,7 @@ function ScenarioGuide({ children, className }: { children: ReactNode; className
       className={className}
       positionOffset={offset.x !== 0 || offset.y !== 0 ? offset : undefined}
       onPointerDown={onPointerDown}
+      data-theme="light"
     >
       <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-sm)" }}>
         <TitleText size="2xs" title="Demo guide" />
