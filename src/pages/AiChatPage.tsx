@@ -39,6 +39,7 @@ import {
   type PromptInputContextItem,
 } from "../components/PromptInput";
 import { PromptOptionInput } from "../components/PromptOptionInput";
+import { Popover, type VirtualAnchor } from "../components/Popover";
 import { IconButton } from "../components/IconButton";
 import { Icon } from "../components/Icon";
 import { TitleText } from "../components/TitleText";
@@ -407,6 +408,144 @@ function UpdateFieldsTask({
 }
 UpdateFieldsTask.displayName = "UpdateFieldsTask";
 
+// Floating bottom-right Popover that tells the user what action to take next
+// to follow the working scenario path. Anchored to a virtual point at the
+// bottom-right of the viewport so it stays put across page scroll/resize.
+// The whole panel is draggable: pointer-down on the panel captures the
+// starting position, pointermove on window accumulates a delta into
+// positionOffset, clamped so the popover stays inside the viewport.
+function ScenarioGuide({ children, className }: { children: ReactNode; className?: string }) {
+  const anchorRef = useRef<VirtualAnchor>({
+    getBoundingClientRect: () =>
+      new DOMRect(window.innerWidth - 24, window.innerHeight - 24, 0, 0),
+  });
+
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [offset, setOffset] = useState({ x: 0, y: 0 });
+  const offsetRef = useRef(offset);
+  offsetRef.current = offset;
+
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    ox: number;
+    oy: number;
+    baseX: number;
+    baseY: number;
+    panelW: number;
+    panelH: number;
+  } | null>(null);
+
+  const onPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    const el = panelRef.current;
+    const rect = el?.getBoundingClientRect();
+    const o = offsetRef.current;
+    dragRef.current = {
+      startX: e.clientX,
+      startY: e.clientY,
+      ox: o.x,
+      oy: o.y,
+      baseX: rect ? rect.left - o.x : 0,
+      baseY: rect ? rect.top - o.y : 0,
+      panelW: rect?.width ?? 0,
+      panelH: rect?.height ?? 0,
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleMove = (e: PointerEvent) => {
+      const d = dragRef.current;
+      if (!d) return;
+      let nextX = d.ox + (e.clientX - d.startX);
+      let nextY = d.oy + (e.clientY - d.startY);
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const minX = -d.baseX;
+      const minY = -d.baseY;
+      const maxX = vw - d.panelW - d.baseX;
+      const maxY = vh - d.panelH - d.baseY;
+      nextX = Math.max(minX, Math.min(maxX, nextX));
+      nextY = Math.max(minY, Math.min(maxY, nextY));
+      setOffset({ x: nextX, y: nextY });
+    };
+    const handleUp = () => { dragRef.current = null; };
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerup", handleUp);
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerup", handleUp);
+    };
+  }, []);
+
+  return (
+    <Popover
+      ref={panelRef}
+      open
+      onClose={() => {}}
+      anchorRef={anchorRef as RefObject<VirtualAnchor | null>}
+      placement="top-end"
+      offset={0}
+      fixed
+      closeOnClickOutside={false}
+      closeOnEscape={false}
+      autoFocus={false}
+      width={240}
+      className={className}
+      positionOffset={offset.x !== 0 || offset.y !== 0 ? offset : undefined}
+      onPointerDown={onPointerDown}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-sm)" }}>
+        <TitleText size="2xs" title="Demo guide" />
+        <BodyText size="sm">{children}</BodyText>
+      </div>
+    </Popover>
+  );
+}
+ScenarioGuide.displayName = "ScenarioGuide";
+
+// Resolves the guide message for the current scenario state. Returns null
+// when no guidance applies (transient steps, post-Apply, non-s-1 scenarios).
+function getScenarioGuide(args: {
+  scenarioStep: number;
+  workspaceChoice: "new" | "existing" | null;
+  editingPlanId: string | null;
+  hasEditedPlan: boolean;
+  fieldsApplied: boolean;
+}): ReactNode {
+  const { scenarioStep, workspaceChoice, editingPlanId, hasEditedPlan, fieldsApplied } = args;
+  if (scenarioStep === 0) {
+    return <>Submit a prompt to start (e.g. <em>"Create a new campaign for summer 2026"</em>).</>;
+  }
+  if (scenarioStep === 1) {
+    return <>Pick <strong>Use an existing workspace</strong>.</>;
+  }
+  if (scenarioStep === 2 && workspaceChoice === "existing") {
+    return <>Pick <strong>BMW Global</strong> and submit.</>;
+  }
+  if (scenarioStep === 4 && !hasEditedPlan) {
+    return <>Pick an ad account (e.g. <strong>BMW Global Meta Ads</strong>) and submit.</>;
+  }
+  if (scenarioStep === 5 && !editingPlanId && !hasEditedPlan) {
+    return <>Click <strong>Edit</strong> on the plan to swap the ad account.</>;
+  }
+  if (scenarioStep === 5 && editingPlanId) {
+    return <>Type any message and submit to update the plan.</>;
+  }
+  if (scenarioStep === 4 && hasEditedPlan) {
+    return <>Pick a <strong>different</strong> ad account and submit.</>;
+  }
+  if (scenarioStep === 5 && !editingPlanId && hasEditedPlan) {
+    return <>Click <strong>Start</strong> on the plan.</>;
+  }
+  if (scenarioStep === 6) {
+    return <>Click the <strong>add-to-context</strong> icon on the campaign preview, attach a file via <strong>+</strong> or drag-drop, then submit.</>;
+  }
+  if (scenarioStep === 7 && !fieldsApplied) {
+    return <>Click <strong>Apply</strong> on the campaign-field card.</>;
+  }
+  return null;
+}
+
 export default function AiChatPage() {
   const [expanded, setExpanded] = useState(false);
   const [agentsExpanded, setAgentsExpanded] = useState(false);
@@ -585,6 +724,15 @@ export default function AiChatPage() {
   // file-extraction step (after step 6 submit) can reference it.
   const [createdCampaign, setCreatedCampaign] = useState<Campaign | null>(null);
 
+  // Reset demo-flow flags when the scenario rewinds to the start (or the user
+  // switches scenario), so the guide message returns to the first step.
+  useEffect(() => {
+    if (scenarioStep === 0) {
+      setHasEditedPlan(false);
+      setFieldsApplied(false);
+    }
+  }, [scenarioStep]);
+
   const lastMsg = activeMessages[activeMessages.length - 1];
   const isStreaming = lastMsg?.role === "assistant"
     && (lastMsg.phase === "loading" || lastMsg.phase === "generating");
@@ -599,6 +747,12 @@ export default function AiChatPage() {
   const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
   const editingPlanIdRef = useRef<string | null>(null);
   const planRefsMap = useRef<Map<string, RefObject<CampaignPlanTaskHandle | null>>>(new Map());
+
+  // ScenarioGuide flags — flipped during the demo flow so the guide can advance
+  // to the next instruction (e.g. "Click Start" after the user has gone through
+  // the Edit detour). Reset when the scenario rewinds to step 0.
+  const [hasEditedPlan, setHasEditedPlan] = useState(false);
+  const [fieldsApplied, setFieldsApplied] = useState(false);
 
   // Restores focus to the PromptInput textarea — used after any prompt-internal
   // action (submit, stop, recommendation click) that might shift focus to a
@@ -650,6 +804,7 @@ export default function AiChatPage() {
     if (capturedEditId) {
       setEditingPlanId(null);
       editingPlanIdRef.current = null;
+      setHasEditedPlan(true);
 
       const userMsg = { id: `u-${Date.now()}`, role: "user" as const, message: value, replyLabel: "Editing plan" };
       const aiId = `a-${Date.now() + 1}`;
@@ -785,6 +940,7 @@ export default function AiChatPage() {
             // into a self-driven task cot, and finally appends a streamed
             // confirmation bubble with an inline campaign preview.
             const handleApplyFields = () => {
+              setFieldsApplied(true);
               setScenarios((prev) => prev.map((s) =>
                 s.id === "s-1" ? {
                   ...s,
@@ -1575,6 +1731,10 @@ export default function AiChatPage() {
           </Grid>
         </main>
       </div>
+      {activeScenarioId === "s-1" && (() => {
+        const guide = getScenarioGuide({ scenarioStep, workspaceChoice, editingPlanId, hasEditedPlan, fieldsApplied });
+        return guide ? <ScenarioGuide className={styles.scenarioGuide}>{guide}</ScenarioGuide> : null;
+      })()}
     </div>
   );
 }

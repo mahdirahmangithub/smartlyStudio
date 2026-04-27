@@ -52,3 +52,12 @@
     padding: 0 0 var(--prompt-bottom-gap, var(--spacing-md));
   }
 }
+
+/* Demo-guide popover — yellow background to make the floating helper stand
+   out from the rest of the chat surface. The whole panel is draggable, so
+   show a move cursor and suppress text selection while dragging. */
+.scenarioGuide {
+  background: var(--color-yellow-100) !important;
+  cursor: move;
+  user-select: none;
+}
