@@ -615,6 +615,12 @@ function getScenarioGuide(args: {
 export default function AiChatPage() {
   const [expanded, setExpanded] = useState(false);
   const [agentsExpanded, setAgentsExpanded] = useState(false);
+  // Collapsed-sidebar dropdowns: Agents and Chat History each open a dropdown
+  // anchored to their icon-only NavigationItem when the sidebar is collapsed.
+  const collapsedAgentsAnchorRef = useRef<HTMLDivElement>(null);
+  const collapsedHistoryAnchorRef = useRef<HTMLDivElement>(null);
+  const [collapsedAgentsOpen, setCollapsedAgentsOpen] = useState(false);
+  const [collapsedHistoryOpen, setCollapsedHistoryOpen] = useState(false);
   const [theme, setTheme] = useState<Theme>("light");
   const [typeface, setTypeface] = useState<Typeface>("mac");
 
@@ -754,10 +760,6 @@ export default function AiChatPage() {
   const [scenarios, setScenarios] = useState<Scenario[]>([
     { id: "s-1", label: "Campaign Creation",               messages: [],                      pinned: false, order: 0 },
     { id: "s-6", label: "Create campaign in current WS",   messages: [],                      pinned: false, order: 1 },
-    { id: "s-2", label: "Q3 performance analysis",         messages: [],                      pinned: false, order: 2 },
-    { id: "s-3", label: "Campaign brief for BMW",          messages: [],                      pinned: false, order: 3 },
-    { id: "s-4", label: "Audience segmentation ideas",     messages: [],                      pinned: false, order: 4 },
-    { id: "s-5", label: "TikTok creative review",          messages: [],                      pinned: false, order: 5 },
   ]);
 
   const [activeScenarioId, setActiveScenarioId] = useState<string>("s-1");
@@ -768,14 +770,15 @@ export default function AiChatPage() {
     activeAssistIdRef.current = null;
   }, [activeScenarioId]);
 
-  // Pre-populate the prompt context row with a BMW Meta chip the first time
-  // the "Create campaign in current WS" scenario is opened — that scenario's
-  // premise is that the workspace is already in the user's working context.
-  const initializedScenariosRef = useRef<Set<string>>(new Set());
+  // Reset the prompt's context row whenever the active scenario changes, so
+  // chips don't leak between conversations. s-6's premise is that the
+  // workspace is already in the user's context, so re-add the BMW Meta chip
+  // every time s-6 is entered (not just on first open).
   useEffect(() => {
-    if (activeScenarioId === "s-6" && !initializedScenariosRef.current.has("s-6")) {
-      initializedScenariosRef.current.add("s-6");
+    if (activeScenarioId === "s-6") {
       setContextItems([{ id: "ctx-bmw-meta", icon: "topic", label: "BMW Meta" }]);
+    } else {
+      setContextItems([]);
     }
   }, [activeScenarioId]);
 
@@ -1955,39 +1958,108 @@ export default function AiChatPage() {
             leadingIcon={<Icon name="search" size={20} />}
             iconOnly={!expanded}
           />
-          <NavigationCategoryItem
-            label="Agents"
-            leadingIcon={<Icon name="robot" size={20} />}
-            iconOnly={!expanded}
-            expanded={agentsExpanded}
-            onClick={() => setAgentsExpanded((v) => !v)}
-          >
-            <NavigationSubItem
-              label="Create Agent"
-              leadingIcon={<Icon name="add" size={16} />}
-            />
-            <NavigationSubItem label="Campaign Creator" />
-            <NavigationSubItem label="Headroom Analyzer" />
-          </NavigationCategoryItem>
-          <NavigationCategoryItem
-            label="Chat History"
-            leadingIcon={<Icon name="history" size={20} />}
-            iconOnly={!expanded}
-            expanded={historyExpanded}
-            onClick={() => setHistoryExpanded((v) => !v)}
-          >
-            {sortedHistory.map((item) => (
-              <ChatHistoryItem
-                key={item.id}
-                label={item.label}
-                pinned={item.pinned}
-                checked={item.id === activeScenarioId}
-                onSelect={() => { setActiveScenarioId(item.id); setScenarioStep(0); }}
-                onPinToTop={() => pinToTop(item.id)}
-                onUnpin={() => unpin(item.id)}
-              />
-            ))}
-          </NavigationCategoryItem>
+          {expanded ? (
+            <>
+              <NavigationCategoryItem
+                label="Agents"
+                leadingIcon={<Icon name="robot" size={20} />}
+                expanded={agentsExpanded}
+                onClick={() => setAgentsExpanded((v) => !v)}
+              >
+                <NavigationSubItem
+                  label="Create Agent"
+                  leadingIcon={<Icon name="add" size={16} />}
+                />
+                <NavigationSubItem label="Campaign Creator" />
+                <NavigationSubItem label="Headroom Analyzer" />
+              </NavigationCategoryItem>
+              <NavigationCategoryItem
+                label="Chat History"
+                leadingIcon={<Icon name="history" size={20} />}
+                expanded={historyExpanded}
+                onClick={() => setHistoryExpanded((v) => !v)}
+              >
+                {sortedHistory.map((item) => (
+                  <ChatHistoryItem
+                    key={item.id}
+                    label={item.label}
+                    pinned={item.pinned}
+                    checked={item.id === activeScenarioId}
+                    onSelect={() => { setActiveScenarioId(item.id); setScenarioStep(0); }}
+                    onPinToTop={() => pinToTop(item.id)}
+                    onUnpin={() => unpin(item.id)}
+                  />
+                ))}
+              </NavigationCategoryItem>
+            </>
+          ) : (
+            <>
+              {/* Collapsed: Agents → dropdown anchored to the icon-only item. */}
+              <div ref={collapsedAgentsAnchorRef}>
+                <NavigationItem
+                  label="Agents"
+                  leadingIcon={<Icon name="robot" size={20} />}
+                  iconOnly
+                  onClick={() => setCollapsedAgentsOpen((v) => !v)}
+                />
+              </div>
+              <Dropdown
+                open={collapsedAgentsOpen}
+                onClose={() => setCollapsedAgentsOpen(false)}
+                anchorRef={collapsedAgentsAnchorRef}
+                placement="right-start"
+                width={220}
+              >
+                <GenericSelectOption
+                  labelText="Create Agent"
+                  description={false}
+                  leading={<Icon name="add" size={16} />}
+                  onClick={() => setCollapsedAgentsOpen(false)}
+                />
+                <GenericSelectOption
+                  labelText="Campaign Creator"
+                  description={false}
+                  onClick={() => setCollapsedAgentsOpen(false)}
+                />
+                <GenericSelectOption
+                  labelText="Headroom Analyzer"
+                  description={false}
+                  onClick={() => setCollapsedAgentsOpen(false)}
+                />
+              </Dropdown>
+
+              {/* Collapsed: Chat History → dropdown with the scenarios. */}
+              <div ref={collapsedHistoryAnchorRef}>
+                <NavigationItem
+                  label="Chat History"
+                  leadingIcon={<Icon name="history" size={20} />}
+                  iconOnly
+                  onClick={() => setCollapsedHistoryOpen((v) => !v)}
+                />
+              </div>
+              <Dropdown
+                open={collapsedHistoryOpen}
+                onClose={() => setCollapsedHistoryOpen(false)}
+                anchorRef={collapsedHistoryAnchorRef}
+                placement="right-start"
+                width={280}
+              >
+                {sortedHistory.map((item) => (
+                  <SingleSelectOption
+                    key={item.id}
+                    labelText={item.label}
+                    description={false}
+                    checked={item.id === activeScenarioId}
+                    onChange={() => {
+                      setActiveScenarioId(item.id);
+                      setScenarioStep(0);
+                      setCollapsedHistoryOpen(false);
+                    }}
+                  />
+                ))}
+              </Dropdown>
+            </>
+          )}
         </Sidebar>
 
         {/* Content — always starts at the 72px collapsed rail offset.
@@ -2145,7 +2217,7 @@ export default function AiChatPage() {
                           "Create an automation feed",
                           "Set up a new campaign for summer 2026",
                         ]}
-                        showAnimatedPlaceholder={activeMessages.length === 0}
+                        showAnimatedPlaceholder={activeMessages.length === 0 && activeScenarioId !== "s-6"}
                       />
                       <PromptInputFooter>
                         <PromptInputFooterStart>
