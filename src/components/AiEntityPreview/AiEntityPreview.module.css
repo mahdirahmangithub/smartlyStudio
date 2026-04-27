@@ -1,5 +1,6 @@
 .card {
   padding: var(--spacing-sm-extra);
+  max-width: var(--ai-entity-preview-max-width, 420px);
 }
 
 .tableWrap table {

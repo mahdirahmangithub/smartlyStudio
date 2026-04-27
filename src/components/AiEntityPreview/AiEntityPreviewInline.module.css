@@ -4,11 +4,11 @@
   display: inline-flex;
   align-items: center;
   gap: var(--spacing-2xs);
-  background: var(--element-surface-over);
+  background: var(--util-subtle-default);
   border: var(--spacing-hair-line) solid var(--element-outline-neutral-default);
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-sm);
   overflow: clip;
-  padding: 0 var(--spacing-2xs);
+  padding: 0 var(--spacing-xs);
   margin: 0 var(--spacing-2xs);
   text-decoration: none;
   color: var(--text-neutral-secondary-default);
@@ -19,10 +19,14 @@
 
 .root:hover {
   border-color: var(--element-outline-neutral-hover);
+    background: var(--util-subtle-strong);
+
 }
 
 .root:active {
   border-color: var(--element-outline-neutral-press);
+    background: var(--util-subtle-strong);
+
 }
 
 .root:focus-visible {

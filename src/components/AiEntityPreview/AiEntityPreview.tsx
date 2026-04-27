@@ -5,6 +5,8 @@ import { DataTable, type ColumnDef } from "../DataTable";
 import { DataCellContent, type DataCellContentProps } from "../DataCellContent";
 
 import { Button } from "../Button";
+import { IconButton } from "../IconButton";
+import { Icon } from "../Icon";
 import { IconContainer } from "../IconContainer";
 import { Tooltip } from "../Tooltip";
 import { cx } from "../../utils/cx";
@@ -31,6 +33,19 @@ export interface AiEntityPreviewProps {
   onEdit?: () => void;
   onCancel?: () => void;
   onCreate?: () => void;
+  /** Label for the primary action button. Defaults to "Create". */
+  createLabel?: string;
+  /** Click handler for the forecasting-context header action button. */
+  onHeaderAction?: () => void;
+  /**
+   * Hide the default header action icon (forecasting_context). Used internally
+   * by AiEntityPreviewMultiple to suppress the action when rendering the
+   * preview inside a row tooltip — the action belongs to the standalone surface
+   * only, not to ephemeral hover previews.
+   */
+  hideHeaderAction?: boolean;
+  /** Override the card's max-width (in px). Defaults to 420px. */
+  maxWidth?: number;
   className?: string;
 }
 
@@ -44,13 +59,38 @@ export function AiEntityPreview({
   onEdit,
   onCancel,
   onCreate,
+  createLabel = "Create",
+  onHeaderAction,
+  hideHeaderAction = false,
+  maxWidth,
   className,
 }: AiEntityPreviewProps) {
+  const headerActionTrailing = hideHeaderAction ? null : (
+    <>
+      {headerCellContent?.trailing}
+      <IconButton
+        size="sm"
+        variant="neutral"
+        emphasis="low"
+        icon={<Icon name="forecasting_context" size={16} aria-hidden />}
+        aria-label="Add to context"
+        onClick={(e) => {
+          e.stopPropagation();
+          onHeaderAction?.();
+        }}
+      />
+    </>
+  );
+
+  const resolvedHeaderCellContent: Partial<DataCellContentProps> | undefined = hideHeaderAction
+    ? headerCellContent
+    : { ...headerCellContent, trailing: headerActionTrailing };
+
   const tableColumns: ColumnDef<SingleRow>[] = [
     {
       key: "__entity__",
       title,
-      headerCellContent,
+      headerCellContent: resolvedHeaderCellContent,
       children: columns.map((col) => ({
         key: col.key,
         dataIndex: col.key,
@@ -78,6 +118,7 @@ export function AiEntityPreview({
       radius="sm"
       onClick={onClick}
       className={cx(styles.card, className)}
+      style={maxWidth ? { ["--ai-entity-preview-max-width" as never]: `${maxWidth}px` } : undefined}
     >
       <div className={styles.tableWrapNoHover}>
         <DataTable
@@ -106,7 +147,7 @@ export function AiEntityPreview({
             )}
             {onCreate && (
               <Button size="md" variant="neutral" emphasis="high" onClick={onCreate}>
-                Create
+                {createLabel}
               </Button>
             )}
           </div>
@@ -142,6 +183,14 @@ export interface AiEntityPreviewMultipleProps {
   onEdit?: () => void;
   onCancel?: () => void;
   onCreate?: () => void;
+  /** Label for the primary action button. Defaults to "Create". */
+  createLabel?: string;
+  /** Click handler for the per-row "Add to context" icon button at the end of each row. */
+  onRowAction?: (item: AiEntityPreviewItem) => void;
+  /** Hide the per-row action column. */
+  hideRowAction?: boolean;
+  /** Override the card's max-width (in px). Defaults to 420px. */
+  maxWidth?: number;
   className?: string;
 }
 
@@ -154,6 +203,10 @@ export function AiEntityPreviewMultiple({
   onEdit,
   onCancel,
   onCreate,
+  createLabel = "Create",
+  onRowAction,
+  hideRowAction = false,
+  maxWidth,
   className,
 }: AiEntityPreviewMultipleProps) {
   const [hoveredItem, setHoveredItem] = useState<AiEntityPreviewItem | null>(null);
@@ -195,6 +248,31 @@ export function AiEntityPreviewMultiple({
         })()
       ),
     })),
+    ...(hideRowAction ? [] : [{
+      key: "__action__",
+      title: undefined,
+      onHeaderCell: () => ({ style: { padding: 0, border: "none" } }),
+      density: "lg" as const,
+      dividerRight: false,
+      render: (_: unknown, record: AiEntityPreviewItem) => (
+        <DataCellContent
+          cellAlignment="right"
+          trailing={
+            <IconButton
+              size="sm"
+              variant="neutral"
+              emphasis="low"
+              icon={<Icon name="forecasting_context" size={16} aria-hidden />}
+              aria-label="Add to context"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRowAction?.(record);
+              }}
+            />
+          }
+        />
+      ),
+    }]),
   ];
 
   return (
@@ -203,6 +281,7 @@ export function AiEntityPreviewMultiple({
       radius="sm"
       isStatic
       className={cx(styles.card, className)}
+      style={maxWidth ? { ["--ai-entity-preview-max-width" as never]: `${maxWidth}px` } : undefined}
     >
       <div className={styles.tableWrap}>
         <Tooltip
@@ -212,7 +291,7 @@ export function AiEntityPreviewMultiple({
           content={hoveredItem ? (
             renderTooltip
               ? renderTooltip(hoveredItem)
-              : <AiEntityPreview title={hoveredItem.title} columns={hoveredItem.columns} />
+              : <AiEntityPreview title={hoveredItem.title} columns={hoveredItem.columns} hideHeaderAction />
           ) : null}
           type="neutral"
           showTail={false}
@@ -294,7 +373,7 @@ export function AiEntityPreviewMultiple({
             )}
             {onCreate && (
               <Button size="md" variant="neutral" emphasis="high" onClick={onCreate}>
-                Create
+                {createLabel}
               </Button>
             )}
           </div>

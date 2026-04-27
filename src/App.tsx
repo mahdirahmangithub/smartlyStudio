@@ -114,6 +114,7 @@ import AiEntityPreviewPlayground from "./pages/AiEntityPreviewPlayground";
 import AiThreadPlayground from "./pages/AiThreadPlayground";
 import AiChatPage from "./pages/AiChatPage";
 import AiGenerationPlayground from "./pages/AiGenerationPlayground";
+import AiGenerationSuggestionPlayground from "./pages/AiGenerationSuggestionPlayground";
 import AISideEntryPlayground from "./pages/AISideEntryPlayground";
 import AITextGenerationPlayground from "./pages/AITextGenerationPlayground";
 import GlobalNavigationBarPlayground from "./pages/GlobalNavigationBarPlayground";
@@ -213,6 +214,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "ai-thread"
 | "ai-chat"
 | "ai-generation"
+| "ai-generation-suggestion"
 
 
 const MONOCHROME = new Set<string>(["originals", "custom", "logo"]);
@@ -359,6 +361,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "ai-thread", label: "AiThread" },
   { key: "ai-chat", label: "AiChat" },
   { key: "ai-generation", label: "AiGeneration" },
+  { key: "ai-generation-suggestion", label: "AiGenSuggestion" },
   { key: "cot", label: "CoT" },
   { key: "ai-side-entry", label: "AISideEntry" },
   { key: "ai-text-generation", label: "AI TextGen" },
@@ -773,6 +776,7 @@ export default function App() {
             {page === "ai-side-entry" && <AISideEntryPlayground />}
             {page === "ai-text-generation" && <AITextGenerationPlayground />}
             {page === "ai-generation" && <AiGenerationPlayground />}
+            {page === "ai-generation-suggestion" && <AiGenerationSuggestionPlayground />}
           </div>
         </main>
       </div>

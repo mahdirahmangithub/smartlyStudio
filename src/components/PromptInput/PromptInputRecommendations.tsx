@@ -10,6 +10,7 @@ import styles from "./PromptInputRecommendations.module.css";
 export interface RecommendationItem {
   id: string;
   label: string;
+  leadingIcon?: ReactNode;
   onSelect: () => void;
 }
 
@@ -70,6 +71,7 @@ export function PromptInputRecommendations({
                 variant="neutral"
                 emphasis={buttonEmphasis}
                 size={buttonSize}
+                leadingIcon={item.leadingIcon}
                 onClick={item.onSelect}
               >
                 {item.label}

@@ -21,6 +21,9 @@ export type { AiEntityConfig, AiEntitySurfaceConfig, AiEntityColumnConfig } from
 export { CAMPAIGN_CONFIG } from "./configs/campaign";
 export type { Campaign } from "./configs/campaign";
 
+export { CAMPAIGN_FIELD_CONFIG } from "./configs/campaignField";
+export type { CampaignField } from "./configs/campaignField";
+
 export { AUDIENCE_CONFIG } from "./configs/audience";
 export type { Audience } from "./configs/audience";
 

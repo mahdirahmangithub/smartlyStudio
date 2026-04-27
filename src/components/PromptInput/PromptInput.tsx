@@ -440,8 +440,12 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       (e: ChangeEvent<HTMLInputElement>) => {
         const list = e.target.files;
         if (!list?.length) return;
+        // Snapshot before setState — `e.target.value = ""` below clears the
+        // input's FileList, and React may defer the updater function until
+        // after that reset, leaving `list` empty when it runs.
+        const arr = Array.from(list);
         setAttachedFiles((prev) => {
-          const added = Array.from(list).map((file) => {
+          const added = arr.map((file) => {
             const previewUrl = isImageFile(file) ? URL.createObjectURL(file) : undefined;
             return { id: newFileId(), file, previewUrl };
           });

@@ -1,0 +1,17 @@
+/* ── AiGenerationSuggestion — outer flex column ── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+/* ── AiGenerationSuggestionEntities — entity list with dividers between ── */
+
+.entities {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 100%;
+}

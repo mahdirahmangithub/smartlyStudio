@@ -12,7 +12,9 @@ import type { AiEntityConfig, AiEntitySurfaceConfig } from "./aiEntityTypes";
 function resolveProps<T>(config: AiEntitySurfaceConfig<T>, data: T) {
   return {
     title: config.getTitle(data),
-    headerCellContent: config.headerCellContent,
+    headerCellContent: config.getHeaderCellContent
+      ? config.getHeaderCellContent(data)
+      : config.headerCellContent,
     columns: config.columns.map((c) => ({
       key: c.key,
       ...(c.getCellContent
@@ -21,6 +23,10 @@ function resolveProps<T>(config: AiEntitySurfaceConfig<T>, data: T) {
       ),
     })),
   };
+}
+
+function resolveItemsProps<T>(config: AiEntitySurfaceConfig<T>) {
+  return config.maxWidth ? { maxWidth: config.maxWidth } : {};
 }
 
 /* ── Single ── */
@@ -36,7 +42,7 @@ export function AiEntityPreviewTyped<T>({
   data,
   ...rest
 }: AiEntityPreviewTypedProps<T>) {
-  return <AiEntityPreview {...resolveProps(config.single, data)} {...rest} />;
+  return <AiEntityPreview {...resolveProps(config.single, data)} {...resolveItemsProps(config.single)} {...rest} />;
 }
 
 AiEntityPreviewTyped.displayName = "AiEntityPreviewTyped";
@@ -44,14 +50,17 @@ AiEntityPreviewTyped.displayName = "AiEntityPreviewTyped";
 /* ── Multiple ── */
 
 export interface AiEntityPreviewMultipleTypedProps<T>
-  extends Omit<AiEntityPreviewMultipleProps, "items" | "renderTooltip"> {
+  extends Omit<AiEntityPreviewMultipleProps, "items" | "renderTooltip" | "onRowAction"> {
   config: AiEntityConfig<T>;
   data: T[];
+  /** Click handler for the per-row "Add to context" icon — receives the typed row data. */
+  onRowAction?: (data: T) => void;
 }
 
 export function AiEntityPreviewMultipleTyped<T>({
   config,
   data,
+  onRowAction,
   ...rest
 }: AiEntityPreviewMultipleTypedProps<T>) {
   const tooltipConfig = config.tooltip ?? config.single;
@@ -68,16 +77,25 @@ export function AiEntityPreviewMultipleTyped<T>({
   const renderTooltip = (item: AiEntityPreviewItem): ReactNode => {
     const raw = dataMap.get(item.key);
     if (!raw) return null;
-    const preview = <AiEntityPreview {...resolveProps(tooltipConfig, raw)} />;
+    const preview = <AiEntityPreview {...resolveProps(tooltipConfig, raw)} hideHeaderAction />;
     return config.tooltipStyle
       ? <div style={config.tooltipStyle}>{preview}</div>
       : preview;
   };
 
+  const handleRowAction = onRowAction
+    ? (item: AiEntityPreviewItem) => {
+        const raw = dataMap.get(item.key);
+        if (raw) onRowAction(raw);
+      }
+    : undefined;
+
   return (
     <AiEntityPreviewMultiple
       items={items}
       renderTooltip={renderTooltip}
+      onRowAction={handleRowAction}
+      {...resolveItemsProps(config.multiple)}
       {...rest}
     />
   );
@@ -100,12 +118,12 @@ export function AiEntityPreviewInlineTyped<T>({
 }: AiEntityPreviewInlineTypedProps<T>) {
   const tooltipConfig = config.tooltip ?? config.single;
   const tooltipProps = resolveProps(tooltipConfig, data);
-  const preview = <AiEntityPreview {...tooltipProps} />;
+  const preview = <AiEntityPreview {...tooltipProps} hideHeaderAction />;
 
   return (
     <AiEntityPreviewInline
       label={config.single.getTitle(data)}
-      icon={config.entityIcon}
+      icon={config.getEntityIcon?.(data) ?? config.entityIcon}
       href={config.getHref?.(data)}
       tooltipContent={
         config.tooltipStyle

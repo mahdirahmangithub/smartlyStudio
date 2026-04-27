@@ -1,4 +1,4 @@
-import { useId, useState, Children, cloneElement, isValidElement } from "react";
+import { useContext, useId, useState, Children, cloneElement, isValidElement } from "react";
 import { Icon } from "../Icon";
 import { Spinner } from "../Spinner";
 import { Expander } from "../Expander";
@@ -6,6 +6,39 @@ import { useCollapsible } from "../../hooks/useCollapsible";
 import { cx } from "../../utils/cx";
 import styles from "./CotItem.module.css";
 import type { CotItemProps, CotItemStatus, CotItemVariant } from "./cotTypes";
+import { CotContainerContext, CotItemContext, type CotContainerContextValue } from "./cotContext";
+
+/**
+ * Derive a CotItem's status from its enclosing CotContainer's state and the
+ * item's index. Returns undefined when no derivation applies — the consumer's
+ * explicit status (or the default "idle") is then used.
+ *
+ * Rules (only for type="task"):
+ *   • container "completed"               → "complete" (every item)
+ *   • container "running" + progress P:
+ *       progress  >=  ((i+1)/total) * 100 → "complete"  (item finished)
+ *       progress  >=  (i / total)   * 100 → "loading"   (in-progress item)
+ *       otherwise                         → "idle"      (future item)
+ *   • any other container status          → undefined   (no override)
+ */
+function deriveStatusFromContext(
+  containerCtx: CotContainerContextValue | null,
+  index: number | null,
+  total: number | null,
+): CotItemStatus | undefined {
+  if (!containerCtx || index == null || total == null || total <= 0) return undefined;
+  if (containerCtx.type !== "task") return undefined;
+  const { status, progress } = containerCtx;
+  if (status === "completed") return "complete";
+  if (status === "running") {
+    const lower = (index / total) * 100;
+    const upper = ((index + 1) / total) * 100;
+    if (progress >= upper) return "complete";
+    if (progress >= lower) return "loading";
+    return "idle";
+  }
+  return undefined;
+}
 
 function LeadingIcon({
   variant,
@@ -40,7 +73,7 @@ export function CotItem({
   children,
   variant = "dot",
   icon,
-  status = "idle",
+  status: statusProp,
   expandable = false,
   defaultExpanded = false,
   expanded: expandedProp,
@@ -50,6 +83,18 @@ export function CotItem({
   className,
   ...rest
 }: CotItemProps) {
+  // If the consumer didn't pass an explicit status, derive one from the
+  // enclosing CotContainer's progress. Falls back to "idle" if no derivation
+  // applies (e.g. no container, or container not in task/running state).
+  const containerCtx = useContext(CotContainerContext);
+  const itemCtx = useContext(CotItemContext);
+  const derivedStatus = deriveStatusFromContext(
+    containerCtx,
+    itemCtx?.index ?? null,
+    itemCtx?.total ?? null,
+  );
+  const status: CotItemStatus = statusProp ?? derivedStatus ?? "idle";
+
   const showConnector = connector ?? (status !== "idle");
 
   const slotChildren = disabled

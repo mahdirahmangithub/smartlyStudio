@@ -4,10 +4,12 @@ import {
   AiEntityPreviewMultipleTyped,
   AiEntityPreviewInlineTyped,
   CAMPAIGN_CONFIG,
+  CAMPAIGN_FIELD_CONFIG,
   AUDIENCE_CONFIG,
   WORKSPACE_CONFIG,
   type AiEntityConfig,
   type Campaign,
+  type CampaignField,
   type Audience,
   type Workspace,
 } from "../components/AiEntityPreview";
@@ -52,6 +54,18 @@ const AUDIENCES: Audience[] = [
   { id: "a-8", name: "Contextual – Sports",   size: "1.8M",  cpm: "$8.90",  overlap: "7%",  region: "US" },
 ];
 
+/* ── Campaign field sample data ── */
+
+const CAMPAIGN_FIELDS: CampaignField[] = [
+  { id: "f-1", fieldName: "Objective",           icon: "emoji_flags",     value: "Conversions",                 campaignName: "Summer 2026 – Run BMW" },
+  { id: "f-2", fieldName: "Conversion location", icon: "ads_click",       value: "Website",                     campaignName: "Summer 2026 – Run BMW" },
+  { id: "f-3", fieldName: "Optimization event",  icon: "page_info",       value: "Purchase",                    campaignName: "Q4 Retargeting" },
+  { id: "f-4", fieldName: "Budget",              icon: "attach_money",    value: "$48,000 lifetime",            campaignName: "Summer 2026 – Run BMW" },
+  { id: "f-5", fieldName: "Schedule",            icon: "calendar_clock",  value: "Jun 1 – Aug 31, 2026",        campaignName: "Spring Brand Awareness" },
+  { id: "f-6", fieldName: "Targeting",           icon: "target",          value: "US · 18–34 · Auto enthusiasts", campaignName: "Holiday Promo" },
+  { id: "f-7", fieldName: "Creative",            icon: "animated_images", value: "12 video assets · 4 statics", campaignName: "Video Push – TikTok" },
+];
+
 /* ── Workspace sample data ── */
 
 const WORKSPACES: Workspace[] = [
@@ -64,12 +78,13 @@ const WORKSPACES: Workspace[] = [
 
 /* ── Type registry ── */
 
-type TypeKey = "campaign" | "audience" | "workspace";
+type TypeKey = "campaign" | "campaign-field" | "audience" | "workspace";
 
 const REGISTRY: Record<TypeKey, { config: AiEntityConfig<any>; data: any[]; itemName: string; label: string }> = {
-  campaign:  { config: CAMPAIGN_CONFIG,  data: CAMPAIGNS,   itemName: "campaigns",  label: "Campaign" },
-  audience:  { config: AUDIENCE_CONFIG,  data: AUDIENCES,   itemName: "audiences",  label: "Audience" },
-  workspace: { config: WORKSPACE_CONFIG, data: WORKSPACES,  itemName: "workspaces", label: "Workspace" },
+  campaign:         { config: CAMPAIGN_CONFIG,        data: CAMPAIGNS,        itemName: "campaigns",       label: "Campaign" },
+  "campaign-field": { config: CAMPAIGN_FIELD_CONFIG,  data: CAMPAIGN_FIELDS,  itemName: "campaign fields", label: "Campaign field" },
+  audience:         { config: AUDIENCE_CONFIG,        data: AUDIENCES,        itemName: "audiences",       label: "Audience" },
+  workspace:        { config: WORKSPACE_CONFIG,       data: WORKSPACES,       itemName: "workspaces",      label: "Workspace" },
 };
 
 /* ── Playground ── */

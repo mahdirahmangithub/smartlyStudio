@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Expander } from "../Expander";
 import { Button } from "../Button";
 import { IconButton } from "../IconButton";
@@ -11,6 +11,7 @@ import { useCollapsible } from "../../hooks/useCollapsible";
 import { cx } from "../../utils/cx";
 import styles from "./CotContainer.module.css";
 import type { CotContainerProps } from "./cotTypes";
+import { CotContainerContext } from "./cotContext";
 
 export function CotContainer({
   type,
@@ -35,6 +36,13 @@ export function CotContainer({
   const isEdited = status === "edited";
   const isIdle = status === "idle";
 
+  // Broadcast container state so descendant CotItems can auto-derive their
+  // status (loading spinner on the in-progress item, complete on past ones).
+  const containerCtx = useMemo(
+    () => ({ type, status, progress }),
+    [type, status, progress],
+  );
+
   const autoTag = isCancelled
     ? <Tag size="md" variant="neutral" emphasis="low" label="Canceled" />
     : isEdited
@@ -58,53 +66,58 @@ export function CotContainer({
     // No title → always expanded, uniform padding, no collapsible
     if (title == null) {
       return (
-        <div className={cx(styles.root, styles.reasoningFlat, className)} {...rest}>
-          {children}
+        <CotContainerContext.Provider value={containerCtx}>
+          <div className={cx(styles.root, styles.reasoningFlat, className)} {...rest}>
+            {children}
+            {hint && (
+              <div className={styles.hint}>
+                <InlineMessage type="neutral" emphasis="low" text={hint} showLeadingIcon={false} />
+              </div>
+            )}
+          </div>
+        </CotContainerContext.Provider>
+      );
+    }
+
+    return (
+      <CotContainerContext.Provider value={containerCtx}>
+        <div className={cx(styles.root, className)} {...rest}>
+          <button
+            type="button"
+            className={styles.titleButtonReasoning}
+            onClick={toggle}
+            aria-expanded={isExpanded}
+            aria-controls={contentId}
+          >
+            <TitleText size="2xs" title={title} as="span" />
+            <Expander expanded={isExpanded} size="sm" emphasis="medium" />
+          </button>
+
+          {children != null && (
+            <div
+              id={contentId}
+              ref={collapsibleRef}
+              className={styles.items}
+              aria-hidden={!isExpanded}
+              inert={!isExpanded ? true : undefined}
+            >
+              <div className={styles.itemsInnerReasoning}>{children}</div>
+            </div>
+          )}
+
           {hint && (
             <div className={styles.hint}>
               <InlineMessage type="neutral" emphasis="low" text={hint} showLeadingIcon={false} />
             </div>
           )}
         </div>
-      );
-    }
-
-    return (
-      <div className={cx(styles.root, className)} {...rest}>
-        <button
-          type="button"
-          className={styles.titleButtonReasoning}
-          onClick={toggle}
-          aria-expanded={isExpanded}
-          aria-controls={contentId}
-        >
-          <TitleText size="2xs" title={title} as="span" />
-          <Expander expanded={isExpanded} size="sm" emphasis="medium" />
-        </button>
-
-        {children != null && (
-          <div
-            id={contentId}
-            ref={collapsibleRef}
-            className={styles.items}
-            aria-hidden={!isExpanded}
-            inert={!isExpanded ? true : undefined}
-          >
-            <div className={styles.itemsInnerReasoning}>{children}</div>
-          </div>
-        )}
-
-        {hint && (
-          <div className={styles.hint}>
-            <InlineMessage type="neutral" emphasis="low" text={hint} showLeadingIcon={false} />
-          </div>
-        )}
-      </div>
+      </CotContainerContext.Provider>
     );
   }
 
   // task type
   return (
+    <CotContainerContext.Provider value={containerCtx}>
     <div className={cx(styles.root, className)} {...rest}>
       <div className={styles.card}>
         <div className={styles.header}>
@@ -185,6 +198,7 @@ export function CotContainer({
         </div>
       )}
     </div>
+    </CotContainerContext.Provider>
   );
 }
 

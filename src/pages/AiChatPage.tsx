@@ -1,4 +1,5 @@
-import { useRef, useState, useCallback, useEffect, type ReactNode } from "react";
+import { useRef, useState, useCallback, useEffect, forwardRef, useImperativeHandle, createRef, type ReactNode, type RefObject } from "react";
+import { flushSync } from "react-dom";
 import { NavBarContent } from "../components/NavBarContent";
 import { Navbar } from "../components/Navbar";
 import { Sidebar } from "../components/Sidebar";
@@ -11,9 +12,13 @@ import { GenericSelectOption } from "../components/GenericSelectOption";
 import { SingleSelectOption } from "../components/SingleSelectOption";
 import { OptionSeparator } from "../components/OptionSeparator";
 import { Grid, Col } from "../components/Grid";
-import { AiThread, AiThreadIntro, AiThreadIntroActions, type AiThreadMessage } from "../components/AiThread";
+import { AiThread, AiThreadIntro, AiThreadIntroActions, type AiThreadMessage, type AiThreadHandle } from "../components/AiThread";
 import { CotContainer, CotItem, Cot } from "../components/Cot";
-import { AiEntityPreviewInlineTyped, WORKSPACE_CONFIG, type Workspace } from "../components/AiEntityPreview";
+import { AiEntityPreviewInlineTyped, AiEntityPreviewTyped, AiEntityPreviewMultipleTyped, WORKSPACE_CONFIG, CAMPAIGN_CONFIG, CAMPAIGN_FIELD_CONFIG, type Workspace, type Campaign, type CampaignField } from "../components/AiEntityPreview";
+import { AiGenerationSuggestion, AiGenerationSuggestionEntities } from "../components/AiGenerationSuggestion";
+import { Entity } from "../components/Entity";
+import { BodyText } from "../components/BodyText";
+import type { FeedbackValue } from "../components/FeedbackBoolean";
 import { EmptyState } from "../components/EmptyState";
 import { ActionCard } from "../components/ActionCard";
 import {
@@ -25,9 +30,13 @@ import {
   PromptInputAddMenu,
   PromptInputSubmit,
   PromptInputContextMenu,
+  PromptInputInfo,
+  PromptInputRecommendations,
   DEFAULT_TRIGGER_MENUS,
   type PromptInputTriggerConfig,
   type ContextMenuCategory,
+  type RecommendationItem,
+  type PromptInputContextItem,
 } from "../components/PromptInput";
 import { PromptOptionInput } from "../components/PromptOptionInput";
 import { IconButton } from "../components/IconButton";
@@ -233,6 +242,171 @@ function SettingsMenu({
   );
 }
 
+interface CampaignPlanStep {
+  title: string;
+  description: string;
+}
+
+export interface CampaignPlanTaskHandle {
+  startEdit: () => void;
+  cancelEdit: () => void;
+  markEdited: () => void;
+  /** Stop a running plan progression and reset to idle. */
+  stop: () => void;
+}
+
+const CampaignPlanTask = forwardRef<CampaignPlanTaskHandle, { steps: CampaignPlanStep[]; onEdit?: () => void; onStart?: () => void; onComplete?: () => void }>(
+  ({ steps, onEdit, onStart, onComplete }, ref) => {
+    const [status, setStatus] = useState<"idle" | "running" | "cancelled" | "completed" | "editing" | "edited">("idle");
+    const [progress, setProgress] = useState(0);
+    const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    // Guards onComplete from firing twice — React StrictMode double-invokes
+    // state updater functions in dev, which would otherwise duplicate side effects.
+    const completedRef = useRef(false);
+
+    useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current); }, []);
+
+    useImperativeHandle(ref, () => ({
+      startEdit: () => setStatus("editing"),
+      cancelEdit: () => setStatus("idle"),
+      markEdited: () => setStatus("edited"),
+      stop: () => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+        intervalRef.current = null;
+        completedRef.current = false;
+        setStatus("idle");
+        setProgress(0);
+      },
+    }));
+
+    const handleEdit = () => {
+      setStatus("editing");
+      onEdit?.();
+    };
+
+    const handleStart = () => {
+      setStatus("running");
+      setProgress(0);
+      completedRef.current = false;
+      onStart?.();
+      intervalRef.current = setInterval(() => {
+        setProgress((p) => {
+          const next = p + 2;
+          if (next >= 100) {
+            if (!completedRef.current) {
+              completedRef.current = true;
+              if (intervalRef.current) clearInterval(intervalRef.current);
+              intervalRef.current = null;
+              setStatus("completed");
+              onComplete?.();
+            }
+            return 100;
+          }
+          return next;
+        });
+      }, 80);
+    };
+
+    const handleStop = () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      setStatus("idle");
+    };
+
+    const handleCancel = () => {
+      handleStop();
+      setProgress(0);
+      setStatus("cancelled");
+    };
+
+    return (
+      <CotContainer
+        type="task"
+        title="Campaign creation plan"
+        defaultExpanded
+        status={status}
+        progress={progress}
+        onStart={status === "idle" ? handleStart : undefined}
+        onStop={status === "running" ? handleStop : undefined}
+        onCancel={status === "idle" ? handleCancel : undefined}
+        onEdit={status === "idle" ? handleEdit : undefined}
+      >
+        <Cot>
+          {steps.map((step, i) => (
+            <CotItem
+              key={i}
+              variant="todo"
+              title={step.title}
+              description={step.description}
+              connector={i < steps.length - 1}
+            />
+          ))}
+        </Cot>
+      </CotContainer>
+    );
+  },
+);
+CampaignPlanTask.displayName = "CampaignPlanTask";
+
+// Self-driven task cot that animates progress 0 → 100 from mount, transitions
+// to "completed" when done, and notifies the parent via onComplete. Used by
+// the "Apply campaign fields" flow after the user accepts extracted values.
+function UpdateFieldsTask({
+  fields,
+  onComplete,
+}: {
+  fields: CampaignField[];
+  onComplete: () => void;
+}) {
+  const [status, setStatus] = useState<"running" | "completed">("running");
+  const [progress, setProgress] = useState(0);
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setProgress((p) => {
+        const next = p + 2;
+        if (next >= 100) {
+          if (!completedRef.current) {
+            completedRef.current = true;
+            clearInterval(id);
+            setStatus("completed");
+            onCompleteRef.current();
+          }
+          return 100;
+        }
+        return next;
+      });
+    }, 80);
+    return () => clearInterval(id);
+  }, []);
+
+  return (
+    <CotContainer
+      type="task"
+      title="Update campaign fields"
+      defaultExpanded
+      status={status}
+      progress={progress}
+    >
+      <Cot>
+        {fields.map((f) => (
+          <CotItem
+            key={f.id}
+            variant="icon"
+            icon={<Icon name={f.icon} size={16} aria-hidden />}
+            title={f.fieldName}
+            description={`apply ${f.value}`}
+          />
+        ))}
+      </Cot>
+    </CotContainer>
+  );
+}
+UpdateFieldsTask.displayName = "UpdateFieldsTask";
+
 export default function AiChatPage() {
   const [expanded, setExpanded] = useState(false);
   const [agentsExpanded, setAgentsExpanded] = useState(false);
@@ -240,9 +414,14 @@ export default function AiChatPage() {
   const [typeface, setTypeface] = useState<Typeface>("mac");
 
   const mainScrollRef = useRef<HTMLElement>(null);
+  const threadRef = useRef<AiThreadHandle>(null);
   const promptRef = useRef<HTMLDivElement>(null);
   const [promptHeight, setPromptHeight] = useState(0);
   const streamRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Active assistant message id during generation. Pending setTimeouts and the
+  // streaming interval check this ref before doing work — handleStop sets it
+  // to null to short-circuit any further updates.
+  const activeAssistIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const el = promptRef.current;
@@ -257,6 +436,17 @@ export default function AiChatPage() {
     return () => ro.disconnect();
   }, []);
 
+  // Per-message feedback handler — updates the message's feedbackValue in
+  // place so the FeedbackBoolean inside the bubble reflects the chosen state.
+  const setFeedback = useCallback((msgId: string) => (value: FeedbackValue) => {
+    setScenarios((prev) => prev.map((s) => ({
+      ...s,
+      messages: s.messages.map((m) =>
+        m.id === msgId && m.role === "assistant" ? { ...m, feedbackValue: value } : m
+      ),
+    })));
+  }, []);
+
   const streamAiMessage = useCallback((
     scenarioId: string,
     msgId: string,
@@ -265,14 +455,21 @@ export default function AiChatPage() {
     skipLoading = false,
   ) => {
     if (streamRef.current) clearInterval(streamRef.current);
+    activeAssistIdRef.current = msgId;
 
     const LOADING_MS = skipLoading ? 0 : 800;
     const CHARS_PER_TICK = 4;
     const TICK_MS = 25;
 
     const startGenerating = () => {
+      // Bail if the user stopped (or moved on) while loading was pending.
+      if (activeAssistIdRef.current !== msgId) return;
       let idx = 0;
       streamRef.current = setInterval(() => {
+        if (activeAssistIdRef.current !== msgId) {
+          if (streamRef.current) { clearInterval(streamRef.current); streamRef.current = null; }
+          return;
+        }
         idx += CHARS_PER_TICK;
         const done = idx >= fullText.length;
         const slice = done ? fullText : fullText.slice(0, idx);
@@ -281,7 +478,11 @@ export default function AiChatPage() {
             ? { ...s, messages: s.messages.map((m) => m.id === msgId ? { ...m, phase: done ? "done" as const : "generating" as const, text: slice } : m) }
             : s
         ));
-        if (done) { clearInterval(streamRef.current!); onComplete?.(); }
+        if (done) {
+          if (streamRef.current) { clearInterval(streamRef.current); streamRef.current = null; }
+          activeAssistIdRef.current = null;
+          onComplete?.();
+        }
       }, TICK_MS);
     };
 
@@ -335,14 +536,14 @@ export default function AiChatPage() {
   ];
 
   const AD_ACCOUNTS = [
-    { id: "aa-1",  label: "BMW Meta Ads" },
-    { id: "aa-2",  label: "BMW Google Ads" },
-    { id: "aa-3",  label: "Nike EU Meta" },
-    { id: "aa-4",  label: "Acme TikTok Biz" },
-    { id: "aa-5",  label: "Acme Search Ads" },
-    { id: "aa-6",  label: "Unilever EU Ads" },
-    { id: "aa-7",  label: "Unilever US Search" },
-    { id: "aa-8",  label: "Nike YouTube EU" },
+    { id: "aa-1",  label: "BMW Global Meta Ads" },
+    { id: "aa-2",  label: "BMW EU Meta Ads" },
+    { id: "aa-3",  label: "BMW US Meta Ads" },
+    { id: "aa-4",  label: "BMW Motorrad Meta Ads" },
+    { id: "aa-5",  label: "BMW M Performance Meta Ads" },
+    { id: "aa-6",  label: "BMW i Electric Meta Ads" },
+    { id: "aa-7",  label: "MINI Cooper Meta Ads" },
+    { id: "aa-8",  label: "Rolls-Royce Motor Cars Meta Ads" },
   ];
 
   const [scenarios, setScenarios] = useState<Scenario[]>([
@@ -357,34 +558,360 @@ export default function AiChatPage() {
   const [historyExpanded, setHistoryExpanded] = useState(false);
 
   useEffect(() => {
-    if (streamRef.current) clearInterval(streamRef.current);
+    if (streamRef.current) { clearInterval(streamRef.current); streamRef.current = null; }
+    activeAssistIdRef.current = null;
   }, [activeScenarioId]);
 
   const activeMessages = scenarios.find((s) => s.id === activeScenarioId)?.messages ?? [];
 
+  // Tracks which plan is currently running its progress bar (after user clicks
+  // Start). Mirrors via ref for synchronous access in handleStop.
+  const [runningPlanId, setRunningPlanId] = useState<string | null>(null);
+  const runningPlanIdRef = useRef<string | null>(null);
+
+  // Context chips shown in the prompt input. Items are added when the user
+  // clicks "Add to context" on an AiEntityPreview header.
+  const [contextItems, setContextItems] = useState<PromptInputContextItem[]>([]);
+  const addContextItem = useCallback((item: PromptInputContextItem) => {
+    setContextItems((prev) => prev.some((c) => c.id === item.id) ? prev : [...prev, item]);
+  }, []);
+
+  // Mirror of the prompt's currently-attached files so handleSubmit can capture
+  // them at submit time (PromptInput clears its internal list afterwards).
+  // onAttachedFilesChange passes plain File[] — works for both add-menu and drag-drop.
+  const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
+
+  // Campaign created during the plan flow — lifted to state so the post-creation
+  // file-extraction step (after step 6 submit) can reference it.
+  const [createdCampaign, setCreatedCampaign] = useState<Campaign | null>(null);
+
+  const lastMsg = activeMessages[activeMessages.length - 1];
+  const isStreaming = lastMsg?.role === "assistant"
+    && (lastMsg.phase === "loading" || lastMsg.phase === "generating");
+  // The prompt's "loading" state covers both AI streaming AND plan progression
+  // — both are async work the user might want to cancel via the stop button.
+  const isGenerating = isStreaming || runningPlanId !== null;
+
+  // ── Plan-edit flow ──
+  // editingPlanIdRef captures the id synchronously for use in submit callbacks;
+  // planRefsMap holds a handle to each rendered plan so we can call markEdited
+  // / cancelEdit on the right one.
+  const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
+  const editingPlanIdRef = useRef<string | null>(null);
+  const planRefsMap = useRef<Map<string, RefObject<CampaignPlanTaskHandle | null>>>(new Map());
+
+  // Restores focus to the PromptInput textarea — used after any prompt-internal
+  // action (submit, stop, recommendation click) that might shift focus to a
+  // button. The user only loses focus when they intentionally click elsewhere.
+  const focusPromptTextarea = useCallback(() => {
+    promptRef.current?.querySelector<HTMLTextAreaElement>("textarea")?.focus();
+  }, []);
+
+  const handlePlanEditStart = useCallback((planAssistId: string) => {
+    setEditingPlanId(planAssistId);
+    editingPlanIdRef.current = planAssistId;
+    focusPromptTextarea();
+  }, [focusPromptTextarea]);
+
+  const handleCancelEdit = useCallback(() => {
+    const id = editingPlanIdRef.current;
+    if (id) planRefsMap.current.get(id)?.current?.cancelEdit();
+    setEditingPlanId(null);
+    editingPlanIdRef.current = null;
+  }, []);
+
+  const handleStop = useCallback(() => {
+    // If a plan is mid-progression, stop it (no AI streaming in this case).
+    const planId = runningPlanIdRef.current;
+    if (planId) {
+      planRefsMap.current.get(planId)?.current?.stop();
+      runningPlanIdRef.current = null;
+      setRunningPlanId(null);
+      focusPromptTextarea();
+      return;
+    }
+
+    const aiId = activeAssistIdRef.current;
+    if (!aiId) return;
+    // Clear ref FIRST so any pending setTimeout/interval callback short-circuits.
+    activeAssistIdRef.current = null;
+    if (streamRef.current) { clearInterval(streamRef.current); streamRef.current = null; }
+    // Mark the in-flight assistant message as done with whatever text it has.
+    setScenarios((prev) => prev.map((s) => ({
+      ...s,
+      messages: s.messages.map((m) => m.id === aiId ? { ...m, phase: "done" as const } : m),
+    })));
+    focusPromptTextarea();
+  }, [focusPromptTextarea]);
+
   const handleSubmit = useCallback((value: string) => {
-    const userMsg = { id: `u-${Date.now()}`, role: "user" as const, message: value };
+    // ── Edit-mode branch: user is editing an existing plan ──
+    const capturedEditId = editingPlanIdRef.current;
+    if (capturedEditId) {
+      setEditingPlanId(null);
+      editingPlanIdRef.current = null;
+
+      const userMsg = { id: `u-${Date.now()}`, role: "user" as const, message: value, replyLabel: "Editing plan" };
+      const aiId = `a-${Date.now() + 1}`;
+      const aiMsg = { id: aiId, role: "assistant" as const, phase: "loading" as const, text: "" };
+      flushSync(() => {
+        setScenarios((prev) => prev.map((s) =>
+          s.id === "s-1" ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s
+        ));
+      });
+      threadRef.current?.scrollToMessage(userMsg.id, "smooth");
+
+      // Reset ad-account selection so the user picks a fresh one in step 4.
+      setAdAccountSearch("");
+      setSelectedAdAccountId(null);
+
+      streamAiMessage(
+        "s-1", aiId,
+        "<p>Sure — please select a different ad account and I'll update the plan.</p>",
+        () => {
+          // Mark the previous plan as edited and re-show the ad-account picker.
+          planRefsMap.current.get(capturedEditId)?.current?.markEdited();
+          setScenarioStep(4);
+        },
+      );
+      focusPromptTextarea();
+      return;
+    }
+
+    // Snapshot files + context at submit time so the user bubble carries them
+    // even though PromptInput clears attachments right after onSubmit returns.
+    const attachmentsSnapshot = attachedFiles.map((file, i) => ({
+      id: `att-${Date.now()}-${i}`,
+      file,
+      fileName: file.name,
+    }));
+    const contextSnapshot = contextItems;
+
+    const userMsg = {
+      id: `u-${Date.now()}`,
+      role: "user" as const,
+      message: value,
+      ...(attachmentsSnapshot.length ? { attachments: attachmentsSnapshot } : {}),
+      ...(contextSnapshot.length ? { contextItems: contextSnapshot } : {}),
+    };
 
     if (activeScenarioId === "s-1" && scenarioStep === 0) {
       const aiId = `a-${Date.now()}`;
-      const aiMsg = { id: aiId, role: "assistant" as const, phase: "loading" as const, text: "" };
-      setScenarios((prev) => prev.map((s) =>
-        s.id === "s-1" ? { ...s, messages: [userMsg, aiMsg] } : s
-      ));
+      const aiMsg = {
+        id: aiId,
+        role: "assistant" as const,
+        phase: "loading" as const,
+        text: "",
+        copyValue: "Do you want to create this campaign in a new workspace or use an existing one?",
+        showFeedback: true,
+        onFeedbackChange: setFeedback(aiId),
+      };
+      flushSync(() => {
+        setScenarios((prev) => prev.map((s) =>
+          s.id === "s-1" ? { ...s, messages: [userMsg, aiMsg] } : s
+        ));
+      });
+      threadRef.current?.scrollToMessage(userMsg.id, "smooth");
       streamAiMessage(
         "s-1", aiId,
         "<p>Do you want to create this campaign in a new workspace or use an existing one?</p>",
         () => setScenarioStep(1),
       );
+      focusPromptTextarea();
       return;
     }
 
-    setScenarios((prev) => prev.map((s) =>
-      s.id === activeScenarioId
-        ? { ...s, messages: [...s.messages, userMsg] }
-        : s
-    ));
-  }, [activeScenarioId, scenarioStep]);
+    // ── Step 6 → Field extraction flow ──
+    // After a campaign is created and the post-creation recommendations are
+    // visible, the user submits a file (and optional message). The assistant
+    // "extracts" fields from the attachment via a 4-stage cot then renders
+    // the resulting CampaignField multiple-mode preview as a slot.
+    if (activeScenarioId === "s-1" && scenarioStep === 6 && createdCampaign) {
+      const aiId = `a-${Date.now() + 1}`;
+      const campaign = createdCampaign;
+      const aiMsg = {
+        id: aiId,
+        role: "assistant" as const,
+        phase: "loading" as const,
+        text: "",
+        loadingLabel: EXTRACT_LABELS[0],
+        cotContent: buildExtractCot(0),
+        components: {
+          "entity-preview": (_attrs: Record<string, string>) => (
+            <AiEntityPreviewInlineTyped config={CAMPAIGN_CONFIG} data={campaign} />
+          ),
+        },
+      };
+
+      activeAssistIdRef.current = aiId;
+      flushSync(() => {
+        setScenarios((prev) => prev.map((s) =>
+          s.id === "s-1" ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s
+        ));
+      });
+      threadRef.current?.scrollToMessage(userMsg.id, "smooth");
+      setScenarioStep(7);
+
+      // Cycle through extract labels
+      EXTRACT_LABELS.forEach((_label, i) => {
+        if (i === 0) return;
+        setTimeout(() => {
+          if (activeAssistIdRef.current !== aiId) return;
+          setScenarios((prev) => prev.map((s) =>
+            s.id === "s-1" ? {
+              ...s,
+              messages: s.messages.map((m) => m.id === aiId ? {
+                ...m,
+                loadingLabel: EXTRACT_LABELS[i],
+                cotContent: buildExtractCot(i),
+              } : m),
+            } : s
+          ));
+        }, i * 1500);
+      });
+
+      // Stream the response after all labels complete, then attach the
+      // CampaignField multiple-mode preview as the slot.
+      setTimeout(() => {
+        if (activeAssistIdRef.current !== aiId) return;
+        streamAiMessage(
+          "s-1", aiId,
+          `<p>I've extracted the following data for the <entity-preview id="${campaign.id}"></entity-preview> fields. Could you review and confirm if everything looks correct? Let me know if there's anything to add so I can update the list.</p>`,
+          () => {
+            const fields = buildExtractedFields(campaign.name);
+
+            // Apply click → strip actions from the campaignField slot, then
+            // push a loading bubble that cycles APPLY_LABELS, transitions
+            // into a self-driven task cot, and finally appends a streamed
+            // confirmation bubble with an inline campaign preview.
+            const handleApplyFields = () => {
+              setScenarios((prev) => prev.map((s) =>
+                s.id === "s-1" ? {
+                  ...s,
+                  messages: s.messages.map((m) => m.id === aiId ? {
+                    ...m,
+                    slot: (
+                      <AiEntityPreviewMultipleTyped
+                        config={CAMPAIGN_FIELD_CONFIG}
+                        data={fields}
+                        itemName="campaign fields"
+                        visibleCount={3}
+                      />
+                    ),
+                  } : m),
+                } : s
+              ));
+
+              const applyAiId = `a-${Date.now()}-apply`;
+              const applyMsg = {
+                id: applyAiId,
+                role: "assistant" as const,
+                phase: "loading" as const,
+                text: "",
+                loadingLabel: APPLY_LABELS[0],
+              };
+              activeAssistIdRef.current = applyAiId;
+              setScenarios((prev) => prev.map((s) =>
+                s.id === "s-1" ? { ...s, messages: [...s.messages, applyMsg] } : s
+              ));
+
+              setTimeout(() => {
+                if (activeAssistIdRef.current !== applyAiId) return;
+                setScenarios((prev) => prev.map((s) =>
+                  s.id === "s-1" ? {
+                    ...s,
+                    messages: s.messages.map((m) => m.id === applyAiId
+                      ? { ...m, loadingLabel: APPLY_LABELS[1] }
+                      : m),
+                  } : s
+                ));
+              }, 1500);
+
+              setTimeout(() => {
+                if (activeAssistIdRef.current !== applyAiId) return;
+
+                const handleApplyComplete = () => {
+                  const finalAiId = `a-${Date.now()}-applied`;
+                  const finalMsg = {
+                    id: finalAiId,
+                    role: "assistant" as const,
+                    phase: "loading" as const,
+                    text: "",
+                    components: {
+                      "entity-preview": (_attrs: Record<string, string>) => (
+                        <AiEntityPreviewInlineTyped config={CAMPAIGN_CONFIG} data={campaign} />
+                      ),
+                    },
+                    copyValue: `All the field values have been applied and are now updated in your ${campaign.name}.`,
+                    showFeedback: true,
+                    onFeedbackChange: setFeedback(finalAiId),
+                  };
+                  activeAssistIdRef.current = finalAiId;
+                  setScenarios((prev) => prev.map((s) =>
+                    s.id === "s-1" ? { ...s, messages: [...s.messages, finalMsg] } : s
+                  ));
+                  streamAiMessage(
+                    "s-1", finalAiId,
+                    `<p>All the field values have been applied and are now updated in your <entity-preview id="${campaign.id}"></entity-preview>.</p>`,
+                  );
+                };
+
+                setScenarios((prev) => prev.map((s) =>
+                  s.id === "s-1" ? {
+                    ...s,
+                    messages: s.messages.map((m) => m.id === applyAiId ? {
+                      ...m,
+                      phase: "done" as const,
+                      text: "",
+                      loadingLabel: undefined,
+                      slot: <UpdateFieldsTask fields={fields} onComplete={handleApplyComplete} />,
+                    } : m),
+                  } : s
+                ));
+                activeAssistIdRef.current = null;
+              }, 3000);
+            };
+
+            setScenarios((prev) => prev.map((s) =>
+              s.id === "s-1" ? {
+                ...s,
+                messages: s.messages.map((m) => m.id === aiId ? {
+                  ...m,
+                  cotContent: finalExtractReasoningCot,
+                  slot: (
+                    <AiEntityPreviewMultipleTyped
+                      config={CAMPAIGN_FIELD_CONFIG}
+                      data={fields}
+                      itemName="campaign fields"
+                      visibleCount={3}
+                      onEdit={() => {}}
+                      onCancel={() => {}}
+                      onCreate={handleApplyFields}
+                      createLabel="Apply"
+                    />
+                  ),
+                } : m),
+              } : s
+            ));
+          },
+          true,
+        );
+      }, EXTRACT_LABELS.length * 1500 + 400);
+
+      focusPromptTextarea();
+      return;
+    }
+
+    flushSync(() => {
+      setScenarios((prev) => prev.map((s) =>
+        s.id === activeScenarioId
+          ? { ...s, messages: [...s.messages, userMsg] }
+          : s
+      ));
+    });
+    threadRef.current?.scrollToMessage(userMsg.id, "smooth");
+    focusPromptTextarea();
+  }, [activeScenarioId, scenarioStep, streamAiMessage, focusPromptTextarea, attachedFiles, contextItems, createdCampaign, setFeedback]);
 
   const handleWorkspaceSelect = useCallback((type: "new" | "existing") => {
     setWorkspaceChoice(type);
@@ -408,16 +935,30 @@ export default function AiChatPage() {
     }
     const userMsg = { id: `u-${Date.now()}`, role: "user" as const, message };
     const aiId = `a-${Date.now() + 1}`;
-    const aiMsg = { id: aiId, role: "assistant" as const, phase: "loading" as const, text: "", loadingLabel: "Thinking..." };
-    setScenarios((prev) => prev.map((s) =>
-      s.id === "s-1" ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s
-    ));
+    const aiMsg = {
+      id: aiId,
+      role: "assistant" as const,
+      phase: "loading" as const,
+      text: "",
+      loadingLabel: "Thinking...",
+      copyValue: "For setup the campaign select an Ad account then I will finalize the plan to create the campaign.",
+      showFeedback: true,
+      onFeedbackChange: setFeedback(aiId),
+    };
+    activeAssistIdRef.current = aiId;
+    flushSync(() => {
+      setScenarios((prev) => prev.map((s) =>
+        s.id === "s-1" ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s
+      ));
+    });
+    threadRef.current?.scrollToMessage(userMsg.id, "smooth");
     setScenarioStep(3);
     setAdAccountSearch("");
     setSelectedAdAccountId(null);
 
     // Label: "Thinking..." → "Checking ad accounts..."
     setTimeout(() => {
+      if (activeAssistIdRef.current !== aiId) return;
       setScenarios((prev) => prev.map((s) =>
         s.id === "s-1"
           ? { ...s, messages: s.messages.map((m) => m.id === aiId ? { ...m, loadingLabel: "Checking ad accounts..." } : m) }
@@ -427,6 +968,7 @@ export default function AiChatPage() {
 
     // Start streaming after extended loading
     setTimeout(() => {
+      if (activeAssistIdRef.current !== aiId) return;
       streamAiMessage(
         "s-1", aiId,
         "<p>For setup the campaign select an Ad account then I will finalize the plan to create the campaign.</p>",
@@ -434,7 +976,7 @@ export default function AiChatPage() {
         true, // skip internal loading — already loading
       );
     }, 2800);
-  }, [workspaceChoice, campaignNameInput, selectedWorkspaceId, streamAiMessage]);
+  }, [workspaceChoice, campaignNameInput, selectedWorkspaceId, streamAiMessage, setFeedback]);
 
   const LOADING_LABELS = [
     "Thinking...",
@@ -470,6 +1012,57 @@ export default function AiChatPage() {
     </CotContainer>
   );
 
+  // ── Field extraction step (after user submits a file in step 6) ──
+  const EXTRACT_LABELS = [
+    "Reading attachment",
+    "Analyzing content",
+    "Mapping the fields",
+    "Creating campaign field entity",
+  ];
+
+  const buildExtractCot = (completedUpTo: number) => (
+    <CotContainer type="reasoning">
+      <Cot>
+        {EXTRACT_LABELS.map((label, i) => (
+          <CotItem
+            key={i}
+            title={label}
+            variant="dot"
+            status={i < completedUpTo ? "complete" : i === completedUpTo ? "loading" : "idle"}
+          />
+        ))}
+      </Cot>
+    </CotContainer>
+  );
+
+  const finalExtractReasoningCot = (
+    <CotContainer type="reasoning" title="Reasoning">
+      <Cot>
+        {EXTRACT_LABELS.map((label, i) => (
+          <CotItem key={i} title={label} variant="dot" status="complete" />
+        ))}
+      </Cot>
+    </CotContainer>
+  );
+
+  // ── Apply-fields step (after user clicks Apply on the campaignField multiple) ──
+  const APPLY_LABELS = [
+    "Create a plan to update fields",
+    "Get access to Objective",
+  ];
+
+  // Synthetic field set "extracted" from the user's attachment, anchored to
+  // the just-created campaign for realistic in-bubble rendering.
+  const buildExtractedFields = (campaignName: string): CampaignField[] => [
+    { id: "ef-1", fieldName: "Objective",           icon: "emoji_flags",     value: "Conversions",                    campaignName },
+    { id: "ef-2", fieldName: "Conversion location", icon: "ads_click",       value: "Website",                        campaignName },
+    { id: "ef-3", fieldName: "Optimization event",  icon: "page_info",       value: "Purchase",                       campaignName },
+    { id: "ef-4", fieldName: "Budget",              icon: "attach_money",    value: "$48,000 lifetime",               campaignName },
+    { id: "ef-5", fieldName: "Schedule",            icon: "calendar_clock",  value: "Jun 1 – Aug 31, 2026",           campaignName },
+    { id: "ef-6", fieldName: "Targeting",           icon: "target",          value: "US · 18–34 · Auto enthusiasts",  campaignName },
+    { id: "ef-7", fieldName: "Creative",            icon: "animated_images", value: "12 video assets · 4 statics",    campaignName },
+  ];
+
   const handleAdAccountSubmit = useCallback(() => {
     const adAccount = AD_ACCOUNTS.find((a) => a.id === selectedAdAccountId);
     const userMsg = {
@@ -481,24 +1074,129 @@ export default function AiChatPage() {
     const workspace = (workspaceChoice === "existing"
       ? WORKSPACES.find((w) => w.id === selectedWorkspaceId)
       : null) ?? WORKSPACES[0];
+    const workspaceName = workspaceChoice === "new"
+      ? (campaignNameInput.trim() || workspace.name)
+      : workspace.name;
+    const adAccountName = adAccount?.label ?? "the selected ad account";
+
+    const planSteps: CampaignPlanStep[] = [
+      { title: "Set up campaign structure", description: `Create the campaign shell in ${workspaceName} workspace` },
+      { title: "Assign the Ad account to campaign", description: `Add ${adAccountName} as ad account` },
+      { title: "Finalize Ad set and Ad structure", description: "One Ad set and Ad will be added to campaign shell automatically" },
+    ];
+
+    const planRef = createRef<CampaignPlanTaskHandle>();
+    planRefsMap.current.set(aiId, planRef);
+
+    // Campaign data — populated when the user presses Start on the plan and it
+    // finishes its progress. Captured in this closure so workspace/ad-account
+    // selections at plan creation time are stable.
+    const createdCampaign: Campaign = {
+      id: `c-${Date.now()}`,
+      name: `New campaign in ${workspaceName}`,
+      workspace: workspaceName,
+      platform: workspace.platform,
+      adAccount: adAccountName,
+      adSetCount: 1,
+      adCount: 1,
+      status: "Draft",
+      budget: "—",
+      channel: workspace.platform,
+      start: "Today",
+    };
+
+    const handlePlanStart = () => {
+      runningPlanIdRef.current = aiId;
+      setRunningPlanId(aiId);
+    };
+
+    const handlePlanComplete = () => {
+      runningPlanIdRef.current = null;
+      setRunningPlanId(null);
+      // Lift to state so handleSubmit can reference the campaign in step 7+.
+      setCreatedCampaign(createdCampaign);
+      const completionAiId = `a-${Date.now()}-c`;
+      const completionMsg = {
+        id: completionAiId,
+        role: "assistant" as const,
+        phase: "loading" as const,
+        text: "",
+        components: {
+          "entity-preview": (_attrs: Record<string, string>) => (
+            <AiEntityPreviewInlineTyped config={WORKSPACE_CONFIG} data={workspace} />
+          ),
+        },
+        showFeedback: true,
+        onFeedbackChange: setFeedback(completionAiId),
+      };
+
+      setScenarios((prev) => prev.map((s) =>
+        s.id === "s-1" ? { ...s, messages: [...s.messages, completionMsg] } : s
+      ));
+
+      streamAiMessage(
+        "s-1", completionAiId,
+        `<p>I have created a campaign in <entity-preview id="${workspace.id}"></entity-preview> and it is ready to be modified.</p>`,
+        () => {
+          // After streaming, attach the campaign single-mode preview as the slot
+          // and advance to step 6 so the prompt shows post-creation recommendations.
+          setScenarios((prev) => prev.map((s) =>
+            s.id === "s-1" ? {
+              ...s,
+              messages: s.messages.map((m) => m.id === completionAiId ? {
+                ...m,
+                slot: (
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <AiEntityPreviewTyped
+                      config={CAMPAIGN_CONFIG}
+                      data={createdCampaign}
+                      onHeaderAction={() => addContextItem({
+                        id: createdCampaign.id,
+                        icon: "campaign_alt",
+                        label: createdCampaign.name,
+                      })}
+                    />
+                    <BodyText size="md" style={{ marginTop: "var(--spacing-md)" }}>For next step enrich your campaign:</BodyText>
+                    <AiGenerationSuggestion style={{ marginTop: "var(--spacing-2xl)" }}>
+                      <AiGenerationSuggestionEntities>
+                        <Entity
+                          title="Automate Campaign"
+                          description="Automate your campaigns, ad sets, and ads using an automation feed."
+                          leading={<Icon name="automation_feeds" size={20} />}
+                          persistentActions={<Icon name="chevron_right" size={16} />}
+                        />
+                        <Entity
+                          title="Set campaign objective"
+                          description="Select the goal for your campaign to guide optimization and setup."
+                          leading={<Icon name="emoji_flags" size={20} />}
+                          persistentActions={<Icon name="chevron_right" size={16} />}
+                        />
+                        <Entity
+                          title="Select conversion location"
+                          description="Choose where your conversions will happen (e.g. website, app, or lead form)."
+                          leading={<Icon name="ads_click" size={20} />}
+                          persistentActions={<Icon name="chevron_right" size={16} />}
+                        />
+                      </AiGenerationSuggestionEntities>
+                    </AiGenerationSuggestion>
+                  </div>
+                ),
+              } : m),
+            } : s
+          ));
+          setScenarioStep(6);
+        },
+      );
+    };
 
     const finalSlot = (
-      <CotContainer
-        type="task"
-        title="Campaign creation plan"
-        defaultExpanded
-        onEdit={() => {}}
-        onCancel={() => {}}
-        onStart={() => {}}
-      >
-        <Cot>
-          <CotItem title="Set up campaign structure" description="Create the campaign shell in BMW Global workspace" variant="todo" connector />
-          <CotItem title="Configure audience targeting" description="Set audience segments and targeting parameters" variant="todo" connector />
-          <CotItem title="Set budget & schedule" description="Define daily budget, lifetime budget, and flight dates" variant="todo" connector />
-          <CotItem title="Prepare ad creatives" description="Upload or generate ad copy and visuals" variant="todo" connector />
-          <CotItem title="Review & activate campaign" description="Final review before going live" variant="todo" />
-        </Cot>
-      </CotContainer>
+      <CampaignPlanTask
+        ref={planRef}
+        steps={planSteps}
+        onEdit={() => handlePlanEditStart(aiId)}
+        onStart={handlePlanStart}
+        onComplete={handlePlanComplete}
+      />
     );
 
     const aiMsg = {
@@ -508,22 +1206,24 @@ export default function AiChatPage() {
       text: "",
       loadingLabel: LOADING_LABELS[0],
       cotContent: buildLoadingCot(0),
-      components: {
-        "entity-preview": (_attrs: Record<string, string>) => (
-          <AiEntityPreviewInlineTyped config={WORKSPACE_CONFIG} data={workspace} />
-        ),
-      },
+      showFeedback: true,
+      onFeedbackChange: setFeedback(aiId),
     };
 
-    setScenarios((prev) => prev.map((s) =>
-      s.id === "s-1" ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s
-    ));
+    activeAssistIdRef.current = aiId;
+    flushSync(() => {
+      setScenarios((prev) => prev.map((s) =>
+        s.id === "s-1" ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s
+      ));
+    });
+    threadRef.current?.scrollToMessage(userMsg.id, "smooth");
     setScenarioStep(5);
 
     // Cycle through loading labels + cot stages; complete previous before next
     LOADING_LABELS.forEach((_label, i) => {
       if (i === 0) return;
       setTimeout(() => {
+        if (activeAssistIdRef.current !== aiId) return;
         setScenarios((prev) => prev.map((s) =>
           s.id === "s-1" ? {
             ...s,
@@ -539,9 +1239,10 @@ export default function AiChatPage() {
 
     // Start streaming after all labels — all cot items complete at this point
     setTimeout(() => {
+      if (activeAssistIdRef.current !== aiId) return;
       streamAiMessage(
         "s-1", aiId,
-        `<p>I will generate a campaign in <entity-preview id="${workspace.id}"></entity-preview>. Please confirm the plan by clicking start.</p>`,
+        `<p>I have prepared a plan to create the campaign. Please confirm the plan by clicking start.</p>`,
         () => {
           // On complete: all reasoning items done + show task plan slot
           setScenarios((prev) => prev.map((s) =>
@@ -558,7 +1259,7 @@ export default function AiChatPage() {
         true,
       );
     }, LOADING_LABELS.length * 1500 + 400);
-  }, [selectedAdAccountId, workspaceChoice, selectedWorkspaceId, streamAiMessage]);
+  }, [selectedAdAccountId, workspaceChoice, selectedWorkspaceId, campaignNameInput, streamAiMessage, handlePlanEditStart, setFeedback]);
 
   const sortedHistory = [
     ...scenarios.filter((s) => s.pinned),
@@ -588,6 +1289,17 @@ export default function AiChatPage() {
         />
       ),
     },
+  ];
+
+  // Recommendations shown after the campaign-creation entity bubble appears.
+  const POST_CREATION_RECOMMENDATIONS: RecommendationItem[] = [
+    { id: "rec-objective",    label: "Objective",            leadingIcon: <Icon name="emoji_flags"     size={16} />, onSelect: () => focusPromptTextarea() },
+    { id: "rec-conversion",   label: "Conversion location",  leadingIcon: <Icon name="ads_click"       size={16} />, onSelect: () => focusPromptTextarea() },
+    { id: "rec-optimization", label: "Optimization event",   leadingIcon: <Icon name="page_info"       size={16} />, onSelect: () => focusPromptTextarea() },
+    { id: "rec-budget",       label: "Budget",               leadingIcon: <Icon name="attach_money"    size={16} />, onSelect: () => focusPromptTextarea() },
+    { id: "rec-schedule",     label: "Schedule",             leadingIcon: <Icon name="calendar_clock"  size={16} />, onSelect: () => focusPromptTextarea() },
+    { id: "rec-targeting",    label: "Targeting",            leadingIcon: <Icon name="target"          size={16} />, onSelect: () => focusPromptTextarea() },
+    { id: "rec-creative",     label: "Creative",             leadingIcon: <Icon name="animated_images" size={16} />, onSelect: () => focusPromptTextarea() },
   ];
 
   return (
@@ -698,6 +1410,7 @@ export default function AiChatPage() {
           <Grid inset="md">
             <Col span={8} md={8} offsetMd={2}>
               <AiThread
+                  ref={threadRef}
                   messages={activeMessages}
                   scrollContainerRef={mainScrollRef}
                   bottomOffset={promptHeight}
@@ -820,7 +1533,25 @@ export default function AiChatPage() {
                       />
                     </PromptOptionInput>
                   ) : (
-                    <PromptInput onSubmit={handleSubmit} triggerMenus={TRIGGER_MENUS}>
+                    <PromptInput
+                      onSubmit={handleSubmit}
+                      loading={isGenerating}
+                      onStop={handleStop}
+                      triggerMenus={TRIGGER_MENUS}
+                      contextItems={contextItems}
+                      onContextItemsChange={setContextItems}
+                      onAttachedFilesChange={setAttachedFiles}
+                    >
+                      {activeScenarioId === "s-1" && scenarioStep === 6 && (
+                        <PromptInputRecommendations title="Enrich campaign by:" items={POST_CREATION_RECOMMENDATIONS} />
+                      )}
+                      {editingPlanId && (
+                        <PromptInputInfo
+                          type="edit"
+                          title="Editing campaign creation plan"
+                          onAction={handleCancelEdit}
+                        />
+                      )}
                       <PromptInputAttachments />
                       <PromptInputTextarea
                         placeholder="Ask Smartly…"

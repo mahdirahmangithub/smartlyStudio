@@ -13,8 +13,12 @@ export interface AiEntitySurfaceConfig<T> {
   getTitle: (data: T) => string;
   /** Extra props for the header DataCellContent (leading, trailing, state, etc.) */
   headerCellContent?: Partial<DataCellContentProps>;
+  /** Per-item header cell content — overrides the static `headerCellContent` when present. */
+  getHeaderCellContent?: (data: T) => Partial<DataCellContentProps>;
   /** Full DataCellContent props for the title (first) cell in multiple rows — overrides default title rendering */
   getTitleCellContent?: (data: T) => Partial<DataCellContentProps>;
+  /** Override the card's max-width (in px) for this surface. */
+  maxWidth?: number;
   columns: AiEntityColumnConfig<T>[];
 }
 
@@ -23,6 +27,8 @@ export interface AiEntityConfig<T> {
   getKey: (data: T) => string;
   /** Icon representing this entity type — used in inline chips */
   entityIcon?: IconName;
+  /** Per-item icon for inline chips — overrides the static `entityIcon` when present. */
+  getEntityIcon?: (data: T) => IconName;
   /** Builds the URL for navigating to an entity — used in inline chips */
   getHref?: (data: T) => string;
   /** Drives the single-item card */
