@@ -1049,7 +1049,11 @@ export default function AiChatPage() {
         text: "",
         components: {
           "entity-preview": (_attrs: Record<string, string>) => (
-            <AiEntityPreviewInlineTyped config={CAMPAIGN_CONFIG} data={renamedForNewBubble} />
+            <AiEntityPreviewInlineTyped
+              config={CAMPAIGN_CONFIG}
+              data={renamedForNewBubble}
+              status={renamedForNewBubble.status}
+            />
           ),
         },
       };
@@ -1594,7 +1598,7 @@ export default function AiChatPage() {
 
       streamAiMessage(
         "s-6", completionAiId,
-        `<p>The new sales campaign campaign added successfuly to <entity-preview id="${S6_WORKSPACE.id}"></entity-preview>.</p>`,
+        `<p>The new sales campaign added successfuly to <entity-preview id="${S6_WORKSPACE.id}"></entity-preview>.</p>`,
         () => {
           setS6CreatedCampaign(createdCampaign);
           setS6CompletionMsgId(completionAiId);
@@ -1630,7 +1634,7 @@ export default function AiChatPage() {
         `<p>I will generate a Campaign in <entity-preview id="${S6_WORKSPACE.id}"></entity-preview> with Sales as Objective.</p>`,
         () => {
           const planSteps: CampaignPlanStep[] = [
-            { title: "Create Campaign Sell",                   description: `Create a Campaign in ${S6_WORKSPACE.name}` },
+            { title: "Create Campaign Shell",                   description: `Create a Campaign in ${S6_WORKSPACE.name}` },
             { title: "Assign an Ad Account to the campaign",   description: `This campaign will uses ${adAccountName}` },
             { title: "Fill objective of campaign",             description: "Set Sales as objective of the campaign" },
           ];
