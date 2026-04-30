@@ -51,6 +51,10 @@
   .promptDock {
     padding: 0 0 var(--prompt-bottom-gap, var(--spacing-md));
   }
+  .sidebar,
+  .scenarioGuide {
+    display: none;
+  }
 }
 
 /* Demo-guide popover — yellow background to make the floating helper stand

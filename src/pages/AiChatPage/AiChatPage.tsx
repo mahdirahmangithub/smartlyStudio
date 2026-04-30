@@ -100,6 +100,7 @@ export default function AiChatPage() {
 
             <div className={styles.body}>
               <Sidebar
+                className={styles.sidebar}
                 collapsible
                 expandBehavior="overlay"
                 resizable
