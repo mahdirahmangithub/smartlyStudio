@@ -36,6 +36,7 @@ export default function AiChatPage() {
   const mainScrollRef = useRef<HTMLElement>(null);
   const threadRef = useRef<AiThreadHandle>(null);
   const promptRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const [promptHeight, setPromptHeight] = useState(0);
 
   useEffect(() => {
@@ -47,6 +48,25 @@ export default function AiChatPage() {
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
+
+  // Sync the document's `theme-color` meta tag with the active theme so
+  // Safari (and other browsers that honor it) tints the URL bar / status
+  // bar to match. We resolve the colour at runtime by reading the themed
+  // root's computed `--element-surface-default`, so the value automatically
+  // tracks any future token changes without duplicating hex values here.
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el) return;
+    const color = getComputedStyle(el).getPropertyValue("--element-surface-default").trim();
+    if (!color) return;
+    let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.name = "theme-color";
+      document.head.appendChild(meta);
+    }
+    meta.content = color;
+  }, [theme]);
 
   const initialScenarios: ScenarioRecord[] = SCENARIOS.map((cfg, i) => ({
     id: cfg.id,
@@ -76,7 +96,7 @@ export default function AiChatPage() {
         const ActiveScenario = SCENARIOS.find((s) => s.id === chat.activeScenarioId)?.Component;
 
         return (
-          <div className={styles.root} data-theme={theme} data-typeface={typeface}>
+          <div ref={rootRef} className={styles.root} data-theme={theme} data-typeface={typeface}>
             {/* Mobile-only theme cycle button — pinned top-left since the
                 navbar (which holds settings on desktop) is hidden below
                 520px. Click cycles light → dark → dusk → light. */}
