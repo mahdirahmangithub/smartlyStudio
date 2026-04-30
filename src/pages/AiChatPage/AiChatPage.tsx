@@ -77,6 +77,18 @@ export default function AiChatPage() {
 
         return (
           <div className={styles.root} data-theme={theme} data-typeface={typeface}>
+            {/* Mobile-only theme cycle button — pinned top-left since the
+                navbar (which holds settings on desktop) is hidden below
+                520px. Click cycles light → dark → dusk → light. */}
+            <IconButton
+              className={styles.mobileThemeBtn}
+              size="md"
+              variant="neutral"
+              emphasis="low"
+              icon={<Icon name={theme === "light" ? "sunny" : theme === "dark" ? "dark_mode" : "wb_twilight"} size={16} />}
+              aria-label={`Switch theme (current: ${theme})`}
+              onClick={() => setTheme(theme === "light" ? "dark" : theme === "dark" ? "dusk" : "light")}
+            />
             <Navbar className={styles.navbar} logo={<NavigationBrandItem hideLogotype />} position="sticky">
               <NavBarContent
                 actions={[

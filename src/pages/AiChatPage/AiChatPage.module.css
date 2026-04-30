@@ -44,6 +44,13 @@
   padding: 0 0 var(--prompt-bottom-gap, var(--spacing-xl));
 }
 
+/* Mobile theme-cycle button — hidden on desktop (where the navbar/settings
+   menu handles theme switching), revealed at xs/2xs and pinned top-left of
+   the page. */
+.mobileThemeBtn {
+  display: none;
+}
+
 /* Mobile-only (xs and 2xs). 520px = --breakpoint-xs-max.
    Hardcoded because CSS @media queries can't read custom properties;
    matches the convention in Grid.module.css. */
@@ -55,6 +62,13 @@
   .scenarioGuide,
   .navbar {
     display: none;
+  }
+  .mobileThemeBtn {
+    display: inline-flex;
+    position: fixed;
+    top: var(--spacing-md);
+    left: var(--spacing-md);
+    z-index: 20;
   }
 }
 
