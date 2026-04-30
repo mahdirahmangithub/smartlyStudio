@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useRef, useSyncExternalStore, type ReactElement } from "react";
 import { AiEntityPreviewInlineTyped, AiEntityPreviewMultipleTyped } from "./AiEntityPreviewTyped";
 import type { AiEntityPreviewMultipleTypedProps } from "./AiEntityPreviewTyped";
 import type { AiEntityConfig } from "./aiEntityTypes";
@@ -21,12 +21,12 @@ export interface CitationGroupApi<T> {
    *  `AiEntityPreviewInlineTyped` with its 1-based index in `data` as the
    *  visible label. Pointer enter/leave on the chip lights up the matching
    *  row in `<Sources>`. Returns `null` if no entity matches `id`. */
-  Citation: (props: CitationProps) => JSX.Element | null;
+  Citation: (props: CitationProps) => ReactElement | null;
   /** Multi-mode preview of every entity in `data`, with `highlightedKey`
    *  driven by which inline `<Citation>` is currently being hovered. Pass
    *  any other `AiEntityPreviewMultipleTyped` props through (e.g.
    *  `hideRowAction`, `itemName`, `onRowAction`). */
-  Sources: (props: SourcesListProps<T>) => JSX.Element;
+  Sources: (props: SourcesListProps<T>) => ReactElement;
 }
 
 /**
