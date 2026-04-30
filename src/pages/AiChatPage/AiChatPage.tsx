@@ -77,7 +77,7 @@ export default function AiChatPage() {
 
         return (
           <div className={styles.root} data-theme={theme} data-typeface={typeface}>
-            <Navbar logo={<NavigationBrandItem hideLogotype />} position="sticky">
+            <Navbar className={styles.navbar} logo={<NavigationBrandItem hideLogotype />} position="sticky">
               <NavBarContent
                 actions={[
                   {

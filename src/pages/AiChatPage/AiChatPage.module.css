@@ -52,7 +52,8 @@
     padding: 0 0 var(--prompt-bottom-gap, var(--spacing-md));
   }
   .sidebar,
-  .scenarioGuide {
+  .scenarioGuide,
+  .navbar {
     display: none;
   }
 }
