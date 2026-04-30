@@ -58,6 +58,12 @@
   white-space: pre;
 }
 
+/* Wrap long lines instead of overflowing horizontally. */
+.code.wrap {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .code.sizeLg {
   font-family: var(--type-code-lg-family);
   font-weight: var(--type-code-lg-weight);

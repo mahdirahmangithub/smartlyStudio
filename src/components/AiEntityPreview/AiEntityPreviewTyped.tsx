@@ -66,11 +66,14 @@ export function AiEntityPreviewMultipleTyped<T>({
   const tooltipConfig = config.tooltip ?? config.single;
   const dataMap = new Map(data.map((d) => [config.getKey(d), d]));
 
-  const items: AiEntityPreviewItem[] = data.map((d) => ({
+  const items: AiEntityPreviewItem[] = data.map((d, i) => ({
     key: config.getKey(d),
     ...resolveProps(config.multiple, d),
     ...(config.multiple.getTitleCellContent
       ? { titleCellContent: config.multiple.getTitleCellContent(d) }
+      : {}),
+    ...(config.multiple.getPrefixCellContent
+      ? { prefixCellContent: config.multiple.getPrefixCellContent(d, i) }
       : {}),
   }));
 
@@ -109,11 +112,16 @@ export interface AiEntityPreviewInlineTypedProps<T>
   extends Omit<AiEntityPreviewInlineProps, "label" | "icon" | "href" | "tooltipContent"> {
   config: AiEntityConfig<T>;
   data: T;
+  /** Override the chip's label — defaults to `config.single.getTitle(data)`.
+   *  Useful for citation-style chips where the visible text is a row number
+   *  rather than the entity title. The tooltip still shows the full preview. */
+  label?: string;
 }
 
 export function AiEntityPreviewInlineTyped<T>({
   config,
   data,
+  label,
   ...rest
 }: AiEntityPreviewInlineTypedProps<T>) {
   const tooltipConfig = config.tooltip ?? config.single;
@@ -122,9 +130,11 @@ export function AiEntityPreviewInlineTyped<T>({
 
   return (
     <AiEntityPreviewInline
-      label={config.single.getTitle(data)}
+      label={label ?? config.single.getTitle(data)}
       icon={config.getEntityIcon?.(data) ?? config.entityIcon}
       href={config.getHref?.(data)}
+      labelStyle={config.inlineLabelStyle}
+      style={config.inlineStyle}
       tooltipContent={
         config.tooltipStyle
           ? <div style={config.tooltipStyle}>{preview}</div>

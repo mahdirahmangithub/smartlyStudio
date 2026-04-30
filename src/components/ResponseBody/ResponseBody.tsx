@@ -63,8 +63,17 @@ function renderNode(node: ChildNode, key: string, components?: ComponentMap): Re
     case "a": {
       const href = el.getAttribute("href") ?? "#";
       const isExternal = href.startsWith("http");
+      const linkType = el.getAttribute("data-link-type") === "brand" ? "brand" : undefined;
+      const linkStrong = el.hasAttribute("data-link-strong");
       return (
-        <Link key={key} href={href} inline external={isExternal}>
+        <Link
+          key={key}
+          href={href}
+          inline
+          external={isExternal}
+          type={linkType}
+          strong={linkStrong}
+        >
           {kids}
         </Link>
       );

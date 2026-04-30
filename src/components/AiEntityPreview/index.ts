@@ -18,6 +18,9 @@ export type { AiEntityPreviewInlineProps } from "./AiEntityPreviewInline";
 
 export type { AiEntityConfig, AiEntitySurfaceConfig, AiEntityColumnConfig } from "./aiEntityTypes";
 
+export { useCitationGroup } from "./CitationGroup";
+export type { CitationGroupApi, CitationProps, SourcesListProps } from "./CitationGroup";
+
 export { CAMPAIGN_CONFIG } from "./configs/campaign";
 export type { Campaign } from "./configs/campaign";
 
@@ -29,3 +32,6 @@ export type { Audience } from "./configs/audience";
 
 export { WORKSPACE_CONFIG } from "./configs/workspace";
 export type { Workspace } from "./configs/workspace";
+
+export { KNOWLEDGE_BASE_CONFIG } from "./configs/knowledgeBase";
+export type { KnowledgeBaseArticle } from "./configs/knowledgeBase";

@@ -167,6 +167,9 @@ export interface AiEntityPreviewItem {
   title: string;
   /** Full DataCellContent props for the first column — overrides title when provided */
   titleCellContent?: Partial<DataCellContentProps>;
+  /** Optional cell rendered BEFORE the title cell. The prefix column is shown
+   *  whenever any item provides this — typically a row number or status. */
+  prefixCellContent?: Partial<DataCellContentProps>;
   /** Shown in subsequent columns via DataCellContent description */
   columns: AiEntityPreviewColumn[];
 }
@@ -189,6 +192,9 @@ export interface AiEntityPreviewMultipleProps {
   onRowAction?: (item: AiEntityPreviewItem) => void;
   /** Hide the per-row action column. */
   hideRowAction?: boolean;
+  /** Highlight the row whose key matches — useful for syncing hover with an
+   *  external surface (e.g. inline citation chips highlighting their source row). */
+  highlightedKey?: string | null;
   /** Override the card's max-width (in px). Defaults to 420px. */
   maxWidth?: number;
   className?: string;
@@ -206,6 +212,7 @@ export function AiEntityPreviewMultiple({
   createLabel = "Create",
   onRowAction,
   hideRowAction = false,
+  highlightedKey,
   maxWidth,
   className,
 }: AiEntityPreviewMultipleProps) {
@@ -220,8 +227,19 @@ export function AiEntityPreviewMultiple({
   const { ref: collapsibleRef } = useCollapsible(showAll);
 
   const colKeys = items[0]?.columns.map((c) => c.key) ?? [];
+  const hasPrefix = items.some((i) => i.prefixCellContent != null);
 
   const tableColumns: ColumnDef<AiEntityPreviewItem>[] = [
+    ...(hasPrefix ? [{
+      key: "__prefix__",
+      title: undefined,
+      onHeaderCell: () => ({ style: { padding: 0, border: "none" } }),
+      density: "lg" as const,
+      dividerRight: false,
+      render: (_: unknown, record: AiEntityPreviewItem) => (
+        <DataCellContent {...record.prefixCellContent} />
+      ),
+    }] : []),
     {
       key: "__title__",
       title: undefined,
@@ -313,6 +331,7 @@ export function AiEntityPreviewMultiple({
               onRow={(record) => ({
                 onMouseEnter: () => setHoveredItem(record),
                 onMouseLeave: () => setHoveredItem(null),
+                ...(highlightedKey === record.key ? { className: styles.highlightedRow } : {}),
                 ...(onClick ? { onClick: () => onClick(record.key) } : {}),
               })}
             />
@@ -333,6 +352,7 @@ export function AiEntityPreviewMultiple({
                     onRow={(record) => ({
                       onMouseEnter: () => setHoveredItem(record),
                       onMouseLeave: () => setHoveredItem(null),
+                      ...(highlightedKey === record.key ? { className: styles.highlightedRow } : {}),
                       ...(onClick ? { onClick: () => onClick(record.key) } : {}),
                     })}
                   />

@@ -309,6 +309,19 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
       }
     }, [collapsible, expanded, onExpandedChange, onOpenChange]);
 
+    // Click on any empty (non-interactive) area of the collapsed panel
+    // expands the sidebar — saves the user from having to aim for the
+    // header's expand button. Skips clicks that landed on (or inside) a
+    // real control: buttons, links, form fields, role="button" etc.
+    const handlePanelClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+      if (!collapsible || expanded) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest(
+        'button, a, input, select, textarea, summary, label, [role="button"], [role="link"], [role="menuitem"], [role="tab"], [role="checkbox"], [role="radio"], [role="switch"], [role="option"]',
+      )) return;
+      onExpandedChange?.(true);
+    }, [collapsible, expanded, onExpandedChange]);
+
     const showTrigger = collapsible || (isToggleable && !collapsible);
 
     const triggerIcon = collapsible
@@ -346,7 +359,13 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(
             } as React.CSSProperties}
             onTransitionEnd={handlePanelTransitionEnd}
           >
-            <div className={styles.panelInner}>
+            <div
+              className={cx(
+                styles.panelInner,
+                collapsible && !expanded && styles.collapsedClickable,
+              )}
+              onClick={handlePanelClick}
+            >
               {/* ── Header ── */}
               <div className={styles.header}>
                 {hasHeaderContent && (

@@ -89,6 +89,23 @@ export default function CotPlayground() {
   return (
     <div style={s.page}>
 
+      {/* ── Top example: task with plan, no actions ── */}
+      <section style={s.section}>
+        <h3 style={s.sectionTitle}>Task — with plan, no actions</h3>
+        <CotContainer
+          type="task"
+          title="Apply Terraform plan"
+          defaultExpanded
+          planDetailsCode={PLAN_DETAILS_CODE}
+        >
+          <Cot>
+            <CotItem variant="todo" title="Validate the plan"           description="Check the diff against current state"  status="idle" />
+            <CotItem variant="todo" title="Apply infrastructure changes" description="Provision and update resources"        status="idle" />
+            <CotItem variant="todo" title="Run smoke tests"              description="Verify the deployed function responds" status="idle" />
+          </Cot>
+        </CotContainer>
+      </section>
+
       {/* ── Controls ── */}
       <div style={s.controls}>
         <div style={s.controlRow}>
@@ -469,6 +486,97 @@ export default function CotPlayground() {
           <TaskContainerDemo />
         </section>
 
+        {/* ── Task type: with plan details code block ── */}
+        <section style={s.section}>
+          <h3 style={s.sectionTitle}>Task — with plan details</h3>
+          <CotContainer
+            type="task"
+            title="Apply Terraform plan"
+            defaultExpanded
+            onEdit={() => {}}
+            onCancel={() => {}}
+            onStart={() => {}}
+            planDetailsCode={`Campaign Creation Plan
+
+This plan outlines how the campaign will be created within the selected workspace using the chosen ad account, minimizing manual input while ensuring a valid, scalable structure.
+
+⸻
+
+1. Initialize Campaign Shell
+
+The system creates a new campaign entity inside the selected workspace. Core campaign attributes are inferred from prior context when available (objective, platform, optimization goal). If missing, only the critical parameter is requested before creation.
+
+At this stage:
+
+* Campaign name is auto-generated based on naming conventions (objective, audience, date tokens).
+* Buying type and objective are set.
+* Default optimization settings are applied.
+
+This establishes a valid campaign container without requiring full configuration upfront.
+
+⸻
+
+2. Attach Ad Account
+
+The selected ad account is assigned to the campaign.
+
+This step ensures:
+
+* Platform-specific constraints and features are applied (e.g. Meta structure rules).
+* Billing, pixel, and tracking configurations are inherited.
+* Available audiences and creatives are scoped correctly.
+
+No additional input is required since the ad account is already selected.
+
+⸻
+
+3. Generate Minimum Viable Structure
+
+The system automatically creates a baseline delivery structure to make the campaign immediately valid and launch-ready.
+
+This includes:
+
+* One ad set with default targeting aligned to the campaign objective
+* One ad within the ad set using either:
+    * Existing creative assets (if available), or
+    * Placeholder creative for later completion
+
+Defaults applied:
+
+* Budget: system-recommended starting point based on objective
+* Schedule: starts immediately unless specified otherwise
+* Placement: automatic placements
+* Bidding strategy: lowest cost or equivalent default
+
+This ensures the campaign can run while allowing iteration later.
+
+⸻
+
+4. Validate and Finalize Structure
+
+Before completion, the system performs a lightweight validation pass:
+
+* Ensures no missing required fields
+* Confirms budget and schedule are valid
+* Verifies tracking and attribution readiness
+* Checks structural integrity (campaign → ad set → ad)
+
+If issues are detected, the system highlights only blocking problems.`}
+          >
+            <Cot>
+              <CotItem variant="todo" title="Validate the plan"           description="Check the diff against current state"     status="idle" />
+              <CotItem variant="todo" title="Apply infrastructure changes" description="Provision and update resources"           status="idle" />
+              <CotItem variant="todo" title="Run smoke tests"              description="Verify the deployed function responds"    status="idle" />
+            </Cot>
+          </CotContainer>
+        </section>
+
+        {/* ── Task type: with plan details + custom title ── */}
+        <section style={s.section}>
+          <h3 style={s.sectionTitle}>Task — with plan details (custom title)</h3>
+          <PlanDetailsExpandableDemo />
+        </section>
+
         {/* ── Reasoning type: no header ── */}
         <section style={s.section}>
           <h3 style={s.sectionTitle}>Reasoning — no header (always expanded)</h3>
@@ -523,6 +631,96 @@ export default function CotPlayground() {
 
       </div>
     </div>
+  );
+}
+
+/* ── Plan-details expandable demo ── */
+
+const PLAN_DETAILS_CODE = `Campaign Creation Plan
+
+This plan outlines how the campaign will be created within the selected workspace using the chosen ad account, minimizing manual input while ensuring a valid, scalable structure.
+
+⸻
+
+1. Initialize Campaign Shell
+
+The system creates a new campaign entity inside the selected workspace. Core campaign attributes are inferred from prior context when available (objective, platform, optimization goal). If missing, only the critical parameter is requested before creation.
+
+At this stage:
+
+* Campaign name is auto-generated based on naming conventions (objective, audience, date tokens).
+* Buying type and objective are set.
+* Default optimization settings are applied.
+
+This establishes a valid campaign container without requiring full configuration upfront.
+
+⸻
+
+2. Attach Ad Account
+
+The selected ad account is assigned to the campaign.
+
+This step ensures:
+
+* Platform-specific constraints and features are applied (e.g. Meta structure rules).
+* Billing, pixel, and tracking configurations are inherited.
+* Available audiences and creatives are scoped correctly.
+
+No additional input is required since the ad account is already selected.
+
+⸻
+
+3. Generate Minimum Viable Structure
+
+The system automatically creates a baseline delivery structure to make the campaign immediately valid and launch-ready.
+
+This includes:
+
+* One ad set with default targeting aligned to the campaign objective
+* One ad within the ad set using either:
+    * Existing creative assets (if available), or
+    * Placeholder creative for later completion
+
+Defaults applied:
+
+* Budget: system-recommended starting point based on objective
+* Schedule: starts immediately unless specified otherwise
+* Placement: automatic placements
+* Bidding strategy: lowest cost or equivalent default
+
+This ensures the campaign can run while allowing iteration later.
+
+⸻
+
+4. Validate and Finalize Structure
+
+Before completion, the system performs a lightweight validation pass:
+
+* Ensures no missing required fields
+* Confirms budget and schedule are valid
+* Verifies tracking and attribution readiness
+* Checks structural integrity (campaign → ad set → ad)
+
+If issues are detected, the system highlights only blocking problems.`;
+
+function PlanDetailsExpandableDemo() {
+  return (
+    <CotContainer
+      type="task"
+      title="Generate campaign creation plan"
+      defaultExpanded
+      onEdit={() => {}}
+      onCancel={() => {}}
+      onStart={() => {}}
+      planDetailsTitle="Generated plan"
+      planDetailsCode={PLAN_DETAILS_CODE}
+    >
+      <Cot>
+        <CotItem variant="todo" title="Create campaign shell" description="Spin up a new campaign in the workspace"   status="idle" />
+        <CotItem variant="todo" title="Assign ad account"     description="Wire the chosen account to the campaign"   status="idle" />
+        <CotItem variant="todo" title="Apply objective"       description="Set Sales as the campaign objective"        status="idle" />
+      </Cot>
+    </CotContainer>
   );
 }
 

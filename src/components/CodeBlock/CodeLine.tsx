@@ -27,6 +27,8 @@ export interface CodeLineProps {
   /** Render a 32px gutter spacer (used when line numbers are shown in a separate column) */
   showGutter?: boolean;
   enableSyntax?: boolean;
+  /** Wrap long lines instead of overflowing horizontally. */
+  wrap?: boolean;
 }
 
 const SIZE_CLASS: Record<CodeBlockSize, string> = {
@@ -72,6 +74,7 @@ export function CodeLine({
   highlight,
   showGutter = false,
   enableSyntax = true,
+  wrap = false,
 }: CodeLineProps) {
   const tokens = useMemo(
     () => (enableSyntax ? tokenizeLine(code) : null),
@@ -85,7 +88,7 @@ export function CodeLine({
     <div className={styles.root}>
       {showGutter && <div className={styles.gutter} aria-hidden="true" />}
 
-      <code className={cx(styles.code, SIZE_CLASS[size])}>
+      <code className={cx(styles.code, SIZE_CLASS[size], wrap && styles.wrap)}>
         {highlight && (
           <>
             <div

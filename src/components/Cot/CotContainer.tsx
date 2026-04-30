@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useId, useMemo, useState, type ReactNode } from "react";
 import { Expander } from "../Expander";
 import { Button } from "../Button";
 import { IconButton } from "../IconButton";
@@ -7,11 +7,38 @@ import { TitleText } from "../TitleText";
 import { ProgressBar } from "../ProgressBar";
 import { Tag } from "../Tag";
 import { Icon } from "../Icon";
+import { CodeBlock } from "../CodeBlock";
+import { CopyButton } from "../CopyButton";
+import { ProgressiveBlur } from "../ProgressiveBlur";
 import { useCollapsible } from "../../hooks/useCollapsible";
 import { cx } from "../../utils/cx";
 import styles from "./CotContainer.module.css";
 import type { CotContainerProps } from "./cotTypes";
 import { CotContainerContext } from "./cotContext";
+
+/**
+ * Wraps the plan-details CodeBlock so its height animates smoothly between
+ * the collapsed peek and the natural full height (expanded). Opacity is NOT
+ * faded — the visible peek should stay opaque while only the height grows.
+ * Keep the collapsedHeight token in sync with `.planDetails`'s height in CSS.
+ */
+function PlanDetailsCollapsible({
+  expanded,
+  children,
+}: {
+  expanded: boolean;
+  children: ReactNode;
+}) {
+  const { ref } = useCollapsible(expanded, {
+    collapsedHeight: "var(--spacing-11xl)",
+    fadeOpacity: false,
+  });
+  return (
+    <div ref={ref} className={styles.planDetails}>
+      {children}
+    </div>
+  );
+}
 
 export function CotContainer({
   type,
@@ -24,6 +51,12 @@ export function CotContainer({
   onCancel,
   onStart,
   onStop,
+  planDetailsCode,
+  planDetailsTitle = "Plan detail",
+  planDetailsActions,
+  planDetailsExpanded: planDetailsExpandedProp,
+  defaultPlanDetailsExpanded = false,
+  onPlanDetailsExpandedChange,
   expanded: expandedProp,
   defaultExpanded = false,
   onExpandedChange,
@@ -61,6 +94,36 @@ export function CotContainer({
     if (!isControlled) setExpandedInternal((v) => !v);
     onExpandedChange?.(!isExpanded);
   };
+
+  // Plan-details expanded — controlled if `planDetailsExpanded` is provided,
+  // otherwise managed internally so default actions can drive it.
+  const isPdControlled = planDetailsExpandedProp !== undefined;
+  const [pdExpandedInternal, setPdExpandedInternal] = useState(defaultPlanDetailsExpanded);
+  const pdExpanded = isPdControlled ? planDetailsExpandedProp! : pdExpandedInternal;
+  const togglePdExpanded = () => {
+    const next = !pdExpanded;
+    if (!isPdControlled) setPdExpandedInternal(next);
+    onPlanDetailsExpandedChange?.(next);
+  };
+
+  const defaultPlanDetailsActions = planDetailsCode != null ? (
+    <>
+      <CopyButton
+        size="sm"
+        variant="neutral"
+        emphasis="low"
+        value={planDetailsCode}
+      />
+      <IconButton
+        size="sm"
+        variant="neutral"
+        emphasis="low"
+        icon={<Icon name={pdExpanded ? "unfold_less" : "unfold_more"} size={16} aria-hidden />}
+        aria-label={pdExpanded ? "Collapse plan details" : "Expand plan details"}
+        onClick={togglePdExpanded}
+      />
+    </>
+  ) : null;
 
   if (type === "reasoning") {
     // No title → always expanded, uniform padding, no collapsible
@@ -119,7 +182,34 @@ export function CotContainer({
   return (
     <CotContainerContext.Provider value={containerCtx}>
     <div className={cx(styles.root, className)} {...rest}>
-      <div className={styles.card}>
+      {planDetailsCode != null && (
+        <PlanDetailsCollapsible
+          expanded={pdExpanded}
+        >
+          <CodeBlock
+            size="sm"
+            title={planDetailsTitle}
+            code={planDetailsCode}
+            actions={planDetailsActions ?? defaultPlanDetailsActions}
+            wrapLines
+            className={styles.planDetailsCodeBlock}
+          />
+        </PlanDetailsCollapsible>
+      )}
+      {planDetailsCode != null && (
+        <ProgressiveBlur
+          position="bottom"
+          steps={4}
+          maxBlur={1}
+          gradientColor="var(--element-surface-default)"
+          className={cx(
+            styles.planDetailsFader,
+            pdExpanded && styles.planDetailsFaderHidden,
+          )}
+          aria-hidden
+        />
+      )}
+      <div className={cx(styles.card, planDetailsCode != null && styles.cardWithPlanDetails)}>
         <div className={styles.header}>
           {/* Title row: expand/collapse button + optional tag */}
           <div className={styles.titleRow}>

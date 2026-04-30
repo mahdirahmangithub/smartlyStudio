@@ -34,50 +34,15 @@
   overflow: hidden;
 }
 
-/* ── Color gradient overlay ── */
+/* ── Color gradient overlay ──
+   Background is now generated dynamically by the component (driven by the
+   `gradientColor` prop) so any CSS color or token can be used. The default
+   matches the previous hardcoded `var(--color-black-opacity-32)` look. */
 
 .gradient {
   position: absolute;
   inset: 0;
   pointer-events: none;
-}
-
-.gradient-bottom {
-  background: linear-gradient(
-    to bottom,
-    transparent 0%,
-    color-mix(in srgb, var(--color-black-opacity-32) 0.2%, transparent) 1.8%,
-    color-mix(in srgb, var(--color-black-opacity-32) 0.8%, transparent) 4.8%,
-    color-mix(in srgb, var(--color-black-opacity-32) 2.1%, transparent) 9%,
-    color-mix(in srgb, var(--color-black-opacity-32) 4.2%, transparent) 13.9%,
-    color-mix(in srgb, var(--color-black-opacity-32) 7.5%, transparent) 19.8%,
-    color-mix(in srgb, var(--color-black-opacity-32) 12.6%, transparent) 27%,
-    color-mix(in srgb, var(--color-black-opacity-32) 19.4%, transparent) 35%,
-    color-mix(in srgb, var(--color-black-opacity-32) 27.8%, transparent) 43.5%,
-    color-mix(in srgb, var(--color-black-opacity-32) 38.2%, transparent) 53%,
-    color-mix(in srgb, var(--color-black-opacity-32) 54.1%, transparent) 66%,
-    color-mix(in srgb, var(--color-black-opacity-32) 73.8%, transparent) 81%,
-    var(--color-black-opacity-32) 100%
-  );
-}
-
-.gradient-top {
-  background: linear-gradient(
-    to top,
-    transparent 0%,
-    color-mix(in srgb, var(--color-black-opacity-32) 0.2%, transparent) 1.8%,
-    color-mix(in srgb, var(--color-black-opacity-32) 0.8%, transparent) 4.8%,
-    color-mix(in srgb, var(--color-black-opacity-32) 2.1%, transparent) 9%,
-    color-mix(in srgb, var(--color-black-opacity-32) 4.2%, transparent) 13.9%,
-    color-mix(in srgb, var(--color-black-opacity-32) 7.5%, transparent) 19.8%,
-    color-mix(in srgb, var(--color-black-opacity-32) 12.6%, transparent) 27%,
-    color-mix(in srgb, var(--color-black-opacity-32) 19.4%, transparent) 35%,
-    color-mix(in srgb, var(--color-black-opacity-32) 27.8%, transparent) 43.5%,
-    color-mix(in srgb, var(--color-black-opacity-32) 38.2%, transparent) 53%,
-    color-mix(in srgb, var(--color-black-opacity-32) 54.1%, transparent) 66%,
-    color-mix(in srgb, var(--color-black-opacity-32) 73.8%, transparent) 81%,
-    var(--color-black-opacity-32) 100%
-  );
 }
 
 /* ── Children content ── */

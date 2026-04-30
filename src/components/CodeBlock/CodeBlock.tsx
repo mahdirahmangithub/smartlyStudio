@@ -63,6 +63,8 @@ export interface CodeBlockProps {
   language?: string;
   /** Enable syntax highlighting (default true) */
   enableSyntax?: boolean;
+  /** Wrap long lines inside the block instead of overflowing horizontally. */
+  wrapLines?: boolean;
 
   className?: string;
   id?: string;
@@ -105,6 +107,7 @@ export const CodeBlock = forwardRef<HTMLElement, CodeBlockProps>(
       hasNextVersion = false,
 
       enableSyntax = true,
+      wrapLines = false,
 
       className,
       id,
@@ -183,6 +186,19 @@ export const CodeBlock = forwardRef<HTMLElement, CodeBlockProps>(
         aria-label={hasHeader ? undefined : "Code block"}
         className={cx(styles.root, SIZE_ROOT_CLASS[size], className)}
       >
+        {/* Sticky replica of the actions, rendered as a direct child of root
+            so root's `overflow: clip` confines it visually to the codeblock
+            (no overshoot past the codeblock's bottom). The replica reserves
+            its own box height in CSS but cancels its flow impact via a
+            negative `margin-bottom`, so the header isn't pushed down — see
+            `.stickyReplica` for details. The original actions stay in the
+            header as a layout placeholder (opacity: 0, pointer-events: none)
+            while the replica owns the visual + interactive copy. */}
+        {hasHeader && actions && (
+          <div className={styles.stickyReplica}>
+            {actions}
+          </div>
+        )}
         {hasHeader && (
           <header className={styles.header}>
             <div className={styles.headerText}>
@@ -191,11 +207,15 @@ export const CodeBlock = forwardRef<HTMLElement, CodeBlockProps>(
                 <p className={styles.headerDescription}>{description}</p>
               )}
             </div>
-            {actions && <div className={styles.headerActions}>{actions}</div>}
+            {actions && (
+              <div className={styles.headerActions} aria-hidden="true">
+                {actions}
+              </div>
+            )}
           </header>
         )}
 
-        <div className={styles.codeSection}>
+        <div className={cx(styles.codeSection, wrapLines && styles.codeSectionWrap)}>
           {showLineNumbers && (
             <div className={styles.lineNumbers} aria-hidden="true">
               {displayedLines.map((_, i) => (
@@ -221,6 +241,7 @@ export const CodeBlock = forwardRef<HTMLElement, CodeBlockProps>(
                   showGutter={showLineNumbers}
                   highlight={hl ? { type: hl.type, indicator: hl.indicator } : undefined}
                   enableSyntax={enableSyntax}
+                  wrap={wrapLines}
                 />
               );
             })}

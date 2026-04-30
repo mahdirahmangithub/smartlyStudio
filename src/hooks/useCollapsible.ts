@@ -1,5 +1,21 @@
 import { useRef, useLayoutEffect } from "react";
 
+export interface UseCollapsibleOptions {
+  /**
+   * Height when collapsed. Accepts any CSS height value (e.g. `"0px"`,
+   * `"128px"`, or `"var(--spacing-11xl)"`). Defaults to `"0px"` — the
+   * "fully hidden" case used by accordions, expandable rows, etc.
+   */
+  collapsedHeight?: string;
+  /**
+   * Whether to fade opacity during the transition. Defaults to `true` for
+   * the typical "hidden ↔ visible" expand. Set `false` when the collapsed
+   * state still shows partial content (e.g. a clipped preview that should
+   * stay fully opaque while only the height grows).
+   */
+  fadeOpacity?: boolean;
+}
+
 /**
  * Drives a height + opacity expand/collapse animation on a container element.
  *
@@ -9,9 +25,15 @@ import { useRef, useLayoutEffect } from "react";
  * using the design-system expand/collapse animation tokens.
  *
  * @param expanded  Whether the content should be visible.
+ * @param options   Optional `collapsedHeight` and `fadeOpacity` overrides
+ *                  (defaults: `"0px"` and `true`).
  * @returns `ref` — attach to the collapsible wrapper `<div>`.
  */
-export function useCollapsible(expanded: boolean) {
+export function useCollapsible(
+  expanded: boolean,
+  options: UseCollapsibleOptions = {},
+) {
+  const { collapsedHeight = "0px", fadeOpacity = true } = options;
   const ref = useRef<HTMLDivElement>(null);
   const prevExpandedRef = useRef(expanded);
 
@@ -23,24 +45,30 @@ export function useCollapsible(expanded: boolean) {
     prevExpandedRef.current = expanded;
 
     if (prev === expanded) {
-      el.style.height = expanded ? "auto" : "0px";
-      el.style.opacity = expanded ? "var(--opacity-100)" : "var(--opacity-0)";
+      el.style.height = expanded ? "auto" : collapsedHeight;
+      if (fadeOpacity) {
+        el.style.opacity = expanded ? "var(--opacity-100)" : "var(--opacity-0)";
+      }
       return;
     }
 
     if (expanded) {
       el.style.transition = "none";
       el.style.height = "auto";
-      el.style.opacity = "var(--opacity-100)";
+      if (fadeOpacity) el.style.opacity = "var(--opacity-100)";
       const fullHeight = el.scrollHeight;
 
-      el.style.height = "0px";
-      el.style.opacity = "var(--opacity-0)";
+      el.style.height = collapsedHeight;
+      if (fadeOpacity) el.style.opacity = "var(--opacity-0)";
 
       requestAnimationFrame(() => {
-        el.style.transition = `height var(--animation-state-expand-duration) var(--animation-state-expand-easing), opacity var(--animation-state-expand-duration) var(--animation-state-expand-easing)`;
+        const heightTransition = `height var(--animation-state-expand-duration) var(--animation-state-expand-easing)`;
+        const opacityTransition = `opacity var(--animation-state-expand-duration) var(--animation-state-expand-easing)`;
+        el.style.transition = fadeOpacity
+          ? `${heightTransition}, ${opacityTransition}`
+          : heightTransition;
         el.style.height = `${fullHeight}px`;
-        el.style.opacity = "var(--opacity-100)";
+        if (fadeOpacity) el.style.opacity = "var(--opacity-100)";
       });
 
       const onEnd = (e: TransitionEvent) => {
@@ -53,12 +81,16 @@ export function useCollapsible(expanded: boolean) {
       el.style.height = `${el.scrollHeight}px`;
       el.style.transition = "none";
       requestAnimationFrame(() => {
-        el.style.transition = `height var(--animation-state-collapse-duration) var(--animation-state-collapse-easing), opacity var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)`;
-        el.style.height = "0px";
-        el.style.opacity = "var(--opacity-0)";
+        const heightTransition = `height var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)`;
+        const opacityTransition = `opacity var(--animation-state-collapse-duration) var(--animation-state-collapse-easing)`;
+        el.style.transition = fadeOpacity
+          ? `${heightTransition}, ${opacityTransition}`
+          : heightTransition;
+        el.style.height = collapsedHeight;
+        if (fadeOpacity) el.style.opacity = "var(--opacity-0)";
       });
     }
-  }, [expanded]);
+  }, [expanded, collapsedHeight, fadeOpacity]);
 
   return { ref };
 }

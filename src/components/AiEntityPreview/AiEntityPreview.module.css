@@ -21,6 +21,15 @@
   --element-fill-neutral-tertiary-hover: transparent;
 }
 
+/* Externally-driven row highlight — mirrors the :hover background on each
+   cell so we can sync hover with another surface (e.g. an inline citation chip). */
+.highlightedRow > td {
+  background-image: linear-gradient(
+    var(--element-fill-neutral-tertiary-hover),
+    var(--element-fill-neutral-tertiary-hover)
+  );
+}
+
 
 /* ── Action bar ── */
 

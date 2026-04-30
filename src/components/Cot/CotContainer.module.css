@@ -29,6 +29,71 @@
   box-sizing: border-box;
 }
 
+/* ── Plan details (CodeBlock above the task card) ── */
+
+/* Wrapper around the CodeBlock. Sized so the peek shows 128px and the
+   bottom 32px tucks behind the card. The card has a non-transparent
+   background and a higher z-index so the overlap reads as "the codeblock
+   slides under the task card". `useCollapsible` drives `height` inline
+   (animating between the initial value below and the natural scrollHeight)
+   so the initial height here is the collapsed state. */
+.planDetails {
+  height: var(--spacing-11xl);
+  /* `clip-path` instead of `overflow: hidden` so this wrapper doesn't
+     establish a scrollport — sticky descendants (the codeblock's actions
+     replica) can find the page as their scrollport instead of being
+     trapped here. Visual clipping during useCollapsible's height
+     animation is identical. */
+  clip-path: inset(0);
+  margin-bottom: var(--spacing-negative-xl);
+  position: relative;
+  z-index: 0;
+ }
+
+/* Extra bottom padding on the plan-details CodeBlock — adds room after the
+   last line so when the wrapper expands, the last line stays clear of the
+   card overlap (32px tucks behind, ~32px peeks above as breathing room).
+   Overrides the CodeBlock's default 16px bottom padding. */
+.planDetailsCodeBlock {
+  padding-bottom: var(--spacing-4xl-extra);
+  }
+.planDetailsCodeBlock header {padding-bottom: 0px;}
+.cardWithPlanDetails {
+  position: relative;
+  z-index: 1;
+}
+
+/* Layout for the ProgressiveBlur layer placed between the codeblock and the
+   card. 64px tall; negative top/bottom margins (-32px each) collapse its
+   effective vertical footprint to 0 so the codeblock's existing -32px
+   overlap with the card stays correct. The bottom 32px lives inside the
+   card's overlap zone and is naturally painted over by the card (later-in-
+   DOM sibling at the same z-index wins). The top 32px peeks above the card
+   edge and stacks above the codeblock (z-index 1 vs codeblock's 0).
+   Hair-line insets on left/right keep the card's vertical borders uncovered.
+   The blur + colour ramp itself is owned by ProgressiveBlur. */
+.planDetailsFader {
+  z-index: 1;
+   height: var(--spacing-9xl);
+  margin-top: calc(var(--spacing-9xl) * -1);
+  margin-bottom: var(--spacing-negative-sm-extra);
+  margin-left: var(--spacing-hair-line);
+  margin-right: var(--spacing-hair-line);
+  pointer-events: none;
+  transform-origin: bottom;
+    transition:
+    transform var(--animation-state-collapse-duration) var(--animation-state-collapse-easing),
+    opacity var(--animation-state-collapse-duration) var(--animation-state-collapse-easing);
+}
+
+/* When the codeblock is expanded, collapse the fader by scaling its Y to 0
+   and fading opacity. Using scale instead of height keeps the layout stable
+   (the negative margins above zero out the box anyway). */
+.planDetailsFaderHidden {
+  transform: scaleY(0);
+  opacity: 0;
+}
+
 /* ── Header (title row + optional progress row) ── */
 
 .header {

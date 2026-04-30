@@ -45,6 +45,12 @@
   min-width: 0;
 }
 
+/* shadow-sm in dark / dusk only — light mode stays flat */
+:global([data-theme='dark']) .bubble,
+:global([data-theme='dusk']) .bubble {
+  box-shadow: var(--shadow-sm);
+}
+
 /* ── Text area ── */
 
 .textArea {

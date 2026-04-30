@@ -7,11 +7,13 @@ import {
   CAMPAIGN_FIELD_CONFIG,
   AUDIENCE_CONFIG,
   WORKSPACE_CONFIG,
+  KNOWLEDGE_BASE_CONFIG,
   type AiEntityConfig,
   type Campaign,
   type CampaignField,
   type Audience,
   type Workspace,
+  type KnowledgeBaseArticle,
 } from "../components/AiEntityPreview";
 import { AiResponseBubble } from "../components/AiResponseBubble";
 
@@ -76,15 +78,26 @@ const WORKSPACES: Workspace[] = [
   { id: "w-5", name: "Snapchat Ads",    platform: "Snapchat", campaignCount: 2,  adSetCount: 6,  adCount: 18 },
 ];
 
+/* ── Knowledge base sample data ── */
+
+const KNOWLEDGE_BASE_ARTICLES: KnowledgeBaseArticle[] = [
+  { id: "kb-1", title: "How to create a Meta workspace",      url: "https://help.smartly.io/articles/how-to-create-a-meta-workspace" },
+  { id: "kb-2", title: "Sales objective overview (ODAX)",     url: "https://help.smartly.io/articles/sales-objective-overview" },
+  { id: "kb-3", title: "Cloning campaigns across workspaces", url: "https://help.smartly.io/articles/cloning-campaigns" },
+  { id: "kb-4", title: "Importing campaigns from CSV",        url: "https://help.smartly.io/articles/importing-campaigns" },
+  { id: "kb-5", title: "Conversion windows explained",        url: "https://help.smartly.io/articles/conversion-windows" },
+];
+
 /* ── Type registry ── */
 
-type TypeKey = "campaign" | "campaign-field" | "audience" | "workspace";
+type TypeKey = "campaign" | "campaign-field" | "audience" | "workspace" | "knowledge-base";
 
 const REGISTRY: Record<TypeKey, { config: AiEntityConfig<any>; data: any[]; itemName: string; label: string }> = {
-  campaign:         { config: CAMPAIGN_CONFIG,        data: CAMPAIGNS,        itemName: "campaigns",       label: "Campaign" },
-  "campaign-field": { config: CAMPAIGN_FIELD_CONFIG,  data: CAMPAIGN_FIELDS,  itemName: "campaign fields", label: "Campaign field" },
-  audience:         { config: AUDIENCE_CONFIG,        data: AUDIENCES,        itemName: "audiences",       label: "Audience" },
-  workspace:        { config: WORKSPACE_CONFIG,       data: WORKSPACES,       itemName: "workspaces",      label: "Workspace" },
+  campaign:         { config: CAMPAIGN_CONFIG,        data: CAMPAIGNS,                itemName: "campaigns",       label: "Campaign" },
+  "campaign-field": { config: CAMPAIGN_FIELD_CONFIG,  data: CAMPAIGN_FIELDS,          itemName: "campaign fields", label: "Campaign field" },
+  audience:         { config: AUDIENCE_CONFIG,        data: AUDIENCES,                itemName: "audiences",       label: "Audience" },
+  workspace:        { config: WORKSPACE_CONFIG,       data: WORKSPACES,               itemName: "workspaces",      label: "Workspace" },
+  "knowledge-base": { config: KNOWLEDGE_BASE_CONFIG,  data: KNOWLEDGE_BASE_ARTICLES,  itemName: "articles",        label: "Knowledge base" },
 };
 
 /* ── Playground ── */

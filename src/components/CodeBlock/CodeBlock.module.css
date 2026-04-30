@@ -1,3 +1,38 @@
+/* Sticky replica of the header actions. Lives as a direct child of `.root`
+   (rendered before the header in DOM) so that `.root`'s `overflow: clip`
+   confines it visually to the codeblock. Children at the top of the box,
+   16px of empty space below them — this 16px is the "release buffer" so
+   when the codeblock's bottom approaches, sticky slides up early and the
+   actions never get closer than 16px to the codeblock edge. The negative
+   margin-bottom cancels the box's flow impact so the header isn't pushed. */
+.stickyReplica {
+  position: sticky;
+  top: var(--spacing-md);
+  z-index: 2;
+  align-self: flex-end;
+  display: flex;
+  gap: var(--spacing-xs);
+  align-items: flex-start;
+  height: var(--spacing-4xl-extra);
+  margin-bottom: calc(-1 * (var(--spacing-4xl-extra) + var(--spacing-sm)));
+  pointer-events: auto;
+}
+ 
+
+
+
+.stickyReplica::after{
+  content: '';
+  position: absolute;
+  width: calc(100% + 4px);
+  left:-2px;
+  top:-2px;
+  height:calc(var(--spacing-xl) + 4px);
+  backdrop-filter: blur(var(--blur-sm));
+  border-radius:var(--radius-lg);
+    z-index: -1;
+}
+
 /* ── Root ─────────────────────────────────────────────────────────── */
 
 .root {
@@ -136,6 +171,12 @@
   gap: var(--spacing-xs);
   align-items: center;
   flex-shrink: 0;
+  /* The visible / interactive copy is the sticky replica rendered outside
+     `.root` (see `.stickyReplica`). This original keeps its layout slot in
+     the header's flex row (so headerText still gets the right width) but
+     is itself invisible and non-interactive — clicks go to the replica. */
+  opacity: 0;
+  pointer-events: none;
 }
 
 /* ── Code section ────────────────────────────────────────────────── */
@@ -146,6 +187,11 @@
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
+}
+
+/* Wrap mode — drop horizontal scrolling so long lines wrap inside the block. */
+.codeSectionWrap {
+  overflow-x: visible;
 }
 .codeSection ::selection {
   color: var(--text-neutral-inverse-primary);

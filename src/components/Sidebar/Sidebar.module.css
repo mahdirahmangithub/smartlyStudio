@@ -46,6 +46,13 @@
   padding: var(--spacing-md) var(--spacing-md) 0;
 }
 
+/* Collapsed + collapsible: empty (non-interactive) areas expand the sidebar
+   on click. Cursor signals the affordance; interactive children override
+   it back to their own (pointer) via specificity of their own rules. */
+.collapsedClickable {
+  cursor: e-resize;
+}
+
 .panel.collapsing {
   transition: width var(--animation-state-collapse-duration) var(--animation-state-collapse-easing);
 }

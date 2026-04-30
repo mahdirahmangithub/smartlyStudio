@@ -17,6 +17,9 @@ export interface AiEntitySurfaceConfig<T> {
   getHeaderCellContent?: (data: T) => Partial<DataCellContentProps>;
   /** Full DataCellContent props for the title (first) cell in multiple rows — overrides default title rendering */
   getTitleCellContent?: (data: T) => Partial<DataCellContentProps>;
+  /** Per-row prefix cell — rendered BEFORE the title cell when present.
+   *  Receives the row data and the 0-based row index. */
+  getPrefixCellContent?: (data: T, index: number) => Partial<DataCellContentProps>;
   /** Override the card's max-width (in px) for this surface. */
   maxWidth?: number;
   columns: AiEntityColumnConfig<T>[];
@@ -37,6 +40,12 @@ export interface AiEntityConfig<T> {
   tooltip?: AiEntitySurfaceConfig<T>;
   /** Extra styles applied to the tooltip wrapper */
   tooltipStyle?: CSSProperties;
+  /** Inline-mode label style — applied to the chip's label span. Useful for
+   *  overriding typography (e.g. number-xs) per entity type. */
+  inlineLabelStyle?: CSSProperties;
+  /** Inline-mode root style — applied to the chip's root element (anchor /
+   *  button / span). Useful for overriding shape (e.g. pill border-radius). */
+  inlineStyle?: CSSProperties;
   /** Drives each row in the multiple-item list */
   multiple: AiEntitySurfaceConfig<T>;
 }

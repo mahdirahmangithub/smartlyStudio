@@ -70,6 +70,25 @@ export interface CotContainerProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   progress?: number;
   /** Overrides the auto-derived tag for the title row. */
   tag?: ReactNode;
+  /** When provided, renders a CodeBlock (size="sm", height 144px) above the
+   *  task card with its bottom 32px tucked behind the card. */
+  planDetailsCode?: string;
+  /** Header title for the plan-details CodeBlock. Defaults to "Plan detail". */
+  planDetailsTitle?: string;
+  /** Header action area for the plan-details CodeBlock. Defaults to a CopyButton
+   *  + an expand/collapse IconButton wired to the plan-details expanded state.
+   *  Provide a custom node to override (e.g. extra buttons or a different layout). */
+  planDetailsActions?: ReactNode;
+  /** Controlled expanded state for the plan-details CodeBlock. When omitted
+   *  the container manages its own state (default collapsed). When true the
+   *  CodeBlock grows to its natural height and pushes the task card down
+   *  (still keeping the 32px overlap). */
+  planDetailsExpanded?: boolean;
+  /** Initial expanded state when uncontrolled. Defaults to false. */
+  defaultPlanDetailsExpanded?: boolean;
+  /** Notified whenever the plan-details expanded state changes (whether the
+   *  change originated from the default toggle action or a controlled update). */
+  onPlanDetailsExpandedChange?: (expanded: boolean) => void;
   onEdit?: () => void;
   onCancel?: () => void;
   onStart?: () => void;

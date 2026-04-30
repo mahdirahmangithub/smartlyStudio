@@ -9,3 +9,6 @@ export type { Audience } from "./audience";
 
 export { WORKSPACE_CONFIG } from "./workspace";
 export type { Workspace } from "./workspace";
+
+export { KNOWLEDGE_BASE_CONFIG } from "./knowledgeBase";
+export type { KnowledgeBaseArticle } from "./knowledgeBase";
