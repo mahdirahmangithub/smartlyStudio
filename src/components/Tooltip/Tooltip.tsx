@@ -394,6 +394,7 @@ const TAIL_FILL: Record<TooltipType, string> = {
 };
 
 const EXIT_MS = 200; // matches --animation-tooltip-exit-duration (--motion-duration-fast-md)
+const REOPEN_SUPPRESS_MS = 150; // after a press, suppress reopen while cursor lingers on trigger
 
 /* ═══════════════════════════════════════════════════════════════════ */
 /* Tooltip                                                            */
@@ -460,6 +461,7 @@ export function Tooltip({
   const hideTimerRef = useRef<number>(undefined);
   const mouseRef = useRef<{ x: number; y: number } | null>(null);
   const rafRef = useRef<number>(undefined);
+  const pressedAtRef = useRef<number>(0);
   const isCursorMode = anchor === "cursor";
 
   /* ── animation mount / unmount ───────────────── */
@@ -603,6 +605,7 @@ export function Tooltip({
   const scheduleShow = useCallback(() => {
     clearTimeout(hideTimerRef.current);
     if (isOpen || isControlled) return;
+    if (Date.now() - pressedAtRef.current < REOPEN_SUPPRESS_MS) return;
     if (effectiveShowDelay <= 0) {
       setOpen(true);
     } else {
@@ -658,6 +661,65 @@ export function Tooltip({
     return () => document.removeEventListener("pointerdown", handler, true);
   }, [closeOnPointerDownOutside, isMounted, isOpen, queueHide]);
 
+  // Safety net: while uncontrolled & open, watch for the cursor leaving the
+  // trigger/float area, the trigger becoming disabled, the window losing focus,
+  // or Escape being pressed. Covers cases where mouseleave never fires
+  // (trigger gets disabled, unmounts, or the layout shifts under the cursor).
+  useEffect(() => {
+    if (!isOpen || !isMounted || isControlled || isCursorMode) return;
+
+    const trigger = triggerRef.current;
+
+    const isOverTriggerOrFloat = (target: Node | null) => {
+      if (!target) return false;
+      return (
+        triggerRef.current?.contains(target) === true ||
+        floatingRef.current?.contains(target) === true
+      );
+    };
+
+    const onDocPointerMove = (e: PointerEvent) => {
+      if (isOverTriggerOrFloat(e.target as Node | null)) return;
+      scheduleHide();
+    };
+
+    const onWinBlur = () => setOpen(false);
+
+    const onDocKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+
+    const isTriggerDisabled = () => {
+      const el = triggerRef.current as HTMLElement | null;
+      if (!el) return false;
+      if ((el as HTMLButtonElement).disabled === true) return true;
+      const aria = el.getAttribute("aria-disabled");
+      return aria === "true" || aria === "";
+    };
+
+    let mo: MutationObserver | null = null;
+    if (trigger) {
+      mo = new MutationObserver(() => {
+        if (isTriggerDisabled()) setOpen(false);
+      });
+      mo.observe(trigger, {
+        attributes: true,
+        attributeFilter: ["disabled", "aria-disabled"],
+      });
+    }
+
+    document.addEventListener("pointermove", onDocPointerMove, { passive: true });
+    window.addEventListener("blur", onWinBlur);
+    document.addEventListener("keydown", onDocKeyDown);
+
+    return () => {
+      document.removeEventListener("pointermove", onDocPointerMove);
+      window.removeEventListener("blur", onWinBlur);
+      document.removeEventListener("keydown", onDocKeyDown);
+      mo?.disconnect();
+    };
+  }, [isOpen, isMounted, isControlled, isCursorMode, scheduleHide, setOpen]);
+
   /* ── event handlers ─────────────────────────── */
 
   const onMouseEnter = useCallback(
@@ -695,12 +757,13 @@ export function Tooltip({
     if (!disabled) scheduleHide();
   }, [disabled, scheduleHide]);
 
-  const onKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) setOpen(false);
-    },
-    [isOpen, setOpen],
-  );
+  const onPointerDown = useCallback(() => {
+    if (disabled || isControlled) return;
+    clearTimeout(showTimerRef.current);
+    clearTimeout(hideTimerRef.current);
+    pressedAtRef.current = Date.now();
+    if (isOpen) setOpen(false);
+  }, [disabled, isControlled, isOpen, setOpen]);
 
   const onFloatEnter = useCallback(() => {
     if (disableInteractive || isControlled) return;
@@ -778,7 +841,7 @@ export function Tooltip({
     onMouseLeave: mergeHandlers(onMouseLeave, cp.onMouseLeave),
     onFocus: mergeHandlers(onFocus, cp.onFocus),
     onBlur: mergeHandlers(onBlur, cp.onBlur),
-    onKeyDown: mergeHandlers(onKeyDown, cp.onKeyDown),
+    onPointerDown: mergeHandlers(onPointerDown, cp.onPointerDown),
   };
   if (anchor === "cursor") {
     triggerProps.onMouseMove = mergeHandlers(onMouseMove, cp.onMouseMove);
