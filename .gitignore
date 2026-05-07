@@ -24,3 +24,10 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Cloud-sync duplicate files (e.g. iCloud "filename 2.ext" conflicts)
+* 2.*
+*\ 2.*
+
+# Claude Code workspace state — local-only
+.claude/

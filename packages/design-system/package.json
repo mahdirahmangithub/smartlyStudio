@@ -1,0 +1,39 @@
+{
+  "name": "@sds/design-system",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "tokens": "node scripts/build-tokens.cjs",
+    "icons": "node scripts/build-icons.cjs"
+  },
+  "dependencies": {
+    "@lexical/react": "^0.43.0",
+    "@react-spring/web": "^10.0.3",
+    "@visx/axis": "^3.12.0",
+    "@visx/brush": "^3.12.0",
+    "@visx/curve": "^3.12.0",
+    "@visx/event": "^3.12.0",
+    "@visx/grid": "^3.12.0",
+    "@visx/group": "^3.12.0",
+    "@visx/marker": "^3.12.0",
+    "@visx/responsive": "^3.12.0",
+    "@visx/scale": "^3.12.0",
+    "@visx/shape": "^3.12.0",
+    "@visx/tooltip": "^3.12.0",
+    "@visx/zoom": "^3.12.0",
+    "d3-array": "^3.2.4",
+    "d3-time-format": "^4.1.0",
+    "lexical": "^0.43.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@types/d3-array": "^3.2.2",
+    "@types/d3-time-format": "^4.0.3",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3"
+  }
+}

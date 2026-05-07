@@ -1,0 +1,50 @@
+.chipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  padding-bottom: var(--spacing-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--spacing-8xl), 1fr));
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-md);
+}
+
+.drawerBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.drawerPreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-2xl) var(--spacing-md);
+  border: var(--spacing-hair-line) solid var(--element-divider-neutral-default);
+  border-radius: var(--radius-lg);
+  background: var(--element-surface-under);
+  color: var(--text-neutral-primary);
+}
+
+.drawerSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.drawerSectionUsage {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.iconDrawer {
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  bottom: var(--spacing-md);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+}

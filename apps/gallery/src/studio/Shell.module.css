@@ -1,0 +1,108 @@
+.layout {
+  display: flex;
+  align-items: flex-start;
+  min-height: 100vh;
+}
+
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: var(--z-index-navigation);
+}
+
+.sidebarNav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2xs);
+}
+
+.page {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-top: var(--spacing-2xl);
+  padding-bottom: var(--spacing-2xl);
+  padding-inline: var(--grid-offset-md);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.searchSection {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  background: var(--element-surface-default);
+  padding-top: var(--spacing-md);
+}
+
+.searchRow {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.search {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.search > div,
+.search > div:hover,
+.search > div:focus-within {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.topFade,
+.bottomFade {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--animation-state-change-duration) var(--animation-state-change-easing);
+}
+
+.topFade {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: var(--spacing-6xl);
+}
+
+.bottomFade {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--spacing-6xl);
+  z-index: 1;
+}
+
+.fadeVisible {
+  opacity: 1;
+}
+
+.emptyState {
+  flex: 1 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-3xl) 0;
+}
+
+.templateFullscreen {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.exitPreview {
+  position: fixed;
+  top: var(--spacing-md);
+  right: var(--spacing-md);
+  z-index: calc(var(--z-index-navigation) + 1);
+  box-shadow: var(--shadow-lg);
+}

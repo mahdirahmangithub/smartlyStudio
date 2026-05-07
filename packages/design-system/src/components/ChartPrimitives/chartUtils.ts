@@ -1,0 +1,227 @@
+import { scaleBand, scaleLinear, scaleTime } from "@visx/scale";
+import { bisector, extent } from "d3-array";
+
+export interface ConfidenceBand<D = any> {
+  upper: (d: D) => number;
+  lower: (d: D) => number;
+}
+
+export type LineDash = "dotted" | "dashed" | "dash-dot";
+export type BarFillPattern = "dotted" | "hatch-right" | "hatch-left";
+
+export const DASH_PATTERNS: Record<LineDash, string> = {
+  dotted: "0 6",
+  dashed: "8 8",
+  "dash-dot": "12 6 0.5 6",
+};
+
+export interface Series<D = any> {
+  id: string;
+  label: string;
+  data: D[];
+  color?: string;
+  icon?: React.ReactNode;
+  confidenceBand?: ConfidenceBand<D>;
+  /** Which Y axis this series binds to. Defaults to "left". */
+  yAxis?: "left" | "right";
+  /** Show area gradient fill under this series line. */
+  areaFill?: boolean;
+  /** Stroke dash style for line charts. Omit for solid. */
+  dash?: LineDash;
+  /** Fill pattern overlay for bar charts. Omit for solid fill. */
+  fillPattern?: BarFillPattern;
+  /**
+   * Render the segment of this line that falls *after* this x-value as a
+   * forecast: dashed stroke + lighter shade. The boundary point is included
+   * in both the actual and forecast segments so they connect visually.
+   */
+  forecastFrom?: Date | number;
+}
+
+export interface ReferenceLine {
+  /** X-axis value where the vertical line is drawn. */
+  x: Date | number;
+  /** Optional label rendered at the top of the chart aligned with the line. */
+  label?: string;
+  /** Stroke color. Defaults to var(--data-viz-warning-default). */
+  color?: string;
+  /** Dash pattern. Omit for solid. Reuses existing LineDash names. */
+  dashStyle?: LineDash;
+}
+
+function toMs(v: Date | number): number {
+  return v instanceof Date ? v.getTime() : v;
+}
+
+/**
+ * Splits a series's data array at `forecastFrom` into actual / forecast halves.
+ * The boundary point appears in BOTH arrays for visual continuity.
+ * Returns `null` when the series has no `forecastFrom`.
+ */
+export function splitSeriesAtForecast<D>(
+  series: Series<D>,
+  xAccessor: (d: D) => Date | number,
+): { actual: D[]; forecast: D[] } | null {
+  if (series.forecastFrom == null) return null;
+  const cutoff = toMs(series.forecastFrom);
+  const actual = series.data.filter((d) => toMs(xAccessor(d)) <= cutoff);
+  const forecast = series.data.filter((d) => toMs(xAccessor(d)) >= cutoff);
+  return { actual, forecast };
+}
+
+export interface ChartAnnotation {
+  /** X value on the scale (e.g. a Date for time-series charts). */
+  x: Date | number;
+  /** Y value on the scale. */
+  y: number;
+  /** Primary label shown in the tooltip. */
+  label: string;
+  /** Optional secondary text. */
+  description?: string;
+  /** Dot color — defaults to the first series color. */
+  color?: string;
+  /** Tooltip placement relative to the dot. */
+  placement?: "top" | "bottom" | "left" | "right";
+  /** Series id to bind to (uses that series' y-axis and color). */
+  seriesId?: string;
+}
+
+export interface Margin {
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
+}
+
+export const DEFAULT_MARGIN: Margin = { top: 16, right: 16, bottom: 40, left: 48 };
+
+import {
+  getCategoricalPalette,
+  getCategoricalColor,
+  invalidateDataVizCache,
+} from "./dataVizPalette";
+
+export const CATEGORICAL_TOKENS = [
+  "--data-viz-categorical-1-default",
+  "--data-viz-categorical-2-default",
+  "--data-viz-categorical-3-default",
+  "--data-viz-categorical-4-default",
+  "--data-viz-categorical-5-default",
+  "--data-viz-categorical-6-default",
+  "--data-viz-categorical-7-default",
+  "--data-viz-categorical-8-default",
+] as const;
+
+/** @deprecated Use `getCategoricalPalette()` from `dataVizPalette` directly. */
+export function getCategoricalColors(): string[] {
+  return getCategoricalPalette();
+}
+
+/** @deprecated Use `invalidateDataVizCache()` from `dataVizPalette` directly. */
+export function invalidateColorCache() {
+  invalidateDataVizCache();
+}
+
+export function getSeriesColor(index: number, override?: string): string {
+  return getCategoricalColor(index, override);
+}
+
+export function isCategoricalColor(override?: string): boolean {
+  return !override;
+}
+
+export function buildTimeScale(
+  data: Date[],
+  width: number
+) {
+  const [min, max] = extent(data) as [Date, Date];
+  return scaleTime<number>({
+    domain: [min, max],
+    range: [0, width],
+  });
+}
+
+export function buildLinearScale(
+  data: number[],
+  size: number,
+  nice = true,
+  range: [number, number] = [size, 0],
+) {
+  const [min = 0, max = 0] = extent(data) as [number, number];
+  let lo = min;
+  let hi = max;
+  if (nice) {
+    const niced = scaleLinear<number>({ domain: [lo, hi], range }).nice();
+    [lo, hi] = niced.domain() as [number, number];
+  }
+  const padding = (hi - lo) * 0.1 || 1;
+  return scaleLinear<number>({
+    domain: [lo - padding, hi + padding],
+    range,
+  });
+}
+
+export function buildBandScale(
+  domain: string[],
+  size: number,
+  padding = 0.2
+) {
+  return scaleBand<string>({
+    domain,
+    range: [0, size],
+    padding,
+  });
+}
+
+export function buildLinearScaleForBars(
+  data: number[],
+  size: number,
+  includeZero = true,
+  invert = true
+) {
+  const [min = 0, max = 0] = extent(data) as [number, number];
+  const lo = includeZero ? Math.min(0, min) : min;
+  const hi = includeZero ? Math.max(0, max) : max;
+  const range: [number, number] = invert ? [size, 0] : [0, size];
+  const niced = scaleLinear<number>({ domain: [lo, hi], range }).nice();
+  return niced;
+}
+
+export function createBisector<D>(accessor: (d: D) => Date | number) {
+  return bisector<D, Date | number>(accessor).left;
+}
+
+export function findNearestDatum<D>(
+  data: D[],
+  accessor: (d: D) => Date | number,
+  xValue: Date | number,
+  bisectorFn: ReturnType<typeof createBisector<D>>
+): D | undefined {
+  const index = bisectorFn(data, xValue, 1);
+  const d0 = data[index - 1];
+  const d1 = data[index];
+  if (!d0) return d1;
+  if (!d1) return d0;
+  const v = xValue instanceof Date ? xValue.getTime() : xValue;
+  const v0 = accessor(d0);
+  const v1 = accessor(d1);
+  const t0 = v0 instanceof Date ? v0.getTime() : v0;
+  const t1 = v1 instanceof Date ? v1.getTime() : v1;
+  return v - t0 > t1 - v ? d1 : d0;
+}
+
+/* ── Shared fill-pattern helpers ── */
+
+const FILL_PATTERN_IDS: Record<BarFillPattern, string> = {
+  dotted: "pat-dotted",
+  "hatch-right": "pat-hatch-right",
+  "hatch-left": "pat-hatch-left",
+};
+
+export function getPatternFill(
+  pattern: BarFillPattern | undefined,
+  prefix: string,
+): string | undefined {
+  if (!pattern) return undefined;
+  return `url(#${prefix}-${FILL_PATTERN_IDS[pattern]})`;
+}

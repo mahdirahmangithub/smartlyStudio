@@ -1,0 +1,178 @@
+/* ─────────────────────────── Root ─────────────────────────── */
+
+.root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+}
+
+.compact {
+  gap: var(--spacing-sm);
+}
+
+/* ─────────────────────────── Compact mode ─────────────────────────── */
+
+.caption {
+  color: var(--text-neutral-tertiary-default);
+  font-family: var(--type-label-sm-family);
+  font-weight: var(--type-label-sm-weight);
+  font-size: var(--type-label-sm-size);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+  white-space: nowrap;
+}
+
+.totalText {
+  color: var(--text-neutral-primary);
+  font-family: var(--type-label-sm-family);
+  font-weight: var(--type-label-sm-weight);
+  font-size: var(--type-label-sm-size);
+  line-height: var(--type-label-sm-line-height);
+  letter-spacing: var(--type-label-sm-letter-spacing);
+  white-space: nowrap;
+}
+
+/* Inner row that hugs prev/input/next together (2px between them) inside
+ * the compact wrapper, while the outer wrapper keeps 8px around the
+ * caption and the "of N" total — matches the Figma's nested gap setup. */
+.compactBase {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+}
+
+.compactForm {
+  display: flex;
+  align-items: center;
+  margin: 0;
+}
+
+/* Compact-mode wrapper shrink-wraps to its content (driven by the native
+ * input's `field-sizing: content`). The native input's `min-width: 1ch`
+ * sets the floor at exactly one character of the input text — wrapper
+ * padding + borders give the rest, so single-digit pages render tightly
+ * and the wrapper grows automatically as more digits are typed.
+ * Min-width scales with size: 32px (--spacing-2xl) for sm, 40px
+ * (--spacing-4xl) for lg, matching the surrounding button heights. */
+.compactInput {
+  width: auto;
+}
+
+.sizeSm .compactInput {
+  min-width: var(--spacing-2xl);
+}
+
+.sizeLg .compactInput {
+  min-width: var(--spacing-4xl);
+}
+
+/* The Input component centers its native <input> inside the wrapper for
+ * the compact pagination — page numbers read better centered, matching
+ * the Figma. We also remove the asymmetric inner padding so the centered
+ * text sits dead-center, and use `field-sizing: content` so the input
+ * (and the wrapper around it) sizes to fit the typed value. */
+.compactInput input {
+  text-align: center;
+  padding: 0;
+  field-sizing: content;
+  min-width: 1ch;
+}
+
+/* Menu-variant trigger — same min-width floor as the input variant so
+ * single-digit pages don't render squashed next to the 40px chevron
+ * IconButtons. Auto-grows for multi-digit page numbers. */
+.compactMenuTrigger {
+  min-width: var(--spacing-2xl);
+}
+
+/* Menu-variant dropdown — sized to ~4 character widths plus spacing-md
+ * of internal padding. !important is needed to beat the inline `width`
+ * Dropdown writes onto its panel from the numeric `width` prop. */
+.compactMenuDropdown {
+  width: calc(4ch + var(--spacing-5xl)) !important;
+}
+
+/* ─────────────────────────── Default mode ─────────────────────────── */
+
+.pageList {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-neutral-placeholder);
+  user-select: none;
+}
+
+/* Padding around the more_horiz glyph scales with the pagination size so
+ * the ellipsis gutter matches the height of the surrounding buttons. */
+.sizeSm .ellipsis {
+  padding: var(--spacing-sm-minus);
+}
+
+.sizeLg .ellipsis {
+  padding: var(--spacing-sm-plus);
+}
+
+.singleList,
+.joinedList {
+  display: inline-flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.singleList {
+  gap: var(--spacing-2xs);
+}
+
+.joinedList {
+  /* Adjacent buttons overlap their 1px borders for the seamless toggle-
+   * button-group treatment from the Figma. */
+  gap: 0;
+}
+
+.joinedList > li {
+  display: inline-flex;
+}
+
+/* ─────────────────────────── Page button ─────────────────────────── */
+
+.pageButton {
+  /* Squarer feel — pagination buttons read as a row of equally-sized cells. */
+  min-width: var(--spacing-2xl);
+  padding: 0 var(--spacing-xs);
+}
+
+/* Active page sits on top so its full ::after outline ring is visible even
+ * when neighboring buttons overlap its border via negative margin. */
+.pageButton.pageButtonCurrent {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Joined-group corner + overlap treatment ── */
+
+.pageButton.joinedFirst {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin-right: calc(-1 * var(--spacing-px));
+}
+
+.pageButton.joinedMiddle {
+  border-radius: 0;
+  margin-right: calc(-1 * var(--spacing-px));
+}
+
+.pageButton.joinedLast {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}

@@ -1,0 +1,1 @@
+export { AiChatTemplate } from "./AiChatTemplate";

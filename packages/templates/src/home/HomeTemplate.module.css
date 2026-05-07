@@ -1,0 +1,225 @@
+.root {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--element-surface-under);
+}
+
+.main {
+  padding-left: var(--spacing-9xl);
+  padding-right: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  padding-bottom: var(--spacing-md);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.toolbarSpacer {
+  flex: 1;
+}
+
+.dashboardSection {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacing-md);
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacing-md);
+}
+
+.dashboardCard {
+  min-height: var(--spacing-9xl);
+  height: 100%;
+}
+
+/* Metric cards (Spend / Impressions / Link Clicks / CPM / CPC / CTR) —
+ * Stat sits at the top, MetricChart at the bottom. We turn the
+ * Container's body into a flex column with `justify-content: space-
+ * between` so the sparkline always rests on the bottom edge regardless
+ * of the card's height. */
+.metricCard > [class*="content"] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metricChart {
+  padding-bottom: var(--spacing-sm);
+}
+
+.chartCardBody {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Constrains the chart's ParentSize wrapper (height: 100%) to its intrinsic
+ * 300px height, otherwise it stretches to fill the dashboardCard's full
+ * height (via grid stretch + .dashboardCard { height: 100% }) and pushes
+ * the Stats below the visible card area where they get clipped by the
+ * Container's `overflow: clip`. Also centers natural-width charts (e.g.
+ * PieChart sized to its diameter); width:100% charts (LineChart) still
+ * fill the slot regardless. */
+.chartCardSlot {
+  height: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* PieChart wraps its inline-flex container in a full-width ParentSize
+   * div, so flex centering above only centers the wrapper, not the pie.
+   * `text-align: center` cascades through ParentSize's wrapper and centers
+   * the inline-flex pie container as inline-level content. */
+  text-align: center;
+}
+
+.chartCardStatsRow {
+  display: flex;
+  align-items: stretch;
+  gap: var(--spacing-lg);
+  padding:  var(--spacing-md);
+}
+
+.chartCardStatSlot {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.splitSection {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--spacing-md);
+}
+
+@media (min-width: 1025px) {
+  .splitSection {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+}
+
+/* The stack uses `flex: 0 1 auto` + `min-height: 0` so it sizes to its
+ * content when there's room, but can be shrunk by the column when the
+ * adjacent metrics grid drives a tighter card height. The shrink is
+ * absorbed by `.insightBody` below (callout has `flex: 0 0 auto` so it
+ * stays at its natural size). */
+.insightStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.insightStack > .insightCallout {
+  flex: 0 0 auto;
+}
+
+/* Body text caps at 20 lines with an ellipsis at the cut point.
+ * `display: -webkit-box` + `-webkit-line-clamp` is the only setup that
+ * clamps across multiple BodyText paragraphs as a single block — this
+ * replaces the previous `display: flex; gap: …` layout, so we re-add
+ * the inter-paragraph spacing via the adjacent-sibling margin rule below.
+ * The flex sizing props still apply because .insightStack is the flex
+ * parent, and `min-height: 0 / overflow: hidden` keeps the existing
+ * shrink chain so the body also clips at the card's bottom edge if the
+ * card is shorter than the 20-line cap. */
+.insightBody {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 16;
+  line-clamp: 16;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  /* Fade-out over the last 4 lines so the truncation reads as a soft
+   * gradient instead of a hard cut. `lh` lets us measure in line-heights
+   * so the fade band scales with the BodyText typography. The gradient
+   * also softens the natural bottom edge when content is short — there's
+   * no CSS way to apply it only on truncation, so we accept that it
+   * runs in both cases. */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0,
+    black calc(100% - 8lh),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    black 0,
+    black calc(100% - 8lh),
+    transparent 100%
+  );
+}
+
+.insightBody > * + * {
+  margin-top: var(--spacing-md);
+}
+
+/* Make the Weekly Insights container's body a vertical flex column so
+ * the trailing Pagination is pinned to the bottom of the available
+ * content area regardless of how much insight text comes before it.
+ * Targets Container's hashed `.content` slot via attribute selector. */
+.weeklyInsightsCard > [class*="content"] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Centered Pagination at the bottom of the Weekly Insights container.
+ * `margin-top: auto` claims the empty vertical space inside the flex
+ * column above, sliding the pagination down to the bottom edge. */
+.insightPagination {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: var(--spacing-md);
+}
+
+.insightCallout {
+  background: var(--element-fill-brand-secondary-default);
+  border-radius: var(--radius-xl);
+  border:var(--spacing-hair-line) solid var(--element-outline-brand-active)
+}
+
+/* Scoped override: in this template only, the icon-Thumbnail inside the
+ * insight callout has a surface-default background instead of the default
+ * brand-secondary fill. Targets Thumbnail's hashed inner content class via
+ * an attribute selector inside :global(). */
+.insightThumbnail :global([class*="content"]) {
+  background: var(--element-surface-default);
+}
+
+@media (min-width: 521px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1025px) {
+  .dashboardSection {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .metricsGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+  }
+}

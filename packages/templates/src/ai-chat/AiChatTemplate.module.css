@@ -1,0 +1,46 @@
+/* Same shell layout as the AiChatPage demo, minus the scenario plumbing.
+ * Kept locally inside the templates package so the template can ship
+ * without depending on app-level files. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--element-surface-default);
+}
+
+.body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.promptDock {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  max-width: 720px;
+  margin-inline: auto;
+  padding: 0 0 var(--prompt-bottom-gap, var(--spacing-xl));
+}
+
+@media (max-width: 520px) {
+  .promptDock {
+    padding: 0 0 var(--prompt-bottom-gap, var(--spacing-md));
+  }
+  .sidebar,
+  .navbar {
+    display: none;
+  }
+}

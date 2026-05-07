@@ -1,0 +1,247 @@
+/* ───────────────────────────── Root ───────────────────────────── */
+
+.root {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--spacing-xs);
+  color: var(--text-neutral-primary);
+}
+
+/* ─────────────────────────── Pretitle ──────────────────────────── */
+
+.pretitleRow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-2xs);
+  min-width: 0;
+}
+
+.pretitle {
+  display: block;
+  margin: 0;
+  color: var(--text-neutral-tertiary-default);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ───────────────────────── Main (number row) ───────────────────── */
+
+.main {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+  white-space: nowrap;
+}
+
+.number {
+  position: relative;
+  display: inline-flex;
+  align-items: baseline;
+  color: var(--text-neutral-primary);
+  /* The visible digits are stacked columns of 0–9, so direct selection would
+   * grab "01234567890". Block selection here and let .numberCopy capture it. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.affix {
+  display: inline-block;
+}
+
+/* Transparent, selectable text overlay carrying the clean formatted string.
+ * Sits exactly on top of the animated visuals so the user sees their browser
+ * selection rectangle in the right place and copying yields "$18.96M". */
+.numberCopy {
+  position: absolute;
+  inset: 0;
+  color: transparent;
+  white-space: nowrap;
+  pointer-events: auto;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+/* Monospace digits keep widths stable during the slot-machine roll. */
+.monospace .number {
+  font-family: var(--type-code-lg-family);
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─────────────────────────── Caption ───────────────────────────── */
+
+.caption {
+  color: var(--text-neutral-tertiary-default);
+  white-space: nowrap;
+}
+
+/* ─────────────────────── Slot-machine value ────────────────────── */
+
+.flipRow {
+  display: inline-flex;
+  align-items: baseline;
+  vertical-align: baseline;
+}
+
+.digitColumn {
+  position: relative;
+  display: inline-block;
+  width: 1ch;
+  height: 1lh;
+  overflow: hidden;
+  vertical-align: baseline;
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 1) 28%,
+    rgba(0, 0, 0, 1) 70%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 1) 28%,
+    rgba(0, 0, 0, 1) 70%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+.digitTrack {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.digitCell {
+  display: block;
+  height: 1lh;
+  text-align: center;
+}
+
+.staticChar {
+  display: inline-block;
+  vertical-align: baseline;
+}
+
+/* ───────────────────────── Trend badge ─────────────────────────── */
+
+.trendBadgeRow {
+  display: inline-flex;
+}
+
+/* ─────────────────────── Screen-reader only ────────────────────── */
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ───────────────────────────── Sizes ───────────────────────────── */
+/*
+ * Each size pulls its sub-block typography from existing presets:
+ *   value    → --type-title-* (or body-strong-lg for xs)
+ *   pretitle → --type-body-* (or font-size-2xs primitive for xs/10px)
+ *   caption  → matches pretitle
+ */
+
+/* xs — pretitle 10/16, value 16/20, caption 10/16 */
+.sizeXs .pretitle,
+.sizeXs .caption {
+  font-family: var(--type-body-md-family);
+  font-weight: var(--font-weight-regular);
+  font-size: var(--font-size-2xs);
+  line-height: var(--line-height-unitless-relaxed);
+  letter-spacing: var(--letter-spacing-md);
+}
+.sizeXs .number {
+  font-family: var(--type-body-strong-lg-family);
+  font-weight: var(--type-body-strong-lg-weight);
+  font-size: var(--type-body-strong-lg-size);
+  line-height: var(--type-body-strong-lg-line-height);
+  letter-spacing: var(--type-body-strong-lg-letter-spacing);
+  gap: 0;
+}
+.sizeXs .main {
+  gap: var(--spacing-2xs);
+}
+
+/* sm — pretitle 12/16, value 18/24, caption 12/16 */
+.sizeSm .pretitle,
+.sizeSm .caption {
+  font-family: var(--type-body-sm-family);
+  font-weight: var(--type-body-sm-weight);
+  font-size: var(--type-body-sm-size);
+  line-height: var(--type-body-sm-line-height);
+  letter-spacing: var(--type-body-sm-letter-spacing);
+}
+.sizeSm .number {
+  font-family: var(--type-title-xs-family);
+  font-weight: var(--type-title-xs-weight);
+  font-size: var(--type-title-xs-size);
+  line-height: var(--type-title-xs-line-height);
+  letter-spacing: var(--type-title-xs-letter-spacing);
+  gap: 0;
+}
+.sizeSm .main {
+  gap: var(--spacing-2xs);
+}
+
+/* md — pretitle 14/20, value 24/32, caption 14/20 */
+.sizeMd .pretitle,
+.sizeMd .caption {
+  font-family: var(--type-body-md-family);
+  font-weight: var(--type-body-md-weight);
+  font-size: var(--type-body-md-size);
+  line-height: var(--type-body-md-line-height);
+  letter-spacing: var(--type-body-md-letter-spacing);
+}
+.sizeMd .number {
+  font-family: var(--type-title-md-family);
+  font-weight: var(--type-title-md-weight);
+  font-size: var(--type-title-md-size);
+  line-height: var(--type-title-md-line-height);
+  letter-spacing: var(--type-title-md-letter-spacing);
+  gap: var(--spacing-2xs);
+}
+.sizeMd .main {
+  gap: var(--spacing-xs);
+}
+
+/* lg — pretitle 14/20, value 32/40, caption 14/20 */
+.sizeLg .pretitle,
+.sizeLg .caption {
+  font-family: var(--type-body-md-family);
+  font-weight: var(--type-body-md-weight);
+  font-size: var(--type-body-md-size);
+  line-height: var(--type-body-md-line-height);
+  letter-spacing: var(--type-body-md-letter-spacing);
+}
+.sizeLg .number {
+  font-family: var(--type-title-lg-family);
+  font-weight: var(--type-title-lg-weight);
+  font-size: var(--type-title-lg-size);
+  line-height: var(--type-title-lg-line-height);
+  letter-spacing: var(--type-title-lg-letter-spacing);
+  gap: var(--spacing-2xs);
+}
+.sizeLg .main {
+  gap: var(--spacing-xs);
+}
+
+/* ────────────────── Reduced-motion overrides ───────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .digitColumn {
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}

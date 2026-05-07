@@ -1,0 +1,12 @@
+.cardsGrid {
+  padding-top: var(--spacing-md);
+}
+
+
+.tagsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-2xs);
+  padding-top: var(--spacing-md);
+  min-width: 0;
+}

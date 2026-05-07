@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "ignoreDeprecations": "6.0",
+    "verbatimModuleSyntax": true,
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "baseUrl": ".",
+    "paths": {
+      "@sds": ["../design-system/src/index.ts"],
+      "@sds/*": ["../design-system/src/*"],
+      "@layouts": ["../layouts/src/index.ts"],
+      "@layouts/*": ["../layouts/src/*"]
+    }
+  },
+  "include": ["src"]
+}
