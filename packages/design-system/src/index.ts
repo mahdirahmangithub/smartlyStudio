@@ -65,7 +65,21 @@ export * from './components/FileUploadList';
 export * from './components/Footer';
 export * from './components/GenericSelectOption';
 export * from './components/GlobalNavigationBar';
-export * from './components/Grid';
+/* Grid re-exports `Container` / `ContainerProps` (the layout container,
+ * max-width wrapper) which collides with `./components/Container` (the
+ * card-style Container with density / elevated / title / etc.). Keep
+ * the canonical Container at the top level via `./components/Container`
+ * and import the Grid-flavoured layout container directly via
+ * `@sds/components/Grid` when needed (already the convention in apps,
+ * templates, and prototypes). */
+export { Grid, Col } from './components/Grid';
+export type {
+  ContainerMaxWidth,
+  GridProps,
+  GridGutter,
+  GridInset,
+  ColProps,
+} from './components/Grid';
 export * from './components/Header';
 export * from './components/HeroCard';
 export * from './components/Hint';
