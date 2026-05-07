@@ -1,4 +1,5 @@
 {
+  "outputDirectory": "apps/gallery/dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ]
