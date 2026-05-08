@@ -25,6 +25,18 @@ export interface SelectOptionHeaderProps
   onSearchClear?: () => void;
   /** Ref for the search input element */
   searchRef?: Ref<HTMLInputElement>;
+  /**
+   * Extra props spread onto the inner SearchInput. Use this to forward
+   * `useDropdownCombobox` wiring (`onKeyDown`, `aria-activedescendant`) so
+   * the search input keeps DOM focus while ArrowUp/Down navigate options.
+   */
+  searchInputProps?: {
+    onKeyDown?: React.KeyboardEventHandler<HTMLInputElement>;
+    "aria-activedescendant"?: string | undefined;
+    "aria-autocomplete"?: "none" | "inline" | "list" | "both";
+    "aria-controls"?: string;
+    "aria-expanded"?: boolean;
+  };
 
   /** "From" field value (controlled) */
   fromValue?: string;
@@ -58,6 +70,7 @@ export const SelectOptionHeader = forwardRef<
       onSearchChange,
       onSearchClear,
       searchRef,
+      searchInputProps,
       fromValue,
       fromPlaceholder = "From",
       onFromChange,
@@ -90,6 +103,7 @@ export const SelectOptionHeader = forwardRef<
             onChange={onSearchChange}
             onClear={onSearchClear}
             clearable
+            {...searchInputProps}
           />
         )}
 

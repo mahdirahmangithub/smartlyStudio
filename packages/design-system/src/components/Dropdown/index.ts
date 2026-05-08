@@ -22,3 +22,8 @@ export { HoverSubmenu } from "./HoverSubmenu";
 export type { HoverSubmenuProps } from "./HoverSubmenu";
 export { DrilldownSubmenu } from "./DrilldownSubmenu";
 export type { DrilldownSubmenuProps } from "./DrilldownSubmenu";
+export { useDropdownCombobox } from "./useDropdownCombobox";
+export type {
+  UseDropdownComboboxConfig,
+  UseDropdownComboboxReturn,
+} from "./useDropdownCombobox";

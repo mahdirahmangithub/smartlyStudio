@@ -1,4 +1,5 @@
 import {
+  useId,
   useRef,
   useState,
   useCallback,
@@ -27,15 +28,34 @@ export interface HoverSubmenuProps {
   leading?: ReactNode;
   /** Submenu body — more `HoverSubmenu` or option rows */
   children: ReactNode;
+  /**
+   * Optional sticky header for the submenu panel (e.g. a `SelectOptionHeader`
+   * with a search input). Rendered above the scrollable option list so it
+   * doesn't scroll with the items.
+   */
+  header?: ReactNode;
   /** Submenu panel width */
   width?: number;
+  /**
+   * When `true`, the submenu auto-closes (after a 150ms grace) once the
+   * cursor leaves the trigger row or the panel. Snappy hover-menu UX, good
+   * for pure option lists.
+   *
+   * When `false` (default), the submenu stays open until dismissed by
+   * Escape, click-outside, sibling submenu opening, or selecting an option.
+   * Recommended for submenus hosting inputs / forms (e.g. embedded search)
+   * since the user may drift the cursor away while typing.
+   */
+  closeOnPointerLeave?: boolean;
 }
 
 export function HoverSubmenu({
   labelText,
   leading,
+  header,
   children,
   width = 220,
+  closeOnPointerLeave = false,
 }: HoverSubmenuProps) {
   const depth          = useContext(MenuDepthContext);
   const graceCtx       = useContext(MenuGraceContext);
@@ -43,6 +63,9 @@ export function HoverSubmenu({
 
   /** Stable per-mount identity for the sibling registry. */
   const idRef = useRef<symbol>(Symbol());
+
+  /** Stable id for the submenu panel — wired to trigger's `aria-controls`. */
+  const panelId = useId();
 
   const anchorRef      = useRef<HTMLDivElement>(null);
   const panelElRef     = useRef<HTMLDivElement | null>(null);
@@ -55,6 +78,18 @@ export function HoverSubmenu({
 
   const [open, setOpen]           = useState(false);
   const [autoFocus, setAutoFocus] = useState(false);
+  /**
+   * Set to true only when this submenu is being closed because a sibling is
+   * opening. Skips the panel's exit animation so the sibling-to-sibling
+   * hand-off feels instant rather than crossfaded. Reset on the next open.
+   */
+  const [instantClose, setInstantClose] = useState(false);
+  /**
+   * Set to true when this submenu is opening AS the replacement for a
+   * sibling that was just instant-closed. Skips this panel's enter
+   * animation so the hand-off feels truly instant on both sides.
+   */
+  const [instantOpen, setInstantOpen] = useState(false);
 
   /** Ref mirror of `open` so event handlers avoid stale closures. */
   const openRef = useRef(open);
@@ -81,6 +116,10 @@ export function HoverSubmenu({
   closeSelfRef.current = () => {
     clearOpen(); clearClose(); clearGrace();
     graceCtx?.setGraceIntent(null);
+    // Sibling-triggered close: skip the exit animation. React batches both
+    // state updates so the Dropdown sees `open=false` AND `exitAnimation=false`
+    // in the same commit and unmounts immediately.
+    setInstantClose(true);
     setOpen(false);
     setAutoFocus(false);
   };
@@ -93,9 +132,47 @@ export function HoverSubmenu({
 
   /* ── Open / close helpers ─────────────────────────────────────────────── */
 
+  /** Cleanup function for native pointer listeners attached in onPanelMount. */
+  const panelListenerCleanupRef = useRef<(() => void) | null>(null);
+
   const onPanelMount = useCallback((el: HTMLDivElement | null) => {
+    // Tear down any prior listeners (panel remount, e.g. across drill levels).
+    panelListenerCleanupRef.current?.();
+    panelListenerCleanupRef.current = null;
     panelElRef.current = el;
-  }, []);
+    if (!el) return;
+
+    /* Attach pointer enter/leave to the PANEL element itself (not a div
+     * wrapping children), so the boundary covers the whole panel — header
+     * slot included. The previous wrapping-div approach fired pointerleave
+     * when the cursor moved from the children area to a search input in
+     * the header, which started the close timer and dismissed the submenu
+     * unexpectedly when the user focused or typed in the search. */
+    const handleEnter = (e: globalThis.PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      clearClose();
+      clearGrace();
+      graceCtx?.setGraceIntent(null);
+    };
+    const handleLeave = (e: globalThis.PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      clearClose();
+      // Sticky mode: cursor leaving the panel doesn't dismiss. The user can
+      // still close via Escape, click-outside, sibling submenu, or option select.
+      if (!closeOnPointerLeave) return;
+      closeTimerRef.current = window.setTimeout(() => {
+        setOpen(false);
+        closeTimerRef.current = undefined;
+      }, CLOSE_DELAY_MS);
+    };
+
+    el.addEventListener("pointerenter", handleEnter);
+    el.addEventListener("pointerleave", handleLeave);
+    panelListenerCleanupRef.current = () => {
+      el.removeEventListener("pointerenter", handleEnter);
+      el.removeEventListener("pointerleave", handleLeave);
+    };
+  }, [clearClose, clearGrace, graceCtx, closeOnPointerLeave]);
 
   // Resolve the focusable trigger item once the anchor div is in the DOM.
   useEffect(() => {
@@ -108,7 +185,13 @@ export function HoverSubmenu({
     clearClose();
     clearGrace();
     graceCtx?.setGraceIntent(null);
-    siblingManager?.notifyOpen(idRef.current);
+    // `notifyOpen` returns true if any sibling was just instant-closed —
+    // in that case skip our own enter animation so the hand-off is snappy.
+    const replacedSibling = siblingManager?.notifyOpen(idRef.current) ?? false;
+    setInstantOpen(replacedSibling);
+    // Reset the instant-close flag before opening so the next close (e.g.
+    // via Escape or click-outside) animates normally.
+    setInstantClose(false);
     setAutoFocus(focus);
     setOpen(true);
   }, [clearClose, clearGrace, graceCtx, siblingManager]);
@@ -177,31 +260,17 @@ export function HoverSubmenu({
     }
 
     clearClose();
+    // Sticky mode: leaving the trigger doesn't dismiss either. The grace
+    // polygon above is still useful for sibling coordination during
+    // diagonal cursor traversal even if we're not arming the close timer.
+    if (!closeOnPointerLeave) return;
     closeTimerRef.current = window.setTimeout(() => {
       setOpen(false);
       closeTimerRef.current = undefined;
     }, CLOSE_DELAY_MS);
-  }, [clearOpen, clearClose, clearGrace, graceCtx]);
+  }, [clearOpen, clearClose, clearGrace, graceCtx, closeOnPointerLeave]);
 
-  /* ── Panel content pointer events ────────────────────────────────────── */
-
-  /** Cursor entered the submenu panel — cancel close and clear the grace polygon. */
-  const onPanelPointerEnter = useCallback((e: PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType !== "mouse") return;
-    clearClose();
-    clearGrace();
-    graceCtx?.setGraceIntent(null);
-  }, [clearClose, clearGrace, graceCtx]);
-
-  /** Cursor left the submenu panel — start close timer. */
-  const onPanelPointerLeave = useCallback((e: PointerEvent<HTMLDivElement>) => {
-    if (e.pointerType !== "mouse") return;
-    clearClose();
-    closeTimerRef.current = window.setTimeout(() => {
-      setOpen(false);
-      closeTimerRef.current = undefined;
-    }, CLOSE_DELAY_MS);
-  }, [clearClose]);
+  /* Panel pointer enter/leave are attached natively in `onPanelMount` above. */
 
   /* ── Keyboard ─────────────────────────────────────────────────────────── */
 
@@ -234,12 +303,17 @@ export function HoverSubmenu({
           description={false}
           leading={leading}
           isActive={open}
+          ariaHasPopup="menu"
+          ariaExpanded={open}
+          ariaControls={panelId}
           onClick={() => {}}
         />
         <Dropdown
+          id={panelId}
           open={open}
           onClose={handleClose}
           anchorRef={anchorRef}
+          header={header}
           placement="right-start"
           role="menu"
           width={width}
@@ -252,13 +326,10 @@ export function HoverSubmenu({
           onPanelMount={onPanelMount}
           panelKeyboardNav
           keyboardWrap
+          exitAnimation={!instantClose}
+          enterAnimation={!instantOpen}
         >
-          <div
-            onPointerEnter={onPanelPointerEnter}
-            onPointerLeave={onPanelPointerLeave}
-          >
-            {children}
-          </div>
+          {children}
         </Dropdown>
       </div>
     </MenuDepthContext.Provider>

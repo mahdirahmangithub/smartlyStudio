@@ -246,13 +246,16 @@ export function NavBarContent({
                   icon={<Icon name="more_horiz" size={16} />}
                   aria-label="More actions"
                   aria-expanded={overflowOpen}
-                  aria-haspopup="true"
+                  aria-haspopup="menu"
                   onClick={toggleOverflow}
                 />
                 <Dropdown
                   open={overflowOpen}
                   onClose={closeOverflow}
                   anchorRef={moreRef}
+                  returnFocusRef={moreRef}
+                  role="menu"
+                  aria-label="More actions"
                   placement="bottom-end"
                   width={220}
                 >

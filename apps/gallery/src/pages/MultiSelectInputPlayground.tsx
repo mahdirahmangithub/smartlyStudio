@@ -1,10 +1,11 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useId } from "react";
 import { MultiSelectInput, type MultiSelectInputSize } from "@sds/components/MultiSelectInput";
 import { GenericSelectOption } from "@sds/components/GenericSelectOption";
 import { MultiSelectOption } from "@sds/components/MultiSelectOption";
 import { Tag, type TagType } from "@sds/components/Tag";
 import { MoreTag } from "@sds/components/MoreTag";
 import { SelectOptionHeader } from "@sds/components/SelectOptionHeader";
+import { useDropdownCombobox } from "@sds/components/Dropdown";
 
 const SIZES: MultiSelectInputSize[] = ["md", "lg", "xl"];
 
@@ -53,6 +54,7 @@ function GenericDemo() {
   const [selected, setSelected] = useState<string[]>([]);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownId = useId();
 
   const available = useMemo(
     () =>
@@ -71,6 +73,17 @@ function GenericDemo() {
   const handleRemove = (fruit: string) => {
     setSelected((prev) => prev.filter((f) => f !== fruit));
   };
+
+  // Combobox-mode wiring (single-add pattern: Enter/Tab adds the highlighted
+  // option, dropdown stays open for further additions via consumer reset).
+  const cbx = useDropdownCombobox({
+    open,
+    setOpen,
+    panelId: dropdownId,
+    inputRef,
+    onCommit: (fruit) => handleSelect(fruit),
+    revalidateKey: `${query}::${selected.length}`,
+  });
 
   const handleClick = () => {
     if (!open && !disabled && !readOnly) setOpen(true);
@@ -186,6 +199,7 @@ function GenericDemo() {
           disabled={disabled}
           readOnly={readOnly}
           clearable={clearable}
+          dropdownId={dropdownId}
           placeholder={selected.length > 0 ? "" : "Pick fruits..."}
           value={query}
           onChange={(e) => {
@@ -194,13 +208,13 @@ function GenericDemo() {
           }}
           onClick={handleClick}
           onKeyDown={(e) => {
-            if (e.key === "Escape" && open) {
-              setOpen(false);
-              setQuery("");
-            }
+            // Backspace-empties-last-tag is consumer-specific — keep before the
+            // hook so it only fires when the input is empty.
             if (e.key === "Backspace" && query === "" && selected.length > 0) {
               handleRemove(selected[selected.length - 1]);
+              return;
             }
+            cbx.handleInputKeyDown(e);
           }}
           expanded={open && !disabled && !readOnly}
           onClose={() => {
@@ -212,13 +226,15 @@ function GenericDemo() {
             setQuery("");
           }}
           tags={selected.length > 0 ? tagElements : undefined}
+          {...cbx.inputProps}
         >
           {available.length > 0 ? (
             available.map((fruit) => (
               <GenericSelectOption
                 key={fruit}
                 labelText={fruit}
-                onClick={() => handleSelect(fruit)}
+                {...cbx.getOptionProps(fruit, fruit)}
+                onClick={() => cbx.commit(fruit, fruit)}
               />
             ))
           ) : (
@@ -241,6 +257,7 @@ function MultiSelectOptionDemo() {
   const [selected, setSelected] = useState<string[]>(["Apple", "Cherry"]);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownId = useId();
 
   const filtered = useMemo(
     () =>
@@ -255,6 +272,21 @@ function MultiSelectOptionDemo() {
       checked ? [...prev, fruit] : prev.filter((f) => f !== fruit)
     );
   };
+
+  // Multi-select toggle pattern: Enter on a highlighted option toggles its
+  // checked state and KEEPS the dropdown open. commitOnTab=false so Tab only
+  // exits without toggling.
+  const cbx = useDropdownCombobox({
+    open,
+    setOpen,
+    panelId: dropdownId,
+    inputRef,
+    onCommit: (fruit) => {
+      handleToggle(fruit, !selected.includes(fruit));
+    },
+    revalidateKey: `${query}::${selected.length}`,
+    commitOnTab: false,
+  });
 
   const handleClick = () => {
     if (!open) setOpen(true);
@@ -274,6 +306,7 @@ function MultiSelectOptionDemo() {
       <div style={{ maxWidth: 420 }}>
         <MultiSelectInput
           ref={inputRef}
+          dropdownId={dropdownId}
           placeholder={selected.length > 0 ? "" : "Select fruits..."}
           value={query}
           onChange={(e) => {
@@ -282,13 +315,11 @@ function MultiSelectOptionDemo() {
           }}
           onClick={handleClick}
           onKeyDown={(e) => {
-            if (e.key === "Escape" && open) {
-              setOpen(false);
-              setQuery("");
-            }
             if (e.key === "Backspace" && query === "" && selected.length > 0) {
               setSelected((prev) => prev.slice(0, -1));
+              return;
             }
+            cbx.handleInputKeyDown(e);
           }}
           expanded={open}
           onClose={() => {
@@ -313,6 +344,7 @@ function MultiSelectOptionDemo() {
                 ))
               : undefined
           }
+          {...cbx.inputProps}
         >
           {filtered.length > 0 ? (
             filtered.map((fruit) => (
@@ -320,6 +352,7 @@ function MultiSelectOptionDemo() {
                 key={fruit}
                 labelText={fruit}
                 checked={selected.includes(fruit)}
+                {...cbx.getOptionProps(fruit, fruit)}
                 onChange={(checked) => handleToggle(fruit, checked)}
               />
             ))

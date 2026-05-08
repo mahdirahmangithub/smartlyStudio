@@ -1,10 +1,11 @@
-import { useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent } from "react";
+import { useId, useMemo, useRef, useState, type ChangeEvent } from "react";
 import { Fieldset, FieldGroup } from "@sds/components/Fieldset";
 import { SelectInput } from "@sds/components/SelectInput";
 import { SingleSelectOption } from "@sds/components/SingleSelectOption";
 import { RadioField } from "@sds/components/Radio";
 import { Button } from "@sds/components/Button";
 import { AiGeneration } from "@sds/components/AiGeneration";
+import { useDropdownCombobox } from "@sds/components/Dropdown";
 import { AD_ACCOUNTS, type AdAccount } from "../../shared/data/adAccounts";
 import { OBJECTIVES, type Objective } from "./constants";
 
@@ -26,6 +27,7 @@ function SelectField<T extends { id: string; label: string }>({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownId = useId();
 
   const filtered = useMemo(
     () =>
@@ -35,6 +37,23 @@ function SelectField<T extends { id: string; label: string }>({
     [options, query],
   );
 
+  // Combobox-mode wiring: input keeps DOM focus while ArrowDown/Up move a
+  // virtual highlight via aria-activedescendant. Enter / Tab commit; the
+  // hook calls onCommit which we use to look up the original option object.
+  const cbx = useDropdownCombobox({
+    open,
+    setOpen,
+    panelId: dropdownId,
+    inputRef,
+    onCommit: (id) => {
+      const found = options.find((o) => o.id === id);
+      if (found) onChange(found);
+      setQuery("");
+      setOpen(false);
+    },
+    revalidateKey: query,
+  });
+
   const displayValue = open ? query : value?.label ?? "";
 
   return (
@@ -42,6 +61,7 @@ function SelectField<T extends { id: string; label: string }>({
       <SelectInput
         ref={inputRef}
         size="lg"
+        dropdownId={dropdownId}
         value={displayValue}
         placeholder={placeholder ?? "Select…"}
         expanded={open}
@@ -52,16 +72,12 @@ function SelectField<T extends { id: string; label: string }>({
         onClick={() => {
           if (!open) setOpen(true);
         }}
-        onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-          if (e.key === "Escape" && open) {
-            setOpen(false);
-            setQuery("");
-          }
-        }}
+        onKeyDown={cbx.handleInputKeyDown}
         onClose={() => {
           setOpen(false);
           setQuery("");
         }}
+        {...cbx.inputProps}
       >
         {filtered.map((o) => (
           <SingleSelectOption
@@ -69,11 +85,8 @@ function SelectField<T extends { id: string; label: string }>({
             labelText={o.label}
             description={false}
             checked={value?.id === o.id}
-            onChange={() => {
-              onChange(o);
-              setQuery("");
-              setOpen(false);
-            }}
+            {...cbx.getOptionProps(o.id, o.label)}
+            onChange={() => cbx.commit(o.id, o.label)}
           />
         ))}
       </SelectInput>

@@ -71,8 +71,13 @@ export const MenuGraceContext = createContext<MenuGraceContextValue | null>(null
 export interface SiblingSubmenuManager {
   /** Register a submenu's instant-close callback. Returns an unregister function. */
   register(id: symbol, closeNow: () => void): () => void;
-  /** Immediately close every registered sibling whose id ≠ caller's id. */
-  notifyOpen(id: symbol): void;
+  /**
+   * Immediately close every registered sibling whose id ≠ caller's id.
+   * Returns `true` if at least one sibling was actually closed, `false`
+   * otherwise. The caller can use this to skip its own enter animation —
+   * sibling-to-sibling hand-offs feel snappier with no enter/exit fade.
+   */
+  notifyOpen(id: symbol): boolean;
 }
 
 export const SiblingSubmenuContext = createContext<SiblingSubmenuManager | null>(null);

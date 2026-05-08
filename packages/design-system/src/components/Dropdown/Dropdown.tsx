@@ -89,6 +89,36 @@ export interface DropdownProps {
   /** Fires when the panel element mounts/unmounts (e.g. submenu pointer bridges). */
   onPanelMount?: (el: HTMLDivElement | null) => void;
   /**
+   * Accessible name for the panel. Required by WAI-ARIA for `role="listbox"` /
+   * `role="menu"` to be properly announced by screen readers. If both this and
+   * `aria-labelledby` are omitted the panel will be unlabelled (current
+   * behaviour); supply a string or an element id to fix.
+   */
+  "aria-label"?: string;
+  /** Element id whose visible text labels the panel. Mutually exclusive with `aria-label`. */
+  "aria-labelledby"?: string;
+  /**
+   * When true, focus is restored to `returnFocusRef ?? anchorRef` after a
+   * click-outside dismissal too (today, only Escape restores). Recommended
+   * for action menus (`role="menu"`) so keyboard users aren't stranded on
+   * `<body>` when they click away. Default `false` to preserve existing
+   * listbox/combobox behaviour where the click-outside target may be
+   * intentional.
+   */
+  restoreFocusOnOutsideClick?: boolean;
+  /**
+   * When `false`, the panel skips the exit animation and unmounts on the
+   * next tick. Useful for snappy sibling-submenu hand-offs where two
+   * overlapping animations would feel sluggish. Default `true`.
+   */
+  exitAnimation?: boolean;
+  /**
+   * When `false`, the panel skips the enter animation and is rendered in
+   * its idle state immediately. Pair with `exitAnimation={false}` for
+   * sibling submenus that hand off without any cross-fade. Default `true`.
+   */
+  enterAnimation?: boolean;
+  /**
    * When true, every nested `HoverSubmenu` draws its pointer-bridge safety-triangle overlay.
    * Only meaningful on the root menu `Dropdown` (`role="menu"`); propagates automatically via
    * context — you do not need to pass this to child `HoverSubmenu` components.
@@ -260,6 +290,11 @@ export function Dropdown({
   zIndex = 9999,
   onPanelMount,
   debugSubmenuBridge = false,
+  "aria-label": ariaLabel,
+  "aria-labelledby": ariaLabelledBy,
+  restoreFocusOnOutsideClick = false,
+  exitAnimation = true,
+  enterAnimation = true,
 }: DropdownProps) {
   const treeCtx = useContext(DropdownMenuTreeContext);
   /**
@@ -315,9 +350,14 @@ export function Dropdown({
         return () => registry.delete(id);
       },
       notifyOpen(id) {
+        let closedAny = false;
         for (const [sibId, sibClose] of registry) {
-          if (sibId !== id) sibClose();
+          if (sibId !== id) {
+            sibClose();
+            closedAny = true;
+          }
         }
+        return closedAny;
       },
     };
   }
@@ -351,6 +391,25 @@ export function Dropdown({
   const drillDepthRef = useRef(0);
   const drillPopRef = useRef<(() => void) | null>(null);
   const keyboardNavRef = useRef(false);
+
+  /* ── Typeahead state — accumulating buffer + reset timer.
+   * 1000ms window matches Radix Menu and React Aria useTypeSelect.
+   * Held in refs (not state) because the rendered tree never reads them. */
+  const typeaheadSearchRef = useRef("");
+  const typeaheadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /* ── Auto-activedescendant state.
+   * When the panel handler detects an input is focused, ArrowUp/Down highlight
+   * options via DOM mutation (`data-dropdown-active`) instead of moving DOM
+   * focus, and `aria-activedescendant` is set on the input to announce the
+   * highlighted option. The ref tracks the highlighted option's id across
+   * re-renders so a `useLayoutEffect` can reapply the visual highlight after
+   * the consumer's children re-render (e.g. when a filter narrows the list).
+   * Consumers using `useDropdownCombobox` pass `panelKeyboardNav={false}` so
+   * this code path never runs for them — they manage everything themselves. */
+  const autoHighlightedIdRef = useRef<string | null>(null);
+  const autoHighlightInputRef = useRef<HTMLElement | null>(null);
+  const autoHighlightCounterRef = useRef(0);
   const rafRef = useRef<number>(undefined);
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -372,14 +431,27 @@ export function Dropdown({
 
     if (open && !wasOpen) {
       setIsMounted(true);
-      setAnim("enter");
+      // Skip the enter animation when requested (e.g. sibling-submenu hand-off
+      // where the predecessor was just dismissed without animation).
+      setAnim(enterAnimation ? "enter" : "idle");
     } else if (!open && wasOpen) {
-      setAnim("exit");
-      exitTimerRef.current = window.setTimeout(
-        () => setIsMounted(false),
-        EXIT_MS + 50
-      );
-      if (dismissReasonRef.current === "escape") {
+      if (exitAnimation) {
+        setAnim("exit");
+        exitTimerRef.current = window.setTimeout(
+          () => setIsMounted(false),
+          EXIT_MS + 50
+        );
+      } else {
+        // Skip exit animation — unmount on next tick so React commits the
+        // open=false state cleanly before the panel disappears.
+        setAnim("idle");
+        setIsMounted(false);
+      }
+      const reason = dismissReasonRef.current;
+      const shouldRestoreFocus =
+        reason === "escape" ||
+        (reason === "click-outside" && restoreFocusOnOutsideClick);
+      if (shouldRestoreFocus) {
         const el = returnFocusRef?.current ?? anchorRef.current;
         el?.focus({ preventScroll: true });
       }
@@ -553,11 +625,17 @@ export function Dropdown({
   }, [itemRole]);
 
   const getHeaderInput = useCallback((): HTMLElement | null => {
-    return (
-      headerRef.current?.querySelector<HTMLElement>(
-        'input:not([type="checkbox"]):not([type="radio"])'
-      ) ?? null
-    );
+    // Per-level header-input parity with the top-level panel header: a search
+    // input rendered inside a drilldown level (or root level when no drill is
+    // active) should be discoverable too. The active level always carries
+    // [data-drill-active], including the root level at depth 0.
+    const panel = panelRef.current;
+    const inputSel =
+      'input:not([type="checkbox"]):not([type="radio"]):not([disabled]):not([readonly])';
+    const drillActive = panel?.querySelector("[data-drill-active]") ?? null;
+    const drillInput = drillActive?.querySelector<HTMLElement>(inputSel) ?? null;
+    if (drillInput) return drillInput;
+    return headerRef.current?.querySelector<HTMLElement>(inputSel) ?? null;
   }, []);
 
   const getFocusables = useCallback((): HTMLElement[] => {
@@ -565,6 +643,90 @@ export function Dropdown({
     if (!panel) return [];
     return Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SEL));
   }, []);
+
+  /** True when `el` is a text-typeable input/textarea (not checkbox/radio/hidden). */
+  const isTextInputElement = useCallback((el: Element | null): el is HTMLElement => {
+    if (!el) return false;
+    if (el.tagName === "TEXTAREA") return true;
+    if (el.tagName !== "INPUT") return false;
+    const t = (el as HTMLInputElement).type;
+    return t !== "checkbox" && t !== "radio" && t !== "hidden";
+  }, []);
+
+  /**
+   * Walk visible options and ensure each has an `id` so we can target them
+   * via `aria-activedescendant`. Generates ids only for options that don't
+   * already have one (e.g. options rendered without `optionId`).
+   */
+  const ensureOptionIds = useCallback((opts: HTMLElement[]) => {
+    for (const opt of opts) {
+      if (!opt.id) {
+        opt.id = `${id ?? "dd"}-auto-opt-${++autoHighlightCounterRef.current}`;
+      }
+    }
+  }, [id]);
+
+  /** Apply visual highlight + aria-activedescendant for the auto-activedescendant flow. */
+  const applyAutoHighlight = useCallback(
+    (opt: HTMLElement, inputEl: HTMLElement) => {
+      const panel = panelRef.current;
+      if (!panel) return;
+      // Clear any prior highlight, then mark the new one.
+      panel
+        .querySelectorAll<HTMLElement>('[data-dropdown-active="true"]')
+        .forEach((el) => el.removeAttribute("data-dropdown-active"));
+      // If focus moved between inputs (e.g. from-to header), clear the stale
+      // aria-activedescendant on the previous input.
+      const prevInput = autoHighlightInputRef.current;
+      if (prevInput && prevInput !== inputEl) {
+        prevInput.removeAttribute("aria-activedescendant");
+      }
+      opt.setAttribute("data-dropdown-active", "true");
+      autoHighlightedIdRef.current = opt.id;
+      autoHighlightInputRef.current = inputEl;
+      inputEl.setAttribute("aria-activedescendant", opt.id);
+      opt.scrollIntoView({ block: "nearest" });
+    },
+    [],
+  );
+
+  /**
+   * After every render, reconcile the visual highlight against
+   * `autoHighlightedIdRef`. Necessary because the consumer's children re-render
+   * on filter / list changes, and React doesn't preserve our DOM-mutated
+   * `data-dropdown-active` attribute on freshly-rendered nodes. If the
+   * previously-highlighted id is gone (option filtered out), re-anchor to the
+   * first visible option.
+   */
+  useLayoutEffect(() => {
+    if (!isMounted) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+    const inputEl = autoHighlightInputRef.current;
+    // Clear any stale highlight markers (could be on a now-stale node).
+    panel
+      .querySelectorAll<HTMLElement>('[data-dropdown-active="true"]')
+      .forEach((el) => el.removeAttribute("data-dropdown-active"));
+    if (!autoHighlightedIdRef.current || !inputEl) return;
+    // Look up the previously-highlighted option by id.
+    const opt = panel.querySelector<HTMLElement>(
+      `#${CSS.escape(autoHighlightedIdRef.current)}`,
+    );
+    if (opt) {
+      opt.setAttribute("data-dropdown-active", "true");
+      inputEl.setAttribute("aria-activedescendant", opt.id);
+      return;
+    }
+    // Highlighted option vanished (e.g. filtered out) — re-anchor to first.
+    const opts = getOptions();
+    if (opts.length === 0) {
+      autoHighlightedIdRef.current = null;
+      inputEl.removeAttribute("aria-activedescendant");
+      return;
+    }
+    ensureOptionIds(opts);
+    applyAutoHighlight(opts[0], inputEl);
+  });
 
   useEffect(() => {
     if (!isMounted || anim !== "enter" || !autoFocus) return;
@@ -583,22 +745,96 @@ export function Dropdown({
   const handlePanelKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       if (!panelKeyboardNav) return;
+      // A consumer's onKeyDown on the input may already have claimed the key
+      // (e.g. when wiring `useDropdownCombobox`). Bail so we don't double-handle.
+      if (e.defaultPrevented) return;
       const panel = panelRef.current;
       if (!panel) return;
       const { key, shiftKey } = e;
       const active = document.activeElement as HTMLElement;
+      const inputFocused = isTextInputElement(active) && panel.contains(active);
 
-      /* ── ArrowLeft: pop drill level, or close submenu at root ── */
-      if (key === "ArrowLeft" && panelRole === "menu") {
-        e.preventDefault();
-        e.stopPropagation();
+      /* ── Auto-activedescendant: when a search/text input inside the panel
+       *    has focus, ArrowUp/Down/Home/End/Enter operate on a virtual
+       *    highlight (`data-dropdown-active` + `aria-activedescendant`) so
+       *    the input keeps DOM focus. Works for header inputs, drilldown
+       *    levels with their own search, and HoverSubmenu panels. */
+      if (inputFocused) {
+        if (key === "ArrowDown" || key === "ArrowUp" || key === "Home" || key === "End") {
+          e.preventDefault();
+          e.stopPropagation();
+          const opts = getOptions();
+          if (opts.length === 0) return;
+          ensureOptionIds(opts);
+          const currentId = autoHighlightedIdRef.current;
+          const currentIdx = currentId
+            ? opts.findIndex((o) => o.id === currentId)
+            : -1;
+          let nextIdx: number;
+          if (key === "Home") nextIdx = 0;
+          else if (key === "End") nextIdx = opts.length - 1;
+          else if (key === "ArrowDown") {
+            if (currentIdx === -1) nextIdx = 0;
+            else if (currentIdx < opts.length - 1) nextIdx = currentIdx + 1;
+            else if (keyboardWrap) nextIdx = 0;
+            else return;
+          } else {
+            // ArrowUp
+            if (currentIdx === -1) nextIdx = opts.length - 1;
+            else if (currentIdx > 0) nextIdx = currentIdx - 1;
+            else if (keyboardWrap) nextIdx = opts.length - 1;
+            else return;
+          }
+          applyAutoHighlight(opts[nextIdx], active);
+          return;
+        }
+        if (key === "Enter") {
+          const id = autoHighlightedIdRef.current;
+          if (!id) return;
+          const opt = panel.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
+          if (opt) {
+            e.preventDefault();
+            e.stopPropagation();
+            opt.click();
+          }
+          return;
+        }
+        // Other keys (typing, Escape, Tab) fall through to the existing
+        // handling below so the input still receives them naturally.
+      } else if (autoHighlightedIdRef.current) {
+        // Focus left the input (e.g. user clicked an option). Drop the
+        // virtual highlight so the next interaction doesn't show two states.
+        autoHighlightInputRef.current?.removeAttribute("aria-activedescendant");
+        autoHighlightedIdRef.current = null;
+        autoHighlightInputRef.current = null;
+        panel
+          .querySelectorAll<HTMLElement>('[data-dropdown-active="true"]')
+          .forEach((el) => el.removeAttribute("data-dropdown-active"));
+      }
+
+      /* ── ArrowLeft: pop drill (any role), or close submenu at root (menu only) ──
+       *
+       * Drilldown is independent of `role` (works for both `menu` and `listbox`),
+       * so the pop-drill action shouldn't be gated on role. Closing on
+       * ArrowLeft at the root level is menu-only — listbox panels keep
+       * ArrowLeft for native left-cursor / sibling-option intent.
+       *
+       * Skipped when focus is inside a text input so the input retains its
+       * native horizontal-cursor behaviour (drill-level search inputs etc.). */
+      if (key === "ArrowLeft" && !inputFocused) {
         if (drillDepthRef.current > 0 && drillPopRef.current) {
+          e.preventDefault();
+          e.stopPropagation();
           drillPopRef.current();
-        } else {
+          return;
+        }
+        if (panelRole === "menu") {
+          e.preventDefault();
+          e.stopPropagation();
           dismissReasonRef.current = "escape"; // reuse escape path so returnFocusRef fires
           onCloseRef.current();
+          return;
         }
-        return;
       }
 
       /* ── Arrow Up / Down ── */
@@ -680,6 +916,80 @@ export function Dropdown({
         return;
       }
 
+      /* ── Typeahead — single printable character jumps to next matching option.
+       * Skipped when focus is inside a text input (search header / inline drill
+       * input) so the input owns typing. Buffer accumulates and resets after
+       * 1000ms; repeated single-letter ("aaa") normalizes to "a" so each press
+       * cycles to the next match. Matches Radix Menu + React Aria patterns. */
+      if (
+        key.length === 1 &&
+        !e.altKey &&
+        !e.ctrlKey &&
+        !e.metaKey
+      ) {
+        const tag = active?.tagName;
+        const inputType = (active as HTMLInputElement | null)?.type;
+        const isInTextInput =
+          tag === "TEXTAREA" ||
+          (tag === "INPUT" &&
+            inputType !== "checkbox" &&
+            inputType !== "radio" &&
+            inputType !== "hidden");
+        if (isInTextInput) {
+          // Let the input own the keystroke; fall through to Tab below.
+        } else {
+          if (typeaheadTimerRef.current) clearTimeout(typeaheadTimerRef.current);
+          typeaheadSearchRef.current += key.toLowerCase();
+          typeaheadTimerRef.current = setTimeout(() => {
+            typeaheadSearchRef.current = "";
+          }, 1000);
+
+          const opts = getOptions();
+          if (opts.length === 0) return;
+
+          // Same-letter cycling: "aaa" → "a", advances through matches.
+          const buf = typeaheadSearchRef.current;
+          const search =
+            buf.length > 1 && buf.split("").every((c) => c === buf[0])
+              ? buf[0]
+              : buf;
+
+          const currentIdx = opts.indexOf(active);
+          // Single-letter cycle: start AFTER the focused item; multi-letter
+          // (still building the search) starts from the focused item.
+          const startIdx =
+            search.length === 1 && currentIdx >= 0
+              ? (currentIdx + 1) % opts.length
+              : Math.max(currentIdx, 0);
+
+          let match: HTMLElement | null = null;
+          for (let i = 0; i < opts.length; i++) {
+            const idx = (startIdx + i) % opts.length;
+            const candidate = opts[idx];
+            const text = (
+              candidate.getAttribute("aria-label") ??
+              candidate.textContent ??
+              ""
+            )
+              .trim()
+              .toLowerCase();
+            if (text.startsWith(search)) {
+              match = candidate;
+              break;
+            }
+          }
+
+          if (match && match !== active) {
+            e.preventDefault();
+            e.stopPropagation();
+            keyboardNavRef.current = true;
+            focusVisible(match);
+            match.scrollIntoView?.({ block: "nearest" });
+          }
+          return;
+        }
+      }
+
       /* ── Tab ── */
       if (key === "Tab") {
         if (panelRole === "menu") {
@@ -715,6 +1025,9 @@ export function Dropdown({
       returnFocusRef,
       panelKeyboardNav,
       keyboardWrap,
+      isTextInputElement,
+      ensureOptionIds,
+      applyAutoHighlight,
     ]
   );
 
@@ -743,6 +1056,8 @@ export function Dropdown({
       ref={panelRef}
       id={id}
       role={panelRole}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
       data-dropdown-tree-panel=""
       className={cx(styles.panel, animClass, className)}
       style={panelStyle}

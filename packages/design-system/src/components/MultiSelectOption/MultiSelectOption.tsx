@@ -24,6 +24,12 @@ export interface MultiSelectOptionProps
   trailing?: Omit<OptionItemTrailingProps, "disabled">;
   /** When true, omits the focus-visible ring (hover/press backgrounds unchanged). */
   hideFocusRing?: boolean;
+  /** `id` on the interactive row (e.g. `aria-activedescendant` target). */
+  optionId?: string;
+  /** Highlights the row (combobox / listbox active descendant). */
+  isActive?: boolean;
+  /** When true, row is not in tab order — host (e.g. combobox input) keeps focus. */
+  unmanagedFocus?: boolean;
   onChange?: (checked: boolean) => void;
 }
 
@@ -38,6 +44,9 @@ export function MultiSelectOption({
   leading,
   trailing,
   hideFocusRing = true,
+  optionId,
+  isActive = false,
+  unmanagedFocus = false,
   onChange,
   className,
   ...rest
@@ -59,15 +68,17 @@ export function MultiSelectOption({
   return (
     <div className={cx(styles.option, className)} {...rest}>
       <div
+        id={optionId}
         role="option"
         aria-selected={checked}
         aria-disabled={disabled || undefined}
-        tabIndex={disabled ? -1 : 0}
+        tabIndex={disabled || unmanagedFocus ? -1 : 0}
         className={cx(
           styles.content,
           checked && styles.checked,
           disabled && styles.disabled,
-          hideFocusRing && styles.noFocusRing
+          hideFocusRing && styles.noFocusRing,
+          isActive && styles.active
         )}
         onClick={handleClick}
         onKeyDown={handleKeyDown}

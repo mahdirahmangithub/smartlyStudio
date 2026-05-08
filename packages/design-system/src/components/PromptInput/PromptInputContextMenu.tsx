@@ -107,13 +107,21 @@ export function PromptInputContextMenu({
     ? categories.filter((cat) => cat.label.toLowerCase().includes(q))
     : categories;
 
-  /* ── Item counts — root vs drilled ── */
+  /* ── Filtered drill items — same `query` filters every level ── */
+
+  const filteredDrillItems = drillState
+    ? q
+      ? drillState.level.items.filter((item) =>
+          item.label.toLowerCase().includes(q),
+        )
+      : drillState.level.items
+    : [];
+
+  /* ── Item counts — root vs drilled (always uses the filtered list) ── */
 
   const rootItemCount = filteredSuggested.length + filteredCategories.length;
-  // Drilled level: 1 Back row + level items.
-  const totalItems = drillState
-    ? 1 + drillState.level.items.length
-    : rootItemCount;
+  // Drilled level: 1 Back row + filtered level items.
+  const totalItems = drillState ? 1 + filteredDrillItems.length : rootItemCount;
 
   useEffect(() => {
     setItemCount?.(totalItems);
@@ -129,7 +137,7 @@ export function PromptInputContextMenu({
         if (activeIndex === 0) {
           setDrillState(null); // Back
         } else {
-          drillState.level.items[activeIndex - 1]?.onSelect();
+          filteredDrillItems[activeIndex - 1]?.onSelect();
         }
         return;
       }
@@ -226,22 +234,26 @@ export function PromptInputContextMenu({
         leading={<Icon name="arrow_back" size={16} />}
         onClick={() => setDrillState(null)}
       />
-      {drillState.level.items.map((item, i) => {
-        const index = i + 1;
-        return (
-          <GenericSelectOption
-            key={item.id}
-            itemRole="option"
-            unmanagedFocus
-            optionId={menuId ? `${menuId}-opt-${index}` : undefined}
-            isActive={index === activeIndex}
-            description={false}
-            labelText={item.label}
-            leading={<Icon name={item.icon} size={20} />}
-            onClick={item.onSelect}
-          />
-        );
-      })}
+      {filteredDrillItems.length === 0 ? (
+        <OptionSeparator type="group-label" labelText="No matches" />
+      ) : (
+        filteredDrillItems.map((item, i) => {
+          const index = i + 1;
+          return (
+            <GenericSelectOption
+              key={item.id}
+              itemRole="option"
+              unmanagedFocus
+              optionId={menuId ? `${menuId}-opt-${index}` : undefined}
+              isActive={index === activeIndex}
+              description={false}
+              labelText={item.label}
+              leading={<Icon name={item.icon} size={20} />}
+              onClick={item.onSelect}
+            />
+          );
+        })
+      )}
     </>
   );
 

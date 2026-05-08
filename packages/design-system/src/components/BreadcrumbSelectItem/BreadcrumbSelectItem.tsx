@@ -213,6 +213,8 @@ export const BreadcrumbSelectItem = forwardRef<
         open={dropdownOpen}
         onClose={closeDropdown}
         anchorRef={chevronRef}
+        returnFocusRef={chevronRef}
+        aria-label="Breadcrumb options"
         placement="bottom-start"
         width={200}
       >

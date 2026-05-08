@@ -31,6 +31,12 @@ export interface MultiSelectInputProps
   children?: ReactNode;
   tags?: ReactNode;
   readOnly?: boolean;
+  /**
+   * Override the internal Dropdown panel id. Pass this when you wire up
+   * `useDropdownCombobox` so the hook can target the same panel via
+   * `document.getElementById`. Defaults to a `useId`-generated value.
+   */
+  dropdownId?: string;
 }
 
 const CLEAR_SIZE: Record<MultiSelectInputSize, InputClearSize> = {
@@ -67,6 +73,7 @@ export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputPro
       className,
       id: idProp,
       "aria-describedby": ariaDescribedbyProp,
+      dropdownId: dropdownIdProp,
       ...rest
     },
     externalRef
@@ -77,7 +84,8 @@ export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputPro
 
     const innerRef = useRef<HTMLInputElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
-    const dropdownId = useId();
+    const internalDropdownId = useId();
+    const dropdownId = dropdownIdProp ?? internalDropdownId;
 
     const setRef = useCallback(
       (node: HTMLInputElement | null) => {
@@ -138,6 +146,18 @@ export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputPro
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+      // Consumer's onKeyDown runs FIRST so callers using `useDropdownCombobox`
+      // (or any other handler that owns ArrowDown / Enter) can `preventDefault`
+      // and we won't fall through to the legacy "move focus into options"
+      // behavior below — which would steal DOM focus from the input.
+      onKeyDown?.(e);
+      if (e.defaultPrevented) return;
+
+      // Backspace-empties-last-tag is consumer-owned; we already gave them a
+      // chance above. No legacy fallback for this key.
+      if (e.key === "Backspace" && currentValue === "" && hasTags) return;
+
+      // Legacy fallback when no consumer is intercepting.
       if ((e.key === "ArrowDown" || e.key === "Enter") && children) {
         if (expanded) {
           if (e.key === "ArrowDown") {
@@ -155,13 +175,6 @@ export const MultiSelectInput = forwardRef<HTMLInputElement, MultiSelectInputPro
           onClick?.({ target: innerRef.current } as unknown as React.MouseEvent<HTMLInputElement>);
         }
       }
-
-      if (e.key === "Backspace" && currentValue === "" && hasTags) {
-        onKeyDown?.(e);
-        return;
-      }
-
-      onKeyDown?.(e);
     };
 
     return (

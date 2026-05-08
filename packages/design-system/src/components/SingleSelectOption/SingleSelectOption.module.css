@@ -54,6 +54,12 @@
   outline: none;
 }
 
+/* Combobox / listbox active descendant — host (e.g. input) keeps DOM focus
+   while this row is virtually highlighted. Same visual as keyboard hover. */
+.content.active:not(.disabled) {
+  background: var(--element-fill-neutral-tertiary-hover);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    CHECKED interactive states
    ═══════════════════════════════════════════════════════════════════════ */

@@ -1,8 +1,9 @@
-import { useState, useRef, type ChangeEvent } from "react";
+import { useState, useRef, useId, type ChangeEvent } from "react";
 import {
   Dropdown,
   HoverSubmenu,
   DrilldownSubmenu,
+  useDropdownCombobox,
 } from "@sds/components/Dropdown";
 import { SelectOptionHeader } from "@sds/components/SelectOptionHeader";
 import { MultiSelectOption } from "@sds/components/MultiSelectOption";
@@ -36,6 +37,8 @@ const NESTED_MENU_BRIDGE_DEBUG = true;
 export default function DropdownPlayground() {
   /* ── multi-select with search + add ─────────── */
   const multiRef = useRef<HTMLButtonElement>(null);
+  const multiSearchRef = useRef<HTMLInputElement>(null);
+  const multiPanelId = useId();
   const [multiOpen, setMultiOpen] = useState(false);
   const [multiSearch, setMultiSearch] = useState("");
   const [selectedFruits, setSelectedFruits] = useState<Set<string>>(new Set(["Apple", "Cherry"]));
@@ -50,9 +53,20 @@ export default function DropdownPlayground() {
       return next;
     });
   };
+  const multiCbx = useDropdownCombobox({
+    open: multiOpen,
+    setOpen: setMultiOpen,
+    panelId: multiPanelId,
+    inputRef: multiSearchRef,
+    onCommit: (f) => toggleFruit(f),
+    revalidateKey: `${multiSearch}::${selectedFruits.size}`,
+    commitOnTab: false,
+  });
 
   /* ── scrollable multi-select (constrained height) */
   const scrollRef = useRef<HTMLButtonElement>(null);
+  const scrollSearchRef = useRef<HTMLInputElement>(null);
+  const scrollPanelId = useId();
   const [scrollOpen, setScrollOpen] = useState(false);
   const [scrollSearch, setScrollSearch] = useState("");
   const [scrollSelected, setScrollSelected] = useState<Set<string>>(new Set());
@@ -76,6 +90,15 @@ export default function DropdownPlayground() {
       return next;
     });
   };
+  const scrollCbx = useDropdownCombobox({
+    open: scrollOpen,
+    setOpen: setScrollOpen,
+    panelId: scrollPanelId,
+    inputRef: scrollSearchRef,
+    onCommit: (c) => toggleCountry(c),
+    revalidateKey: `${scrollSearch}::${scrollSelected.size}`,
+    commitOnTab: false,
+  });
 
   /* ── single-select ──────────────────────────── */
   const singleRef = useRef<HTMLButtonElement>(null);
@@ -88,6 +111,8 @@ export default function DropdownPlayground() {
 
   /* ── tag multi-select with search ───────────── */
   const tagRef = useRef<HTMLButtonElement>(null);
+  const tagSearchRef = useRef<HTMLInputElement>(null);
+  const tagPanelId = useId();
   const [tagOpen, setTagOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set());
@@ -103,6 +128,15 @@ export default function DropdownPlayground() {
       return next;
     });
   };
+  const tagCbx = useDropdownCombobox({
+    open: tagOpen,
+    setOpen: setTagOpen,
+    panelId: tagPanelId,
+    inputRef: tagSearchRef,
+    onCommit: (t) => toggleTag(t),
+    revalidateKey: `${tagSearch}::${selectedTags.size}`,
+    commitOnTab: false,
+  });
 
   /* ── generic with groups ────────────────────── */
   const genericRef = useRef<HTMLButtonElement>(null);
@@ -150,6 +184,30 @@ export default function DropdownPlayground() {
       return next;
     });
 
+  /* ── hover submenu with search input (auto-activedescendant) ─────── */
+  const hoverSearchRef = useRef<HTMLButtonElement>(null);
+  const [hoverSearchOpen, setHoverSearchOpen] = useState(false);
+  const [hoverSearchQuery, setHoverSearchQuery] = useState("");
+  const [hoverSearchPicked, setHoverSearchPicked] = useState<string | null>(null);
+  const hoverSearchFiltered = FRUITS.filter((f) =>
+    f.toLowerCase().includes(hoverSearchQuery.toLowerCase())
+  );
+
+  /* ── drill-down with search input (auto-activedescendant) ─────── */
+  const drillSearchRef = useRef<HTMLButtonElement>(null);
+  const [drillSearchOpen, setDrillSearchOpen] = useState(false);
+  const [drillSearchQuery, setDrillSearchQuery] = useState("");
+  const [drillSearchPicked, setDrillSearchPicked] = useState<string | null>(null);
+  const COUNTRIES_FOR_DRILL = [
+    "Argentina", "Australia", "Brazil", "Canada", "Chile",
+    "China", "Colombia", "Denmark", "Egypt", "Finland",
+    "France", "Germany", "Greece", "India", "Indonesia",
+    "Ireland", "Italy", "Japan", "Kenya", "Mexico",
+  ];
+  const drillSearchFiltered = COUNTRIES_FOR_DRILL.filter((c) =>
+    c.toLowerCase().includes(drillSearchQuery.toLowerCase())
+  );
+
   const btnStyle: React.CSSProperties = {
     padding: "8px 16px",
     borderRadius: 8,
@@ -173,16 +231,25 @@ export default function DropdownPlayground() {
             {selectedFruits.size ? `${selectedFruits.size} fruits selected` : "Select fruits..."}
           </button>
           <Dropdown
+            id={multiPanelId}
             open={multiOpen}
             onClose={() => setMultiOpen(false)}
             anchorRef={multiRef}
+            returnFocusRef={multiSearchRef}
+            aria-label="Fruits"
+            {...multiCbx.dropdownProps}
             header={
               <SelectOptionHeader
                 type="search"
+                searchRef={multiSearchRef}
                 searchValue={multiSearch}
                 searchPlaceholder="Search fruits..."
                 onSearchChange={(e: ChangeEvent<HTMLInputElement>) => setMultiSearch(e.target.value)}
                 onSearchClear={() => setMultiSearch("")}
+                searchInputProps={{
+                  onKeyDown: multiCbx.handleInputKeyDown,
+                  ...multiCbx.inputProps,
+                }}
               />
             }
             footer={
@@ -204,6 +271,7 @@ export default function DropdownPlayground() {
                 labelText={f}
                 description={false}
                 checked={selectedFruits.has(f)}
+                {...multiCbx.getOptionProps(f, f)}
                 onChange={() => toggleFruit(f)}
               />
             ))}
@@ -222,17 +290,26 @@ export default function DropdownPlayground() {
             {scrollSelected.size ? `${scrollSelected.size} countries selected` : "Select countries..."}
           </button>
           <Dropdown
+            id={scrollPanelId}
             open={scrollOpen}
             onClose={() => setScrollOpen(false)}
             anchorRef={scrollRef}
+            returnFocusRef={scrollSearchRef}
+            aria-label="Countries"
             maxHeight={400}
+            {...scrollCbx.dropdownProps}
             header={
               <SelectOptionHeader
                 type="search"
+                searchRef={scrollSearchRef}
                 searchValue={scrollSearch}
                 searchPlaceholder="Search countries..."
                 onSearchChange={(e: ChangeEvent<HTMLInputElement>) => setScrollSearch(e.target.value)}
                 onSearchClear={() => setScrollSearch("")}
+                searchInputProps={{
+                  onKeyDown: scrollCbx.handleInputKeyDown,
+                  ...scrollCbx.inputProps,
+                }}
               />
             }
             footer={
@@ -254,6 +331,7 @@ export default function DropdownPlayground() {
                 labelText={c}
                 description={false}
                 checked={scrollSelected.has(c)}
+                {...scrollCbx.getOptionProps(c, c)}
                 onChange={() => toggleCountry(c)}
               />
             ))}
@@ -320,16 +398,25 @@ export default function DropdownPlayground() {
             {selectedTags.size ? `${selectedTags.size} tags` : "Select tags..."}
           </button>
           <Dropdown
+            id={tagPanelId}
             open={tagOpen}
             onClose={() => setTagOpen(false)}
             anchorRef={tagRef}
+            returnFocusRef={tagSearchRef}
+            aria-label="Tags"
+            {...tagCbx.dropdownProps}
             header={
               <SelectOptionHeader
                 type="search"
+                searchRef={tagSearchRef}
                 searchValue={tagSearch}
                 searchPlaceholder="Search tags..."
                 onSearchChange={(e: ChangeEvent<HTMLInputElement>) => setTagSearch(e.target.value)}
                 onSearchClear={() => setTagSearch("")}
+                searchInputProps={{
+                  onKeyDown: tagCbx.handleInputKeyDown,
+                  ...tagCbx.inputProps,
+                }}
               />
             }
             footer={
@@ -351,6 +438,7 @@ export default function DropdownPlayground() {
                 labelText={t}
                 description={false}
                 checked={selectedTags.has(t)}
+                {...tagCbx.getOptionProps(t, t)}
                 onChange={() => toggleTag(t)}
               />
             ))}
@@ -871,6 +959,172 @@ export default function DropdownPlayground() {
               />
             ))}
           </HoverSubmenu>
+        </Dropdown>
+      </section>
+
+      {/* ── HoverSubmenu with embedded search (auto-activedescendant) ──
+       * Demonstrates Dropdown's auto-activedescendant: the search input
+       * inside the submenu keeps DOM focus while ArrowUp/Down highlight
+       * options, Enter commits the highlighted one. No `useDropdownCombobox`
+       * wiring — Dropdown's panel handler detects the focused input and
+       * switches to the activedescendant pattern automatically.
+       */}
+      <section style={{ maxWidth: 560 }}>
+        <h3>Hover submenu with embedded search</h3>
+        <p
+          style={{
+            fontSize: "var(--type-body-sm-size)",
+            color: "var(--text-neutral-secondary)",
+            marginBottom: "var(--spacing-md)",
+          }}
+        >
+          A <strong>HoverSubmenu</strong> can host its own search input. The
+          input keeps DOM focus while you type and use <kbd>ArrowUp</kbd> /
+          <kbd>ArrowDown</kbd> to highlight options; <kbd>Enter</kbd> commits.
+          No hook wiring needed — Dropdown auto-detects the focused input.
+        </p>
+        <button
+          ref={hoverSearchRef}
+          style={btnStyle}
+          type="button"
+          onClick={() => setHoverSearchOpen(!hoverSearchOpen)}
+        >
+          {hoverSearchPicked ? `Picked: ${hoverSearchPicked}` : "Open hover-search demo"}
+        </button>
+        <Dropdown
+          open={hoverSearchOpen}
+          onClose={() => setHoverSearchOpen(false)}
+          anchorRef={hoverSearchRef}
+          role="menu"
+          width={240}
+        >
+          <HoverSubmenu
+            labelText="Browse fruits"
+            leading={<Icon name="search" size={20} />}
+            header={
+              <SelectOptionHeader
+                type="search"
+                searchValue={hoverSearchQuery}
+                searchPlaceholder="Search fruits..."
+                onSearchChange={(e: ChangeEvent<HTMLInputElement>) => setHoverSearchQuery(e.target.value)}
+                onSearchClear={() => setHoverSearchQuery("")}
+              />
+            }
+          >
+            {hoverSearchFiltered.length > 0 ? (
+              hoverSearchFiltered.map((f) => (
+                <GenericSelectOption
+                  key={f}
+                  labelText={f}
+                  description={false}
+                  onClick={() => {
+                    setHoverSearchPicked(f);
+                    setHoverSearchOpen(false);
+                    setHoverSearchQuery("");
+                  }}
+                />
+              ))
+            ) : (
+              <div
+                style={{
+                  padding: "12px 8px",
+                  fontSize: 13,
+                  color: "var(--text-neutral-placeholder)",
+                }}
+              >
+                No matches
+              </div>
+            )}
+          </HoverSubmenu>
+        </Dropdown>
+      </section>
+
+      {/* ── DrilldownSubmenu with embedded search (auto-activedescendant) ──
+       * Same pattern, but the search input lives inside a drill level. The
+       * Dropdown's `getOptions()` already scopes to `[data-drill-active]`,
+       * so the auto-activedescendant flow naturally targets only the
+       * visible level's options.
+       */}
+      <section style={{ maxWidth: 560 }}>
+        <h3>Drill-down with embedded search</h3>
+        <p
+          style={{
+            fontSize: "var(--type-body-sm-size)",
+            color: "var(--text-neutral-secondary)",
+            marginBottom: "var(--spacing-md)",
+          }}
+        >
+          A <strong>DrilldownSubmenu</strong> level can host its own search
+          input too. Drill into <em>Browse countries</em> and start typing —
+          the input keeps focus while you arrow through results and{" "}
+          <kbd>Enter</kbd> picks one.
+        </p>
+        <button
+          ref={drillSearchRef}
+          style={btnStyle}
+          type="button"
+          onClick={() => setDrillSearchOpen(!drillSearchOpen)}
+        >
+          {drillSearchPicked ? `Picked: ${drillSearchPicked}` : "Open drill-search demo"}
+        </button>
+        <Dropdown
+          open={drillSearchOpen}
+          onClose={() => setDrillSearchOpen(false)}
+          anchorRef={drillSearchRef}
+          role="menu"
+          width={260}
+          panelKeyboardNav
+        >
+          <GenericSelectOption
+            labelText="Recent"
+            description={false}
+            leading={<Icon name="schedule" size={20} />}
+            onClick={() => setDrillSearchOpen(false)}
+          />
+          <DrilldownSubmenu
+            labelText="Browse countries"
+            leading={<Icon name="public" size={20} />}
+            header={
+              <SelectOptionHeader
+                type="search"
+                searchValue={drillSearchQuery}
+                searchPlaceholder="Search countries..."
+                onSearchChange={(e: ChangeEvent<HTMLInputElement>) => setDrillSearchQuery(e.target.value)}
+                onSearchClear={() => setDrillSearchQuery("")}
+              />
+            }
+          >
+            {drillSearchFiltered.length > 0 ? (
+              drillSearchFiltered.map((c) => (
+                <GenericSelectOption
+                  key={c}
+                  labelText={c}
+                  description={false}
+                  onClick={() => {
+                    setDrillSearchPicked(c);
+                    setDrillSearchOpen(false);
+                    setDrillSearchQuery("");
+                  }}
+                />
+              ))
+            ) : (
+              <div
+                style={{
+                  padding: "12px 8px",
+                  fontSize: 13,
+                  color: "var(--text-neutral-placeholder)",
+                }}
+              >
+                No matches
+              </div>
+            )}
+          </DrilldownSubmenu>
+          <GenericSelectOption
+            labelText="Settings"
+            description={false}
+            leading={<Icon name="settings" size={20} />}
+            onClick={() => setDrillSearchOpen(false)}
+          />
         </Dropdown>
       </section>
     </div>

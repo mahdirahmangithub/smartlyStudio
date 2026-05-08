@@ -1,5 +1,6 @@
 import {
   forwardRef,
+  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -8,6 +9,7 @@ import {
   type ChangeEvent,
   type FormEvent,
   type HTMLAttributes,
+  type KeyboardEvent,
 } from "react";
 import { IconButton } from "../IconButton";
 import { ToggleButton } from "../ToggleButton";
@@ -74,12 +76,23 @@ export interface PaginationProps
   "aria-label"?: string;
   /** i18n hook for the per-page button aria-label. */
   getItemAriaLabel?: (page: number, isCurrent: boolean) => string;
+  /** aria-label for the previous-page button. Default "Previous page". */
+  previousAriaLabel?: string;
+  /** aria-label for the next-page button. Default "Next page". */
+  nextAriaLabel?: string;
+  /**
+   * i18n hook for the polite live-region announcement that fires on every
+   * page change. Default `(page, count) => "Page {page} of {count}"`.
+   */
+  getAnnouncement?: (page: number, count: number) => string;
 }
 
 /* ─────────────────────────── Helpers ─────────────────────────── */
 
 const defaultGetItemAriaLabel = (p: number, isCurrent: boolean) =>
   isCurrent ? `Page ${p}, current page` : `Go to page ${p}`;
+
+const defaultGetAnnouncement = (p: number, c: number) => `Page ${p} of ${c}`;
 
 /* Map Pagination's two sizes onto the underlying primitives. The sub-
  * components have their own size enums (Button has sm/md/lg, Input has
@@ -155,16 +168,89 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
       className,
       "aria-label": ariaLabel = "Pagination",
       getItemAriaLabel = defaultGetItemAriaLabel,
+      previousAriaLabel = "Previous page",
+      nextAriaLabel = "Next page",
+      getAnnouncement = defaultGetAnnouncement,
       ...rest
     },
     ref,
   ) {
     const totalId = useId();
+    const pageListRef = useRef<HTMLOListElement>(null);
 
-    if (count <= 0) return null;
+    const [announcement, setAnnouncement] = useState("");
+    const isFirstAnnouncementRef = useRef(true);
 
+    // Compute clamped values up-front so hooks below can depend on them.
+    // Math.max(1, ...) keeps safeCount valid even when `count` is invalid;
+    // the `count <= 0` early return below still prevents render in that case.
     const safeCount = Math.max(1, Math.floor(count));
     const safePage = Math.min(Math.max(1, Math.floor(page)), safeCount);
+
+    useEffect(() => {
+      if (count <= 0) return;
+      // Skip the mount announcement; only fire after a real page change.
+      if (isFirstAnnouncementRef.current) {
+        isFirstAnnouncementRef.current = false;
+        return;
+      }
+      setAnnouncement(getAnnouncement(safePage, safeCount));
+    }, [count, safePage, safeCount, getAnnouncement]);
+
+    const handlePageListKeyDown = useCallback(
+      (event: KeyboardEvent<HTMLOListElement>) => {
+        if (event.altKey || event.shiftKey || event.ctrlKey || event.metaKey)
+          return;
+        const list = pageListRef.current;
+        if (!list) return;
+        const buttons = Array.from(
+          list.querySelectorAll<HTMLButtonElement>("button:not([disabled])"),
+        );
+        if (buttons.length === 0) return;
+        const currentIndex = buttons.indexOf(
+          document.activeElement as HTMLButtonElement,
+        );
+        if (currentIndex === -1) return;
+
+        let nextIndex: number | undefined;
+        switch (event.key) {
+          case "ArrowRight":
+            event.preventDefault();
+            nextIndex = Math.min(currentIndex + 1, buttons.length - 1);
+            break;
+          case "ArrowLeft":
+            event.preventDefault();
+            nextIndex = Math.max(currentIndex - 1, 0);
+            break;
+          case "Home":
+            event.preventDefault();
+            nextIndex = 0;
+            break;
+          case "End":
+            event.preventDefault();
+            nextIndex = buttons.length - 1;
+            break;
+          default:
+            return;
+        }
+
+        const target = buttons[nextIndex!];
+        if (target && target !== document.activeElement) target.focus();
+      },
+      [],
+    );
+
+    const liveRegion = (
+      <span
+        className={styles.srOnly}
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {announcement}
+      </span>
+    );
+
+    if (count <= 0) return null;
 
     const goPrev = () => {
       if (!disabled && safePage > 1) onChange(safePage - 1);
@@ -179,7 +265,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
     const prevButton = (
       <IconButton
         icon={<Icon name="chevron_left" size={CHEVRON_ICON_SIZE[size]} />}
-        aria-label="Previous page"
+        aria-label={previousAriaLabel}
         emphasis="low"
         variant="neutral"
         size={ICON_BUTTON_SIZE[size]}
@@ -192,7 +278,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
     const nextButton = (
       <IconButton
         icon={<Icon name="chevron_right" size={CHEVRON_ICON_SIZE[size]} />}
-        aria-label="Next page"
+        aria-label={nextAriaLabel}
         emphasis="low"
         variant="neutral"
         size={ICON_BUTTON_SIZE[size]}
@@ -210,6 +296,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
           className={cx(styles.root, styles.compact, SIZE_CLASS[size], className)}
           {...rest}
         >
+          {liveRegion}
           {caption && <span className={styles.caption}>{caption}</span>}
           <div className={styles.compactBase}>
             {prevButton}
@@ -258,8 +345,13 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
         className={cx(styles.root, SIZE_CLASS[size], className)}
         {...rest}
       >
+        {liveRegion}
         {prevButton}
-        <ol className={styles.pageList}>
+        <ol
+          ref={pageListRef}
+          className={styles.pageList}
+          onKeyDown={handlePageListKeyDown}
+        >
           {groups.map((g, gi) => {
             if (g.kind === "ellipsis") {
               return (
@@ -295,6 +387,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(
                           disabled={disabled}
                           aria-label={getItemAriaLabel(p, isCurrent)}
                           aria-current={isCurrent ? "page" : undefined}
+                          tabIndex={isCurrent ? 0 : -1}
                           onClick={() => goTo(p)}
                           className={cx(
                             styles.pageButton,
@@ -442,7 +535,9 @@ function CompactMenu({
         open={open}
         onClose={() => setOpen(false)}
         anchorRef={triggerRef}
+        returnFocusRef={triggerRef}
         role="listbox"
+        aria-label="Select page"
         maxHeight={320}
         /* Numeric width fed into Dropdown's positioning math — close to
          * the rendered `4ch + var(--spacing-md)` value so the panel sits

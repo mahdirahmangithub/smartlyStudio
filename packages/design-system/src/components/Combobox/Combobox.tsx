@@ -14,7 +14,12 @@ import {
   SelectInput,
   type SelectInputSize,
 } from "../SelectInput";
-import { Dropdown, type DropdownPlacement } from "../Dropdown";
+import {
+  Dropdown,
+  useDropdownCombobox,
+  type DropdownPlacement,
+  type UseDropdownComboboxReturn,
+} from "../Dropdown";
 import { SingleSelectOption } from "../SingleSelectOption";
 import { OptionSeparator } from "../OptionSeparator";
 import type { OptionItemTrailingProps } from "../OptionItemTrailing";
@@ -39,6 +44,8 @@ interface ComboboxContextValue {
   matchCount: number;
   incMatch: () => void;
   decMatch: () => void;
+  /** Shared combobox-mode wiring (highlight, activedescendant, keyboard). */
+  cbx: UseDropdownComboboxReturn;
 }
 
 const ComboboxContext = createContext<ComboboxContextValue | null>(null);
@@ -63,6 +70,20 @@ const HIDDEN_STYLE: React.CSSProperties = {
   overflow: "hidden",
   opacity: 0,
   pointerEvents: "none",
+};
+
+// Visually hides the live-region span without removing it from the a11y tree.
+// Standard sr-only recipe (matches Calendar / Pagination).
+const SR_ONLY_STYLE: React.CSSProperties = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0, 0, 0, 0)",
+  whiteSpace: "nowrap",
+  border: 0,
 };
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -139,6 +160,18 @@ function ComboboxRoot({
   const incMatch = useCallback(() => setMatchCount((c) => c + 1), []);
   const decMatch = useCallback(() => setMatchCount((c) => c - 1), []);
 
+  // Shared combobox-mode wiring: input keeps DOM focus, options highlighted
+  // via aria-activedescendant. Re-anchors the highlight whenever the filter
+  // (`query`) or visible count (`matchCount`) changes.
+  const cbx = useDropdownCombobox({
+    open: currentOpen,
+    setOpen,
+    panelId: dropdownId,
+    inputRef,
+    onCommit: onSelect,
+    revalidateKey: `${query}::${matchCount}`,
+  });
+
   const ctx: ComboboxContextValue = {
     value: currentValue,
     selectedLabel,
@@ -155,11 +188,28 @@ function ComboboxRoot({
     matchCount,
     incMatch,
     decMatch,
+    cbx,
   };
+
+  // Announce filter result count when the user is actively filtering. Empty
+  // string while idle so SR doesn't fire on mount or on selection close.
+  const announcement =
+    currentOpen && query
+      ? matchCount === 0
+        ? "No results"
+        : `${matchCount} ${matchCount === 1 ? "result" : "results"}`
+      : "";
 
   return (
     <ComboboxContext.Provider value={ctx}>
       {children}
+      <span
+        aria-live="polite"
+        aria-atomic="true"
+        style={SR_ONLY_STYLE}
+      >
+        {announcement}
+      </span>
       {name && (
         <select
           name={name}
@@ -203,7 +253,6 @@ function ComboboxInput({
   className,
 }: ComboboxInputProps) {
   const ctx = useComboboxContext();
-
   const displayValue = ctx.open ? ctx.query : ctx.selectedLabel ?? "";
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -213,30 +262,6 @@ function ComboboxInput({
 
   const handleClick = () => {
     if (!ctx.open && !ctx.disabled && !ctx.readOnly) ctx.setOpen(true);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Escape" && ctx.open) {
-      ctx.setOpen(false);
-      return;
-    }
-    if (e.key === "ArrowDown" || e.key === "Enter") {
-      if (ctx.open) {
-        if (e.key === "ArrowDown") {
-          e.preventDefault();
-          const panel = document.getElementById(ctx.dropdownId);
-          if (panel) {
-            const first = panel.querySelector<HTMLElement>(
-              '[role="option"]:not([aria-disabled="true"])'
-            );
-            first?.focus({ focusVisible: true } as FocusOptions);
-          }
-        }
-      } else {
-        e.preventDefault();
-        ctx.setOpen(true);
-      }
-    }
   };
 
   const handleClear = () => {
@@ -261,9 +286,10 @@ function ComboboxInput({
         value={displayValue}
         onChange={handleChange}
         onClick={handleClick}
-        onKeyDown={handleKeyDown}
+        onKeyDown={ctx.cbx.handleInputKeyDown}
         onClear={handleClear}
         expanded={ctx.open && !ctx.disabled && !ctx.readOnly}
+        {...ctx.cbx.inputProps}
         className={className}
       />
     </div>
@@ -298,6 +324,9 @@ function ComboboxContent({
       matchAnchorWidth
       autoFocus={false}
       returnFocusRef={ctx.inputRef}
+      // Combobox owns keyboard nav via the input; panel is passive.
+      {...ctx.cbx.dropdownProps}
+      aria-label="Suggestions"
       {...dropdownProps}
     >
       {children}
@@ -356,7 +385,8 @@ function ComboboxItem({
       descriptionText={description}
       leading={leading}
       trailing={trailing}
-      onChange={() => ctx.onSelect(value, label)}
+      {...ctx.cbx.getOptionProps(value, label)}
+      onChange={() => ctx.cbx.commit(value, label)}
     />
   );
 }

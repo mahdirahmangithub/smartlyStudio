@@ -38,6 +38,21 @@ export interface GenericSelectOptionProps
    * When true, row is not in the tab order (`tabIndex={-1}`) — host keeps focus (e.g. combobox textarea).
    */
   unmanagedFocus?: boolean;
+  /**
+   * `aria-haspopup` on the focusable inner element. Use `"menu"` for rows
+   * that open a submenu / drilldown so screen readers announce "has popup".
+   */
+  ariaHasPopup?: "menu" | "listbox" | "tree" | "grid" | "dialog" | true;
+  /**
+   * `aria-expanded` on the focusable inner element. Pair with `ariaHasPopup`
+   * so screen readers announce open/closed state.
+   */
+  ariaExpanded?: boolean;
+  /**
+   * `aria-controls` on the focusable inner element. The id of the panel
+   * this row controls (e.g. a submenu panel). Pair with `ariaHasPopup`.
+   */
+  ariaControls?: string;
 }
 
 
@@ -58,6 +73,9 @@ export function GenericSelectOption({
   optionId,
   isActive = false,
   unmanagedFocus = false,
+  ariaHasPopup,
+  ariaExpanded,
+  ariaControls,
   className,
   ...rest
 }: GenericSelectOptionProps) {
@@ -86,6 +104,9 @@ export function GenericSelectOption({
         role={resolvedRole}
         aria-disabled={disabled || undefined}
         aria-selected={resolvedRole === "option" ? isActive : undefined}
+        aria-haspopup={ariaHasPopup}
+        aria-expanded={ariaHasPopup !== undefined ? !!ariaExpanded : undefined}
+        aria-controls={ariaControls}
         tabIndex={disabled || unmanagedFocus ? -1 : 0}
         className={cx(
           styles.content,

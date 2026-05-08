@@ -31,6 +31,12 @@ export interface DrilldownFrame {
    * (where FrameContent reads it), so the read always sees the current value.
    */
   content: MutableRefObject<ReactNode>;
+  /**
+   * Optional sticky header slot for this drill level (e.g. a search input).
+   * Rendered ABOVE the level's ScrollFade so it stays fixed while options
+   * scroll. Same ref-based reconciliation as `content` so live updates flow.
+   */
+  header?: MutableRefObject<ReactNode>;
   label: string;
   triggerRef: RefObject<HTMLElement | null>;
 }
@@ -152,12 +158,19 @@ export function DrilldownPanelContent({
   };
 
   // When drilling forward, focus the first focusable in the newly-visible level.
+  // Prefer a native search input over the first option — matches the panel-level
+  // header-input precedence in Dropdown's getHeaderInput(). Native <input>
+  // elements have implicit tabindex (no attribute), so a `[tabindex="0"]` query
+  // alone would skip them and land on the back row instead.
   useEffect(() => {
     if (stack.length > prevLenRef.current) {
       const timer = setTimeout(() => {
         const levels = viewportRef.current?.querySelectorAll<HTMLElement>("[data-drill-level]");
         const last = levels?.[levels.length - 1];
-        const focusable = last?.querySelector<HTMLElement>('[tabindex="0"]');
+        const input = last?.querySelector<HTMLElement>(
+          'input:not([type="checkbox"]):not([type="radio"]):not([disabled]):not([readonly])'
+        );
+        const focusable = input ?? last?.querySelector<HTMLElement>('[tabindex="0"]');
         focusable?.focus({ focusVisible: true } as FocusOptions);
       }, 0);
       prevLenRef.current = stack.length;
@@ -198,7 +211,9 @@ export function DrilldownPanelContent({
           <ScrollFade {...scrollFadeProps}>{children}</ScrollFade>
         </div>
 
-        {/* Each drilled level — FrameContent reads the ref written above. */}
+        {/* Each drilled level — FrameContent reads the ref written above.
+            An optional sticky header sits ABOVE the ScrollFade so a search
+            input embedded in a drill level doesn't scroll with the options. */}
         {stack.map((frame, i) => (
           <div
             key={i}
@@ -206,12 +221,18 @@ export function DrilldownPanelContent({
             data-drill-active={i === stack.length - 1 ? "" : undefined}
             className={styles.drillLevel}
           >
+            {frame.header && (
+              <div className={styles.drillLevelHeader}>
+                <FrameContent contentRef={frame.header} />
+              </div>
+            )}
             <ScrollFade {...scrollFadeProps}>
-              {/* Back row */}
+              {/* Back row — labels with the parent frame's label so SR users
+                  hear "Back to {parent}" instead of an unmoored "Back". */}
               <GenericSelectOption
                 hideFocusRing
                 description={false}
-                labelText="Back"
+                labelText={`Back to ${frame.label}`}
                 leading={<Icon name="arrow_back" size={16} />}
                 onClick={popWithFocus}
               />

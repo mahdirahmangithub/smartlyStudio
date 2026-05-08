@@ -1,7 +1,8 @@
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef, useMemo, useId } from "react";
 import { SelectInput, type SelectInputSize } from "@sds/components/SelectInput";
 import { SingleSelectOption } from "@sds/components/SingleSelectOption";
 import { Icon } from "@sds/components/Icon";
+import { useDropdownCombobox } from "@sds/components/Dropdown";
 
 const SIZES: SelectInputSize[] = ["md", "lg", "xl"];
 
@@ -52,6 +53,7 @@ export default function SelectInputPlayground() {
   const [selected, setSelected] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const dropdownId = useId();
 
   const filtered = useMemo(
     () =>
@@ -63,18 +65,30 @@ export default function SelectInputPlayground() {
     [query]
   );
 
-  const displayValue = open ? query : selected ?? "";
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
-    if (!open) setOpen(true);
-  };
-
   const handleSelect = (country: string) => {
     setSelected(country);
     setQuery("");
     setOpen(false);
     inputRef.current?.focus();
+  };
+
+  // Combobox-mode wiring: input keeps DOM focus, ArrowUp/Down highlight via
+  // aria-activedescendant, Enter / Tab commit. Single source of truth for the
+  // canonical pattern (see useDropdownCombobox).
+  const cbx = useDropdownCombobox({
+    open,
+    setOpen,
+    panelId: dropdownId,
+    inputRef,
+    onCommit: (country) => handleSelect(country),
+    revalidateKey: query,
+  });
+
+  const displayValue = open ? query : selected ?? "";
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    if (!open) setOpen(true);
   };
 
   const handleClear = () => {
@@ -90,13 +104,6 @@ export default function SelectInputPlayground() {
 
   const handleClick = () => {
     if (!open && !disabled) setOpen(true);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Escape" && open) {
-      setOpen(false);
-      setQuery("");
-    }
   };
 
   return (
@@ -157,15 +164,17 @@ export default function SelectInputPlayground() {
               disabled={disabled}
               readOnly={readOnly}
               clearable={clearable}
+              dropdownId={dropdownId}
               placeholder={selected ?? "Search a country..."}
               value={displayValue}
               onChange={handleInputChange}
               onClick={handleClick}
-              onKeyDown={handleKeyDown}
+              onKeyDown={cbx.handleInputKeyDown}
               expanded={open && !disabled && !readOnly}
               onClose={handleClose}
               onClear={handleClear}
               leadingIcon={showLeading ? <Icon name="search" size={ICON_SIZE[size]} /> : undefined}
+              {...cbx.inputProps}
             >
               {filtered.length > 0 ? (
                 filtered.map((country) => (
@@ -174,7 +183,8 @@ export default function SelectInputPlayground() {
                     labelText={country}
                     checked={selected === country}
                     description={false}
-                    onChange={() => handleSelect(country)}
+                    {...cbx.getOptionProps(country, country)}
+                    onChange={() => cbx.commit(country, country)}
                   />
                 ))
               ) : (

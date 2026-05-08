@@ -12,9 +12,25 @@
   box-sizing: border-box;
 }
 
+/* Auto-activedescendant highlight: applied via setAttribute on the highlighted
+   option when ArrowUp/Down navigates while focus is in a panel input. Same
+   visual as the option components' own .active class — works even on options
+   that don't expose an `isActive` prop, since the highlight is purely DOM. */
+.panel [data-dropdown-active="true"]:not([aria-disabled="true"]) {
+  background: var(--element-fill-neutral-tertiary-hover);
+}
+
 /* ── header (sticky top) ──────────────────────────────────────────────── */
 
 .header {
+  flex-shrink: 0;
+  padding: var(--spacing-sm) var(--spacing-sm) 0;
+}
+
+/* Per-drill-level sticky header (e.g. search input inside a drilled level).
+   Mirrors `.header` padding so a SelectOptionHeader looks identical whether
+   it sits in the panel's root header slot or inside a drilled level. */
+.drillLevelHeader {
   flex-shrink: 0;
   padding: var(--spacing-sm) var(--spacing-sm) 0;
 }

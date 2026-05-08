@@ -30,6 +30,12 @@ export interface SelectInputProps
   expanded?: boolean;
   onClose?: () => void;
   children?: ReactNode;
+  /**
+   * Override the internal Dropdown panel id. Pass this when you wire up
+   * `useDropdownCombobox` so the hook can target the same panel via
+   * `document.getElementById`. Defaults to a `useId`-generated value.
+   */
+  dropdownId?: string;
 }
 
 const CLEAR_SIZE: Record<SelectInputSize, InputClearSize> = {
@@ -66,6 +72,7 @@ export const SelectInput = forwardRef<HTMLInputElement, SelectInputProps>(
       className,
       id: idProp,
       "aria-describedby": ariaDescribedbyProp,
+      dropdownId: dropdownIdProp,
       ...rest
     },
     externalRef
@@ -76,7 +83,8 @@ export const SelectInput = forwardRef<HTMLInputElement, SelectInputProps>(
 
     const innerRef = useRef<HTMLInputElement>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
-    const dropdownId = useId();
+    const internalDropdownId = useId();
+    const dropdownId = dropdownIdProp ?? internalDropdownId;
 
     const setRef = useCallback(
       (node: HTMLInputElement | null) => {
@@ -151,6 +159,15 @@ export const SelectInput = forwardRef<HTMLInputElement, SelectInputProps>(
     };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+      // Consumer's onKeyDown runs FIRST so callers using `useDropdownCombobox`
+      // (or any other handler that owns ArrowDown / Enter) can `preventDefault`
+      // and we won't fall through to the legacy "move focus into options"
+      // behavior below — which would steal DOM focus from the input.
+      onKeyDown?.(e);
+      if (e.defaultPrevented) return;
+
+      // Legacy fallback when no consumer is intercepting: open the dropdown
+      // (when closed) or move focus into the option list (when open).
       if ((e.key === "ArrowDown" || e.key === "Enter") && children) {
         if (expanded) {
           if (e.key === "ArrowDown") {
@@ -168,7 +185,6 @@ export const SelectInput = forwardRef<HTMLInputElement, SelectInputProps>(
           onClick?.({ target: innerRef.current } as unknown as React.MouseEvent<HTMLInputElement>);
         }
       }
-      onKeyDown?.(e);
     };
 
     return (
