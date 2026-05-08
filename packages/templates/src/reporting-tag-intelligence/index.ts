@@ -1,0 +1,1 @@
+export { ReportingTagIntelligenceTemplate } from "./ReportingTagIntelligenceTemplate";

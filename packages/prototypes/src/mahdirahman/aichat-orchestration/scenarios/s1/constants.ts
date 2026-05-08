@@ -9,6 +9,12 @@ export const LOADING_LABELS = [
   "Generating campaign creation plan...",
 ];
 
+export const WORKSPACE_LOOKUP_LABELS = [
+  "Looking for workspace",
+  "No exact match",
+  "Found similar options",
+];
+
 export const EXTRACT_LABELS = [
   "Reading attachment",
   "Analyzing content",

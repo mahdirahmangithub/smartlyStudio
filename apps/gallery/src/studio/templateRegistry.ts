@@ -1,8 +1,9 @@
 import type { TagType } from "@sds/components/Tag";
 import { HomeTemplate } from "@templates/home";
 import { AiChatTemplate } from "@templates/ai-chat";
+import { ReportingTagIntelligenceTemplate } from "@templates/reporting-tag-intelligence";
 
-export type TemplateKey = "home" | "ai-chat";
+export type TemplateKey = "home" | "ai-chat" | "reporting-tag-intelligence";
 
 export interface TemplateMeta {
   key: TemplateKey;
@@ -33,9 +34,18 @@ export const TEMPLATES: TemplateMeta[] = [
       { label: "Agent", variant: "neutral" },
     ],
   },
+  {
+    key: "reporting-tag-intelligence",
+    title: "Reporting",
+    image: "/prototypes/prototype-3.png",
+    tags: [
+      { label: "Intelligence", variant: "neutral" },
+    ],
+  },
 ];
 
 export const TEMPLATE_COMPONENTS: Record<TemplateKey, () => React.ReactElement> = {
   home: HomeTemplate,
   "ai-chat": AiChatTemplate,
+  "reporting-tag-intelligence": ReportingTagIntelligenceTemplate,
 };

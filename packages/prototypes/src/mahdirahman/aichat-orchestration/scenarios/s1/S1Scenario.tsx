@@ -29,6 +29,7 @@ import {
   KNOWLEDGE_BASE_CONFIG,
   useCitationGroup,
   type Campaign,
+  type Workspace,
 } from "@sds/components/AiEntityPreview";
 import { AiGenerationSuggestion, AiGenerationSuggestionEntities } from "@sds/components/AiGenerationSuggestion";
 import { Entity } from "@sds/components/Entity";
@@ -41,6 +42,7 @@ import {
   LOADING_LABELS,
   EXTRACT_LABELS,
   APPLY_LABELS,
+  WORKSPACE_LOOKUP_LABELS,
   PLAN_DETAILS_CODE,
   KB_SOURCES,
   buildExtractedFields,
@@ -57,6 +59,74 @@ export const S1_CONFIG = {
   id: "s-1",
   label: "Campaign Creation",
 } as const;
+
+const QUOTE_CHARS = `"'“”‘’«»`;
+const QUOTED_RE = new RegExp(`[${QUOTE_CHARS}]([^${QUOTE_CHARS}]+)[${QUOTE_CHARS}]`);
+const VERB_RE = /(?:go with|use|using|pick|choose|workspace(?:\s+named?)?)\s+(.+?)(?:[.?!]|$)/i;
+
+function extractWorkspaceName(input: string): string {
+  const quoted = input.match(QUOTED_RE);
+  if (quoted) return quoted[1].trim();
+  const verb = input.match(VERB_RE);
+  if (verb) return verb[1].trim();
+  return input.trim();
+}
+
+/**
+ * Generates two workspace name variants close to what the user typed:
+ *   - If the input contains a 4-digit year → shift the year by -1.
+ *   - Else if the input has 3+ tokens → drop the last token.
+ *   - Else → append " 2025".
+ *
+ * The second variant drops the second-to-last token (3+ tokens) or appends
+ * " Test" (1–2 tokens). Variants are de-duped against the original and each
+ * other so the suggestions always read as distinct, plausible workspaces.
+ */
+function makeSimilarNames(name: string): [string, string] {
+  const trimmed = name.trim();
+  const tokens = trimmed.split(/\s+/);
+  const yearIdx = tokens.findIndex((t) => /^\d{4}$/.test(t));
+
+  let v1: string;
+  if (yearIdx >= 0) {
+    const shifted = [...tokens];
+    shifted[yearIdx] = String(parseInt(shifted[yearIdx]!, 10) - 1);
+    v1 = shifted.join(" ");
+  } else if (tokens.length >= 3) {
+    v1 = tokens.slice(0, -1).join(" ");
+  } else {
+    v1 = `${trimmed} 2025`;
+  }
+
+  let v2: string;
+  if (tokens.length >= 3) {
+    v2 = [...tokens.slice(0, -2), tokens[tokens.length - 1]!].join(" ");
+  } else {
+    v2 = `${trimmed} Test`;
+  }
+
+  if (v1 === trimmed || !v1) v1 = `${trimmed} (Old)`;
+  if (v2 === trimmed || v2 === v1 || !v2) v2 = `${trimmed} Test`;
+  return [v1, v2];
+}
+
+function buildSimilarWorkspaces(name: string): [Workspace, Workspace] {
+  const [n1, n2] = makeSimilarNames(name);
+  const stamp = Date.now();
+  return [
+    { id: `synth-w-${stamp}-1`, name: n1, platform: "Meta",   campaignCount: 6, adSetCount: 18, adCount: 54 },
+    { id: `synth-w-${stamp}-2`, name: n2, platform: "Google", campaignCount: 4, adSetCount: 12, adCount: 36 },
+  ];
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 interface S1ScenarioProps {
   /** Class applied to the ScenarioGuide popover (yellow background, etc.). */
@@ -91,6 +161,10 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
   const [selectedAdAccountId, setSelectedAdAccountId] = useState<string | null>(null);
   const [createdCampaign, setCreatedCampaign] = useState<Campaign | null>(null);
 
+  // Sub-flow: user dismissed the step-1 option picker and is typing the
+  // workspace name into the regular PromptInput instead.
+  const [workspaceTextEntry, setWorkspaceTextEntry] = useState(false);
+
   // Plan-edit flow — editingPlanIdRef captures the id synchronously for use
   // inside submit callbacks.
   const [editingPlanId, setEditingPlanId] = useState<string | null>(null);
@@ -106,6 +180,7 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
     if (scenarioStep === 0) {
       setHasEditedPlan(false);
       setFieldsApplied(false);
+      setWorkspaceTextEntry(false);
     }
   }, [scenarioStep]);
 
@@ -199,6 +274,72 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
         "<p>Do you want to create this campaign in a new workspace or use an existing one?</p>",
         () => setScenarioStep(1),
       );
+      chat.focusPromptTextarea();
+      return;
+    }
+
+    // ── Step 1 text-entry sub-flow ──
+    // User dismissed the workspace option picker and typed a workspace name
+    // (e.g. `i want to go with "BMW Global EU"`). We do a fake lookup that
+    // cycles loading labels (no CoT), then streams a "did you mean" reply
+    // suggesting two similar workspaces from the list.
+    if (scenarioStep === 1 && workspaceTextEntry) {
+      const workspaceName = extractWorkspaceName(value);
+      const similar = buildSimilarWorkspaces(workspaceName);
+      const workspaceById = new Map(similar.map((w) => [w.id, w]));
+      const aiId = `a-${Date.now() + 1}`;
+      const aiMsg = {
+        id: aiId,
+        role: "assistant" as const,
+        phase: "loading" as const,
+        text: "",
+        loadingLabel: WORKSPACE_LOOKUP_LABELS[0],
+        components: {
+          "entity-preview": (attrs: Record<string, string>) => {
+            const w = workspaceById.get(attrs.id);
+            if (!w) return null;
+            return <AiEntityPreviewInlineTyped config={WORKSPACE_CONFIG} data={w} />;
+          },
+        },
+        showFeedback: true,
+        onFeedbackChange: chat.setFeedback(aiId),
+      };
+
+      chat.activeAssistIdRef.current = aiId;
+      flushSync(() => {
+        chat.setScenarios((prev) => prev.map((s) =>
+          s.id === S1_CONFIG.id ? { ...s, messages: [...s.messages, userMsg, aiMsg] } : s
+        ));
+      });
+      chat.threadRef.current?.scrollToMessage(userMsg.id, "smooth");
+
+      WORKSPACE_LOOKUP_LABELS.forEach((_label, i) => {
+        if (i === 0) return;
+        setTimeout(() => {
+          if (chat.activeAssistIdRef.current !== aiId) return;
+          chat.setScenarios((prev) => prev.map((s) =>
+            s.id === S1_CONFIG.id ? {
+              ...s,
+              messages: s.messages.map((m) => m.id === aiId ? {
+                ...m,
+                loadingLabel: WORKSPACE_LOOKUP_LABELS[i],
+              } : m),
+            } : s
+          ));
+        }, i * 1500);
+      });
+
+      setTimeout(() => {
+        if (chat.activeAssistIdRef.current !== aiId) return;
+        const escName = escapeHtml(workspaceName);
+        const fullText =
+          `<p>I couldn't find a workspace named "<strong>${escName}</strong>"</p>` +
+          `<p>Did you mean:</p>` +
+          `<ul>${similar.map((w) => `<li><entity-preview id="${w.id}"></entity-preview></li>`).join("")}</ul>` +
+          `<p>Select one of these, or create a new workspace with the name "<strong>${escName}</strong>"</p>`;
+        chat.streamAiMessage(S1_CONFIG.id, aiId, fullText, undefined, true);
+      }, WORKSPACE_LOOKUP_LABELS.length * 1500 + 400);
+
       chat.focusPromptTextarea();
       return;
     }
@@ -386,7 +527,7 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
     });
     chat.threadRef.current?.scrollToMessage(userMsg.id, "smooth");
     chat.focusPromptTextarea();
-  }, [scenarioStep, createdCampaign, chat]);
+  }, [scenarioStep, workspaceTextEntry, createdCampaign, chat]);
 
   /* ── Workspace-picker handlers ────────────────────────────────────── */
 
@@ -762,11 +903,11 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
           />
         ))}
     </PromptOptionInput>
-  ) : scenarioStep === 1 ? (
+  ) : scenarioStep === 1 && !workspaceTextEntry ? (
     <PromptOptionInput
       label="Where should this campaign live?"
-      onClose={() => setScenarioStep(0)}
-      onSkip={() => setScenarioStep(0)}
+      onClose={() => setWorkspaceTextEntry(true)}
+      onSkip={() => setWorkspaceTextEntry(true)}
       hasValue={false}
       isLastStep={false}
     >
@@ -824,7 +965,7 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
 
   /* ── Guide ─────────────────────────────────────────────────────────── */
 
-  const guide = getS1Guide({ scenarioStep, workspaceChoice, editingPlanId, hasEditedPlan, fieldsApplied });
+  const guide = getS1Guide({ scenarioStep, workspaceChoice, workspaceTextEntry, editingPlanId, hasEditedPlan, fieldsApplied });
 
   return (
     <>
@@ -840,16 +981,20 @@ S1Scenario.displayName = "S1Scenario";
 function getS1Guide(args: {
   scenarioStep: number;
   workspaceChoice: "new" | "existing" | null;
+  workspaceTextEntry: boolean;
   editingPlanId: string | null;
   hasEditedPlan: boolean;
   fieldsApplied: boolean;
 }): ReactNode {
-  const { scenarioStep, workspaceChoice, editingPlanId, hasEditedPlan, fieldsApplied } = args;
+  const { scenarioStep, workspaceChoice, workspaceTextEntry, editingPlanId, hasEditedPlan, fieldsApplied } = args;
   if (scenarioStep === 0) {
     return <>Submit a prompt to start (e.g. <em>"Create a new campaign for summer 2026"</em>).</>;
   }
+  if (scenarioStep === 1 && workspaceTextEntry) {
+    return <>Type a workspace name (e.g. <em>I want to go with "BMW Global EU"</em>) and submit.</>;
+  }
   if (scenarioStep === 1) {
-    return <>Pick <strong>Use an existing workspace</strong>.</>;
+    return <>Pick <strong>Use an existing workspace</strong>, or close the picker and type a workspace name.</>;
   }
   if (scenarioStep === 2 && workspaceChoice === "existing") {
     return <>Pick <strong>BMW Global</strong> and submit.</>;
