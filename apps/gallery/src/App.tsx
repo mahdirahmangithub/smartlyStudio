@@ -350,9 +350,16 @@ function IconsPage() {
   );
 }
 
+const DEFAULT_PAGE: Page = "button";
+
 function getPageFromPath(): Page {
-  const path = window.location.pathname.replace(/^\//, "") || "button";
-  return path as Page;
+  const path = window.location.pathname;
+  const match = path.match(/^\/components(?:\/([^/]+))?\/?$/);
+  const slug = match?.[1];
+  if (!slug) return DEFAULT_PAGE;
+  // Validate against PAGES so a stray /components/garbage falls back cleanly
+  // instead of casting an unknown string into the Page union.
+  return PAGES.some((p) => p.key === slug) ? (slug as Page) : DEFAULT_PAGE;
 }
 
 const PAGES: { key: Page; label: string }[] = [
@@ -510,7 +517,7 @@ export default function App() {
   const setPage = useCallback((p: Page) => {
     setPageState(p);
     setSidebarOpen(false);
-    window.history.pushState(null, "", `/${p}`);
+    window.history.pushState(null, "", `/components/${p}`);
   }, []);
 
   useEffect(() => {

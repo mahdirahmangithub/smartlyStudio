@@ -20,7 +20,7 @@ const path = window.location.pathname;
 
 function pickRoot() {
   if (path === "/chat") return <AiChatPage />;
-  if (path === "/components") return <App />;
+  if (path === "/components" || path.startsWith("/components/")) return <App />;
   const previewMatch = path.match(/^\/p\/([^/]+)\/?$/);
   if (previewMatch) {
     const key = previewMatch[1] as TemplateKey;
