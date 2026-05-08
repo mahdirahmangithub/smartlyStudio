@@ -1,5 +1,7 @@
 import type { ComponentType } from "react";
 import { S1_CONFIG, S1Scenario } from "./s1/S1Scenario";
+import { S2_CONFIG, S2Scenario } from "./s2/S2Scenario";
+import { S3_CONFIG, S3Scenario } from "./s3/S3Scenario";
 import { S6_CONFIG, S6Scenario } from "./s6/S6Scenario";
 import { S7_CONFIG, S7Scenario } from "./s7/S7Scenario";
 import { S8_CONFIG, S8Scenario } from "./s8/S8Scenario";
@@ -19,6 +21,8 @@ export interface ScenarioConfig {
  *  entry here. Nothing else in the page needs to change. */
 export const SCENARIOS: ScenarioConfig[] = [
   { ...S1_CONFIG, Component: S1Scenario },
+  { ...S2_CONFIG, Component: S2Scenario },
+  { ...S3_CONFIG, Component: S3Scenario },
   { ...S6_CONFIG, Component: S6Scenario },
   { ...S7_CONFIG, Component: S7Scenario },
   { ...S8_CONFIG, Component: S8Scenario },
