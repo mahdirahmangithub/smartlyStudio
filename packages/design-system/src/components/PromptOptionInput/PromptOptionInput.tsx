@@ -325,7 +325,7 @@ export const PromptOptionInput = forwardRef<PromptOptionInputHandle, PromptOptio
         role="group"
         aria-labelledby={ariaLabelledBy ?? labelId}
         aria-label={ariaLabel}
-        className={cx(styles.field, info && styles.fieldWithInfo, className)}
+        className={cx(styles.field, Boolean(info) && styles.fieldWithInfo, className)}
         style={style}
         onKeyDown={handleFieldKeyDown}
       >
