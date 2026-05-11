@@ -8,10 +8,10 @@ import {
   PromptInputFooterStart,
   PromptInputAddMenu,
   PromptInputSubmit,
-  PromptInputContextMenu,
+  TriggerMenu,
   DEFAULT_TRIGGER_MENUS,
   type PromptInputTriggerConfig,
-  type ContextMenuCategory,
+  type MenuNode,
 } from "@sds/components/PromptInput";
 import {
   AiEntityPreviewInlineTyped,
@@ -245,17 +245,17 @@ export function S2Scenario({ guideClassName }: S2ScenarioProps) {
 
   /* ── Trigger menus for the default PromptInput ──────────────────── */
 
-  const CONTEXT_CATEGORIES: ContextMenuCategory[] = [
-    { id: "campaigns", icon: "campaign_alt", label: "Campaigns", onSelect: () => {} },
-    { id: "audiences", icon: "group", label: "Audiences", onSelect: () => {} },
-    { id: "reports", icon: "reporting", label: "Reports", onSelect: () => {} },
+  const CONTEXT_CATEGORIES: MenuNode[] = [
+    { id: "campaigns", icon: "campaign_alt", label: "Campaigns" },
+    { id: "audiences", icon: "group", label: "Audiences" },
+    { id: "reports", icon: "reporting", label: "Reports" },
   ];
   const TRIGGER_MENUS: PromptInputTriggerConfig[] = [
     ...DEFAULT_TRIGGER_MENUS,
     {
       char: "@",
       renderContent: (props) => (
-        <PromptInputContextMenu {...props} categories={CONTEXT_CATEGORIES} />
+        <TriggerMenu {...props} items={CONTEXT_CATEGORIES} />
       ),
     },
   ];
@@ -267,6 +267,7 @@ export function S2Scenario({ guideClassName }: S2ScenarioProps) {
   return (
     <>
       <PromptInput
+        ref={chat.promptInputRef}
         onSubmit={handleSubmit}
         loading={chat.isGenerating}
         onStop={chat.handleStop}

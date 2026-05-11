@@ -2,55 +2,49 @@ import { Fragment } from "react";
 import { Icon } from "../Icon";
 import { GenericSelectOption } from "../GenericSelectOption";
 import { OptionSeparator } from "../OptionSeparator";
-import type { AttachmentMenuItemDef } from "./promptInputAttachmentMenuData";
+import type { MenuNode } from "../../types/MenuNode";
 import { usePromptInput } from "./promptInputContext";
+import type { PromptInputAttachmentKind } from "./promptInputTypes";
 
-/** Renders attachment menu rows; must be used under `<PromptInput>`. */
+/**
+ * Renders attachment-menu rows for the **`+` button** entry point.
+ *
+ * The caret-driven `/` flow no longer goes through this component — it's
+ * rendered by `<TriggerMenu>` directly inside `<PromptInput>`. This file
+ * is button-only post-Phase-3.
+ *
+ * Must be mounted under `<PromptInput>` (uses `usePromptInput()` for the
+ * focus/highlight state and the `pickAttachmentKind` dispatcher).
+ */
 export function PromptInputAttachmentMenuItems({
   items,
 }: {
-  items: readonly AttachmentMenuItemDef[];
+  items: readonly MenuNode[];
 }) {
   const {
     pickAttachmentKind,
-    attachmentMenuSource,
-    attachmentMenuId,
-    attachmentMenuCombobox,
-    caretAttachmentActiveIndex,
-    setCaretAttachmentActiveIndex,
     buttonAttachmentActiveIndex,
     setButtonAttachmentActiveIndex,
   } = usePromptInput();
 
-  const combobox = attachmentMenuCombobox && attachmentMenuSource === "caret";
-  const fromButton = attachmentMenuSource === "button";
-
   return items.map((item, index) => (
-    <Fragment key={item.kind}>
+    <Fragment key={item.id}>
       {item.dividerBefore && index > 0 ? <OptionSeparator type="divider" /> : null}
       <GenericSelectOption
-        itemRole={combobox ? "option" : "menuitem"}
-        unmanagedFocus={combobox}
-        optionId={combobox ? `${attachmentMenuId}-opt-${index}` : undefined}
-        isActive={
-          (combobox && index === caretAttachmentActiveIndex) ||
-          (fromButton && index === buttonAttachmentActiveIndex)
-        }
+        itemRole="menuitem"
+        isActive={index === buttonAttachmentActiveIndex}
         labelText={item.label}
         description={false}
-        leading={<Icon name={item.icon} size={20} />}
-        onClick={() => pickAttachmentKind(item.kind)}
-        onFocus={fromButton ? () => setButtonAttachmentActiveIndex(index) : undefined}
-        onMouseEnter={
-          combobox
-            ? () => setCaretAttachmentActiveIndex(index)
-            : fromButton
-              ? () => setButtonAttachmentActiveIndex(index)
-              : undefined
-        }
+        leading={item.icon ? <Icon name={item.icon} size={20} /> : undefined}
+        disabled={item.disabled}
+        onClick={() => {
+          if (item.kind) {
+            pickAttachmentKind(item.kind as PromptInputAttachmentKind);
+          }
+        }}
+        onFocus={() => setButtonAttachmentActiveIndex(index)}
+        onMouseEnter={() => setButtonAttachmentActiveIndex(index)}
       />
     </Fragment>
   ));
 }
-
-export type { AttachmentMenuItemDef } from "./promptInputAttachmentMenuData";

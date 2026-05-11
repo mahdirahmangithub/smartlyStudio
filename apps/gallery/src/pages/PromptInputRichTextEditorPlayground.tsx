@@ -10,19 +10,16 @@ import {
   PromptInputSubmit,
   PromptInputInfo,
   PromptInputRecommendations,
-  PromptInputContextMenu,
-  usePromptInput,
+  TriggerMenu,
+  MENTION_MENU_ITEMS,
+  SUGGESTED_CONTEXT_ITEMS,
   type PromptInputTriggerConfig,
   type PromptInputInfoType,
   type RecommendationItem,
-  type ContextMenuSuggestedItem,
-  type ContextMenuCategory,
-  type ContextMenuDrillLevel,
+  type MenuNode,
   type PromptInputContextItem,
 } from "@sds/components/PromptInput";
-import { ChipNode, $createChipNode } from "@sds/components/RichTextEditor";
-import type { AttachmentMenuItemDef } from "@sds/components/PromptInput/PromptInputAttachmentMenu";
-import { $getSelection, $isRangeSelection } from "lexical";
+import { ChipNode } from "@sds/components/RichTextEditor";
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
 const cardStyle: CSSProperties = {
@@ -37,108 +34,23 @@ const promptWrapper: CSSProperties = {
   margin: "100px auto",
 };
 
-/* ── Shared context menu data ── */
-
-const SUGGESTED_ITEMS: ContextMenuSuggestedItem[] = [
-  { id: "ws-1", icon: "Meta_color", label: "Summer 2026 - Run BMW", subtitle: "Workspace" },
-  { id: "camp-1", icon: "campaign_alt", label: "Campaign_1209", subtitle: "in Summer 2026 - Run BMW" },
-  { id: "camp-2", icon: "campaign_alt", label: "Campaign_freq", subtitle: "in Summer 2026 - Run BMW" },
-];
-
-const CAMPAIGN_DRILL: ContextMenuDrillLevel = {
-  items: [
-    { id: "c-1", icon: "campaign_alt", label: "Summer 2026 - Run BMW", onSelect: () => {} },
-    { id: "c-2", icon: "campaign_alt", label: "Campaign_1209", onSelect: () => {} },
-    { id: "c-3", icon: "campaign_alt", label: "Campaign_freq", onSelect: () => {} },
-    { id: "c-4", icon: "campaign_alt", label: "Q4 Retargeting", onSelect: () => {} },
-  ],
-};
-
-const PROJECT_DRILL: ContextMenuDrillLevel = {
-  items: [
-    { id: "p-1", icon: "folder", label: "Alpha Project", onSelect: () => {} },
-    { id: "p-2", icon: "folder", label: "Beta Launch", onSelect: () => {} },
-    { id: "p-3", icon: "folder", label: "Internal Tools", onSelect: () => {} },
-  ],
-};
-
-const CATEGORIES: ContextMenuCategory[] = [
-  { id: "campaigns", icon: "campaign_alt", label: "Campaigns", onSelect: () => {}, drillLevel: CAMPAIGN_DRILL },
-  { id: "catalogs", icon: "shopping_cart", label: "Catalogs", onSelect: () => {} },
-  { id: "producers", icon: "data_table", label: "Producers", onSelect: () => {} },
-  { id: "projects", icon: "folder", label: "Projects", onSelect: () => {}, drillLevel: PROJECT_DRILL },
-  { id: "reports-bar", icon: "reporting", label: "Reports", onSelect: () => {} },
-  { id: "reports-org", icon: "page_info", label: "Reports", onSelect: () => {} },
-  { id: "reports-lab", icon: "science", label: "Reports", onSelect: () => {} },
-];
+/* ── Shared trigger config ──
+ * Pulls the canonical category tree from the design system's `menuData`.
+ * In RTE surfaces, `<TriggerMenu>`'s default `onSelect` inserts an inline
+ * chip via `useInsertChip()`. In textarea surfaces, the same default adds
+ * to the context row instead — no per-surface wrapper required. */
 
 const DEFAULT_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
   { char: "/" },
   {
     char: "@",
     renderContent: (props) => (
-      <PromptInputContextMenu
-        {...props}
-        suggestedItems={SUGGESTED_ITEMS}
-        onSelectSuggested={(_item) => props.onAccept()}
-        categories={CATEGORIES}
-      />
+      <TriggerMenu {...props} items={MENTION_MENU_ITEMS} />
     ),
   },
 ];
 
-/* ── ContextMenuWithAdd — inner component that wires @ to addContextItem ── */
-
-function ContextMenuWithAdd({
-  query,
-  onClose: _onClose,
-  onAccept,
-  activeIndex,
-  setItemCount,
-  registerPickHandler,
-  menuId,
-}: {
-  query: string;
-  onClose: () => void;
-  onAccept: () => void;
-  activeIndex: number;
-  setItemCount: (n: number) => void;
-  registerPickHandler: (fn: () => void) => void;
-  menuId: string;
-}) {
-  const { addContextItem } = usePromptInput();
-
-  const handleSelectSuggested = (item: ContextMenuSuggestedItem) => {
-    addContextItem({ id: item.id, icon: item.icon as PromptInputContextItem["icon"], label: item.label });
-    onAccept();
-  };
-
-  const handleSelectCategory = (cat: ContextMenuCategory) => {
-    addContextItem({ id: cat.id, icon: cat.icon as PromptInputContextItem["icon"], label: cat.label });
-    onAccept();
-  };
-
-  return (
-    <PromptInputContextMenu
-      query={query}
-      activeIndex={activeIndex}
-      setItemCount={setItemCount}
-      registerPickHandler={registerPickHandler}
-      menuId={menuId}
-      suggestedItems={SUGGESTED_ITEMS}
-      onSelectSuggested={handleSelectSuggested}
-      categories={CATEGORIES.map((cat) => ({
-        ...cat,
-        onSelect: () => handleSelectCategory(cat),
-      }))}
-    />
-  );
-}
-
-const CONTEXT_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
-  { char: "/" },
-  { char: "@", renderContent: (props) => <ContextMenuWithAdd {...props} /> },
-];
+const CONTEXT_TRIGGER_MENUS = DEFAULT_TRIGGER_MENUS;
 
 /* ── Demos ── */
 
@@ -232,9 +144,9 @@ function DisabledDemo() {
 }
 
 
-const SLASH_ITEMS: AttachmentMenuItemDef[] = [
-  { kind: "photos-files", label: "Add photos & files", icon: "attach_file", keywords: ["upload", "file", "image", "photo"] },
-  { kind: "link", label: "Add link", icon: "link", keywords: ["url", "href"] },
+const SLASH_ITEMS: MenuNode[] = [
+  { id: "photos-files", kind: "photos-files", label: "Add photos & files", icon: "attach_file", keywords: ["upload", "file", "image", "photo"] },
+  { id: "link", kind: "link", label: "Add link", icon: "link", keywords: ["url", "href"] },
 ];
 
 const PER_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
@@ -242,12 +154,7 @@ const PER_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
   {
     char: "@",
     renderContent: (props) => (
-      <PromptInputContextMenu
-        {...props}
-        suggestedItems={SUGGESTED_ITEMS}
-        onSelectSuggested={(_item) => props.onAccept()}
-        categories={CATEGORIES}
-      />
+      <TriggerMenu {...props} items={MENTION_MENU_ITEMS} />
     ),
   },
 ];
@@ -461,69 +368,17 @@ function InfoBannerDemo() {
   );
 }
 
-/* ── Inline chips demo — unique to RichTextEditor ── */
-
-/**
- * Inner component that inserts a ChipNode at the cursor when @ selects an item.
- * Must live inside <PromptInput> to access usePromptInput().
- */
-function ChipInsertContextMenu({
-  query,
-  onClose,
-  onAccept: _onAccept,
-  activeIndex,
-  setItemCount,
-  registerPickHandler,
-  menuId,
-}: {
-  query: string;
-  onClose: () => void;
-  onAccept: () => void;
-  activeIndex: number;
-  setItemCount: (n: number) => void;
-  registerPickHandler: (fn: () => void) => void;
-  menuId: string;
-}) {
-  const { lexicalEditor: editor } = usePromptInput();
-
-  const handleSelectSuggested = (item: ContextMenuSuggestedItem) => {
-    if (!editor) return;
-    editor.update(() => {
-      const sel = $getSelection();
-      if (!$isRangeSelection(sel)) return;
-
-      // Delete the '@' trigger char + query text that precedes the cursor,
-      // then insert the chip. All in one update so nothing runs between.
-      const deleteCount = query.length + 1;
-      for (let i = 0; i < deleteCount; i++) {
-        sel.deleteCharacter(true);
-      }
-
-      sel.insertNodes([$createChipNode(item.label, item.icon as Parameters<typeof $createChipNode>[1])]);
-    });
-    // Close without calling onAccept — onAccept calls setValue which feeds
-    // ControlledValuePlugin.root.clear() and would destroy the chip we just inserted.
-    onClose();
-  };
-
-  return (
-    <PromptInputContextMenu
-      query={query}
-      activeIndex={activeIndex}
-      setItemCount={setItemCount}
-      registerPickHandler={registerPickHandler}
-      menuId={menuId}
-      suggestedItems={SUGGESTED_ITEMS}
-      onSelectSuggested={handleSelectSuggested}
-      categories={[]}
-    />
-  );
-}
+/* ── Inline chips demo — unique to RichTextEditor ──
+ * No wrapper needed: in an RTE-surfaced `<PromptInput>`, the default
+ * `<TriggerMenu>` `onSelect` calls `useInsertChip()` — replacing the
+ * trigger char + typed query with a `ChipNode` at the caret. */
 
 const CHIP_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
   {
     char: "@",
-    renderContent: (props) => <ChipInsertContextMenu {...props} />,
+    renderContent: (props) => (
+      <TriggerMenu {...props} items={SUGGESTED_CONTEXT_ITEMS} />
+    ),
   },
 ];
 

@@ -26,6 +26,13 @@ export interface PromptOptionInputProps {
   steps?: PromptOptionInputSteps;
   /** Show close button */
   onClose?: () => void;
+  /**
+   * Banner rendered above the picker. Pass a `<PromptInputInfo>` (or any
+   * `ReactNode`) — same placement and treatment as the info banner that sits
+   * above `<PromptInput>`. Use the `edit` type when the picker swapped in
+   * for an edit flow, `error` / `warning` for validation, etc.
+   */
+  info?: ReactNode;
   /** Search input — omit to hide */
   search?: PromptOptionInputSearch;
   /** Inline text input row — omit to hide */

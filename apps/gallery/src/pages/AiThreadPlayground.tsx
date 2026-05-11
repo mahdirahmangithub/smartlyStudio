@@ -19,14 +19,12 @@ import {
   PromptInputSubmit,
   PromptInputInfo,
   PromptInputRecommendations,
-  PromptInputContextMenu,
-  usePromptInput,
+  TriggerMenu,
+  MENTION_MENU_ITEMS,
   type PromptInputTriggerConfig,
   type PromptInputInfoType,
+  type PromptInputHandle,
   type RecommendationItem,
-  type ContextMenuCategory,
-  type ContextMenuSuggestedItem,
-  type PromptInputContextItem,
 } from "@sds/components/PromptInput";
 import { Icon } from "@sds/components/Icon";
 import { ResponseBody } from "@sds/components/ResponseBody";
@@ -369,72 +367,19 @@ const PlanTestTask = forwardRef<PlanTestTaskHandle, { onEdit?: () => void }>(
   }
 );
 
-/* ── Context menu data ───────────────────────────────────────── */
-
-const SUGGESTED_ITEMS: ContextMenuSuggestedItem[] = [
-  { id: "ws-1", icon: "Meta_color", label: "Summer 2026 - Run BMW", subtitle: "Workspace" },
-  { id: "camp-1", icon: "campaign_alt", label: "Campaign_1209", subtitle: "in Summer 2026 - Run BMW" },
-  { id: "camp-2", icon: "campaign_alt", label: "Campaign_freq", subtitle: "in Summer 2026 - Run BMW" },
-];
-
-const CATEGORIES: ContextMenuCategory[] = [
-  { id: "campaigns", icon: "campaign_alt", label: "Campaigns", onSelect: () => {}, drillLevel: { items: [
-    { id: "c-1", icon: "campaign_alt", label: "Summer 2026 - Run BMW", onSelect: () => {} },
-    { id: "c-2", icon: "campaign_alt", label: "Campaign_1209", onSelect: () => {} },
-    { id: "c-3", icon: "campaign_alt", label: "Campaign_freq", onSelect: () => {} },
-  ]}},
-  { id: "catalogs", icon: "shopping_cart", label: "Catalogs", onSelect: () => {} },
-  { id: "projects", icon: "folder", label: "Projects", onSelect: () => {}, drillLevel: { items: [
-    { id: "p-1", icon: "folder", label: "Alpha Project", onSelect: () => {} },
-    { id: "p-2", icon: "folder", label: "Beta Launch", onSelect: () => {} },
-  ]}},
-  { id: "reports", icon: "reporting", label: "Reports", onSelect: () => {} },
-];
-
-function ContextMenuWithAdd(props: {
-  query: string;
-  onClose: () => void;
-  onAccept: () => void;
-  activeIndex: number;
-  setItemCount: (n: number) => void;
-  registerPickHandler: (fn: () => void) => void;
-  menuId: string;
-}) {
-  const { addContextItem } = usePromptInput();
-
-  const add = (id: string, icon: PromptInputContextItem["icon"], label: string) => {
-    addContextItem({ id, icon, label });
-    props.onAccept();
-  };
-
-  const categories: ContextMenuCategory[] = CATEGORIES.map((cat) => ({
-    ...cat,
-    onSelect: () => add(cat.id, cat.icon as PromptInputContextItem["icon"], cat.label),
-    drillLevel: cat.drillLevel ? {
-      items: cat.drillLevel.items.map((item) => ({
-        ...item,
-        onSelect: () => add(item.id, item.icon as PromptInputContextItem["icon"], item.label),
-      })),
-    } : undefined,
-  }));
-
-  return (
-    <PromptInputContextMenu
-      query={props.query}
-      activeIndex={props.activeIndex}
-      setItemCount={props.setItemCount}
-      registerPickHandler={props.registerPickHandler}
-      menuId={props.menuId}
-      suggestedItems={SUGGESTED_ITEMS}
-      onSelectSuggested={(item) => add(item.id, item.icon as PromptInputContextItem["icon"], item.label)}
-      categories={categories}
-    />
-  );
-}
+/* ── Context menu config ─────────────────────────────────────────
+ * Pulls the canonical category tree from `menuData` and renders via
+ * `<TriggerMenu>`. Default `onSelect` for textarea surfaces adds the picked
+ * leaf to the prompt's context row — no wrapper needed. */
 
 const TRIGGER_MENUS: PromptInputTriggerConfig[] = [
   { char: "/" },
-  { char: "@", renderContent: (props) => <ContextMenuWithAdd {...props} /> },
+  {
+    char: "@",
+    renderContent: (props) => (
+      <TriggerMenu {...props} items={MENTION_MENU_ITEMS} />
+    ),
+  },
 ];
 
 /* ── Recommendations data ────────────────────────────────────── */
@@ -467,10 +412,20 @@ const CATEGORY_ITEMS: Record<string, string[]> = {
   Sports: ["Running shoes", "Gym equipment", "Yoga mat", "Bicycle"],
 };
 
-function ShoppingMultiOption({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
+function ShoppingMultiOption({
+  label,
+  checked,
+  onChange,
+  ...rest
+}: {
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+} & Partial<React.ComponentProps<typeof MultiSelectOption>>) {
   const { optionsDisabled } = usePromptOptionInput();
   return (
     <MultiSelectOption
+      {...rest}
       labelText={label}
       checked={checked}
       disabled={optionsDisabled}
@@ -582,6 +537,7 @@ export default function AiThreadPlayground() {
 
   const threadRef = useRef<AiThreadHandle>(null);
   const promptRef = useRef<HTMLDivElement>(null);
+  const promptInputRef = useRef<PromptInputHandle>(null);
   const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const streamTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const activeIdRef = useRef<string | null>(null);
@@ -628,7 +584,7 @@ export default function AiThreadPlayground() {
   const handlePlanEditStart = useCallback((planAssistId: string) => {
     setEditingPlanId(planAssistId);
     editingPlanIdRef.current = planAssistId;
-    promptRef.current?.querySelector<HTMLTextAreaElement>("textarea")?.focus();
+    promptInputRef.current?.focus();
   }, []);
 
   const handleCancelEdit = useCallback(() => {
@@ -1091,6 +1047,7 @@ export default function AiThreadPlayground() {
               )
             ) : (
               <PromptInput
+                ref={promptInputRef}
                 onSubmit={handleSubmit}
                 loading={generating}
                 onStop={handleStop}

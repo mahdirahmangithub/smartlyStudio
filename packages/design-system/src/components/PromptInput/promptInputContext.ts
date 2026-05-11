@@ -1,7 +1,9 @@
-import { createContext, useContext, type RefObject } from "react";
-import type { LexicalEditor } from "lexical";
+import { createContext, useContext, useCallback, type RefObject } from "react";
+import { $getSelection, $isRangeSelection, type LexicalEditor } from "lexical";
 import type { PromptAttachedFile, PromptInputAttachmentKind, PromptInputContextItem } from "./promptInputTypes";
 import type { ActiveTextareaTrigger } from "../../utils/textareaTrigger";
+import { $createChipNode } from "../RichTextEditor";
+import type { IconName } from "../Icon";
 
 /** Source of the shared attachment `Dropdown` (inline trigger vs + button). */
 export type PromptInputAttachmentMenuSource = "none" | "button" | "caret";
@@ -78,4 +80,53 @@ export function usePromptInput(): PromptInputContextValue {
   const ctx = useContext(PromptInputContext);
   if (!ctx) throw new Error("PromptInput compound components must be used inside <PromptInput>");
   return ctx;
+}
+
+/**
+ * Returns the surface this PromptInput is mounted on:
+ * - `"rte"` when used inside `<PromptInputRichTextEditor>` (a Lexical editor
+ *   has registered itself with the context).
+ * - `"textarea"` when used with the plain textarea surface.
+ *
+ * Trigger menus use this to route a picked item to the right sink: an inline
+ * chip (RTE) vs the prompt's external context row (textarea).
+ */
+export function usePromptInputSurface(): "textarea" | "rte" {
+  const { lexicalEditor } = usePromptInput();
+  return lexicalEditor ? "rte" : "textarea";
+}
+
+/**
+ * Returns a function that inserts an inline chip into the rich-text editor
+ * at the current selection, deleting the trigger character + the user's
+ * query that produced it.
+ *
+ * No-op when the surface is the plain textarea (no Lexical editor registered).
+ *
+ * Use inside a custom trigger `onSelect` handler — e.g. when picking an `@`
+ * item should materialize as a chip in the RTE rather than land in an
+ * external context row. `deleteCount` is the number of characters to remove
+ * before the caret; usually `query.length + 1` to consume the trigger char
+ * + everything typed after it.
+ *
+ * Encapsulates the Lexical boilerplate (`editor.update` + `$getSelection` +
+ * `deleteCharacter` × deleteCount + `insertNodes([$createChipNode(...)])`)
+ * that consumers used to reimplement per playground.
+ */
+export function useInsertChip(): (label: string, icon: IconName, deleteCount: number) => void {
+  const { lexicalEditor } = usePromptInput();
+  return useCallback(
+    (label, icon, deleteCount) => {
+      if (!lexicalEditor) return;
+      lexicalEditor.update(() => {
+        const sel = $getSelection();
+        if (!$isRangeSelection(sel)) return;
+        for (let i = 0; i < deleteCount; i++) sel.deleteCharacter(true);
+        sel.insertNodes([
+          $createChipNode(label, icon as Parameters<typeof $createChipNode>[1]),
+        ]);
+      });
+    },
+    [lexicalEditor],
+  );
 }

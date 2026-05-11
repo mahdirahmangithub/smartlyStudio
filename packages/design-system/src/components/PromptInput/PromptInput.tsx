@@ -1,11 +1,11 @@
 import {
   Children,
   forwardRef,
-  Fragment,
   isValidElement,
   useCallback,
   useEffect,
   useId,
+  useImperativeHandle,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -130,7 +130,7 @@ function AnimatedPlaceholderOverlay({
   );
 }
 import { InlineTextarea } from "../InlineTextarea";
-import { RichTextEditor } from "../RichTextEditor";
+import { RichTextEditor, ChipNode } from "../RichTextEditor";
 import { TriggerMenuPlugin } from "../RichTextEditor/plugins/TriggerMenuPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import type { Klass, LexicalNode } from "lexical";
@@ -146,16 +146,18 @@ import { isImageFile, isVideoFile } from "../../utils/inferFileType";
 import { findActiveTrigger, replaceTextRange, type ActiveTextareaTrigger } from "../../utils/textareaTrigger";
 import { getTextareaCaretViewportRect } from "../../utils/textareaCaretRect";
 import { cx } from "../../utils/cx";
+import { matchesShortcut } from "../../utils/matchesShortcut";
 import styles from "./PromptInput.module.css";
-import { ATTACHMENT_MENU_ITEMS } from "./promptInputAttachmentMenuData";
+import { ATTACHMENT_MENU_ITEMS } from "./menuData";
 import { PromptInputAttachmentMenuItems } from "./PromptInputAttachmentMenu";
+import { TriggerMenu } from "./TriggerMenu";
+import type { MenuNode } from "../../types/MenuNode";
 import type { PromptAttachedFile, PromptInputAttachmentKind, PromptInputTriggerConfig, PromptInputContextItem } from "./promptInputTypes";
 import {
   PromptInputContext,
   usePromptInput,
   type PromptInputContextValue,
 } from "./promptInputContext";
-import { filterMenuItemsByQuery } from "../../utils/textareaTrigger";
 
 export type { PromptAttachedFile, PromptInputAttachmentKind, PromptInputTriggerConfig } from "./promptInputTypes";
 
@@ -164,6 +166,31 @@ export const DEFAULT_TRIGGER_MENUS: readonly PromptInputTriggerConfig[] = [
   { char: "/" },
   { char: "@" },
 ];
+
+/* ── Document-level focus shortcut (Cmd/Ctrl+K) ───────────────────────
+ * Only the most-recently-mounted PromptInput owns the binding — multiple
+ * inputs on the same page (rare, but allowed) would otherwise fight. We
+ * keep a module-level stack of focus handlers and fire the topmost.
+ */
+
+interface FocusShortcutOwner {
+  shortcut: string;
+  focus: () => void;
+}
+const focusShortcutOwners: FocusShortcutOwner[] = [];
+let focusShortcutListenerInstalled = false;
+
+function ensureFocusShortcutListener() {
+  if (focusShortcutListenerInstalled || typeof document === "undefined") return;
+  focusShortcutListenerInstalled = true;
+  document.addEventListener("keydown", (e) => {
+    const top = focusShortcutOwners[focusShortcutOwners.length - 1];
+    if (!top) return;
+    if (!matchesShortcut(e, top.shortcut)) return;
+    e.preventDefault();
+    top.focus();
+  });
+}
 
 /* ── File helpers ── */
 
@@ -282,9 +309,42 @@ export interface PromptInputProps {
   contextItems?: PromptInputContextItem[];
   /** Fires whenever context items change (controlled or uncontrolled). */
   onContextItemsChange?: (items: PromptInputContextItem[]) => void;
+  /**
+   * Document-level shortcut that focuses this input from anywhere on the
+   * page. Format: `"mod+k"` (`mod` = Cmd on macOS, Ctrl elsewhere), or any
+   * `"[mod+][shift+][alt+]<key>"` combination.
+   *
+   * Pass `false` to opt out. When multiple `<PromptInput>`s are mounted, the
+   * most-recently-mounted instance owns the binding (others stand down until
+   * the top one unmounts).
+   *
+   * Defaults to `"mod+k"` — matches Slack / Linear / ChatGPT / Notion.
+   */
+  focusShortcut?: string | false;
 }
 
-export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
+/**
+ * Imperative handle for `<PromptInput>`. Pass a ref typed as
+ * `RefObject<PromptInputHandle>` and call these methods directly instead of
+ * reaching into the DOM (`ref.current.querySelector("textarea")` etc.).
+ *
+ * Surface-aware: `focus()` / `blur()` route to the textarea or the Lexical
+ * editor caret automatically, so the same ref works for both
+ * `<PromptInputTextarea>` and `<PromptInputRichTextEditor>` consumers.
+ */
+export interface PromptInputHandle {
+  /** Move focus into the input surface (textarea or RTE caret). */
+  focus(): void;
+  /** Remove focus from the input surface. */
+  blur(): void;
+  /**
+   * Clear the value and any attached files. Context items are preserved —
+   * matches the `clearOnSubmit` default semantics.
+   */
+  clear(): void;
+}
+
+export const PromptInput = forwardRef<PromptInputHandle, PromptInputProps>(
   (
     {
       value: controlledValue,
@@ -305,6 +365,7 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       onAddContext,
       contextItems: controlledContextItems,
       onContextItemsChange,
+      focusShortcut = "mod+k",
     },
     ref,
   ) => {
@@ -361,12 +422,6 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       value: string;
       selectionStart: number;
     } | null>(null);
-    /**
-     * While the menu is open we record which anchor was used. After close, `source` is "none" but
-     * the Dropdown still runs its exit layout — it must keep anchoring to the + button (not the
-     * caret probe at 0,0) so the panel does not jump to the viewport corner.
-     */
-    const attachmentMenuLastOpenAnchorRef = useRef<"button" | "caret">("button");
     const attachmentMenuRef = useRef<AttachmentMenuState>(INITIAL_MENU);
 
     const [attachmentMenu, setAttachmentMenu] = useState<AttachmentMenuState>(INITIAL_MENU);
@@ -779,32 +834,30 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       [attachmentMenu.char, triggerMenus],
     );
 
-    const filteredAttachmentItems = useMemo(() => {
-      // When the active trigger uses a custom renderer, skip filtering entirely.
-      if (activeConfig?.renderContent) return [];
+    /**
+     * Items shown in the **button-mode** attachment menu. Caret-mode rendering
+     * is delegated to `<TriggerMenu>` (it owns its own filter), so this is
+     * only the button-driven path. Always uses the canonical
+     * `ATTACHMENT_MENU_ITEMS` since the button doesn't know about per-trigger
+     * configs (no trigger char in play when opened via the `+` button).
+     */
+    const buttonAttachmentItems: readonly MenuNode[] = useMemo(
+      () => ATTACHMENT_MENU_ITEMS,
+      [],
+    );
 
-      const query = attachmentMenu.source === "button" ? "" : attachmentMenu.query;
-      const char = attachmentMenu.char;
-
-      // Button or forced-at-caret (no trigger char): show full built-in list.
-      if (!char) return filterMenuItemsByQuery(ATTACHMENT_MENU_ITEMS, query);
-
-      // Inline trigger: use the items configured for this char, falling back to the full list.
-      const baseItems = activeConfig?.items ?? ATTACHMENT_MENU_ITEMS;
-      return filterMenuItemsByQuery(baseItems, query);
-    }, [activeConfig, attachmentMenu.source, attachmentMenu.query, attachmentMenu.char]);
-
-    /** Effective item count for arrow-key wrap — custom renderContent reports its own count. */
-    const effectiveCaretItemCount = activeConfig?.renderContent
-      ? renderContentItemCount
-      : filteredAttachmentItems.length;
+    /**
+     * Effective item count for arrow-key wrap on the caret-mode menu.
+     * Both the items path (via `<TriggerMenu>`) and the renderContent path
+     * report their visible item count via `setItemCount`, which writes to
+     * `renderContentItemCount`. So we just read that value uniformly.
+     */
+    const effectiveCaretItemCount = renderContentItemCount;
 
     const attachmentMenuCombobox =
       attachmentMenu.open &&
       attachmentMenu.source === "caret" &&
-      (activeConfig?.renderContent
-        ? renderContentItemCount > 0
-        : filteredAttachmentItems.length > 0);
+      renderContentItemCount > 0;
 
     useEffect(() => {
       const open = attachmentMenu.open && attachmentMenu.source === "caret";
@@ -831,7 +884,7 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
 
     useEffect(() => {
       const open = attachmentMenu.open && attachmentMenu.source === "button";
-      const n = filteredAttachmentItems.length;
+      const n = buttonAttachmentItems.length;
       if (!open) {
         prevButtonMenuOpenRef.current = false;
         return;
@@ -845,7 +898,7 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
         if (n === 0) return 0;
         return Math.min(p, n - 1);
       });
-    }, [attachmentMenu.open, attachmentMenu.source, filteredAttachmentItems.length]);
+    }, [attachmentMenu.open, attachmentMenu.source, buttonAttachmentItems.length]);
 
     useLayoutEffect(() => {
       if (!attachmentMenuCombobox) return;
@@ -879,20 +932,11 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
     ]);
 
     const pickHighlightedCaretAttachment = useCallback(() => {
-      if (activeConfig?.renderContent) {
-        renderContentPickHandlerRef.current?.();
-        return;
-      }
-      const item = filteredAttachmentItems[caretAttachmentActiveIndex];
-      if (item) pickAttachmentKind(item.kind);
-    }, [activeConfig, filteredAttachmentItems, caretAttachmentActiveIndex, pickAttachmentKind]);
-
-    if (attachmentMenu.open) {
-      attachmentMenuLastOpenAnchorRef.current =
-        attachmentMenu.source === "button" ? "button" : "caret";
-    }
-    const dropdownAnchorRef =
-      attachmentMenuLastOpenAnchorRef.current === "button" ? menuButtonRef : caretAnchorRef;
+      // Both the data-driven (`<TriggerMenu>`) and custom (`renderContent`)
+      // caret menus register their own pick handler via `registerPickHandler`,
+      // which writes to `renderContentPickHandlerRef`. Just delegate.
+      renderContentPickHandlerRef.current?.();
+    }, []);
 
     const layoutRevision = `${attachmentMenu.open}-${attachmentMenu.source}-${value.length}-${attachmentMenu.query}-${attachmentMenu.forcedAtCaret}`;
 
@@ -920,7 +964,34 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       closeAttachmentMenu();
     }, [closeAttachmentMenu, setValue, value, lexicalEditor]);
 
-    const contextMenuContent = activeConfig?.renderContent
+    /**
+     * Resolve the `onSelect` for the active trigger config:
+     * - If the consumer provided one, use it.
+     * - If they provided custom `items`, fall back to `<TriggerMenu>`'s
+     *   built-in default (chip in RTE / context-row in textarea).
+     * - If they provided neither (default `/` flow), wire `pickAttachmentKind`
+     *   to dispatch by `item.kind`.
+     */
+    const resolvedCaretOnSelect = useMemo(() => {
+      if (!activeConfig) return undefined;
+      if (activeConfig.onSelect) return activeConfig.onSelect;
+      if (!activeConfig.items) {
+        // No items configured → using fallback ATTACHMENT_MENU_ITEMS → kind dispatch.
+        return (item: MenuNode) => {
+          if (item.kind) {
+            pickAttachmentKind(item.kind as PromptInputAttachmentKind);
+          }
+        };
+      }
+      // Items provided but no onSelect → TriggerMenu's default routing applies.
+      return undefined;
+    }, [activeConfig, pickAttachmentKind]);
+
+    /** Items the caret-mode menu should render. Falls back to the canonical
+     * attachment list when the active config doesn't specify its own. */
+    const resolvedCaretItems = activeConfig?.items ?? ATTACHMENT_MENU_ITEMS;
+
+    const contextMenuContent: ReactNode = activeConfig?.renderContent
       ? activeConfig.renderContent({
           query: attachmentMenu.query,
           onClose: closeAttachmentMenu,
@@ -930,8 +1001,25 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
           registerPickHandler: (fn) => { renderContentPickHandlerRef.current = fn; },
           menuId: attachmentMenuId,
         })
-      : null;
-    if (contextMenuContent !== null) {
+      : (
+          <TriggerMenu
+            items={resolvedCaretItems}
+            query={attachmentMenu.query}
+            activeIndex={caretAttachmentActiveIndex}
+            setItemCount={setRenderContentItemCount}
+            registerPickHandler={(fn) => { renderContentPickHandlerRef.current = fn; }}
+            menuId={attachmentMenuId}
+            onAccept={acceptRenderContentTrigger}
+            onClose={closeAttachmentMenu}
+            onSelect={resolvedCaretOnSelect}
+            filter={activeConfig?.filter}
+          />
+        );
+    // Only snapshot while the menu is open. After close, `activeConfig` is
+    // null (char cleared) and `contextMenuContent` would re-resolve to the
+    // default `/` TriggerMenu — overwriting the snapshot the Dropdown's exit
+    // animation needs, causing a brief flash of the wrong menu.
+    if (attachmentMenu.open && contextMenuContent !== null) {
       lastContextMenuContentRef.current = contextMenuContent;
     }
 
@@ -989,9 +1077,64 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
       }
     }, [disabled, lexicalEditor]);
 
+    const fieldRef = useRef<HTMLDivElement | null>(null);
+
+    const focusInputSurface = useCallback(() => {
+      const ta = textareaRef.current;
+      if (ta) {
+        ta.focus();
+        return;
+      }
+      lexicalEditor?.focus();
+    }, [lexicalEditor]);
+
+    useImperativeHandle(
+      ref,
+      () => ({
+        focus: focusInputSurface,
+        blur() {
+          const ta = textareaRef.current;
+          if (ta) {
+            ta.blur();
+            return;
+          }
+          lexicalEditor?.getRootElement()?.blur();
+        },
+        clear() {
+          setValue("");
+          setAttachedFiles((prev) => {
+            prev.forEach((f) => { if (f.previewUrl) URL.revokeObjectURL(f.previewUrl); });
+            onAttachedFilesChange?.([]);
+            return [];
+          });
+        },
+      }),
+      [lexicalEditor, setValue, onAttachedFilesChange, focusInputSurface],
+    );
+
+    /* ── Document-level focus shortcut ── */
+    useEffect(() => {
+      if (!focusShortcut || disabled) return;
+      const owner: FocusShortcutOwner = {
+        shortcut: focusShortcut,
+        focus: () => {
+          // No-op when focus is already inside this input — don't fight it.
+          const active = document.activeElement;
+          if (active && fieldRef.current?.contains(active)) return;
+          focusInputSurface();
+        },
+      };
+      focusShortcutOwners.push(owner);
+      ensureFocusShortcutListener();
+      return () => {
+        const idx = focusShortcutOwners.indexOf(owner);
+        if (idx >= 0) focusShortcutOwners.splice(idx, 1);
+      };
+    }, [focusShortcut, disabled, focusInputSurface]);
+
     const fieldEl = (
         <div
-          ref={ref}
+          ref={fieldRef}
           role="group"
           aria-label="Prompt input"
           className={cx(styles.field, infoChild && styles.fieldWithInfo, disabled && styles.disabled, isDragOver && styles.dragOver, className)}
@@ -1016,43 +1159,38 @@ export const PromptInput = forwardRef<HTMLDivElement, PromptInputProps>(
           </div>
           <div ref={caretAnchorRef} className={styles.caretAnchor} aria-hidden />
 
-          {/* Standard attachment menu — never opens when the active trigger uses renderContent */}
+          {/* Button-mode menu — opens via the `+` IconButton. Owns its own
+              focus + arrow-key nav inside the panel (panelKeyboardNav). */}
           <Dropdown
             id={attachmentMenuId}
-            role={attachmentMenu.source === "caret" ? "listbox" : "menu"}
-            open={attachmentMenu.open && !activeConfig?.renderContent}
+            role="menu"
+            aria-label="Attachment menu"
+            open={attachmentMenu.open && attachmentMenu.source === "button"}
             onClose={closeAttachmentMenu}
-            anchorRef={dropdownAnchorRef}
+            anchorRef={menuButtonRef}
             placement="bottom-start"
             width={240}
             offset={4}
-            returnFocusRef={
-              attachmentMenu.source === "button" ? undefined : textareaRef
-            }
-            autoFocus={attachmentMenu.source !== "caret"}
-            panelKeyboardNav={attachmentMenu.source !== "caret"}
+            autoFocus
+            panelKeyboardNav
             keyboardWrap
             layoutRevision={layoutRevision}
-            clickOutsideExtraRefs={
-              attachmentMenu.source === "caret" ? [textareaRef] : undefined
-            }
           >
-            {filteredAttachmentItems.length === 0 ? (
-              <Fragment>
-                <div className={styles.menuEmpty} role="presentation">
-                  No matches
-                </div>
-              </Fragment>
-            ) : (
-              <PromptInputAttachmentMenuItems items={filteredAttachmentItems} />
-            )}
+            <PromptInputAttachmentMenuItems items={buttonAttachmentItems} />
           </Dropdown>
 
-          {/* Custom renderContent menu — only opens when the active trigger provides renderContent */}
+          {/* Caret-mode menu — opens by typing a trigger char. Textarea keeps
+              DOM focus (combobox pattern) and drives arrow keys via the
+              activeIndex / itemCount the inner content reports. Renders
+              `<TriggerMenu>` by default; falls through to `renderContent` when
+              the trigger config provides one. */}
           <Dropdown
             id={attachmentMenuId}
             role="listbox"
-            open={attachmentMenu.open && !!activeConfig?.renderContent}
+            aria-label={
+              attachmentMenu.char ? `${attachmentMenu.char} menu` : "Attachment menu"
+            }
+            open={attachmentMenu.open && attachmentMenu.source === "caret"}
             onClose={closeAttachmentMenu}
             anchorRef={caretAnchorRef}
             placement="bottom-start"
@@ -1102,11 +1240,37 @@ export function PromptInputAttachments({ children, className }: PromptInputAttac
     removeContextItem,
     showContextRow,
     onAddContext,
+    textareaRef,
+    lexicalEditor,
   } = usePromptInput();
 
   const showFiles = attachedFiles.length > 0;
   const hasContextItems = contextItems.length > 0;
   const showContextSection = showContextRow || hasContextItems;
+
+  // After removing a chip / attachment, defer focus to the input surface so
+  // it doesn't fall through to document.body (which resets the page's tab
+  // order). rAF lets the row finish unmounting first.
+  const restoreFocusToInput = useCallback(() => {
+    requestAnimationFrame(() => {
+      const ta = textareaRef.current;
+      if (ta) {
+        ta.focus();
+        return;
+      }
+      lexicalEditor?.focus();
+    });
+  }, [textareaRef, lexicalEditor]);
+
+  const handleRemoveContext = useCallback((id: string) => {
+    removeContextItem(id);
+    restoreFocusToInput();
+  }, [removeContextItem, restoreFocusToInput]);
+
+  const handleRemoveFile = useCallback((id: string) => {
+    removeAttachedFile(id);
+    restoreFocusToInput();
+  }, [removeAttachedFile, restoreFocusToInput]);
 
   if (!showFiles && !children && !showContextSection) return null;
 
@@ -1136,7 +1300,7 @@ export function PromptInputAttachments({ children, className }: PromptInputAttac
                 emphasis="medium"
                 variant="neutral"
                 leadingIcon={<Icon name={item.icon} size={16} />}
-                onRemove={() => removeContextItem(item.id)}
+                onRemove={() => handleRemoveContext(item.id)}
               >
                 {item.label}
               </Chip>
@@ -1159,7 +1323,7 @@ export function PromptInputAttachments({ children, className }: PromptInputAttac
                       />
                     }
                     title={file.name}
-                    onRemove={() => removeAttachedFile(id)}
+                    onRemove={() => handleRemoveFile(id)}
                   />
                 );
               }
@@ -1170,7 +1334,7 @@ export function PromptInputAttachments({ children, className }: PromptInputAttac
                     file={file}
                     autoThumbnailSize="lg"
                     title={file.name}
-                    onRemove={() => removeAttachedFile(id)}
+                    onRemove={() => handleRemoveFile(id)}
                   />
                 );
               }
@@ -1180,7 +1344,7 @@ export function PromptInputAttachments({ children, className }: PromptInputAttac
                   file={file}
                   title={file.name}
                   description={formatFileSize(file.size)}
-                  onRemove={() => removeAttachedFile(id)}
+                  onRemove={() => handleRemoveFile(id)}
                 />
               );
             })}
@@ -1220,8 +1384,10 @@ export function PromptInputTextarea({
     value,
     setValue,
     disabled,
+    loading,
     textareaRef,
     submit,
+    stop,
     syncAttachmentMenuFromTextarea,
     attachmentMenuSource,
     attachmentMenuId,
@@ -1231,6 +1397,7 @@ export function PromptInputTextarea({
     caretAttachmentItemCount,
     pickHighlightedCaretAttachment,
     closeAttachmentMenu,
+    openAttachmentMenuAtCaret,
   } = usePromptInput();
   const id = useId();
   const [isFocused, setIsFocused] = useState(false);
@@ -1281,6 +1448,23 @@ export function PromptInputTextarea({
         }
       }
 
+      // Cmd/Ctrl+/ — open the caret menu programmatically. Mirrors VS Code's
+      // command palette pattern; useful when the user already has a draft and
+      // doesn't want to retype the trigger char.
+      if (matchesShortcut(e.nativeEvent, "mod+/")) {
+        e.preventDefault();
+        openAttachmentMenuAtCaret();
+        return;
+      }
+
+      // Escape during a loading generation cancels it — no menu to close at
+      // this point (combobox branch above handled that case).
+      if (e.key === "Escape" && loading) {
+        e.preventDefault();
+        stop();
+        return;
+      }
+
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         submit();
@@ -1292,14 +1476,24 @@ export function PromptInputTextarea({
       setCaretAttachmentActiveIndex,
       closeAttachmentMenu,
       pickHighlightedCaretAttachment,
+      openAttachmentMenuAtCaret,
+      loading,
+      stop,
       submit,
     ],
   );
 
   const listboxId = attachmentMenuId;
+  // Clamp to a valid id even when filter narrows the list between the arrow
+  // keypress and the next render — otherwise `aria-activedescendant` can refer
+  // to an id that no longer exists for a frame.
+  const safeActiveIndex = Math.min(
+    caretAttachmentActiveIndex,
+    Math.max(0, caretAttachmentItemCount - 1),
+  );
   const activeDescendantId =
     attachmentMenuCombobox && attachmentMenuSource === "caret"
-      ? `${attachmentMenuId}-opt-${caretAttachmentActiveIndex}`
+      ? `${attachmentMenuId}-opt-${safeActiveIndex}`
       : undefined;
 
   return (
@@ -1325,10 +1519,13 @@ export function PromptInputTextarea({
           aria-autocomplete={attachmentMenuCombobox ? "list" : undefined}
           aria-activedescendant={activeDescendantId}
         />
-        {hasAnimatedPlaceholders && (
+        {/* Conditional mount — when the input is focused or has a value the
+            overlay unmounts entirely. Re-entering the empty/unfocused state
+            mounts a fresh instance, so the animation always restarts cleanly. */}
+        {hasAnimatedPlaceholders && animOverlayActive && (
           <AnimatedPlaceholderOverlay
             texts={animatedPlaceholders!}
-            active={animOverlayActive}
+            active
           />
         )}
       </div>
@@ -1386,9 +1583,12 @@ export function PromptInputRichTextEditor({
     value,
     setValue,
     disabled,
+    loading,
     submit,
+    stop,
     syncAttachmentMenuFromEditor,
     triggerCharsSet,
+    lexicalEditor,
     _registerLexicalEditor,
     attachmentMenuId,
     attachmentMenuCombobox,
@@ -1398,11 +1598,21 @@ export function PromptInputRichTextEditor({
     caretAttachmentItemCount,
     pickHighlightedCaretAttachment,
     closeAttachmentMenu,
+    openAttachmentMenuAtCaret,
   } = usePromptInput();
   const [isFocused, setIsFocused] = useState(false);
 
   const hasAnimatedPlaceholders = Boolean(animatedPlaceholders?.length);
   const animOverlayActive = hasAnimatedPlaceholders && showAnimatedPlaceholder && value === "" && !isFocused;
+
+  // Always register `ChipNode` — `useInsertChip()` (the default `@` outcome
+  // for RTE surfaces) inserts one and Lexical throws if its class isn't
+  // registered, which would revert the entire editor.update transaction
+  // and leave the trigger char + query stuck in the input.
+  const editorNodes = useMemo(
+    () => (nodes ? [ChipNode, ...nodes] : [ChipNode]),
+    [nodes],
+  );
 
   const handleKeyDown = useCallback(
     (e: globalThis.KeyboardEvent): boolean => {
@@ -1428,6 +1638,9 @@ export function PromptInputRichTextEditor({
         if (e.key === "Escape") {
           e.preventDefault();
           closeAttachmentMenu();
+          // Lexical's caret stays in the contenteditable, but force-focus the
+          // editor in case anything in the close path moved it elsewhere.
+          lexicalEditor?.focus();
           return true;
         }
         if (e.key === "Enter" && !e.shiftKey) {
@@ -1435,6 +1648,20 @@ export function PromptInputRichTextEditor({
           pickHighlightedCaretAttachment();
           return true;
         }
+      }
+
+      // Cmd/Ctrl+/ — open the caret menu programmatically.
+      if (matchesShortcut(e, "mod+/")) {
+        e.preventDefault();
+        openAttachmentMenuAtCaret();
+        return true;
+      }
+
+      // Escape during a loading generation cancels it.
+      if (e.key === "Escape" && loading) {
+        e.preventDefault();
+        stop();
+        return true;
       }
 
       return false;
@@ -1445,12 +1672,21 @@ export function PromptInputRichTextEditor({
       setCaretAttachmentActiveIndex,
       closeAttachmentMenu,
       pickHighlightedCaretAttachment,
+      openAttachmentMenuAtCaret,
+      loading,
+      stop,
+      lexicalEditor,
     ],
   );
 
+  // Clamp — see textarea path above.
+  const safeActiveIndex = Math.min(
+    caretAttachmentActiveIndex,
+    Math.max(0, caretAttachmentItemCount - 1),
+  );
   const activeDescendantId =
     attachmentMenuCombobox && attachmentMenuSource === "caret"
-      ? `${attachmentMenuId}-opt-${caretAttachmentActiveIndex}`
+      ? `${attachmentMenuId}-opt-${safeActiveIndex}`
       : undefined;
 
   return (
@@ -1467,7 +1703,7 @@ export function PromptInputRichTextEditor({
           placeholder={animOverlayActive ? "" : placeholder}
           maxHeight={maxHeight}
           disabled={disabled}
-          nodes={nodes}
+          nodes={editorNodes}
           size="lg"
           className={className}
           role={attachmentMenuCombobox ? "combobox" : undefined}
@@ -1488,10 +1724,11 @@ export function PromptInputRichTextEditor({
             </>
           }
         />
-        {hasAnimatedPlaceholders && (
+        {/* See textarea path — fresh mount per focus cycle. */}
+        {hasAnimatedPlaceholders && animOverlayActive && (
           <AnimatedPlaceholderOverlay
             texts={animatedPlaceholders!}
-            active={animOverlayActive}
+            active
           />
         )}
       </div>
@@ -1639,6 +1876,7 @@ export function PromptInputSubmit({
         <IconButton
           icon={<Icon name="stop_fill" />}
           aria-label={stopLabel}
+          aria-keyshortcuts="Escape"
           variant="neutral"
           emphasis="low"
           size="md"
@@ -1653,6 +1891,7 @@ export function PromptInputSubmit({
       <IconButton
         icon={<Icon name="arrow_upward" />}
         aria-label={submitLabel}
+        aria-keyshortcuts="Enter"
         variant="brand"
         emphasis={canSubmit ? "high" : "low"}
         size="md"

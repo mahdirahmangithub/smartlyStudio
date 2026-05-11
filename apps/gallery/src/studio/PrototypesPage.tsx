@@ -52,6 +52,7 @@ export default function PrototypesPage({ onSelectPrototype }: PrototypesPageProp
     );
   }, [query]);
 
+
   useEffect(() => {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);

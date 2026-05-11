@@ -188,12 +188,16 @@ export * from './hooks/useTypewriter';
 export * from './utils/cx';
 export * from './utils/detectSurface';
 export * from './utils/easedGradient';
+export * from './utils/filterMenuTree';
 export * from './utils/inferFileType';
 export * from './utils/spacing';
 export * from './utils/syntaxTokenizer';
 export * from './utils/textareaCaretRect';
 export * from './utils/textareaTrigger';
 export * from './utils/treeConnectors';
+
+// ── Types (cross-component data shapes) ──
+export type { MenuNode } from './types/MenuNode';
 
 // ── Tokens (types) ──
 export * from './tokens/breakpoints';

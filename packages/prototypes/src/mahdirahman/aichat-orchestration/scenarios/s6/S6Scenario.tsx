@@ -8,10 +8,10 @@ import {
   PromptInputFooterStart,
   PromptInputAddMenu,
   PromptInputSubmit,
-  PromptInputContextMenu,
+  TriggerMenu,
   DEFAULT_TRIGGER_MENUS,
   type PromptInputTriggerConfig,
-  type ContextMenuCategory,
+  type MenuNode,
   type PromptInputContextItem,
 } from "@sds/components/PromptInput";
 import { PromptOptionInput } from "@sds/components/PromptOptionInput";
@@ -382,17 +382,17 @@ export function S6Scenario() {
 
   /* ── Trigger menus for the default PromptInput ── */
 
-  const CONTEXT_CATEGORIES: ContextMenuCategory[] = [
-    { id: "campaigns", icon: "campaign_alt", label: "Campaigns", onSelect: () => {} },
-    { id: "audiences", icon: "group", label: "Audiences", onSelect: () => {} },
-    { id: "reports", icon: "reporting", label: "Reports", onSelect: () => {} },
+  const CONTEXT_CATEGORIES: MenuNode[] = [
+    { id: "campaigns", icon: "campaign_alt", label: "Campaigns" },
+    { id: "audiences", icon: "group", label: "Audiences" },
+    { id: "reports", icon: "reporting", label: "Reports" },
   ];
   const TRIGGER_MENUS: PromptInputTriggerConfig[] = [
     ...DEFAULT_TRIGGER_MENUS,
     {
       char: "@",
       renderContent: (props) => (
-        <PromptInputContextMenu {...props} categories={CONTEXT_CATEGORIES} />
+        <TriggerMenu {...props} items={CONTEXT_CATEGORIES} />
       ),
     },
   ];
@@ -406,7 +406,7 @@ export function S6Scenario() {
         search={{ value: adAccountSearch, onChange: setAdAccountSearch, placeholder: "Search ad accounts…" }}
         hasValue={selectedAdAccountId !== null}
         isLastStep
-        onClose={() => setScenarioStep(0)}
+        onClose={() => { setScenarioStep(0); chat.focusPromptTextarea(); }}
         onSkip={handleAdAccountSubmit}
         onSubmit={handleAdAccountSubmit}
       >
@@ -427,6 +427,7 @@ export function S6Scenario() {
 
   return (
     <PromptInput
+      ref={chat.promptInputRef}
       onSubmit={handleSubmit}
       loading={chat.isGenerating}
       onStop={chat.handleStop}

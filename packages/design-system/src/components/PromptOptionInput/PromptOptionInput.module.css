@@ -17,6 +17,14 @@
   box-sizing: border-box;
 }
 
+/* When an info banner is above the picker, raise the picker above it so its
+ * border + shadow sit cleanly on top of the banner's bottom edge. Matches the
+ * `PromptInputInfo` overlay treatment used by `<PromptInput>`. */
+.fieldWithInfo {
+  position: relative;
+  z-index: 1;
+}
+
 /* ── Header row ── */
 
 .header {

@@ -10,17 +10,14 @@ import {
   PromptInputSubmit,
   PromptInputInfo,
   PromptInputRecommendations,
-  PromptInputContextMenu,
-  usePromptInput,
+  TriggerMenu,
+  MENTION_MENU_ITEMS,
   type PromptInputTriggerConfig,
   type PromptInputInfoType,
   type RecommendationItem,
-  type ContextMenuSuggestedItem,
-  type ContextMenuCategory,
-  type ContextMenuDrillLevel,
+  type MenuNode,
   type PromptInputContextItem,
 } from "@sds/components/PromptInput";
-import type { AttachmentMenuItemDef } from "@sds/components/PromptInput/PromptInputAttachmentMenu";
 
 const sectionStyle: CSSProperties = { marginBottom: 48 };
 const cardStyle: CSSProperties = {
@@ -35,67 +32,16 @@ const promptWrapper: CSSProperties = {
   margin: "100px auto",
 };
 
-/* ── Shared context menu data ── */
-
-const SUGGESTED_ITEMS: ContextMenuSuggestedItem[] = [
-  {
-    id: "ws-1",
-    icon: "Meta_color",
-    label: "Summer 2026 - Run BMW",
-    subtitle: "Workspace",
-  },
-  {
-    id: "camp-1",
-    icon: "campaign_alt",
-    label: "Campaign_1209",
-    subtitle: "in Summer 2026 - Run BMW",
-  },
-  {
-    id: "camp-2",
-    icon: "campaign_alt",
-    label: "Campaign_freq",
-    subtitle: "in Summer 2026 - Run BMW",
-  },
-];
-
-const CAMPAIGN_DRILL: ContextMenuDrillLevel = {
-  items: [
-    { id: "c-1", icon: "campaign_alt", label: "Summer 2026 - Run BMW", onSelect: () => {} },
-    { id: "c-2", icon: "campaign_alt", label: "Campaign_1209", onSelect: () => {} },
-    { id: "c-3", icon: "campaign_alt", label: "Campaign_freq", onSelect: () => {} },
-    { id: "c-4", icon: "campaign_alt", label: "Q4 Retargeting", onSelect: () => {} },
-  ],
-};
-
-const PROJECT_DRILL: ContextMenuDrillLevel = {
-  items: [
-    { id: "p-1", icon: "folder", label: "Alpha Project", onSelect: () => {} },
-    { id: "p-2", icon: "folder", label: "Beta Launch", onSelect: () => {} },
-    { id: "p-3", icon: "folder", label: "Internal Tools", onSelect: () => {} },
-  ],
-};
-
-const CATEGORIES: ContextMenuCategory[] = [
-  { id: "campaigns", icon: "campaign_alt", label: "Campaigns", onSelect: () => {}, drillLevel: CAMPAIGN_DRILL },
-  { id: "catalogs", icon: "shopping_cart", label: "Catalogs", onSelect: () => {} },
-  { id: "producers", icon: "data_table", label: "Producers", onSelect: () => {} },
-  { id: "projects", icon: "folder", label: "Projects", onSelect: () => {}, drillLevel: PROJECT_DRILL },
-  { id: "reports-bar", icon: "reporting", label: "Reports", onSelect: () => {} },
-  { id: "reports-org", icon: "page_info", label: "Reports", onSelect: () => {} },
-  { id: "reports-lab", icon: "science", label: "Reports", onSelect: () => {} },
-];
+/* ── Shared trigger config ──
+ * Pulls the canonical category tree from the design system's `menuData` —
+ * the same source of truth used across playgrounds and prototypes. */
 
 const DEFAULT_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
   { char: "/" },
   {
     char: "@",
     renderContent: (props) => (
-      <PromptInputContextMenu
-        {...props}
-        suggestedItems={SUGGESTED_ITEMS}
-        onSelectSuggested={(_item) => props.onAccept()}
-        categories={CATEGORIES}
-      />
+      <TriggerMenu {...props} items={MENTION_MENU_ITEMS} />
     ),
   },
 ];
@@ -237,9 +183,9 @@ function AttachmentsAndErrorDemo() {
   );
 }
 
-const SLASH_ITEMS: AttachmentMenuItemDef[] = [
-  { kind: "photos-files", label: "Add photos & files", icon: "attach_file", keywords: ["upload", "file", "image", "photo"] },
-  { kind: "link", label: "Add link", icon: "link", keywords: ["url", "href"] },
+const SLASH_ITEMS: MenuNode[] = [
+  { id: "photos-files", kind: "photos-files", label: "Add photos & files", icon: "attach_file", keywords: ["upload", "file", "image", "photo"] },
+  { id: "link", kind: "link", label: "Add link", icon: "link", keywords: ["url", "href"] },
 ];
 
 const PER_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
@@ -247,12 +193,7 @@ const PER_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
   {
     char: "@",
     renderContent: (props) => (
-      <PromptInputContextMenu
-        {...props}
-        suggestedItems={SUGGESTED_ITEMS}
-        onSelectSuggested={(_item) => props.onAccept()}
-        categories={CATEGORIES}
-      />
+      <TriggerMenu {...props} items={MENTION_MENU_ITEMS} />
     ),
   },
 ];
@@ -280,68 +221,19 @@ function PerTriggerDemo() {
   );
 }
 
-/* ── Context row demos ── */
-
-/**
- * Inner component that wires the @ context menu to addContextItem.
- * Must live inside <PromptInput> to access usePromptInput().
- */
-function ContextMenuWithAdd({
-  query,
-  onClose: _onClose,
-  onAccept,
-  activeIndex,
-  setItemCount,
-  registerPickHandler,
-  menuId,
-}: {
-  query: string;
-  onClose: () => void;
-  onAccept: () => void;
-  activeIndex: number;
-  setItemCount: (n: number) => void;
-  registerPickHandler: (fn: () => void) => void;
-  menuId: string;
-}) {
-  const { addContextItem } = usePromptInput();
-
-  const add = (id: string, icon: PromptInputContextItem["icon"], label: string) => {
-    addContextItem({ id, icon, label });
-    onAccept();
-  };
-
-  const categories: ContextMenuCategory[] = CATEGORIES.map((cat) => ({
-    ...cat,
-    onSelect: () => add(cat.id, cat.icon as PromptInputContextItem["icon"], cat.label),
-    drillLevel: cat.drillLevel
-      ? {
-          items: cat.drillLevel.items.map((item) => ({
-            ...item,
-            onSelect: () => add(item.id, item.icon as PromptInputContextItem["icon"], item.label),
-          })),
-        }
-      : undefined,
-  }));
-
-  return (
-    <PromptInputContextMenu
-      query={query}
-      activeIndex={activeIndex}
-      setItemCount={setItemCount}
-      registerPickHandler={registerPickHandler}
-      menuId={menuId}
-      suggestedItems={SUGGESTED_ITEMS}
-      onSelectSuggested={(item) => add(item.id, item.icon as PromptInputContextItem["icon"], item.label)}
-      categories={categories}
-    />
-  );
-}
+/* ── Context row demos ──
+ * No special wrapper needed: when `<TriggerMenu>` is mounted inside a
+ * textarea-surfaced `<PromptInput>`, its default `onSelect` adds the picked
+ * leaf to the prompt's external context row (then accepts). RTE surfaces
+ * insert an inline chip instead. */
 
 const CONTEXT_TRIGGER_MENUS: PromptInputTriggerConfig[] = [
   { char: "/" },
   {
     char: "@",
-    renderContent: (props) => <ContextMenuWithAdd {...props} />,
+    renderContent: (props) => (
+      <TriggerMenu {...props} items={MENTION_MENU_ITEMS} />
+    ),
   },
 ];
 

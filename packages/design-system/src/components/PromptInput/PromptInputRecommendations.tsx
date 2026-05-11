@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, type HTMLAttributes, type ReactNode } from "react";
+import { useCallback, useRef, useState, useEffect, type HTMLAttributes, type KeyboardEvent, type ReactNode } from "react";
 import { TitleText } from "../TitleText";
 import { AiButton, type AiButtonSize } from "../AiButton";
 import { Button } from "../Button";
@@ -54,6 +54,49 @@ export function PromptInputRecommendations({
   const fadeStartStyle = { background: `linear-gradient(to right, ${fadeColor}, transparent)` };
   const fadeEndStyle = { background: `linear-gradient(to left, ${fadeColor}, transparent)` };
 
+  /* ── Roving tabindex: only one button is in the page tab order at a time;
+   * Left/Right walks siblings, Tab leaves the row entirely. Mirrors WAI-ARIA
+   * toolbar pattern. ─────────────────────────────────────────────────────── */
+  const [activeIndex, setActiveIndex] = useState(0);
+  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
+  // Keep activeIndex valid if `items` shrinks.
+  useEffect(() => {
+    if (activeIndex >= items.length && items.length > 0) {
+      setActiveIndex(items.length - 1);
+    }
+  }, [items.length, activeIndex]);
+
+  const handleRowKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
+    if (items.length === 0) return;
+    if (e.key === "ArrowRight") {
+      e.preventDefault();
+      const next = (activeIndex + 1) % items.length;
+      setActiveIndex(next);
+      buttonRefs.current[next]?.focus();
+      return;
+    }
+    if (e.key === "ArrowLeft") {
+      e.preventDefault();
+      const next = (activeIndex - 1 + items.length) % items.length;
+      setActiveIndex(next);
+      buttonRefs.current[next]?.focus();
+      return;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      setActiveIndex(0);
+      buttonRefs.current[0]?.focus();
+      return;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      const last = items.length - 1;
+      setActiveIndex(last);
+      buttonRefs.current[last]?.focus();
+    }
+  }, [activeIndex, items.length]);
+
   return (
     <div className={cx(styles.root, className)} {...rest}>
       {title && (
@@ -63,16 +106,23 @@ export function PromptInputRecommendations({
         <div
           ref={scrollRef}
           className={styles.row}
+          role="toolbar"
+          aria-orientation="horizontal"
+          aria-label={title ?? "Prompt recommendations"}
           onScroll={onScroll}
+          onKeyDown={handleRowKeyDown}
         >
-          {items.map((item) => (
+          {items.map((item, i) => (
             <AiButton key={item.id} size={buttonSize}>
               <Button
+                ref={(el) => { buttonRefs.current[i] = el; }}
                 variant="neutral"
                 emphasis={buttonEmphasis}
                 size={buttonSize}
                 leadingIcon={item.leadingIcon}
+                tabIndex={i === activeIndex ? 0 : -1}
                 onClick={item.onSelect}
+                onFocus={() => setActiveIndex(i)}
               >
                 {item.label}
               </Button>

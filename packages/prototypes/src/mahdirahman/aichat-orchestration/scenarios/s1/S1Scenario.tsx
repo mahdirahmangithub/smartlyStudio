@@ -8,12 +8,12 @@ import {
   PromptInputFooterStart,
   PromptInputAddMenu,
   PromptInputSubmit,
-  PromptInputContextMenu,
+  TriggerMenu,
   PromptInputInfo,
   PromptInputRecommendations,
   DEFAULT_TRIGGER_MENUS,
   type PromptInputTriggerConfig,
-  type ContextMenuCategory,
+  type MenuNode,
 } from "@sds/components/PromptInput";
 import { PromptOptionInput } from "@sds/components/PromptOptionInput";
 import { GenericSelectOption } from "@sds/components/GenericSelectOption";
@@ -824,17 +824,17 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
 
   /* ── Trigger menus + recommendations for the default PromptInput ── */
 
-  const CONTEXT_CATEGORIES: ContextMenuCategory[] = [
-    { id: "campaigns", icon: "campaign_alt", label: "Campaigns", onSelect: () => {} },
-    { id: "audiences", icon: "group", label: "Audiences", onSelect: () => {} },
-    { id: "reports", icon: "reporting", label: "Reports", onSelect: () => {} },
+  const CONTEXT_CATEGORIES: MenuNode[] = [
+    { id: "campaigns", icon: "campaign_alt", label: "Campaigns" },
+    { id: "audiences", icon: "group", label: "Audiences" },
+    { id: "reports", icon: "reporting", label: "Reports" },
   ];
   const TRIGGER_MENUS: PromptInputTriggerConfig[] = [
     ...DEFAULT_TRIGGER_MENUS,
     {
       char: "@",
       renderContent: (props) => (
-        <PromptInputContextMenu {...props} categories={CONTEXT_CATEGORIES} />
+        <TriggerMenu {...props} items={CONTEXT_CATEGORIES} />
       ),
     },
   ];
@@ -852,7 +852,7 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
       search={{ value: adAccountSearch, onChange: setAdAccountSearch, placeholder: "Search ad accounts…" }}
       hasValue={selectedAdAccountId !== null}
       isLastStep
-      onClose={() => setScenarioStep(0)}
+      onClose={() => { setScenarioStep(0); chat.focusPromptTextarea(); }}
       onSkip={handleAdAccountSubmit}
       onSubmit={handleAdAccountSubmit}
     >
@@ -875,7 +875,7 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
       input={{ value: campaignNameInput, onChange: setCampaignNameInput, placeholder: "e.g. Summer 2026 – Run BMW" }}
       hasValue={campaignNameInput.length > 0}
       isLastStep
-      onClose={() => setScenarioStep(0)}
+      onClose={() => { setScenarioStep(0); chat.focusPromptTextarea(); }}
       onSkip={handleFinalSubmit}
       onSubmit={handleFinalSubmit}
     />
@@ -886,7 +886,7 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
       search={{ value: workspaceSearch, onChange: setWorkspaceSearch, placeholder: "Search workspaces…" }}
       hasValue={selectedWorkspaceId !== null}
       isLastStep
-      onClose={() => setScenarioStep(0)}
+      onClose={() => { setScenarioStep(0); chat.focusPromptTextarea(); }}
       onSkip={handleFinalSubmit}
       onSubmit={handleFinalSubmit}
     >
@@ -926,6 +926,7 @@ export function S1Scenario({ guideClassName }: S1ScenarioProps) {
     </PromptOptionInput>
   ) : (
     <PromptInput
+      ref={chat.promptInputRef}
       onSubmit={handleSubmit}
       loading={chat.isGenerating}
       onStop={chat.handleStop}

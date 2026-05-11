@@ -3,6 +3,10 @@ import {
   PromptOptionInput,
   usePromptOptionInput,
 } from "@sds/components/PromptOptionInput";
+import {
+  PromptInputInfo,
+  type PromptInputInfoType,
+} from "@sds/components/PromptInput";
 import { SingleSelectOption } from "@sds/components/SingleSelectOption";
 import { MultiSelectOption } from "@sds/components/MultiSelectOption";
 
@@ -15,18 +19,24 @@ const promptWrapper: CSSProperties = {
 
 // ── Context-aware option wrappers ─────────────────────────────────────────────
 
+// Wrappers must spread `...rest` so the combobox props PromptOptionInput
+// injects via cloneElement (`unmanagedFocus`, `isActive`, `optionId`) reach
+// the underlying select option. Without this, arrow keys in the search input
+// don't visibly highlight matching rows.
 function ContextSingleOption({
   label,
   checked,
   onChange,
+  ...rest
 }: {
   label: string;
   checked: boolean;
   onChange: () => void;
-}) {
+} & Partial<React.ComponentProps<typeof SingleSelectOption>>) {
   const { optionsDisabled } = usePromptOptionInput();
   return (
     <SingleSelectOption
+      {...rest}
       labelText={label}
       checked={checked}
       disabled={optionsDisabled}
@@ -40,14 +50,16 @@ function ContextMultiOption({
   label,
   checked,
   onChange,
+  ...rest
 }: {
   label: string;
   checked: boolean;
   onChange: () => void;
-}) {
+} & Partial<React.ComponentProps<typeof MultiSelectOption>>) {
   const { optionsDisabled } = usePromptOptionInput();
   return (
     <MultiSelectOption
+      {...rest}
       labelText={label}
       checked={checked}
       disabled={optionsDisabled}
@@ -243,6 +255,77 @@ function MinimalDemo() {
   );
 }
 
+// ── Demo 4: Info banner above the picker ─────────────────────────────────────
+
+const INFO_TYPES: PromptInputInfoType[] = ["edit", "error", "warning", "length-limit", "cook-book"];
+
+const INFO_DEFAULTS: Record<PromptInputInfoType, { title?: string }> = {
+  edit: { title: "Editing message" },
+  error: { title: "Something went wrong" },
+  warning: { title: "Approaching limit" },
+  "length-limit": {},
+  "cook-book": { title: "Use a template" },
+};
+
+function InfoBannerDemo() {
+  const [type, setType] = useState<PromptInputInfoType>("edit");
+  const [visible, setVisible] = useState(true);
+  const [selected, setSelected] = useState<string | null>(null);
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, flexWrap: "wrap" }}>
+        <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+          <input type="checkbox" checked={visible} onChange={(e) => setVisible(e.target.checked)} />
+          Show banner
+        </label>
+        <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+          <span style={{ opacity: 0.6 }}>Type:</span>
+          {INFO_TYPES.map((t) => (
+            <label key={t} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="poi-info-type"
+                value={t}
+                checked={type === t}
+                onChange={() => { setType(t); setVisible(true); }}
+              />
+              {t}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div style={promptWrapper}>
+        <PromptOptionInput
+          label="Pick a tone"
+          info={visible ? (
+            <PromptInputInfo
+              type={type}
+              title={INFO_DEFAULTS[type].title}
+              onClose={() => setVisible(false)}
+              onAction={() => setVisible(false)}
+            />
+          ) : undefined}
+          hasValue={selected !== null}
+          isLastStep
+          onSkip={() => setSelected(null)}
+          onSubmit={() => alert(`Selected: ${selected}`)}
+        >
+          {TONES.slice(0, 5).map((tone) => (
+            <ContextSingleOption
+              key={tone}
+              label={tone}
+              checked={selected === tone}
+              onChange={() => setSelected(selected === tone ? null : tone)}
+            />
+          ))}
+        </PromptOptionInput>
+      </div>
+    </div>
+  );
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function PromptOptionInputPlayground() {
@@ -264,6 +347,17 @@ export default function PromptOptionInputPlayground() {
         <div style={promptWrapper}>
           <MinimalDemo />
         </div>
+      </section>
+
+      <section style={sectionStyle}>
+        <h2>Info banner</h2>
+        <p style={{ fontSize: 13, margin: "0 0 8px", opacity: 0.7 }}>
+          Same <code>{"<PromptInputInfo>"}</code> used above <code>{"<PromptInput>"}</code> —
+          same five types (<code>edit</code> / <code>error</code> /{" "}
+          <code>warning</code> / <code>length-limit</code> / <code>cook-book</code>),
+          same placement. Pass via the new <code>info</code> prop.
+        </p>
+        <InfoBannerDemo />
       </section>
     </div>
   );

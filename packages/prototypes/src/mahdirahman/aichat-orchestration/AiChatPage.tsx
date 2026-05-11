@@ -10,6 +10,7 @@ import { GenericSelectOption } from "@sds/components/GenericSelectOption";
 import { SingleSelectOption } from "@sds/components/SingleSelectOption";
 import { Grid, Col } from "@sds/components/Grid";
 import { AiThread, AiThreadIntro, AiThreadIntroActions, type AiThreadHandle } from "@sds/components/AiThread";
+import type { PromptInputHandle } from "@sds/components/PromptInput";
 import { EmptyState } from "@sds/components/EmptyState";
 import { ActionCard } from "@sds/components/ActionCard";
 import { IconButton } from "@sds/components/IconButton";
@@ -36,6 +37,7 @@ export default function AiChatPage() {
   const mainScrollRef = useRef<HTMLElement>(null);
   const threadRef = useRef<AiThreadHandle>(null);
   const promptRef = useRef<HTMLDivElement>(null);
+  const promptInputRef = useRef<PromptInputHandle>(null);
   const [promptHeight, setPromptHeight] = useState(0);
 
   useEffect(() => {
@@ -62,6 +64,7 @@ export default function AiChatPage() {
       initialActiveScenarioId={SCENARIOS[0].id}
       threadRef={threadRef}
       promptRef={promptRef}
+      promptInputRef={promptInputRef}
     >
       {(chat) => {
         const sortedHistory = [

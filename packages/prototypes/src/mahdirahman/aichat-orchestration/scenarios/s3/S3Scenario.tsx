@@ -8,10 +8,10 @@ import {
   PromptInputFooterStart,
   PromptInputAddMenu,
   PromptInputSubmit,
-  PromptInputContextMenu,
+  TriggerMenu,
   DEFAULT_TRIGGER_MENUS,
   type PromptInputTriggerConfig,
-  type ContextMenuCategory,
+  type MenuNode,
 } from "@sds/components/PromptInput";
 import { PromptOptionInput } from "@sds/components/PromptOptionInput";
 import { SingleSelectOption } from "@sds/components/SingleSelectOption";
@@ -238,17 +238,17 @@ export function S3Scenario({ guideClassName }: S3ScenarioProps) {
 
   /* ── Trigger menus for the default PromptInput ──────────────────── */
 
-  const CONTEXT_CATEGORIES: ContextMenuCategory[] = [
-    { id: "campaigns", icon: "campaign_alt", label: "Campaigns", onSelect: () => {} },
-    { id: "audiences", icon: "group", label: "Audiences", onSelect: () => {} },
-    { id: "reports", icon: "reporting", label: "Reports", onSelect: () => {} },
+  const CONTEXT_CATEGORIES: MenuNode[] = [
+    { id: "campaigns", icon: "campaign_alt", label: "Campaigns" },
+    { id: "audiences", icon: "group", label: "Audiences" },
+    { id: "reports", icon: "reporting", label: "Reports" },
   ];
   const TRIGGER_MENUS: PromptInputTriggerConfig[] = [
     ...DEFAULT_TRIGGER_MENUS,
     {
       char: "@",
       renderContent: (props) => (
-        <PromptInputContextMenu {...props} categories={CONTEXT_CATEGORIES} />
+        <TriggerMenu {...props} items={CONTEXT_CATEGORIES} />
       ),
     },
   ];
@@ -266,7 +266,7 @@ export function S3Scenario({ guideClassName }: S3ScenarioProps) {
       }}
       hasValue={selectedAdAccountId !== null}
       isLastStep={false}
-      onClose={() => setScenarioStep(0)}
+      onClose={() => { setScenarioStep(0); chat.focusPromptTextarea(); }}
       onSkip={() => setScenarioStep(2)}
       onSubmit={() => setScenarioStep(2)}
     >
@@ -288,7 +288,7 @@ export function S3Scenario({ guideClassName }: S3ScenarioProps) {
       steps={{ current: 2, total: 3, onPrev: () => setScenarioStep(1) }}
       hasValue={selectedObjectiveId !== null}
       isLastStep={false}
-      onClose={() => setScenarioStep(0)}
+      onClose={() => { setScenarioStep(0); chat.focusPromptTextarea(); }}
       onSkip={() => setScenarioStep(3)}
       onSubmit={() => setScenarioStep(3)}
     >
@@ -308,7 +308,7 @@ export function S3Scenario({ guideClassName }: S3ScenarioProps) {
       steps={{ current: 3, total: 3, onPrev: () => setScenarioStep(2) }}
       hasValue={selectedStatus !== null}
       isLastStep
-      onClose={() => setScenarioStep(0)}
+      onClose={() => { setScenarioStep(0); chat.focusPromptTextarea(); }}
       onSkip={submitWithDefaults}
       onSubmit={submitWithDefaults}
     >
@@ -329,6 +329,7 @@ export function S3Scenario({ guideClassName }: S3ScenarioProps) {
     </PromptOptionInput>
   ) : (
     <PromptInput
+      ref={chat.promptInputRef}
       onSubmit={handleSubmit}
       loading={chat.isGenerating}
       onStop={chat.handleStop}

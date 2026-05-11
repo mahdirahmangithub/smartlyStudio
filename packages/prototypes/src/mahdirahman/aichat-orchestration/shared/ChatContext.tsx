@@ -1,7 +1,7 @@
 import { createContext, useContext, useRef, useState, useCallback, type RefObject, type Dispatch, type SetStateAction } from "react";
 import { flushSync } from "react-dom";
 import type { AiThreadHandle, AiThreadMessage } from "@sds/components/AiThread";
-import type { PromptInputContextItem } from "@sds/components/PromptInput";
+import type { PromptInputContextItem, PromptInputHandle } from "@sds/components/PromptInput";
 import type { FeedbackValue } from "@sds/components/FeedbackBoolean";
 
 /**
@@ -42,7 +42,10 @@ export interface ChatContextValue {
 
   /* ── Thread + prompt refs ── */
   threadRef: RefObject<AiThreadHandle | null>;
+  /** DOM ref to the wrapper around `<PromptInput>` — used for layout (ResizeObserver, etc). */
   promptRef: RefObject<HTMLDivElement | null>;
+  /** Imperative handle on `<PromptInput>` itself — surface-aware focus / blur / clear. */
+  promptInputRef: RefObject<PromptInputHandle | null>;
   focusPromptTextarea: () => void;
 
   /* ── Stream / stop coordination ── */
@@ -88,6 +91,7 @@ interface ChatProviderProps {
   initialActiveScenarioId: string;
   threadRef: RefObject<AiThreadHandle | null>;
   promptRef: RefObject<HTMLDivElement | null>;
+  promptInputRef: RefObject<PromptInputHandle | null>;
   children: (value: ChatContextValue) => React.ReactNode;
 }
 
@@ -101,6 +105,7 @@ export function ChatProvider({
   initialActiveScenarioId,
   threadRef,
   promptRef,
+  promptInputRef,
   children,
 }: ChatProviderProps) {
   const [scenarios, setScenarios] = useState<ScenarioRecord[]>(initialScenarios);
@@ -110,8 +115,12 @@ export function ChatProvider({
   const activeAssistIdRef = useRef<string | null>(null);
 
   const focusPromptTextarea = useCallback(() => {
-    promptRef.current?.querySelector<HTMLTextAreaElement>("textarea")?.focus();
-  }, [promptRef]);
+    // Surface-aware via the imperative handle — works for both the textarea
+    // and the RTE without each consumer reaching into the DOM. rAF defers
+    // until after any pending re-render flushes, so picker→PromptInput swaps
+    // (s1/s3/s6) hit a freshly-mounted ref instead of the previous null.
+    requestAnimationFrame(() => promptInputRef.current?.focus());
+  }, [promptInputRef]);
 
   // Cancel any in-flight stream when the active scenario changes — scenarios
   // own their own message lifecycles, so we don't want s-1's pending updates
@@ -234,6 +243,7 @@ export function ChatProvider({
     activeMessages,
     threadRef,
     promptRef,
+    promptInputRef,
     focusPromptTextarea,
     streamRef,
     activeAssistIdRef,

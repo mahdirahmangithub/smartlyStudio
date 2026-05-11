@@ -7,12 +7,11 @@ import {
   PromptInputFooterStart,
   PromptInputAddMenu,
   PromptInputSubmit,
-  PromptInputContextMenu,
+  TriggerMenu,
+  MENTION_MENU_ITEMS,
   usePromptInput,
   type PromptInputTriggerConfig,
   type PromptInputContextItem,
-  type ContextMenuSuggestedItem,
-  type ContextMenuCategory,
 } from "@sds/components/PromptInput";
 import type { PromptAttachedFile } from "@sds/components/PromptInput/promptInputTypes";
 import { isImageFile } from "@sds/utils/inferFileType";
@@ -24,90 +23,18 @@ import {
 import { Toggle } from "@sds/components/Toggle";
 import { Label } from "@sds/components/Label";
 
-/* ── Context menu data ── */
-
-const SUGGESTED_ITEMS: ContextMenuSuggestedItem[] = [
-  { id: "ws-1",   icon: "Meta_color",    label: "Summer 2026 - Run BMW",  subtitle: "Workspace" },
-  { id: "camp-1", icon: "campaign_alt",  label: "Campaign_1209",          subtitle: "in Summer 2026 - Run BMW" },
-  { id: "camp-2", icon: "campaign_alt",  label: "Campaign_freq",          subtitle: "in Summer 2026 - Run BMW" },
-];
-
-const CATEGORIES_BASE = [
-  {
-    id: "campaigns", icon: "campaign_alt" as const, label: "Campaigns",
-    drillItems: [
-      { id: "c-1", icon: "campaign_alt" as const, label: "Summer 2026 - Run BMW" },
-      { id: "c-2", icon: "campaign_alt" as const, label: "Campaign_1209" },
-      { id: "c-3", icon: "campaign_alt" as const, label: "Campaign_freq" },
-      { id: "c-4", icon: "campaign_alt" as const, label: "Q4 Retargeting" },
-    ],
-  },
-  { id: "catalogs", icon: "shopping_cart" as const, label: "Catalogs", drillItems: null },
-  {
-    id: "projects", icon: "folder" as const, label: "Projects",
-    drillItems: [
-      { id: "p-1", icon: "folder" as const, label: "Alpha Project" },
-      { id: "p-2", icon: "folder" as const, label: "Beta Launch" },
-      { id: "p-3", icon: "folder" as const, label: "Internal Tools" },
-    ],
-  },
-];
-
-/* ── Inner component: wires @ menu to addContextItem ── */
-
-function ContextMenuWithAdd(props: {
-  query: string;
-  onClose: () => void;
-  onAccept: () => void;
-  activeIndex: number;
-  setItemCount: (n: number) => void;
-  registerPickHandler: (fn: () => void) => void;
-  menuId: string;
-}) {
-  const { addContextItem } = usePromptInput();
-
-  const add = (id: string, icon: PromptInputContextItem["icon"], label: string) => {
-    addContextItem({ id, icon, label });
-    props.onAccept();
-  };
-
-  const handleSelectSuggested = (item: ContextMenuSuggestedItem) =>
-    add(item.id, item.icon as PromptInputContextItem["icon"], item.label);
-
-  const categories: ContextMenuCategory[] = CATEGORIES_BASE.map((cat) => ({
-    id: cat.id,
-    icon: cat.icon as ContextMenuCategory["icon"],
-    label: cat.label,
-    onSelect: () => add(cat.id, cat.icon as PromptInputContextItem["icon"], cat.label),
-    drillLevel: cat.drillItems
-      ? {
-          items: cat.drillItems.map((item) => ({
-            id: item.id,
-            icon: item.icon as PromptInputContextItem["icon"],
-            label: item.label,
-            onSelect: () => add(item.id, item.icon as PromptInputContextItem["icon"], item.label),
-          })),
-        }
-      : undefined,
-  }));
-
-  return (
-    <PromptInputContextMenu
-      query={props.query}
-      activeIndex={props.activeIndex}
-      setItemCount={props.setItemCount}
-      registerPickHandler={props.registerPickHandler}
-      menuId={props.menuId}
-      suggestedItems={SUGGESTED_ITEMS}
-      onSelectSuggested={handleSelectSuggested}
-      categories={categories}
-    />
-  );
-}
+/* ── Trigger config ──
+ * Default `<TriggerMenu>` `onSelect` adds the picked leaf to the prompt's
+ * context row when mounted on a textarea surface — no wrapper needed. */
 
 const TRIGGER_MENUS: PromptInputTriggerConfig[] = [
   { char: "/" },
-  { char: "@", renderContent: (props) => <ContextMenuWithAdd {...props} /> },
+  {
+    char: "@",
+    renderContent: (props) => (
+      <TriggerMenu {...props} items={MENTION_MENU_ITEMS} />
+    ),
+  },
 ];
 
 /* ── Inner component: captures current attachedFiles + contextItems on each render ── */
