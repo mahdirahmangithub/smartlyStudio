@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import type { AiThreadHandle } from "./aiThreadTypes";
 
 /**
@@ -24,7 +24,7 @@ import type { AiThreadHandle } from "./aiThreadTypes";
  * ```
  */
 export function useAiThreadActiveMessage(
-  handle: RefObject<AiThreadHandle | null>,
+  _handle: RefObject<AiThreadHandle | null>,
   items: readonly { id: string }[],
   /**
    * The element that owns the scroll. Pass the same value you give

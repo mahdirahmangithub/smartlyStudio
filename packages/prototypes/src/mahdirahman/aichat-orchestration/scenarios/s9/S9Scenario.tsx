@@ -205,7 +205,7 @@ export function S9Scenario({ guideClassName }: S9ScenarioProps) {
 
   /* ── Step 2a: ad account contains "2024" → not found, offer alternatives ── */
 
-  const handleNotFound = useCallback((adAccountTyped: string, objectiveLabel: string) => {
+  const handleNotFound = useCallback((adAccountTyped: string, _objectiveLabel: string) => {
     // Pick 3 accounts whose name is loosely similar (shares a word) or just
     // the first 3 as fallback.
     const words = adAccountTyped.toLowerCase().split(/\s+/);

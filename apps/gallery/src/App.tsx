@@ -217,6 +217,7 @@ type Page = "button" | "icons" | "scroll-fade" | "expander" | "callout" | "divid
 | "ai-response-bubble"
 | "ai-entity-preview"
 | "ai-thread"
+| "ai-thread-dialog-indicator"
 | "ai-chat"
 | "ai-generation"
 | "ai-generation-suggestion"
