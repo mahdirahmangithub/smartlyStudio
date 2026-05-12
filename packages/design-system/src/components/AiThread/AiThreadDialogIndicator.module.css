@@ -1,0 +1,93 @@
+/* ── Container ── */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* items always sit vertically centred in the parent */
+  width: var(--spacing-xl);  
+  flex-shrink: 0;
+  height: 100%;  
+  margin-right: var(--spacing-md);
+   /* No overflow here — ScrollFade handles it when items exceed the height */
+}
+
+/* ── ScrollFade wrapper ──
+ * No explicit height here so ScrollFade's `height:100%` resolves to `auto`
+ * (content-sized). The nav's `justify-content:center` then centres this
+ * content-sized block. `max-height:100%` prevents it from ever taller than
+ * the nav when items overflow — ScrollFade's own scroll area handles the rest. */
+.scrollWrapper {
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  min-height: 0;
+}
+
+/* ── Item list ── */
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+ }
+
+/* ── Individual item button ── */
+
+.item {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--spacing-sm-extra);
+  padding-top: var(--spacing-sm-minus);
+  padding-bottom: var(--spacing-sm-minus);
+  padding-right: var(--spacing-sm);
+  padding-left: var(--spacing-sm-plus);
+  cursor: pointer;
+  outline: none;
+  transition: padding-left var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+}
+
+.item:focus-visible {
+  outline: 2px solid var(--element-outline-brand-default);
+  outline-offset: -2px;
+  border-radius: var(--radius-sm);
+}
+
+.item[data-role="assistant"] {
+  padding-left: var(--spacing-xs);
+}
+
+.item:hover,
+.item[data-active="true"] {
+  padding-left: 0;
+}
+
+/* ── The bar ── */
+
+.bar {
+  flex: 1;
+  height: var(--spacing-hair-line);
+  border-radius: var(--radius-full);
+  background: var(--text-neutral-placeholder);
+  transition:
+    height var(--animation-state-micro-duration) var(--animation-state-micro-easing),
+    background var(--animation-state-micro-duration) var(--animation-state-micro-easing);
+}
+
+.item:hover .bar {
+  height: var(--spacing-px);
+  background: var(--text-neutral-tertiary-default);
+}
+
+.item[data-active="true"] .bar {
+  height: var(--spacing-px);
+  background: var(--text-neutral-primary);
+}
+
+.item[data-bookmarked="true"] .bar {
+  background: var(--text-brand-default);
+}

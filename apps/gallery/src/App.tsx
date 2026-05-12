@@ -112,6 +112,7 @@ import CotPlayground from "./pages/CotPlayground";
 import AiResponseBubblePlayground from "./pages/AiResponseBubblePlayground";
 import AiEntityPreviewPlayground from "./pages/AiEntityPreviewPlayground";
 import AiThreadPlayground from "./pages/AiThreadPlayground";
+import AiThreadDialogIndicatorPlayground from "./pages/AiThreadDialogIndicatorPlayground";
 import AiChatPage from "@prototypes/mahdirahman/aichat-orchestration";
 import AiGenerationPlayground from "./pages/AiGenerationPlayground";
 import AiGenerationSuggestionPlayground from "./pages/AiGenerationSuggestionPlayground";
@@ -370,6 +371,7 @@ const PAGES: { key: Page; label: string }[] = [
   { key: "ai-response-bubble", label: "AiResponseBubble" },
   { key: "ai-entity-preview", label: "AiEntityPreview" },
   { key: "ai-thread", label: "AiThread" },
+  { key: "ai-thread-dialog-indicator", label: "Dialog Indicator" },
   { key: "ai-chat", label: "AiChat" },
   { key: "ai-generation", label: "AiGeneration" },
   { key: "ai-generation-suggestion", label: "AiGenSuggestion" },
@@ -574,6 +576,16 @@ export default function App() {
     return <AiChatPage />;
   }
 
+  // Dialog indicator playground needs the full viewport with no chrome so the
+  // page-scroll + sticky sidebar layout works correctly.
+  if (page === "ai-thread-dialog-indicator") {
+    return (
+      <div data-theme={theme} data-density={density} data-typeface={typeface}>
+        <AiThreadDialogIndicatorPlayground />
+      </div>
+    );
+  }
+
   return (
     <div className="app" data-theme={theme} data-density={density} data-typeface={typeface}>
       <div className="app-shell">
@@ -649,7 +661,9 @@ export default function App() {
                 ? { maxWidth: "none" }
                 : page === "ai-thread"
                   ? { maxWidth: "none", padding: 0, position: "relative", overflow: "hidden" }
-                  : undefined
+                  : page === "ai-thread-dialog-indicator"
+                    ? { maxWidth: "none", padding: 0, position: "relative" }
+                    : undefined
             }
           >
             {page === "button" && <ButtonPlayground />}
@@ -787,6 +801,7 @@ export default function App() {
             {page === "ai-response-bubble" && <AiResponseBubblePlayground />}
             {page === "ai-entity-preview" && <AiEntityPreviewPlayground />}
             {page === "ai-thread" && <AiThreadPlayground />}
+            {page === "ai-thread-dialog-indicator" && <AiThreadDialogIndicatorPlayground />}
             {page === "cot" && <CotPlayground />}
             {page === "ai-side-entry" && <AISideEntryPlayground />}
             {page === "ai-text-generation" && <AITextGenerationPlayground />}

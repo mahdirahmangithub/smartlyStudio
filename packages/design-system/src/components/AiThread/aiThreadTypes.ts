@@ -73,4 +73,13 @@ export interface AiThreadHandle {
    * Use on submit: flushSync the new messages first, then call this with the new user message id.
    */
   scrollToMessage: (id: string, behavior?: ScrollBehavior) => void;
+  /**
+   * Returns the element that owns the thread's scroll position — either the
+   * internal scroll container (self-contained mode) or the external container
+   * passed via `scrollContainerRef` (external-scroll mode).
+   *
+   * Useful for companion components such as `<AiThreadDialogIndicator>` that
+   * need to observe scroll position without modifying the thread itself.
+   */
+  getScrollContainer: () => HTMLElement | null;
 }

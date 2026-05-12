@@ -22,7 +22,15 @@ export const AiThread = forwardRef<AiThreadHandle, AiThreadProps>(
     const { containerRef, sentinelRef, spacerRef, showFab, onFabClick, scrollToBottom, scrollToMessage, scrollIfSticking } =
       useThreadScroll({ generating, bottomOffset, scrollContainerRef });
 
-    useImperativeHandle(handle, () => ({ scrollToBottom, scrollToMessage }), [scrollToBottom, scrollToMessage]);
+    useImperativeHandle(
+      handle,
+      () => ({
+        scrollToBottom,
+        scrollToMessage,
+        getScrollContainer: () => scrollContainerRef?.current ?? containerRef.current,
+      }),
+      [scrollToBottom, scrollToMessage, scrollContainerRef, containerRef],
+    );
 
     const [faderColor, setFaderColor] = useState("var(--element-surface-default)");
     useEffect(() => {

@@ -5,6 +5,7 @@ import { S3_CONFIG, S3Scenario } from "./s3/S3Scenario";
 import { S6_CONFIG, S6Scenario } from "./s6/S6Scenario";
 import { S7_CONFIG, S7Scenario } from "./s7/S7Scenario";
 import { S8_CONFIG, S8Scenario } from "./s8/S8Scenario";
+import { S9_CONFIG, S9Scenario } from "./s9/S9Scenario";
 
 export interface ScenarioConfig {
   id: string;
@@ -26,6 +27,7 @@ export const SCENARIOS: ScenarioConfig[] = [
   { ...S6_CONFIG, Component: S6Scenario },
   { ...S7_CONFIG, Component: S7Scenario },
   { ...S8_CONFIG, Component: S8Scenario },
+  { ...S9_CONFIG, Component: S9Scenario },
 ];
 
 export const SCENARIO_IDS = SCENARIOS.map((s) => s.id);
