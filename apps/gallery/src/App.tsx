@@ -662,9 +662,7 @@ export default function App() {
                 ? { maxWidth: "none" }
                 : page === "ai-thread"
                   ? { maxWidth: "none", padding: 0, position: "relative", overflow: "hidden" }
-                  : page === "ai-thread-dialog-indicator"
-                    ? { maxWidth: "none", padding: 0, position: "relative" }
-                    : undefined
+                  : undefined
             }
           >
             {page === "button" && <ButtonPlayground />}
@@ -802,7 +800,6 @@ export default function App() {
             {page === "ai-response-bubble" && <AiResponseBubblePlayground />}
             {page === "ai-entity-preview" && <AiEntityPreviewPlayground />}
             {page === "ai-thread" && <AiThreadPlayground />}
-            {page === "ai-thread-dialog-indicator" && <AiThreadDialogIndicatorPlayground />}
             {page === "cot" && <CotPlayground />}
             {page === "ai-side-entry" && <AISideEntryPlayground />}
             {page === "ai-text-generation" && <AITextGenerationPlayground />}
